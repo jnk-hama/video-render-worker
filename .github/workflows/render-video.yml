@@ -1,0 +1,169 @@
+# 縦型ショート動画の描画。GAS から repository_dispatch で叩かれる。
+#
+# ★★2026-08-24、オーナー判断「フォロワーとViewを稼ぐ為に金を払う意味がない」。
+#   JSON2Video（1秒=1クレジット）もライセンス購入も使わず、
+#   GitHub Actions の無料枠で ffmpeg を回す構成に決めた。
+#
+# 【なぜここで描画するか】
+# GAS は Python も FFmpeg も動かせない。実行も6分で切れる。
+# 一方この処理自体は無料でできる（1080x1920 / H.264 は実測済み。
+# MoneyPrinterTurbo-SETUP.md 参照）。描画だけ外へ出せば費用は0で済む。
+#
+# 【無料枠】
+#   public リポジトリ … 無制限
+#   private リポジトリ … 2,000分/月（1本あたり1〜3分。4本/日で月120〜360分）
+#   ※private は1ジョブごとに分単位で切り上げ課金される。無料枠内には収まる。
+#
+# 【非同期にしている理由】
+# GAS は6分で切れるので描画の完了を待てない。
+# ここでは Release へ上げるだけにし、GAS は次のサイクルで回収する。
+
+name: render-video
+
+on:
+  repository_dispatch:
+    types: [render-video]
+  # 手で試せる口も残す。payload_json にJSONを貼れば同じ経路を通る
+  workflow_dispatch:
+    inputs:
+      payload_json:
+        description: '描画するJSON（clips / captions）'
+        required: true
+        type: string
+
+permissions:
+  contents: write        # Release を作るため
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ★バージョンを固定せずランナー同梱に任せると、描画結果が黙って変わる。
+      #   apt の ffmpeg を明示的に入れ、実際のバージョンをログへ残す。
+      - name: FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg fonts-dejavu-core
+          ffmpeg -version | head -1
+          fc-list | grep -i dejavu | head -2
+
+      # ★モードA（読み上げ音声＋発声に合わせた字幕）で使う。
+      #   Whisperは積まない。音声をこちらで作るので、単語の時刻は
+      #   推定ではなく確定値で手に入る（scripts/tts.py 参照）。
+      #   large-v3はCPUで音声長の5〜10倍かかり、20分制限に載らないという
+      #   事情もある。
+      - name: TTS
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check edge-tts
+          python3 -c "import edge_tts; print('edge-tts ready')"
+
+      - name: 依頼内容を取り出す
+        id: payload
+        env:
+          # ★シェルへ直接展開しない。JSONに引用符が含まれるとコマンドが壊れる
+          DISPATCH_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+          MANUAL_PAYLOAD: ${{ inputs.payload_json }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            printf '%s' "$DISPATCH_PAYLOAD" > payload.json
+          else
+            printf '%s' "$MANUAL_PAYLOAD" > payload.json
+          fi
+          # ★client_payload は最上位10プロパティまで（GitHub APIの制限）。
+          #   GAS は {"job": {...}} と1個に畳んで送る。旧い平置きも読む。
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          d = json.load(open('payload.json'))
+          if isinstance(d.get('job'), dict):
+              d = d['job']
+          print('job_id=%s' % d.get('job_id', ''))
+          PY
+          python3 - <<'PY'
+          import json
+          d = json.load(open('payload.json'))
+          if isinstance(d.get('job'), dict):
+              d = d['job']
+          print('mode:', d.get('mode'),
+                'clips:', len(d.get('clips') or []),
+                'captions:', len(d.get('captions') or []))
+          PY
+
+      - name: 描画
+        id: render
+        run: |
+          set -euo pipefail
+          python3 scripts/render_video.py --payload payload.json --out out.mp4
+          ls -lh out.mp4
+
+      # ★Release へ上げる理由：
+      #   artifact は取得に認証と解凍が要り、GAS から扱いにくい。
+      #   Release アセットなら1回のGETでMP4そのものが取れる。
+      #   タグに job_id を入れておけば、GAS 側は「自分が頼んだ回」を特定できる。
+      - name: Release へ上げる
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_ID: ${{ steps.payload.outputs.job_id }}
+        run: |
+          set -euo pipefail
+          TAG="render-${JOB_ID}"
+          gh release create "$TAG" out.mp4 \
+            --title "$TAG" \
+            --notes "clips_used=${{ steps.render.outputs.clips_used }} bytes=${{ steps.render.outputs.bytes }}" \
+            --repo "${{ github.repository }}"
+          echo "アップロード完了: $TAG"
+
+      # ★★2026-08-25 追加。放っておくと Release が無限に積もる。
+      #
+      #   1本ごとに Release を1つ作る設計なので、2アカウント×4本/日なら
+      #   月およそ240個、1年で約3,000個。MP4 が付いたまま増え続け、
+      #   リポジトリの Releases 画面は実質使えなくなる。
+      #   GAS 側（collectRender_）は回収後に Release を消していない。
+      #
+      #   GAS の待ち時間は30分で打ち切られる（RENDER_TIMEOUT_MS）ので、
+      #   3日より古いものは確実に誰も取りに来ない。消して安全。
+      #
+      #   ★掃除の失敗でジョブを落とさない。動画は既に上がっており、
+      #     そちらの方が大事。`|| true` で握るが、ログには必ず出す。
+      - name: 古い Release を片づける
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEEP_DAYS: '3'
+        run: |
+          set -uo pipefail
+          gh release list --repo "${{ github.repository }}" \
+            --limit 200 --json tagName,createdAt > releases.json || exit 0
+          python3 - <<'PY' > stale.txt
+          import json, datetime, os
+          keep = int(os.environ.get('KEEP_DAYS', '3'))
+          cut = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=keep)
+          for r in json.load(open('releases.json')):
+              tag = r.get('tagName', '')
+              # ★render- で始まるものだけ。人が作った Release は触らない
+              if not tag.startswith('render-'):
+                  continue
+              t = datetime.datetime.fromisoformat(
+                  r['createdAt'].replace('Z', '+00:00'))
+              if t < cut:
+                  print(tag)
+          PY
+          n=0
+          while read -r tag; do
+            [ -z "$tag" ] && continue
+            gh release delete "$tag" --repo "${{ github.repository }}" \
+              --yes --cleanup-tag && n=$((n+1)) || echo "削除できず: $tag"
+          done < stale.txt
+          echo "古い Release を ${n} 件削除しました（${KEEP_DAYS}日より前）。"
+
+      # 失敗した回も痕跡を残す。無言で終わると GAS 側が延々と待つ
+      - name: 失敗時のログ
+        if: failure()
+        run: |
+          echo "描画に失敗しました。payload は以下:"
+          head -c 2000 payload.json || true

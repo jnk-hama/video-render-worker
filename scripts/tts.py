@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""
+本文を音声にして、単語ごとの発声時刻を返す。
+
+★★2026-08-24、オーナー判断「A 音声にしてやく」。
+
+【なぜ Whisper を使わないか】
+Whisper は「既にある音声」を推定するもの。こちらは音声を自分で作るので、
+推定する必要が無い。edge-tts は合成時に WordBoundary を返すので、
+どの単語が何秒に鳴るかが **推定ではなく確定値** で手に入る。
+
+  ・精度  … 推定誤差ゼロ
+  ・速度  … CPUで実時間より速い（Whisperのlarge-v3はCPUで5〜10倍かかる）
+  ・費用  … 0円・APIキー不要
+
+Whisperを積むのは「人の声が既に入っている素材」を扱う時だけでよい。
+うちの素材（Pexels/Pixabay）は無音なので、その出番が無い。
+
+【WordBoundary の単位】
+offset / duration は 100ナノ秒（tick）。
+  秒 = ticks / 10_000_000
+
+【この環境での制約】
+開発用サンドボックスは WebSocket を通さないため、ここでは実行できない。
+Colab と GitHub Actions では問題にならない（MoneyPrinterTurbo-SETUP.md に
+同じ事象の記録あり）。ここでは import に失敗しても落ちないようにしてある。
+"""
+
+import asyncio
+import os
+
+# 100ナノ秒 → 秒
+TICKS_PER_SECOND = 10_000_000
+
+# 既定の声。落ち着きすぎない、短い動画に合う声を選ぶ
+DEFAULT_VOICE = 'en-US-AndrewMultilingualNeural'
+
+# 読み上げ速度。ショート動画は少し速い方がテンポに合う
+DEFAULT_RATE = '+12%'
+
+
+class TtsUnavailable(Exception):
+    """edge-tts が使えない。呼び出し側は字幕なしへ降りる。"""
+
+
+def _require_edge_tts():
+    try:
+        import edge_tts  # noqa: F401
+        return edge_tts
+    except Exception as e:
+        raise TtsUnavailable('edge-tts を読み込めません: %s' % e)
+
+
+async def _synth(text, voice, rate, out_path):
+    """
+    合成しつつ WordBoundary を集める。
+
+    ★stream() を使う。save() だと音声しか得られず、単語の時刻が捨てられる。
+    """
+    edge_tts = _require_edge_tts()
+    comm = edge_tts.Communicate(text, voice, rate=rate)
+
+    words = []
+    with open(out_path, 'wb') as f:
+        async for chunk in comm.stream():
+            t = chunk.get('type')
+            if t == 'audio':
+                f.write(chunk['data'])
+            elif t == 'WordBoundary':
+                start = float(chunk['offset']) / TICKS_PER_SECOND
+                dur = float(chunk['duration']) / TICKS_PER_SECOND
+                words.append({
+                    'text': str(chunk.get('text', '')),
+                    'start': round(start, 3),
+                    'end': round(start + dur, 3)
+                })
+    return words
+
+
+def synthesize(text, out_path, voice=None, rate=None):
+    """
+    本文を読み上げた音声ファイルを作り、単語ごとの時刻を返す。
+
+    @return {'path': str, 'words': [{'text','start','end'}], 'duration': float}
+    @raises TtsUnavailable 使えない場合。呼び出し側は必ず捕まえること
+    """
+    body = str(text or '').strip()
+    if not body:
+        raise TtsUnavailable('読み上げる本文が空です。')
+
+    _require_edge_tts()
+
+    words = asyncio.run(_synth(body, voice or DEFAULT_VOICE,
+                               rate or DEFAULT_RATE, out_path))
+
+    if not os.path.exists(out_path) or os.path.getsize(out_path) < 1024:
+        raise TtsUnavailable('音声を生成できませんでした（ファイルが空）。')
+
+    # ★WordBoundary が1つも来ないことがある（記号だけの本文など）。
+    #   その場合は音声だけ使い、字幕は呼び出し側で均等割りへ降りる。
+    duration = words[-1]['end'] if words else 0.0
+    return {'path': out_path, 'words': words, 'duration': duration}
+
+
+def group_words(words, per_chunk=3):
+    """
+    単語を「画面に一度に出す塊」へまとめる。
+
+    ★1枚3語。MrBeast系の字幕がこの単位で出るのは、
+      視線を動かさずに一目で読めるのがこの長さだから。
+
+    ★塊の中の単語ごとの時刻は保持する。カラオケの塗り替えに使う。
+    """
+    out = []
+    n = max(1, int(per_chunk))
+    for i in range(0, len(words), n):
+        grp = words[i:i + n]
+        if not grp:
+            continue
+        out.append({
+            'text': ' '.join(w['text'] for w in grp),
+            'start': grp[0]['start'],
+            'end': grp[-1]['end'],
+            # 単語ごとの持ち時間（センチ秒）。ASSの \k へそのまま渡せる
+            'word_cs': [max(1, int(round((w['end'] - w['start']) * 100))) for w in grp]
+        })
+    return out
+
+
+if __name__ == '__main__':
+    import json
+    import sys
+    ap_text = sys.argv[1] if len(sys.argv) > 1 else 'that landing had no business working'
+    ap_out = sys.argv[2] if len(sys.argv) > 2 else 'narration.mp3'
+    try:
+        r = synthesize(ap_text, ap_out)
+        print(json.dumps({'duration': r['duration'],
+                          'chunks': group_words(r['words'])},
+                         ensure_ascii=False, indent=2))
+    except TtsUnavailable as e:
+        print('TTS を使えません: %s' % e)
+        sys.exit(1)

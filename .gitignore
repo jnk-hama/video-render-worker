@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+payload.json
+out.mp4
+releases.json
+stale.txt
