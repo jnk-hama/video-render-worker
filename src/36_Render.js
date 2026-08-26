@@ -174,9 +174,28 @@ function requestRender_(accountKey, clips, text) {
 
   const jobId = key.toLowerCase() + '-' + String(Date.now()) +
                 '-' + Math.floor(Math.random() * 1000);
-  const seconds = list.length * RENDER_CLIP_SECONDS;
-
   const mode = renderModeFor_(key);
+
+  /*
+   * ★★2026-08-25、モードBの「カット尺をランダムにする」が
+   *   一度も効いていなかったのを直した（実際に走らせて確認）。
+   *
+   *   render_video.py はこう書いてある。
+   *     each = float(c.get('duration') or rng.uniform(1.0, 3.0))
+   *   つまり尺を送らなければ 1〜3秒でばらつく設計だった。
+   *   ところがこちらは全クリップに duration=1.6 を入れて送っていたため
+   *   `or` の右側へ一度も進まず、**全カットが等間隔の1.6秒**になっていた。
+   *
+   *   等間隔のカットは、速くてもテンポとして感じられない。ただ機械が
+   *   切っているだけに見える。「ハイテンポなMAD風」を要件にしている以上、
+   *   ここは揺らぐ必要がある。モードBでは尺を送らず、描画側に決めさせる。
+   *
+   *   ★モードAは変えない。あちらは音声の発声時刻に合わせる必要があり、
+   *     尺をこちらで決めないと絵と声がずれる。
+   */
+  const seconds = (mode === 'B')
+    ? list.length * 2.0                      // 1〜3秒の平均。目安表示にだけ使う
+    : list.length * RENDER_CLIP_SECONDS;
 
   const payload = {
     job_id: jobId,
@@ -185,13 +204,15 @@ function requestRender_(accountKey, clips, text) {
     width: 1080, height: 1920, fps: 30,
     clip_seconds: RENDER_CLIP_SECONDS,
     clips: list.map(function (c) {
-      return {
+      const clip = {
         url: String(c.url),
         // ★頭を少し飛ばす。ストック映像は冒頭が静止していることが多い
         //   （モードBでは描画側が中盤からランダムに切り直す）
-        start: Number(c.start) || 0.5,
-        duration: RENDER_CLIP_SECONDS
+        start: Number(c.start) || 0.5
       };
+      // ★モードBは尺を送らない。描画側に1〜3秒で振らせる（上のコメント）
+      if (mode !== 'B') clip.duration = RENDER_CLIP_SECONDS;
+      return clip;
     })
   };
 
@@ -223,9 +244,23 @@ function requestRender_(accountKey, clips, text) {
           Accept: 'application/vnd.github+json',
           'X-GitHub-Api-Version': '2022-11-28'
         },
+        /*
+         * ★★client_payload は「最上位プロパティ10個まで」（GitHub APIの制限）。
+         *   超えると 422 が返り、ワークフローは起動すらしない。
+         *
+         *   平置きで送っていた頃、モードAの最上位は
+         *     job_id / account / mode / width / height / fps /
+         *     clip_seconds / clips / narration / captions
+         *   でちょうど10。**上限に張り付いていて余白がゼロだった。**
+         *   render_video.py は voice / seed / font_size も読む作りなのに、
+         *   どれか1つ足した瞬間に全部の描画が止まる状態で、
+         *   実装済みの機能へ永久に手が届かなかった。
+         *
+         *   1個に畳めば天井が消える。描画側は入れ子・平置きの両方を読む。
+         */
         payload: JSON.stringify({
           event_type: 'render-video',
-          client_payload: payload
+          client_payload: { job: payload }
         }),
         muteHttpExceptions: true
       });
@@ -242,6 +277,20 @@ function requestRender_(accountKey, clips, text) {
     return null;
   }
 
+  /*
+   * ★★2026-08-25、ここの握り潰しをやめた。
+   *
+   *   保存に失敗すると、GitHub 側では描画が走って Release まで出来るのに
+   *   **こちらは頼んだ事実を忘れる**。回収しに行かないので動画は永久に
+   *   宙に浮き、そのアカウントは無言のまま一本も投稿されない。
+   *   しかも次のサイクルでまた頼むので、CI時間だけが減り続ける。
+   *
+   *   これは絵空事ではない。00_Config.gs にある通り、2026-08-22 に
+   *   スクリプトプロパティが50個の上限に達して新規登録できなくなった
+   *   実績がある。つまり setProperty は現に失敗しうる。
+   *
+   *   直せはしないので、せめて黙らない。
+   */
   try {
     props_().setProperty(renderPendingProp_(key), JSON.stringify({
       jobId: jobId,
@@ -249,10 +298,19 @@ function requestRender_(accountKey, clips, text) {
       text: truncate_(String(text || ''), 400),
       clips: list.length
     }));
-  } catch (e) {}
+  } catch (e) {
+    console.error(
+      '描画は依頼できましたが、待ち状態を保存できませんでした: ' + jobId +
+      ' / ' + truncate_(String(e), 150) +
+      ' → この回の動画は回収されません。' +
+      'プロパティ数の上限（50個）が原因の可能性があります。' +
+      'cleanupScriptPropertiesNow() で空きを作ってください。');
+  }
 
   console.log('描画を依頼しました (' + key + ' / モード' + mode + ' / ' + jobId +
-              ' / ' + list.length + '本 ≒ ' + seconds.toFixed(1) + '秒)');
+              ' / ' + list.length + '本 ' +
+              (mode === 'B' ? '≒ ' + seconds.toFixed(0) + '秒前後（尺は可変）'
+                            : '≒ ' + seconds.toFixed(1) + '秒') + ')');
   return { jobId: jobId };
 }
 
@@ -451,8 +509,8 @@ function requestPreviewFromLine_(accountKey) {
       '🎬 まだ動画を組み立てられません。',
       '',
       'GitHubの設定が2つ要ります（どちらも無料）:',
-      '  ① 初期設定 GITHUB_REPO=owner/repo',
-      '  ② 初期設定 GITHUB_TOKEN=<PAT>',
+      '  ① 設定 GITHUB_REPO owner/repo',
+      '  ② 設定 GITHUB_TOKEN <PAT>',
       '',
       'PATの権限は contents:write と actions:write だけで足ります。'
     ].join('\n');
