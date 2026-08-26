@@ -1,0 +1,83 @@
+# Reddit の話題を取ってきて data/topics.json を更新する。
+#
+# ★★2026-08-26。GASの材料が0件で固定されていたのを迂回するために作った。
+#
+# Reddit は 2026-05-28 に未認証の .json API を廃止した。GAS からは 403 しか
+# 返らず、バズ診断はずっと「話題の材料は0件」を出していた。材料が無いと
+# 「映像そのものを題材にする」経路へ落ち、本文が在庫映像の説明になる。
+# スケート動画やRiotの手描き動画が出ていたのはこれが原因。
+#
+# 廃止されたのは .json のAPI で、RSS は認証なしで応答する（はず）。
+# ★「はず」と書いているのは、開発環境のプロキシが reddit.com を塞いでいて
+#   実地確認ができていないため。ここでの初回実行が最初の検証になる。
+#   ログに「HTTP 403」が並ぶなら仮説が外れているので、別経路を考える。
+#
+# 【なぜ GitHub Actions なのか】
+# GAS からは Reddit に到達できず、そもそも認証を通す手段も無い。
+# 一方 Actions は普通のLinuxで、ffmpeg の描画で既に使っている場所。
+# ここで取ってリポジトリに置けば、GAS は raw URL で読むだけで済む。
+
+name: fetch-topics
+
+on:
+  schedule:
+    # ★6時間おき。GASの投稿は2時間おきだが、Redditのトップは
+    #   そこまで速く入れ替わらない。叩きすぎて 429 を食う方が損。
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write        # data/topics.json をコミットするため
+
+# ★同時に走らせない。2本が同じファイルを書くと push が競合する
+concurrency:
+  group: fetch-topics
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 話題を取得
+        run: |
+          set -euo pipefail
+          python3 scripts/fetch_topics.py data/topics.json
+
+      - name: 変更があればコミット
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data/topics.json; then
+            echo "内容に変化なし。コミットしません。"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/topics.json
+          git commit -m "chore: 話題を更新 ($(date -u '+%Y-%m-%d %H:%M') UTC)"
+          # ★他のジョブが先に push している可能性がある。rebase してから送る
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main
+          echo "更新しました。"
+
+      # 取れなかった回も痕跡を残す。無言で終わると
+      # 「動いているのに0件」と「そもそも動いていない」を区別できない
+      - name: 結果の要約
+        if: always()
+        run: |
+          if [ -f data/topics.json ]; then
+            python3 - <<'PY'
+          import json
+          d = json.load(open('data/topics.json'))
+          print('generated_at:', d.get('generated_at'))
+          for k, v in (d.get('accounts') or {}).items():
+              print('  %s: %d件' % (k, len(v)))
+              for c in v[:3]:
+                  print('     r/%s  %s' % (c.get('subreddit'), c.get('title','')[:70]))
+          PY
+          else
+            echo "data/topics.json がまだありません（1件も取れていない）。"
+          fi
