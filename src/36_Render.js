@@ -70,13 +70,27 @@ const RENDER_CLIP_SECONDS = 1.6;
  *   A … 読み上げ音声＋発声に合わせたダイナミック字幕
  *   B … 音声解析も字幕も一切なし。ハイテンポなカット割りのみ
  *
+ * ★★T を追加（2026-08-26）
+ *   T … 素材映像を使わない。単色に近い背景へ本文を単語ごとに
+ *        ポップさせて焼く（タイポグラフィ）
+ *
+ *   【なぜ要るか】
+ *   無料ストック(Pexels/Pixabay)には、Bの題材（同人・アニメ・
+ *   オタク文化）に噛み合う映像が事実上存在しない。検索語を
+ *   何度書き直しても「それっぽい別のもの」しか返らなかった。
+ *   実際に出たのは、手描きの話に対して暗くぼやけた手元の映像で、
+ *   オーナー評価は「出すくらいなら出さない方がマシ」。
+ *   素材を良くする方向は行き止まりと判断し、素材を使わない道を足した。
+ *
+ *   Tでは clips を送らなくても成立する（描画側が背景を作る）。
+ *
  * 取り違えるとBに字幕が乗る。既定をアカウント名と一致させ、
  * それでも変えたい時だけプロパティで上書きできるようにする。
  */
 function renderModeFor_(accountKey) {
   const key = String(accountKey || '').toUpperCase();
   const v = String(getProp_('RENDER_MODE_' + key, key)).toUpperCase();
-  return (v === 'A' || v === 'B') ? v : 'A';
+  return (v === 'A' || v === 'B' || v === 'T') ? v : 'A';
 }
 
 function renderClipCount_(accountKey) {
@@ -167,7 +181,8 @@ function requestRender_(accountKey, clips, text) {
     return null;
   }
   const list = (clips || []).filter(function (c) { return c && c.url; });
-  if (!list.length) {
+  // ★モードTは背景を描画側で作るため、素材0本でも成立する（2026-08-26）
+  if (!list.length && renderModeFor_(key) !== 'T') {
     console.warn('描画に渡す素材がありません。');
     return null;
   }
@@ -219,8 +234,13 @@ function requestRender_(accountKey, clips, text) {
   /*
    * ★モードBには本文も字幕も渡さない（オーナー指示）。
    *   渡すと描画側で誤って使われる余地が残る。送らなければ事故は起きない。
+   *
+   * ★★モードTは逆に、本文が動画そのものになる（2026-08-26）。
+   *   ここを 'A' の決め打ちにすると、Tへ切り替えた瞬間に
+   *   narration も captions も届かず、**背景だけの真っ黒な動画**が出る。
+   *   描画側でも同じ決め打ちで一度それを出しており、両側で踏んだ。
    */
-  if (mode === 'A') {
+  if (mode === 'A' || mode === 'T') {
     payload.narration = String(text || '')
       .split('\n')
       .filter(function (ln) { return !/^\s*#/.test(ln); })
@@ -525,7 +545,12 @@ function requestPreviewFromLine_(accountKey) {
 
   const query = rotatingStockQuery_(key);
   const clips = pickRenderClips_(key, query);
-  if (clips.length < 2) {
+  /*
+   * ★★モードTは素材を使わないので、在庫が0本でも成立する（2026-08-26）。
+   *   ここを素通しにしないと、素材問題を捨てるために作ったモードが
+   *   「素材が足りません」で止まるという、噛み合わない状態になる。
+   */
+  if (renderModeFor_(key) !== 'T' && clips.length < 2) {
     return '🎬 素材が足りません（' + clips.length + '本）。\n' +
            '在庫は自動で補充されるので、少し待ってからもう一度お試しください。';
   }

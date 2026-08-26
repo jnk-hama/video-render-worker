@@ -1150,8 +1150,15 @@ function queueNextRender_(accountKey, text) {
   // 既に頼んであるなら重ねない
   if (pendingRender_(key)) return false;
 
-  const clips = pickRenderClips_(key, rotatingStockQuery_(key));
-  if (clips.length < 2) {
+  /*
+   * ★★モードTは素材を使わない（2026-08-26、36_Render.gs 参照）。
+   *   ここを塞いだままだと、自動投稿の経路だけが「素材が足りません」で
+   *   止まり、手動の「試作」では動くのに本番では一度も出ない、という
+   *   気づきにくい状態になる。
+   */
+  const isTypography = renderModeFor_(key) === 'T';
+  const clips = isTypography ? [] : pickRenderClips_(key, rotatingStockQuery_(key));
+  if (!isTypography && clips.length < 2) {
     console.log('組み立てに足りる素材がありません (' + key + ': ' + clips.length + '本)');
     return false;
   }
