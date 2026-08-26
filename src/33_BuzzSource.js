@@ -222,11 +222,142 @@ function fetchBuzzFromSub_(sub, window, minScoreOverride) {
  *
  * @return {Array<Object>} スコア降順
  */
+/* ------------------------------------------------------------------ */
+/* 外部から供給される材料（GitHub Actions 経由）                          */
+/* ------------------------------------------------------------------ */
+/*
+ * ★★2026-08-26 追加。材料0件が3ヶ月続いていたのを迂回する。
+ *
+ * 【何が起きていたか】
+ * Reddit は 2026-05-28 に未認証の .json API を廃止した。GAS からは
+ * 403 しか返らず、バズ診断はずっと「話題の材料は0件」を出していた。
+ * 材料が無いと「映像そのものを題材にする」経路へ落ち、本文が在庫映像の
+ * 説明になる。スケート動画やRiotの手描き動画が出ていたのは、文章の
+ * 問題ではなく、題材が「たまたま在庫にあった映像」だったから。
+ *
+ * 【何をするか】
+ * 廃止されたのは .json のAPI で、RSS は認証なしで応答する。
+ * GitHub Actions（scripts/fetch_topics.py）が6時間おきに取って
+ * data/topics.json へ置く。GAS はそれを読むだけで、Reddit へ
+ * 到達する必要が無くなる。
+ *
+ * ★実地で確認済み（2026-08-26）: A 13件 / B 5件を取得。
+ *   403 ではなく実際の見出しが返ってきた。
+ *
+ * ★これは規約の回避ではない。公開されているものを、公開されている
+ *   形式で読んでいるだけ。
+ *
+ * 【スコアについての妥協】
+ * RSS には score（upvote数）が入らない。取得側は嘘の数字を入れず
+ * views: 0 のままにしている。つまり伸びているかを確認できない材料を
+ * 使うことになる。劣化だが0件よりはよい。Reddit のアプリ登録が済めば、
+ * 下の gather() が本来の経路として復活し、score 付きで入ってくる。
+ */
+
+/**
+ * ★★raw.githubusercontent.com は使わない（2026-08-26）。
+ *   このリポジトリは private なので raw は 404 を返す。
+ *   Contents API なら既にある GITHUB_TOKEN で読め、private を維持できる。
+ *   （GASのコードには Webアプリの実行URLが直書きされており公開したくない）
+ */
+const EXTERNAL_TOPICS_PATH = 'data/topics.json';
+
+/** 外部材料を使うか。既定で有効。止めたい時だけ 0 を明示する。 */
+function externalTopicsEnabled_() {
+  return String(getProp_('EXTERNAL_TOPICS', '1')) !== '0';
+}
+
+/**
+ * GitHub に置いた材料を読む。
+ *
+ * ★失敗しても例外にしない。ここが落ちても、本来の経路
+ *   （YouTube → Reddit）は動かなければならない。
+ *
+ * @return {!Array<Object>} 取れなければ空配列
+ */
+function fetchExternalTopics_(accountKey) {
+  if (!externalTopicsEnabled_()) return [];
+  const key = String(accountKey || '').toUpperCase();
+
+  // ★描画(36_Render.gs)と同じ設定を使い回す。未設定なら黙って無効
+  const repo = String(getProp_('GITHUB_REPO', '')).trim();
+  const token = String(getProp_('GITHUB_TOKEN', '')).trim();
+  if (!repo || !token) return [];
+
+  let res;
+  try {
+    res = UrlFetchApp.fetch(
+      'https://api.github.com/repos/' + repo + '/contents/' +
+      EXTERNAL_TOPICS_PATH, {
+        headers: {
+          Authorization: 'Bearer ' + token,
+          // ★raw を要求する。既定だと base64 が返り復号の手間が増える
+          Accept: 'application/vnd.github.raw',
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        muteHttpExceptions: true
+      });
+  } catch (e) {
+    console.warn('外部材料へ到達できません: ' + truncate_(String(e), 120));
+    return [];
+  }
+
+  const code = res.getResponseCode();
+  if (code !== 200) {
+    // ★404 は「まだ生成されていない」。異常ではない
+    console.warn('外部材料が HTTP ' + code +
+                 '（未生成、またはトークンの権限不足）');
+    return [];
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(res.getContentText());
+  } catch (e) {
+    console.warn('外部材料のJSONが壊れています: ' + truncate_(String(e), 100));
+    return [];
+  }
+
+  /*
+   * ★鮮度を見る。Actions が止まると古い材料を延々と使い続け、
+   *   「動いているのに内容が古い」という気づきにくい状態になる。
+   *   取得は6時間おきなので、48時間超は2回以上連続で失敗している。
+   */
+  const gen = Date.parse(String((parsed && parsed.generated_at) || ''));
+  if (gen && (Date.now() - gen) > 48 * 60 * 60 * 1000) {
+    const hours = Math.round((Date.now() - gen) / 3600000);
+    console.warn('外部材料が古すぎます（' + hours + '時間前）。使いません。' +
+                 'fetch-topics ワークフローが止まっている可能性があります。');
+    return [];
+  }
+
+  const list = (parsed && parsed.accounts && parsed.accounts[key]) || [];
+  const usable = list.filter(function (c) { return c && c.id && c.title; });
+  if (usable.length) {
+    console.log('外部材料を ' + usable.length + '件 読み込みました (' + key + ')');
+  }
+  return usable;
+}
+
 function collectBuzzCandidates_(accountKey) {
   resetBuzzFetchStats_();
   const key = String(accountKey || '').toUpperCase();
+
+  /*
+   * ★★外部材料を最初に見る（2026-08-26）。
+   *
+   * ここに置くことで、この関数を呼んでいる5箇所すべてに一度で効く。
+   * 呼び出し元ごとに足すと、必ずどこかを忘れる。
+   *
+   * ★足切り(BUZZ_MIN_SCORE)は取得時に fetchBuzzFromSub_ の中で行われる。
+   *   ここから入れたものは素通りする。RSS由来は score を持たないので、
+   *   これが意図した挙動になる。
+   */
+  const external = fetchExternalTopics_(key);
+
   const subs = buzzSubs_(key);
-  if (!subs.length) return [];
+  // ★板が無くても、外部材料があればそれを返す
+  if (!subs.length) return external;
 
   // 板は毎回同じ順で叩かない。偏ると同じ投稿ばかりになる
   const startProp = 'buzz_sub_' + key;
@@ -235,6 +366,21 @@ function collectBuzzCandidates_(accountKey) {
 
   const seen = {};
   const out = [];
+
+  /*
+   * ★外部材料を最初に積む（2026-08-26）。
+   *
+   * ここで seen に入れておけば、Redditのアプリ登録が済んで本来の経路が
+   * 復活した時、同じ投稿が二重に入るのを自動で防げる。
+   * そして下の `if (out.length < 3) gather(...)` により、
+   * 外部材料が3件以上あればRedditを叩きに行かない。
+   * 403しか返らない相手を毎回叩く無駄が消える。
+   */
+  external.forEach(function (c) {
+    if (!c.id || seen[c.id]) return;
+    seen[c.id] = true;
+    out.push(c);
+  });
 
   const gather = function (minScore) {
     for (let w = 0; w < BUZZ_TIME_WINDOWS.length && out.length < 10; w++) {
@@ -291,7 +437,26 @@ function collectBuzzCandidates_(accountKey) {
     if (out.length) buzzRelaxedTo_ = relaxed;
   }
 
-  return out.sort(function (a, b) { return (b.views || 0) - (a.views || 0); });
+  /*
+   * ★★views の降順だけで並べない（2026-08-26）。
+   *
+   * 外部材料（RSS由来）は score を持てないので views が 0 になる。
+   * 素直に降順で並べると、**取れた材料が必ず最下位に落ちる**。
+   * 呼び出し側は上位から数件しか見ないので、せっかく取った材料が
+   * 一度も使われないまま終わる。材料0件を直した意味が消える。
+   *
+   * score を持つもの同士は従来どおり降順。score を持たないものは
+   * その後ろに、取得側が並べた順（メディアがある投稿が先）で置く。
+   * 嘘の数字を入れて順位を作るより、順序の規則を分ける方が正しい。
+   */
+  return out.sort(function (a, b) {
+    const av = Number(a.views) || 0;
+    const bv = Number(b.views) || 0;
+    if (av > 0 && bv > 0) return bv - av;   // 両方スコアあり
+    if (av > 0) return -1;                  // スコアがある方を前へ
+    if (bv > 0) return 1;
+    return 0;                               // 両方スコア無し＝元の順を保つ
+  });
 }
 
 /** 直前の取得で閾値を下げたか（0なら下げていない）。診断に出す。 */
