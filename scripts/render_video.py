@@ -279,7 +279,7 @@ def fit_caption(words, w, font_size):
         size -= 6
 
 
-def build_ass(captions, w, h, font_size):
+def build_ass(captions, w, h, font_size, center=False):
     """
     単語ごとに色が変わる字幕（karaoke）を作る。
 
@@ -312,7 +312,18 @@ def build_ass(captions, w, h, font_size):
         'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
     ]
 
-    y = int(h * 0.74)          # 下から4分の1あたり。UIに隠れにくい高さ
+    """
+    ★置く高さは、背景に映像があるかどうかで変える。
+
+    映像がある回（モードA）は下寄せにする。中央に置くと被写体の顔を
+    塞ぐし、そもそも主役は映像側なので邪魔をしない位置がよい。
+
+    ★★モードT（背景が単色）は中央に置く（2026-08-26）。
+      最初は下寄せのまま出したところ、画面の上7割が完全に死んだ
+      真っ黒の帯になった（実際にフレームを抜いて確認）。
+      文字が主役の回に、その文字を隅へ寄せる理由が無い。
+    """
+    y = int(h * (0.50 if center else 0.74))
     lines = []
     for c in captions:
         text = ass_escape(c.get('text', ''))
@@ -467,17 +478,46 @@ def main():
         job = job['job']
 
     mode = str(job.get('mode') or 'A').upper()
-    if mode not in ('A', 'B'):
-        raise SystemExit('mode は A か B です: %r' % mode)
+    if mode not in ('A', 'B', 'T'):
+        raise SystemExit('mode は A / B / T です: %r' % mode)
 
     w = int(job.get('width') or 1080)
     h = int(job.get('height') or 1920)
     fps = int(job.get('fps') or 30)
-    font_size = int(job.get('font_size') or max(64, int(w * 0.10)))
+    # ★モードTは文字が主役なので、既定を一回り大きくする
+    default_font = max(64, int(w * (0.13 if mode == 'T' else 0.10)))
+    font_size = int(job.get('font_size') or default_font)
     clips = job.get('clips') or []
     seed = job.get('seed')
 
-    if not clips:
+    """
+    ★★2026-08-26、モードT（タイポグラフィ）を追加した。
+
+    【なぜ要るか】
+    Pexels/Pixabay の無料素材では、題材に噛み合う映像が手に入らない。
+    実際に起きたこと：本文は「Riotのアーティストが手描きフレームに
+    才能を注いでいる」で、映像は検索語 hand drawing lineart ink pen
+    close up で拾った暗くてぼやけた手元。**題材とは一致している**のに、
+    見て面白くない。オーナー評価は「出すくらいなら出さない方がマシ」。
+
+    検索語を何度書き直しても同じ壁に当たった。無料ストックは
+    「それっぽい別のもの」しか持っていない。素材を良くする方向は
+    行き止まりだと判断した。
+
+    【何をするか】
+    素材を一切使わない。黒一色の背景に、本文を単語ごとに
+    ポップさせて焼く。文字そのものを絵にする。
+
+    build_ass() は既にカラオケ字幕（\\k で単語ごとに色替え、\\t で
+    拡大）を出せるので、背景を差し替えるだけで成立する。
+    新しく書くのは背景生成だけ。
+
+    【この形が向いている理由】
+    ・素材の質という変数が消える（ここが今までの最大の不確定要素だった）
+    ・ミュート再生で完全に成立する
+    ・GitHub Actions の CPU だけで作れる。追加費用0
+    """
+    if mode != 'T' and not clips:
         raise SystemExit('clips が空です。組み立てる素材がありません。')
 
     work = args.workdir or tempfile.mkdtemp(prefix='render_')
@@ -493,7 +533,7 @@ def main():
     captions = []
     target_seconds = 0.0
 
-    if mode == 'A':
+    if mode in ('A', 'T'):
         audio_path, captions, target_seconds = build_captions_from_tts(
             job.get('narration'), work, job.get('voice'))
 
@@ -507,6 +547,41 @@ def main():
     else:
         # ★モードBは音声解析も字幕も一切行わない（オーナー指示）
         log('モードB: 音声解析と字幕付与は行いません。')
+
+    # ------------------------------------------------------------------
+    # モードT: 素材を使わない。背景をここで作って、下の連結を飛ばす
+    # ------------------------------------------------------------------
+    if mode == 'T':
+        if not captions:
+            raise SystemExit('モードTは字幕が本体です。narration か captions が要ります。')
+
+        # 音声が無い回は字幕の終端が尺になる。最低でも3秒は見せる
+        total = max(3.0, float(target_seconds or 0))
+
+        """
+        ★真っ黒ではなく、ごくわずかに明るい中心を作る。
+
+        完全な #000000 は、多くの端末の黒背景UIと同化して
+        「動画が読み込めていない」ように見える。ごく淡い放射状の
+        グラデーションを敷くと、面として認識されて文字が締まる。
+        vignette は計算が軽く、CPUだけのランナーでも負荷にならない。
+        """
+        bg = os.path.join(work, 'bg.mp4')
+        run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+             '-f', 'lavfi',
+             '-i', 'color=c=0x0d0d12:s=%dx%d:d=%.2f:r=%d' % (w, h, total, fps),
+             '-vf', 'vignette=a=0.7,noise=alls=6:allf=t+u,format=yuv420p',
+             '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20',
+             bg])
+        if not (os.path.exists(bg) and os.path.getsize(bg) > 1024):
+            raise SystemExit('背景を作れませんでした。')
+
+        log('モードT: 素材を使わず、%.1f秒の背景に字幕%d枚を焼きます。'
+            % (total, len(captions)))
+        parts = [bg]
+        target = 1
+    else:
+        parts = None      # 下のクリップ処理で埋める
 
     # ------------------------------------------------------------------
     # クリップを切り出して揃える
@@ -524,61 +599,63 @@ def main():
     pool は必要数 + 手持ち全部。必要数に達したところで止めるので、
     全部が生きていれば余分なダウンロードは起きない。
     """
-    if mode == 'A' and target_seconds > 0:
+    # ★モードTは背景を作り終えているので、素材の取得は一切行わない
+    if parts is None:
+      if mode == 'A' and target_seconds > 0:
         # ★音声の長さに映像を合わせる。合わせないと喋り終わった後に
         #   無音の絵が続く（または途中で映像が尽きる）
         target = max(1, int(round(target_seconds / want_each)))
         log('音声 %.1f秒 に合わせて %d カット' % (target_seconds, target))
-    elif mode == 'B':
+      elif mode == 'B':
         target = len(clips)
-    else:
+      else:
         target = len(clips)
 
-    order = list(clips)
-    if mode == 'B':
+      order = list(clips)
+      if mode == 'B':
         # ★ランダムに並べ替える。毎回同じ順だと「同じ動画」に見える
         rng.shuffle(order)
 
-    # 必要数ぶん並べ、その後ろに予備として手持ちをもう一巡足す
-    pool = [order[i % len(order)] for i in range(target)] + order
+      # 必要数ぶん並べ、その後ろに予備として手持ちをもう一巡足す
+      pool = [order[i % len(order)] for i in range(target)] + order
 
-    parts = []
-    for i, c in enumerate(pool):
-        if len(parts) >= target:
-            break
-        url = c.get('url')
-        if not url:
-            continue
-        src = os.path.join(work, 'src_%02d.mp4' % i)
-        dst = os.path.join(work, 'part_%02d.mp4' % i)
-        log('[%d/%d] %s' % (len(parts) + 1, target, str(url)[:110]))
+      parts = []
+      for i, c in enumerate(pool):
+          if len(parts) >= target:
+              break
+          url = c.get('url')
+          if not url:
+              continue
+          src = os.path.join(work, 'src_%02d.mp4' % i)
+          dst = os.path.join(work, 'part_%02d.mp4' % i)
+          log('[%d/%d] %s' % (len(parts) + 1, target, str(url)[:110]))
 
-        if not download(url, src):
-            continue
+          if not download(url, src):
+              continue
 
-        if mode == 'B':
-            # ★どこを切るかを毎回変える。頭から切ると静止画が並ぶ
-            each = float(c.get('duration') or rng.uniform(1.0, 3.0))
-            st, each = pick_cut_window(src, each, rng)
-        else:
-            st = float(c.get('start') or 0.5)
-            each = float(c.get('duration') or want_each)
+          if mode == 'B':
+              # ★どこを切るかを毎回変える。頭から切ると静止画が並ぶ
+              each = float(c.get('duration') or rng.uniform(1.0, 3.0))
+              st, each = pick_cut_window(src, each, rng)
+          else:
+              st = float(c.get('start') or 0.5)
+              each = float(c.get('duration') or want_each)
 
-        try:
-            if looks_like_image(url, src):
-                # ★静止画は動かしてから連結する（Ken Burns）
-                ok = still_to_clip(src, dst, each, w, h, fps, rng)
-            else:
-                ok = normalize(src, dst, st, each, w, h, fps)
-        except Exception as e:
-            log('  変換に失敗（次のクリップへ）: %s' % e)
-            ok = False
-        if ok:
-            parts.append(dst)
-        try:
-            os.remove(src)
-        except OSError:
-            pass
+          try:
+              if looks_like_image(url, src):
+                  # ★静止画は動かしてから連結する（Ken Burns）
+                  ok = still_to_clip(src, dst, each, w, h, fps, rng)
+              else:
+                  ok = normalize(src, dst, st, each, w, h, fps)
+          except Exception as e:
+              log('  変換に失敗（次のクリップへ）: %s' % e)
+              ok = False
+          if ok:
+              parts.append(dst)
+          try:
+              os.remove(src)
+          except OSError:
+              pass
 
     # --- Abort ゲート -------------------------------------------------
     if not parts:
@@ -618,10 +695,12 @@ def main():
                 'anullsrc=channel_layout=stereo:sample_rate=44100']
     cmd += ['-shortest']
 
-    if mode == 'A' and captions:
+    # ★モードTは字幕そのものが本体。ここを 'A' で決め打ちにすると
+    #   背景だけの真っ黒な動画が出る（実際に一度そうなった）
+    if mode in ('A', 'T') and captions:
         assfile = os.path.join(work, 'caption.ass')
         with open(assfile, 'w', encoding='utf-8') as f:
-            f.write(build_ass(captions, w, h, font_size))
+            f.write(build_ass(captions, w, h, font_size, center=(mode == 'T')))
         cmd += ['-vf', 'ass=' + assfile.replace('\\', '/').replace(':', r'\:')]
 
     cmd += ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
