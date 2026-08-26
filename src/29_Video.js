@@ -690,9 +690,43 @@ function uploadVideoToX_(accountKey, asset) {
   const fin = videoFinalize_(auth, mediaId);
   if (!fin.ok) return null;
 
-  // --- STATUS（変換待ち）---
-  // ★processing_info がある間は投稿に使えない。ここを飛ばすと投稿側が失敗する
-  if (fin.processing && !waitForVideoProcessing_(auth, mediaId)) return null;
+  /*
+   * --- STATUS（変換待ち）---
+   *
+   * ★processing_info がある間は投稿に使えない。ここを飛ばすと投稿側が失敗する。
+   *
+   * ★★2026-08-26、`fin.processing &&` の条件を外した。
+   *
+   *   【起きていたこと】
+   *   試作した動画（10クリップ / 6.7MB）を「バズ B」で投稿したところ、
+   *   X が HTTP 400 を返した。
+   *     "Your media IDs are invalid."
+   *     "media.media_ids": ["2092597475127259136"]
+   *   media_id は取れているのに、投稿の瞬間だけ無効と判定されていた。
+   *
+   *   【原因（推測）】
+   *   videoFinalize_ は FINALIZE のレスポンスに processing_info が
+   *   含まれるかどうかだけで processing を決めている（同ファイル参照）。
+   *   含まれなければ processing=false になり、ここの条件で
+   *   **変換待ちが丸ごと飛ばされる**。まだ変換中の media_id を
+   *   そのまま投稿へ渡せば、X 側から見れば当然「無効なID」になる。
+   *
+   *   このファイルの冒頭に「仕様を一次情報で確認できていない」と
+   *   書いてある通り、processing_info が返らない場合の挙動は
+   *   推測で書かれていた。そこが外れていた可能性が高い。
+   *
+   *   【なぜ条件を外して安全か】
+   *   waitForVideoProcessing_ は STATUS を引いて processing_info が
+   *   無ければ即 true を返す（同ファイル参照）。つまり変換不要な回に
+   *   余計な待ちは発生せず、増えるのは STATUS 1回ぶんだけ。
+   *   一方、待たずに投稿すると 400 で1本まるごと失われる。
+   *   割に合わないので、常に確認してから返す。
+   *
+   *   ★実レスポンスは未確認（clasp logs は GCP プロジェクト紐付けが
+   *     必要で取得できなかった）。直ったかどうかは実機で投稿するまで
+   *     確定しない。
+   */
+  if (!waitForVideoProcessing_(auth, mediaId)) return null;
 
   return mediaId;
 }
