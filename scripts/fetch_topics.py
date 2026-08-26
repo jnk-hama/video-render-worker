@@ -51,8 +51,12 @@ SUBS = {
     'A': ['nextfuckinglevel', 'Damnthatsinteresting', 'BeAmazed',
           'WinStupidPrizes', 'Unexpected', 'holdmybeer',
           'toptalent', 'interestingasfuck', 'ContagiousLaughter'],
-    'B': ['Animemes', 'awwnime', 'anime_irl',
-          'AnimeSakuga', 'animegifs', 'cosplay', 'streetwear'],
+    # ★anime_irl を外した（2026-08-26）。画像だけを投げる板で、
+    #   タイトルが板名の使い回し（"anime_irl"）になり材料にならない。
+    #   実データで5件すべてが除外対象だった。
+    #   代わりに見出しが文章になる板を足す。
+    'B': ['Animemes', 'awwnime', 'AnimeSakuga', 'animegifs',
+          'cosplay', 'streetwear', 'anime', 'manga', 'Genshin_Impact'],
 }
 
 # 1アカウントあたり何件まで残すか。GAS 側は上位10件しか見ないので、
@@ -160,6 +164,32 @@ def fetch_sub(sub, attempt=1):
     return out
 
 
+def is_usable_title(title, sub):
+    """
+    見出しとして使えるか。
+
+    ★★2026-08-26、実データを見て追加した。
+
+    r/anime_irl は画像だけを投げる板で、タイトルが板名の使い回しになる。
+    実際にこう取れた。
+
+        r/anime_irl  anime_irl
+        r/anime_irl  anime_irl
+        r/anime_irl  Anime_irl
+
+    これを材料に渡しても、LLMは書く材料が無いので在庫映像の説明へ戻る。
+    材料0件を直したのに、中身が空では意味がない。
+    """
+    t = (title or '').strip()
+    if len(t) < 20:
+        return False
+    # 板名そのもの（大文字小文字・アンダースコアの違いは無視）
+    norm = lambda x: x.lower().replace('_', '').replace(' ', '')
+    if norm(t) == norm(sub):
+        return False
+    return True
+
+
 def main():
     out_path = sys.argv[1] if len(sys.argv) > 1 else 'data/topics.json'
 
@@ -176,6 +206,9 @@ def main():
             for c in fetch_sub(sub):
                 if c['id'] in seen:
                     continue
+                # ★見出しが板名の使い回しなど、材料にならないものを落とす
+                if not is_usable_title(c['title'], c['subreddit']):
+                    continue
                 seen.add(c['id'])
                 got.append(c)
 
@@ -188,7 +221,8 @@ def main():
         got.sort(key=lambda c: (0 if c['has_media'] else 1))
         accounts[key] = got[:MAX_PER_ACCOUNT]
         total += len(accounts[key])
-        log('[%s] → %d件を採用' % (key, len(accounts[key])))
+        log('[%s] → %d件を採用（見出しが使えないものは除外済み）'
+            % (key, len(accounts[key])))
 
     """
     ★★片方が空でも書き出す（2026-08-26）。
