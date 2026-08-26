@@ -1,153 +1,307 @@
 {
-  "_readme": "Aアカウント(@Jmaslab)のタイポグラフィ動画で紹介するツール群。すべて GitHub API で実在とスター数を照合済み。ここに無いものを台本に入れてはいけない（LLMは存在しないリポジトリとURLを平然と生成し、フォロワーがクリックして404だった時点でアカウントの信用が終わる。10_GitHub.gs 冒頭の注記と同じ理由）。",
-  "_verified_at": "2026-08-26",
-  "_verified_how": "GitHub Search API (repo:owner/name) で1件ずつ照合。stars は照合時点の実数。",
-  "_stars_note": "スター数は動く。台本で数字を出す前に必ず再照合すること。半年前の数字を「今」として出すと、見る人には嘘に見える。",
-
-  "_script_rules": {
-    "order": "スター数の降順に並べる。最初の1行に一番大きい数字が来ないとフックが弱い。",
-    "numbers_for_tts": "読み上げに通すので数字は英単語で開く。'277k' ではなく 'two hundred seventy seven thousand'。TTSは記号を正しく読まない。",
-    "line_length": "1画面2〜4語まで。長いと fit_caption が自動縮小して読めなくなる（render_video.py 参照）。",
-    "post_must_have_payoff": "[POST] を煽りだけにしない。16_Quality.gs の 'This is only the hook. There is no payoff under it.' で0点になり投稿枠が消える。実数を1つ必ず入れる。",
-    "hook_max_len": "本文1行目は75文字以内（HOOK_MAX_LEN）。超えると0点。",
-    "banned_openers": "定義文（'X is/uses/trades'）と 'Have you ever' / 'Did you know' は機械的に0点。",
-    "dead_phrases": "'feels illegal' / 'getting out of hand' / 'say goodbye to' / 'game changer' は今のXで最も濫用されているbotの目印。使わない。"
+ "_readme": "Aアカウント(@Jmaslab)のタイポグラフィ動画で紹介するツール群。すべて GitHub API で実在とスター数を照合済み。ここに無いものを台本に入れてはいけない（LLMは存在しないリポジトリとURLを平然と生成し、フォロワーがクリックして404だった時点でアカウントの信用が終わる。10_GitHub.gs 冒頭の注記と同じ理由）。",
+ "_verified_at": "2026-08-27",
+ "_verified_how": "GitHub Search API (repo:owner/name) で1件ずつ照合。stars は照合時点の実数。",
+ "_stars_note": "スター数は動く。台本で数字を出す前に必ず再照合すること。半年前の数字を「今」として出すと、見る人には嘘に見える。",
+ "_script_rules": {
+  "order": "スター数の降順に並べる。最初の1行に一番大きい数字が来ないとフックが弱い。",
+  "numbers_for_tts": "読み上げに通すので数字は英単語で開く。'277k' ではなく 'two hundred seventy seven thousand'。TTSは記号を正しく読まない。",
+  "line_length": "1画面2〜4語まで。長いと fit_caption が自動縮小して読めなくなる（render_video.py 参照）。",
+  "post_must_have_payoff": "[POST] を煽りだけにしない。16_Quality.gs の 'This is only the hook. There is no payoff under it.' で0点になり投稿枠が消える。実数を1つ必ず入れる。",
+  "hook_max_len": "本文1行目は75文字以内（HOOK_MAX_LEN）。超えると0点。",
+  "banned_openers": "定義文（'X is/uses/trades'）と 'Have you ever' / 'Did you know' は機械的に0点。",
+  "dead_phrases": "'feels illegal' / 'getting out of hand' / 'say goodbye to' / 'game changer' は今のXで最も濫用されているbotの目印。使わない。"
+ },
+ "tools": [
+  {
+   "name": "superpowers",
+   "repo": "obra/superpowers",
+   "url": "https://github.com/obra/superpowers",
+   "stars": 277924,
+   "language": "Shell",
+   "official_description": "An agentic skills framework & software development methodology that works.",
+   "category": "senior-engineer",
+   "hook_en": "Turns your agent into a team that plans, reviews and ships instead of just autocompleting."
   },
-
-  "tools": [
-    {
-      "name": "superpowers",
-      "repo": "obra/superpowers",
-      "url": "https://github.com/obra/superpowers",
-      "stars": 277924,
-      "language": "Shell",
-      "official_description": "An agentic skills framework & software development methodology that works.",
-      "category": "senior-engineer",
-      "hook_en": "Turns your agent into a team that plans, reviews and ships instead of just autocompleting."
-    },
-    {
-      "name": "andrej-karpathy-skills",
-      "repo": "multica-ai/andrej-karpathy-skills",
-      "url": "https://github.com/multica-ai/andrej-karpathy-skills",
-      "stars": 207571,
-      "language": null,
-      "official_description": "A single CLAUDE.md file to improve Claude Code behavior, derived from Andrej Karpathy's observations on LLM coding pitfalls.",
-      "category": "senior-engineer",
-      "hook_en": "Two hundred thousand stars for one markdown file, built from Karpathy's notes on where LLMs break."
-    },
-    {
-      "name": "skills",
-      "repo": "anthropics/skills",
-      "url": "https://github.com/anthropics/skills",
-      "stars": 171751,
-      "language": "Python",
-      "official_description": "Public repository for Agent Skills",
-      "category": "foundation",
-      "_correction": "Geminiは『QAテスター化』に分類していたが、公式説明はQA専用ではない。すべてのスキルの土台。",
-      "hook_en": "The official one. Where every skill you are using came from."
-    },
-    {
-      "name": "gstack",
-      "repo": "garrytan/gstack",
-      "url": "https://github.com/garrytan/gstack",
-      "stars": 129793,
-      "language": "TypeScript",
-      "official_description": "Use Garry Tan's exact Claude Code setup: 23 opinionated tools that serve as CEO, Designer, Eng Manager, Release Manager, Doc Engineer, and QA",
-      "category": "senior-engineer",
-      "hook_en": "Garry Tan's actual setup. Twenty three tools acting as CEO, designer, eng manager and QA."
-    },
-    {
-      "name": "ui-ux-pro-max-skill",
-      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
-      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
-      "stars": 121211,
-      "language": "Python",
-      "official_description": "An AI skill that provides design intelligence for building professional UI/UX across multiple platforms.",
-      "category": "product-designer",
-      "hook_en": "Your agent stops shipping screens that look like a bootstrap template."
-    },
-    {
-      "name": "agent-skills",
-      "repo": "addyosmani/agent-skills",
-      "url": "https://github.com/addyosmani/agent-skills",
-      "stars": 89929,
-      "language": "JavaScript",
-      "official_description": "Production-grade engineering skills for AI coding agents.",
-      "category": "senior-engineer",
-      "hook_en": "Production engineering rules, from the person who wrote the ones you already follow."
-    },
-    {
-      "name": "taste-skill",
-      "repo": "Leonxlnx/taste-skill",
-      "url": "https://github.com/Leonxlnx/taste-skill",
-      "stars": 80882,
-      "language": "JavaScript",
-      "official_description": "Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop",
-      "category": "product-designer",
-      "hook_en": "Its entire job is stopping the AI from generating boring generic slop."
-    },
-    {
-      "name": "impeccable",
-      "repo": "pbakaus/impeccable",
-      "url": "https://github.com/pbakaus/impeccable",
-      "stars": 62832,
-      "language": "JavaScript",
-      "official_description": "The design language that makes your AI harness better at design.",
-      "category": "product-designer",
-      "hook_en": "A design language your harness reads, so it makes the call instead of you."
-    },
-    {
-      "name": "playwright-mcp",
-      "repo": "microsoft/playwright-mcp",
-      "url": "https://github.com/microsoft/playwright-mcp",
-      "stars": 36486,
-      "language": "TypeScript",
-      "official_description": "Playwright MCP server",
-      "category": "qa-tester",
-      "hook_en": "From Microsoft. Your agent opens a real browser and clicks through your app."
-    },
-    {
-      "name": "improve",
-      "repo": "shadcn/improve",
-      "url": "https://github.com/shadcn/improve",
-      "stars": 8994,
-      "language": null,
-      "official_description": "Use your most capable model to audit your codebase and write plans for cheaper models to execute.",
-      "category": "senior-engineer",
-      "hook_en": "Let the expensive model audit the code. Let the cheap one do the work."
-    },
-    {
-      "name": "Agent-Reach",
-      "repo": "Panniantong/Agent-Reach",
-      "url": "https://github.com/Panniantong/Agent-Reach",
-      "stars": 75498,
-      "language": "Python",
-      "official_description": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
-      "category": "senior-engineer",
-      "_correction": "Geminiは『SNSへ投稿する能力を付与』と説明していたが、公式説明は Read & search。投稿機能ではない。",
-      "hook_en": "Your agent reads the entire internet. Twitter, Reddit, YouTube. Zero API fees."
-    },
-    {
-      "name": "belt",
-      "repo": null,
-      "url": "https://inference.sh/belt",
-      "stars": null,
-      "language": null,
-      "official_description": "Cloud platform CLI for AI agents. A single ~4MB binary with no runtime dependencies, running 250+ AI apps.",
-      "category": "senior-engineer",
-      "_note": "GitHubリポジトリではない。inference.sh のCLI。スター数が無いので、数字で殴るフックには使えない。関連リポジトリは inference-sh/skills。",
-      "hook_en": "Four megabytes. One binary. Two hundred fifty AI apps, one command."
-    }
-  ],
-
-  "rejected": [
-    {
-      "name": "openai.com/codex",
-      "reason": "GitHubリポジトリではなくOpenAIのプロダクトページ。他と並べるとリポジトリ紹介という形式が崩れ、スター数も出せない。"
-    },
-    {
-      "name": "Scrapling",
-      "reason": "スクレイピング用途。他人の著作物を取得して自分のアカウントで使う経路につながるため、DMCA・凍結リスクを持ち込む。オーナーと合意の上で除外。"
-    }
+  {
+   "name": "andrej-karpathy-skills",
+   "repo": "multica-ai/andrej-karpathy-skills",
+   "url": "https://github.com/multica-ai/andrej-karpathy-skills",
+   "stars": 207571,
+   "language": null,
+   "official_description": "A single CLAUDE.md file to improve Claude Code behavior, derived from Andrej Karpathy's observations on LLM coding pitfalls.",
+   "category": "senior-engineer",
+   "hook_en": "Two hundred thousand stars for one markdown file, built from Karpathy's notes on where LLMs break."
+  },
+  {
+   "name": "skills",
+   "repo": "anthropics/skills",
+   "url": "https://github.com/anthropics/skills",
+   "stars": 171751,
+   "language": "Python",
+   "official_description": "Public repository for Agent Skills",
+   "category": "foundation",
+   "_correction": "Geminiは『QAテスター化』に分類していたが、公式説明はQA専用ではない。すべてのスキルの土台。",
+   "hook_en": "The official one. Where every skill you are using came from."
+  },
+  {
+   "name": "gstack",
+   "repo": "garrytan/gstack",
+   "url": "https://github.com/garrytan/gstack",
+   "stars": 129793,
+   "language": "TypeScript",
+   "official_description": "Use Garry Tan's exact Claude Code setup: 23 opinionated tools that serve as CEO, Designer, Eng Manager, Release Manager, Doc Engineer, and QA",
+   "category": "senior-engineer",
+   "hook_en": "Garry Tan's actual setup. Twenty three tools acting as CEO, designer, eng manager and QA."
+  },
+  {
+   "name": "ui-ux-pro-max-skill",
+   "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+   "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+   "stars": 121211,
+   "language": "Python",
+   "official_description": "An AI skill that provides design intelligence for building professional UI/UX across multiple platforms.",
+   "category": "product-designer",
+   "hook_en": "Your agent stops shipping screens that look like a bootstrap template."
+  },
+  {
+   "name": "agent-skills",
+   "repo": "addyosmani/agent-skills",
+   "url": "https://github.com/addyosmani/agent-skills",
+   "stars": 89929,
+   "language": "JavaScript",
+   "official_description": "Production-grade engineering skills for AI coding agents.",
+   "category": "senior-engineer",
+   "hook_en": "Production engineering rules, from the person who wrote the ones you already follow."
+  },
+  {
+   "name": "taste-skill",
+   "repo": "Leonxlnx/taste-skill",
+   "url": "https://github.com/Leonxlnx/taste-skill",
+   "stars": 80882,
+   "language": "JavaScript",
+   "official_description": "Taste-Skill - gives your AI good taste. stops the AI from generating boring, generic slop",
+   "category": "product-designer",
+   "hook_en": "Its entire job is stopping the AI from generating boring generic slop."
+  },
+  {
+   "name": "impeccable",
+   "repo": "pbakaus/impeccable",
+   "url": "https://github.com/pbakaus/impeccable",
+   "stars": 62832,
+   "language": "JavaScript",
+   "official_description": "The design language that makes your AI harness better at design.",
+   "category": "product-designer",
+   "hook_en": "A design language your harness reads, so it makes the call instead of you."
+  },
+  {
+   "name": "playwright-mcp",
+   "repo": "microsoft/playwright-mcp",
+   "url": "https://github.com/microsoft/playwright-mcp",
+   "stars": 36486,
+   "language": "TypeScript",
+   "official_description": "Playwright MCP server",
+   "category": "qa-tester",
+   "hook_en": "From Microsoft. Your agent opens a real browser and clicks through your app."
+  },
+  {
+   "name": "improve",
+   "repo": "shadcn/improve",
+   "url": "https://github.com/shadcn/improve",
+   "stars": 8994,
+   "language": null,
+   "official_description": "Use your most capable model to audit your codebase and write plans for cheaper models to execute.",
+   "category": "senior-engineer",
+   "hook_en": "Let the expensive model audit the code. Let the cheap one do the work."
+  },
+  {
+   "name": "Agent-Reach",
+   "repo": "Panniantong/Agent-Reach",
+   "url": "https://github.com/Panniantong/Agent-Reach",
+   "stars": 75498,
+   "language": "Python",
+   "official_description": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
+   "category": "senior-engineer",
+   "_correction": "Geminiは『SNSへ投稿する能力を付与』と説明していたが、公式説明は Read & search。投稿機能ではない。",
+   "hook_en": "Your agent reads the entire internet. Twitter, Reddit, YouTube. Zero API fees."
+  },
+  {
+   "name": "belt",
+   "repo": null,
+   "url": "https://inference.sh/belt",
+   "stars": null,
+   "language": null,
+   "official_description": "Cloud platform CLI for AI agents. A single ~4MB binary with no runtime dependencies, running 250+ AI apps.",
+   "category": "senior-engineer",
+   "_note": "GitHubリポジトリではない。inference.sh のCLI。スター数が無いので、数字で殴るフックには使えない。関連リポジトリは inference-sh/skills。",
+   "hook_en": "Four megabytes. One binary. Two hundred fifty AI apps, one command."
+  },
+  {
+   "name": "agency-agents",
+   "repo": "msitarzewski/agency-agents",
+   "url": "https://github.com/msitarzewski/agency-agents",
+   "stars": 148222,
+   "language": "Shell",
+   "official_description": "A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers.",
+   "category": "whole-agency",
+   "hook_en": "A complete agency in one repo. Frontend wizards, community ninjas, reality checkers."
+  },
+  {
+   "name": "claude-mem",
+   "repo": "thedotmack/claude-mem",
+   "url": "https://github.com/thedotmack/claude-mem",
+   "stars": 91953,
+   "language": "JavaScript",
+   "official_description": "Persistent Context Across Sessions for Every Agent",
+   "category": "ops-manager",
+   "hook_en": "Your agent stops forgetting everything the moment the session ends."
+  },
+  {
+   "name": "OpenCut",
+   "repo": "OpenCut-app/OpenCut",
+   "url": "https://github.com/OpenCut-app/OpenCut",
+   "stars": 86945,
+   "language": "TypeScript",
+   "official_description": "The open-source CapCut alternative",
+   "category": "motion-designer",
+   "hook_en": "Open source CapCut. Eighty six thousand stars and no subscription."
+  },
+  {
+   "name": "awesome-claude-skills",
+   "repo": "ComposioHQ/awesome-claude-skills",
+   "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+   "stars": 73357,
+   "language": "Python",
+   "official_description": "A curated list of awesome Claude Skills, resources, and tools",
+   "category": "whole-agency",
+   "hook_en": "The list everyone forks and nobody finishes reading."
+  },
+  {
+   "name": "mem0",
+   "repo": "mem0ai/mem0",
+   "url": "https://github.com/mem0ai/mem0",
+   "stars": 64116,
+   "language": "Python",
+   "official_description": "Universal memory layer for AI Agents",
+   "category": "ops-manager",
+   "hook_en": "A memory layer that works across every agent you run."
+  },
+  {
+   "name": "last30days-skill",
+   "repo": "mvanhorn/last30days-skill",
+   "url": "https://github.com/mvanhorn/last30days-skill",
+   "stars": 59340,
+   "language": "Python",
+   "official_description": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web",
+   "category": "researcher",
+   "hook_en": "Researches Reddit, X, YouTube and Hacker News, then tells you what actually happened."
+  },
+  {
+   "name": "OpenMontage",
+   "repo": "calesthio/OpenMontage",
+   "url": "https://github.com/calesthio/OpenMontage",
+   "stars": 51242,
+   "language": "Python",
+   "official_description": "World's first open-source, agentic video production system. 12 pipelines, 100+ tools, 700+ skill files.",
+   "category": "motion-designer",
+   "hook_en": "Twelve production pipelines. Seven hundred skill files. One video studio."
+  },
+  {
+   "name": "hyperframes",
+   "repo": "heygen-com/hyperframes",
+   "url": "https://github.com/heygen-com/hyperframes",
+   "stars": 42741,
+   "language": "TypeScript",
+   "official_description": "Write HTML. Render video. Built for agents.",
+   "category": "motion-designer",
+   "hook_en": "Write HTML. Get video. That is the entire pitch."
+  },
+  {
+   "name": "agents",
+   "repo": "wshobson/agents",
+   "url": "https://github.com/wshobson/agents",
+   "stars": 39163,
+   "language": "Python",
+   "official_description": "Multi-harness agentic plugin marketplace for Claude Code, Codex, Cursor, OpenCode, Copilot",
+   "category": "whole-agency",
+   "hook_en": "One marketplace that works across Claude, Codex, Cursor and Copilot."
+  },
+  {
+   "name": "humanizer",
+   "repo": "blader/humanizer",
+   "url": "https://github.com/blader/humanizer",
+   "stars": 38096,
+   "language": "Python",
+   "official_description": "Agent skill that removes signs of AI-generated writing from text",
+   "category": "marketer",
+   "hook_en": "Strips the tells out of AI writing. Which is either useful or terrifying."
+  },
+  {
+   "name": "github-mcp-server",
+   "repo": "github/github-mcp-server",
+   "url": "https://github.com/github/github-mcp-server",
+   "stars": 32532,
+   "language": "Go",
+   "official_description": "GitHub's official MCP Server",
+   "category": "ops-manager",
+   "hook_en": "GitHub's own. Official, and most people still do not know it exists."
+  },
+  {
+   "name": "claude-skills",
+   "repo": "alirezarezvani/claude-skills",
+   "url": "https://github.com/alirezarezvani/claude-skills",
+   "stars": 25032,
+   "language": "Python",
+   "official_description": "380 Claude Code skills & agent skills & plugins (30+ Agents, 70+ commands, 380+ skills)",
+   "category": "whole-agency",
+   "hook_en": "Three hundred eighty skills in one repo."
+  },
+  {
+   "name": "claude-seo",
+   "repo": "AgriciDaniel/claude-seo",
+   "url": "https://github.com/AgriciDaniel/claude-seo",
+   "stars": 15365,
+   "language": "Python",
+   "official_description": "Universal SEO skill for Claude Code. 25 sub-skills + 18 sub-agents.",
+   "category": "marketer",
+   "hook_en": "Twenty five sub-skills and eighteen sub-agents, all for SEO."
+  },
+  {
+   "name": "social-media-skills",
+   "repo": "charlie947/social-media-skills",
+   "url": "https://github.com/charlie947/social-media-skills",
+   "stars": 2415,
+   "language": "Shell",
+   "official_description": null,
+   "category": "social-manager",
+   "hook_en": "Two thousand stars and almost no README. Somebody knows something."
+  }
+ ],
+ "rejected": [
+  {
+   "name": "openai.com/codex",
+   "reason": "GitHubリポジトリではなくOpenAIのプロダクトページ。他と並べるとリポジトリ紹介という形式が崩れ、スター数も出せない。"
+  },
+  {
+   "name": "Scrapling",
+   "reason": "スクレイピング用途。他人の著作物を取得して自分のアカウントで使う経路につながるため、DMCA・凍結リスクを持ち込む。オーナーと合意の上で除外。"
+  },
+  {
+   "name": "github.com/mvanhorn/last30days",
+   "reason": "URLが1文字違い。正しくは mvanhorn/last30days-skill（照合で発見）。この形では404になる。"
+  }
+ ],
+ "_unverified": {
+  "_note": "GitHubリポジトリではないため実在・規模を照合していない。台本で数字を出さないこと。",
+  "items": [
+   "openai.com/codex",
+   "apify.com",
+   "manychat.com",
+   "higgsfield.ai",
+   "notebooklm.google.com",
+   "platform.openai.com/docs/guides/images",
+   "developers.notion.com/docs/mcp",
+   "lnkd.in/eTABiDTs（実体不明・短縮URL）"
   ]
+ }
 }
