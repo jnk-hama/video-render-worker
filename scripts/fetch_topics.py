@@ -40,6 +40,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -66,6 +67,17 @@ UA = 'jmas-topic-fetcher/1.0 (+https://github.com/jnk-hama/video-render-worker)'
 
 TIMEOUT = 20
 
+# ★★429（叩きすぎ）への対処（2026-08-26、初回実行で実際に食らった）。
+#
+#   16板を1秒で連続アクセスした結果、大半が 429 で落ちた。
+#   特にBは全板が429に当たり0件になった。Reddit は短時間の連続アクセスを弾く。
+#
+#   「速く終わらせる」ことに価値は無い。6時間おきの定期実行なので、
+#   2分かかっても構わない。取れないほうが損。
+SLEEP_BETWEEN = 3      # 板と板の間に必ず空ける秒数
+MAX_RETRY = 2          # 429 を食った時に再試行する回数
+RETRY_WAIT = 12        # 再試行までの既定の待ち（Retry-Afterがあればそちらを優先）
+
 ATOM = '{http://www.w3.org/2005/Atom}'
 
 
@@ -73,7 +85,7 @@ def log(msg):
     print(msg, flush=True)
 
 
-def fetch_sub(sub):
+def fetch_sub(sub, attempt=1):
     """
     1つの板から上位を取る。失敗しても例外にしない。
 
@@ -86,6 +98,18 @@ def fetch_sub(sub):
         with urllib.request.urlopen(req, timeout=TIMEOUT) as res:
             body = res.read()
     except urllib.error.HTTPError as e:
+        # ★429 は「叩きすぎ」であって、板が死んでいるわけではない。
+        #   待てば通るので、諦める前に必ず1度は待って試す。
+        if e.code == 429 and attempt <= MAX_RETRY:
+            wait = RETRY_WAIT
+            try:
+                wait = max(wait, int(e.headers.get('Retry-After') or 0))
+            except (TypeError, ValueError):
+                pass
+            log('  r/%s: HTTP 429 → %d秒待って再試行 (%d/%d)'
+                % (sub, wait, attempt, MAX_RETRY))
+            time.sleep(wait)
+            return fetch_sub(sub, attempt + 1)
         log('  r/%s: HTTP %s' % (sub, e.code))
         return []
     except Exception as e:
@@ -145,7 +169,10 @@ def main():
         log('[%s] %d板' % (key, len(subs)))
         got = []
         seen = set()
-        for sub in subs:
+        for idx, sub in enumerate(subs):
+            # ★2板目以降は必ず間隔を空ける（上の SLEEP_BETWEEN 参照）
+            if idx:
+                time.sleep(SLEEP_BETWEEN)
             for c in fetch_sub(sub):
                 if c['id'] in seen:
                     continue
@@ -163,10 +190,33 @@ def main():
         total += len(accounts[key])
         log('[%s] → %d件を採用' % (key, len(accounts[key])))
 
+    """
+    ★★片方が空でも書き出す（2026-08-26）。
+
+    初回実行では A が5件、B が0件（全板429）になった。ここで
+    「全体が0件でなければOK」とすると、B が空のまま上書きされ、
+    B は材料無しの状態が続く。
+
+    かといって全体を捨てると A の5件まで失う。
+    片方だけ空なら、そのアカウントは前回ぶんを残す。
+    """
     if total == 0:
         # ★空のファイルで上書きしない。前回ぶんが残っていた方がまだ役に立つ
         log('1件も取れませんでした。ファイルは更新しません。')
         return 1
+
+    prev = {}
+    if os.path.exists(out_path):
+        try:
+            prev = (json.load(open(out_path, encoding='utf-8'))
+                    .get('accounts') or {})
+        except Exception:
+            prev = {}
+    for key in list(accounts):
+        if not accounts[key] and prev.get(key):
+            accounts[key] = prev[key]
+            log('[%s] 今回0件のため前回ぶん %d件 を維持します。'
+                % (key, len(accounts[key])))
 
     os.makedirs(os.path.dirname(out_path) or '.', exist_ok=True)
     payload = {

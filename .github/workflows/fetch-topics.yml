@@ -50,13 +50,18 @@ jobs:
       - name: 変更があればコミット
         run: |
           set -euo pipefail
-          if git diff --quiet -- data/topics.json; then
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # ★★git diff は「追跡されていない新規ファイル」を変更として見ない。
+          #   初回は data/topics.json が未追跡なので、diff だけで判定すると
+          #   5件ちゃんと書けているのに「内容に変化なし」で素通りする
+          #   （2026-08-26、初回実行で実際に起きた）。
+          #   先に add して、インデックスとHEADを比べる。
+          git add data/topics.json
+          if git diff --cached --quiet -- data/topics.json; then
             echo "内容に変化なし。コミットしません。"
             exit 0
           fi
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/topics.json
           git commit -m "chore: 話題を更新 ($(date -u '+%Y-%m-%d %H:%M') UTC)"
           # ★他のジョブが先に push している可能性がある。rebase してから送る
           git pull --rebase --autostash origin main
