@@ -330,6 +330,11 @@ function handleLineEvent_(event) {
     case 'diag':
       replyToLine_(replyToken, buildAuthDiagnosticsText_());
       break;
+    case 'identity':
+      // ★Webアプリとして走っている「今この実行」の身元を返す。
+      //   diag_checkExecutionIdentity() は 11_Diag.gs にあり、読むだけ。
+      replyToLine_(replyToken, truncate_(diag_checkExecutionIdentity(), 4500));
+      break;
     case 'help':
       replyToLine_(replyToken, helpText_());
       break;
@@ -763,6 +768,26 @@ function parseCommand_(rawText) {
   if (/^(ヘルプ|help|使い方)$/i.test(text))    return { type: 'help' };
   if (/^(id|ID|アイディー|マイID)$/i.test(text)) return { type: 'whoami' };
   if (/^(診断|しんだん|diag|debug)$/i.test(text)) return { type: 'diag' };
+
+  /*
+   * ★★「実行者」（2026-08-27追加）
+   *
+   * 「LOG_SPREADSHEET_ID のスプレッドシートを開けません／実行アカウント:
+   * (取得不可)」が LINE コマンド（バズA など）で出た時の唯一の測定手段。
+   *
+   * このエラーは3系統のどれで起きたかで原因も直し方も全く違う。
+   *   エディタ実行  … 今ログインしているアカウント
+   *   Webアプリ実行 … デプロイしたアカウント（executeAs: USER_DEPLOYING）
+   *   トリガー実行  … そのトリガーを作った人
+   * LINEコマンドは必ずWebアプリ経路を通る。したがって
+   * エディタで diag_checkExecutionIdentity を実行しても犯人は映らない。
+   * 別の（エディタの）アカウントの結果しか出ないためである。
+   *
+   * ここに口を開けておけば、失敗しているのと同じ実行主体から
+   * そのまま名前とシートの開閉可否を報告させられる。読むだけで、
+   * 投稿もXもLLMも触らない。
+   */
+  if (/^(実行者|じっこうしゃ|だれ|whoami2|identity)$/i.test(text)) return { type: 'identity' };
 
   return { type: 'unknown' };
 }
@@ -1636,6 +1661,8 @@ function helpText_() {
     '  引用優先   … 上記に加えて、対象が無い回は単独投稿も出す',
     '  反応優先に戻す … POST_MODEがstandaloneのままだった場合の復旧',
     '  診断      … A/Bが投稿しない原因を上から順に調べる',
+    '  実行者    … 「スプレッドシートを開けません」が出た時に、\n'+
+    '             どのGoogleアカウントで動いているかを実測する',
     '  引用診断B … 引用RTが動かない原因を実APIで確かめる',
     '  情報源診断 … YouTube/RSSから話題を拾えるか確かめる（A/B両方）',
     '  B情報源診断 … 片方だけ見る（「情報源診断B」でも可）',
