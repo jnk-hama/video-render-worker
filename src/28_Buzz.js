@@ -1586,10 +1586,19 @@ function buildBuzzDiagText_() {
   }
 
   // --- 2. スイッチ ---
-  // ★アカウント別に見る。片方だけ止めているのは正常な運用なので
-  //   「問題」ではなく「注記」として出す
-  Object.keys(ACCOUNTS).forEach(function (k) {
-    if (!buzzModeEnabled_(k)) notes.push('⏸ ' + k + ': バズ投稿は停止中（意図的なら問題ありません）');
+  /*
+   * ★アカウント別の停止状態は、問題の有無に関わらず必ず出す（2026-08-27）。
+   *
+   * 最初 notes へ入れたが、notes は problems が0件の時しか描画されない。
+   * VIDEO_UPLOAD=0 が1件残っているだけで「A: 停止中」が消え、
+   * 設定が効いているのか配備できていないのかを区別できなくなった
+   * （実際にオーナーがこの画面で判断できなくなった）。
+   *
+   * これは「問題」ではなく「状態」であり、他の行の読み方を変える情報。
+   * 隠してはいけない。
+   */
+  const stopped = Object.keys(ACCOUNTS).filter(function (k) {
+    return !buzzModeEnabled_(k);
   });
   if (!anyBuzzModeEnabled_()) problems.push('❌ 両アカウントともバズモードが停止（BUZZ_MODE=0）');
   if (!videoUploadEnabled_()) problems.push('❌ 動画添付が無効（VIDEO_UPLOAD=0）');
@@ -1742,6 +1751,9 @@ function buildBuzzDiagText_() {
     const l = buzzLastOutcome_(k);
     lastLines.push('  ' + k + ': ' + (l || '記録なし（まだ一度も動いていません）'));
   });
+  if (stopped.length) {
+    lastLines.push('  ⏸ バズ停止中: ' + stopped.join('・') + '（意図的なら問題ありません）');
+  }
   lastLines.push('  版 ' + BUILD_STAMP);
   const lastBlock = lastLines.join('\n');
 
