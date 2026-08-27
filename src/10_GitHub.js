@@ -247,12 +247,45 @@ function buildGitHubFacts_(repo) {
    * 開くに値する理由は「今まで何でやっていた作業が要らなくなるか」であり、
    * それは description と topics から言える。星の数からは言えない。
    */
+  /*
+   * ★★2026-08-27。伸びている他人のリポジトリ紹介投稿を分解して反映した。
+   *
+   * 【見本】prompts.chat を紹介した中国語の投稿
+   *   9,123インプレッション / 169いいね / 22リポスト
+   * 効いていたのは次の3点だった。
+   *   1) 数字が「リポジトリの有名さ」ではなく「読み手の得」に付いていた
+   *      （3000+テンプレ / 15分で構築 / 月50ドル節約）
+   *   2) 何と比べて何が要らなくなるかを言っていた
+   *   3) 最後が問いかけで終わっていた（返信が付くと配信が伸びる）
+   *
+   * 【真似してはいけない点】
+   * あの投稿には 166.8k / 143k / 168k と、同じスター数が3つ出てくる。
+   * 数字が食い違うのは、AIが書いた文章の最も分かりやすい兆候である。
+   * こちらはAPIの実データを1つだけ持っているので、そこで必ず勝てる。
+   * また「先週これを構築した」といった一人称の体験談も真似しない。
+   * 我々は使っていない。嘘を書けば、訂正の返信で伸びても信用が減る
+   * （このファイル冒頭の方針と同じ）。
+   */
   lines.push('Introduce this repository to developers who have never heard of it.');
-  lines.push('Lead with what it lets you stop doing, or what it replaces.');
-  lines.push('The star count is NOT the story. Do not open with it, and do not');
-  lines.push('call the number impressive. Mention it only if it adds something.');
-  lines.push('Use the URL exactly as given. Do not invent features, benchmarks,');
-  lines.push('comparisons, install steps, or anything not listed above.');
+  lines.push('');
+  lines.push('# What makes this kind of post work');
+  lines.push('- Lead with what the reader stops doing, or what this replaces.');
+  lines.push('- Attach a number to the READER\'S outcome, not to the repo\'s fame.');
+  lines.push('  Only use numbers that appear in the facts above. Never estimate.');
+  lines.push('- Name the specific thing from the description. Not "a tool" -- what it is.');
+  lines.push('- End with a real question to developers. Not rhetorical. Something');
+  lines.push('  someone would actually answer. This is what earns replies.');
+  lines.push('');
+  lines.push('# Hard rules');
+  lines.push('- The star count is NOT the story. Do not open with it and do not');
+  lines.push('  call it impressive. Use the exact figure above or omit it entirely.');
+  lines.push('  NEVER write the same number two different ways in one post.');
+  lines.push('- Do NOT claim you used it, installed it, tested it, or compared it.');
+  lines.push('  You have not. No "I set this up", no "I tried five alternatives".');
+  lines.push('- No emoji-numbered lists (1/2/3), no "hidden gem", "treasure",');
+  lines.push('  "game changer", "must-have", "bookmark this". Those read as bot copy.');
+  lines.push('- Use the URL exactly as given. Do not invent features, benchmarks,');
+  lines.push('  pricing, install steps, or anything not listed above.');
   return lines.join('\n');
 }
 
