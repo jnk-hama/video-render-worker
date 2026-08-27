@@ -49,6 +49,10 @@ const GITHUB_STAR_BAND = '300..30000';
  *   Aの土俵（開発者・AI・自動化）へ寄せてある。
  */
 const GITHUB_QUERY_ROTATION = [
+  /*
+   * --- 道具の帯 ---
+   * 動く物。スター上限で「記念碑」(tensorflow / react / vscode)を外す。
+   */
   'topic:ai-agents stars:' + GITHUB_STAR_BAND + ' pushed:>{since}',
   'topic:llm stars:' + GITHUB_STAR_BAND + ' pushed:>{since}',
   'topic:developer-tools stars:' + GITHUB_STAR_BAND + ' pushed:>{since}',
@@ -56,6 +60,32 @@ const GITHUB_QUERY_ROTATION = [
   'topic:self-hosted stars:' + GITHUB_STAR_BAND + ' pushed:>{since}',
   'topic:automation stars:300..20000 pushed:>{since}',
   'topic:productivity stars:300..20000 pushed:>{since}',
+
+  /*
+   * --- 「持ち帰って今日使う」帯（2026-08-27追加）---
+   *
+   * ★★ブックマーク数がいいね数を上回る投稿の正体がこれだった。
+   *
+   * 実例: multica-ai/andrej-karpathy-skills を紹介した投稿
+   *   いいね 52 / リポスト 9 / 返信 1 / **ブックマーク 86**
+   * ブックマークがいいねを上回るのは、「反応したい」ではなく
+   * 「後で使うために取っておきたい」と思われた時にだけ起きる。
+   * 紹介アカウントが取りに行くべきはこちらで、いいねではない。
+   *
+   * ★スター上限を掛けない。この帯には掛けてはいけない。
+   *   上の実例は **207,912スター** で、上限30,000なら確実に外れる。
+   *   だが中身は 20KB の CLAUDE.md 1枚で、フレームワークではない。
+   *   つまり「スターが多い＝誰でも知っている記念碑」は成り立たない。
+   *
+   * 上限の代わりに **種類** で絞る。awesome / prompts / skills /
+   * cheatsheet といった語は、道具ではなく資料に付く。
+   * tensorflow や react がこれらに引っかかることは無いので、
+   * 上限が無くても記念碑は入ってこない。
+   */
+  'topic:awesome-list stars:>1000 pushed:>{since}',
+  'prompts in:name,description stars:>800 pushed:>{since}',
+  'skills in:name,description stars:>500 pushed:>{since}',
+  'cheatsheet in:name,description stars:>500 pushed:>{since}',
 ];
 
 /**
@@ -269,6 +299,13 @@ function buildGitHubFacts_(repo) {
   lines.push('Introduce this repository to developers who have never heard of it.');
   lines.push('');
   lines.push('# What makes this kind of post work');
+  /*
+   * ★狙う数字はブックマークであっていいねではない（2026-08-27）。
+   *   実例の投稿は いいね52 に対して ブックマーク86。
+   *   後で使うために取っておかれた時にだけ、この逆転が起きる。
+   */
+  lines.push('- Aim to be SAVED, not liked. Someone should bookmark this to');
+  lines.push('  come back to it. That means saying when they would reach for it.');
   lines.push('- Lead with what the reader stops doing, or what this replaces.');
   lines.push('- Attach a number to the READER\'S outcome, not to the repo\'s fame.');
   lines.push('  Only use numbers that appear in the facts above. Never estimate.');
