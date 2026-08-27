@@ -804,9 +804,36 @@ function generateTweet(account, link, topicHint) {
     if (repo) {
       facts = buildGitHubFacts_(repo);
     } else {
-      const others = getAngles_(accountKey).filter(function (a) { return a !== 'GitHub'; });
-      effectiveAngle = others.length ? pickRandom_(others) : 'Tool';
-      console.warn('GitHubリポジトリを取得できないため、角度を ' + effectiveAngle + ' に変更しました。');
+      /*
+       * ★★取れなかった回は、書かずに諦める（2026-08-28）。
+       *
+       * 以前は別の角度（実質 'Tool'）へ差し替えていた。コメントには
+       * 「捏造させない」と書いてあったが、差し替え先には実在データが
+       * 何も無いので、結局モデルが道具の名前と使用体験を作る。実際に出た。
+       *
+       *   「高級マイクで音質改善を試したが設定が面倒で断念した。
+       *     GitHubで見つけたCLIの音響制御ツールに変更。」
+       *
+       * 道具の名前もURLも無く、使ってもいない体験が書かれている。
+       * 「事実に反することを書けば、訂正の返信で伸びても信用が減る」
+       * （10_GitHub.gs 冒頭の方針）。1本落とす方が安い。
+       *
+       * GitHub APIは未認証で叩いており、検索の未認証レートは10回/分。
+       * 取れない回は一時的なことが多く、次の巡回で普通に復活する。
+       */
+      /*
+       * ★見送りは QualityFloorError で伝える。呼び出し側5箇所が既に
+       *   「障害ではなく、今回は出さないという正常な判断」として
+       *   扱う仕組みを持っている（16_Quality.gs 冒頭）。
+       *   null を返すと r.region で TypeError になり、
+       *   正常な見送りが障害として記録される。
+       */
+      console.warn('GitHubリポジトリを取得できませんでした。この回は見送ります。');
+      const skip = new QualityFloorError(accountKey, 0);
+      skip.message = 'GitHubリポジトリの実データを取得できませんでした。' +
+        '実在データが無いまま書かせると道具名と使用体験を捏造するため、' +
+        'この回は見送ります。次回のトリガーで作り直します。';
+      throw skip;
     }
   }
 
