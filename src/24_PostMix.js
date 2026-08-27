@@ -130,7 +130,8 @@ function postMixTargets_(accountKey, ss) {
     });
   }
 
-  if (buzzModeEnabled_()) return base;
+  // ★アカウント別に見る。Aだけ止めた時、Aの配分だけが配り直される
+  if (buzzModeEnabled_(accountKey)) return base;
 
   const out = {};
   const share = Number(base.BUZZ) || 0;

@@ -55,9 +55,34 @@ const BUZZ_TOPIC_TRIES = 3;
 const BUZZ_HASHTAG_MIN = 3;
 const BUZZ_HASHTAG_MAX = 5;
 
-/** バズモードを使うか。既定は有効。止めたい時は BUZZ_MODE=0。 */
-function buzzModeEnabled_() {
+/**
+ * バズモードを使うか。既定は有効。
+ *
+ * ★★アカウント別に切れるようにした（2026-08-27、オーナー指示
+ *   「今のXのくそ動画はあかん」）。
+ *
+ *   BUZZ_MODE_A = 0  … Aだけ止める
+ *   BUZZ_MODE   = 0  … 両方止める（従来どおり）
+ *
+ * Aは「実在するGitHubリポジトリの紹介」でリンククリック1/15（CTR 6.7%）を
+ * 取れており、これは在庫映像を貼る投稿より確実に効いている。一方Bは
+ * 見せる画のあるアカウントなので、片方だけ止められないと
+ * 「両方止める」か「両方我慢する」の二択になる。
+ *
+ * @param {?string} accountKey 省略時は全体設定だけを見る
+ */
+function buzzModeEnabled_(accountKey) {
+  const key = String(accountKey || '').toUpperCase();
+  if (key) {
+    const per = String(getProp_('BUZZ_MODE_' + key, '')).trim();
+    if (per !== '') return per !== '0';
+  }
   return String(getProp_('BUZZ_MODE', '1')) !== '0';
+}
+
+/** どれか1つでもバズモードが生きているアカウントがあるか。 */
+function anyBuzzModeEnabled_() {
+  return Object.keys(ACCOUNTS).some(function (k) { return buzzModeEnabled_(k); });
 }
 
 /* ------------------------------------------------------------------ */
@@ -851,7 +876,8 @@ function buzzSkipSummary_() {
  * @param {{requireMedia:boolean}} [opts]
  */
 function runBuzzCycleAll_(opts) {
-  if (!buzzModeEnabled_()) return false;
+  // ★1つでも生きていれば回す。止まっている側は下の per-account 判定で飛ぶ
+  if (!anyBuzzModeEnabled_()) return false;
 
   const first = nextAccountInTurn_(BUZZ_TURN_PROP);
   const order = [first].concat(Object.keys(ACCOUNTS).filter(function (k) {
@@ -884,7 +910,7 @@ function runBuzzCycleAll_(opts) {
 function runBuzzCycle_(accountKey, opts) {
   const key = String(accountKey || '').toUpperCase();
   const options = opts || {};
-  if (!buzzModeEnabled_()) return noteBuzzSkip_(key, 'バズモードが停止中（BUZZ_MODE=0）');
+  if (!buzzModeEnabled_(key)) return noteBuzzSkip_(key, 'バズモードが停止中（BUZZ_MODE_' + key + ' または BUZZ_MODE = 0）');
   /*
    * ★★Xが拒否している間は、材料集めもLLMも走らせない（2026-08-24）。
    * どうせ投稿できない回に、Gemini代とX API呼び出しを払う理由が無い。
@@ -1475,9 +1501,11 @@ let lastBuzzGenFailure_ = '';
  * @param {?string} accountKey 未指定なら順番どおり
  */
 function runBuzzNowForLine_(accountKey) {
-  if (!buzzModeEnabled_()) {
-    return '⏸ バズモードは停止中です（BUZZ_MODE=0）。\n' +
-           '→ BUZZ_MODE を 1 にすると有効になります。';
+  const askedKey = String(accountKey || '').toUpperCase();
+  if (askedKey ? !buzzModeEnabled_(askedKey) : !anyBuzzModeEnabled_()) {
+    return '⏸ バズモードは停止中です' +
+           (askedKey ? '（' + askedKey + '）' : '') + '。\n' +
+           '→ 「設定 BUZZ_MODE' + (askedKey ? '_' + askedKey : '') + ' 1」で有効になります。';
   }
 
   const key = accountKey ? String(accountKey).toUpperCase() : '';
@@ -1558,7 +1586,12 @@ function buildBuzzDiagText_() {
   }
 
   // --- 2. スイッチ ---
-  if (!buzzModeEnabled_()) problems.push('❌ バズモードが停止（BUZZ_MODE=0）');
+  // ★アカウント別に見る。片方だけ止めているのは正常な運用なので
+  //   「問題」ではなく「注記」として出す
+  Object.keys(ACCOUNTS).forEach(function (k) {
+    if (!buzzModeEnabled_(k)) notes.push('⏸ ' + k + ': バズ投稿は停止中（意図的なら問題ありません）');
+  });
+  if (!anyBuzzModeEnabled_()) problems.push('❌ 両アカウントともバズモードが停止（BUZZ_MODE=0）');
   if (!videoUploadEnabled_()) problems.push('❌ 動画添付が無効（VIDEO_UPLOAD=0）');
   if (!mediaUploadEnabled_()) problems.push('❌ 画像添付が無効（MEDIA_UPLOAD=0）');
 

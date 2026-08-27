@@ -370,7 +370,8 @@ function processQueueCore_() {
         console.log('参照投稿を作れなかったため、通常の経路へ降ります。');
       }
 
-      if (mix && mix.kind === POST_KIND_BUZZ && buzzModeEnabled_()) {
+      // ★アカウント別の停止は runBuzzCycleAll_ の中で判定される
+      if (mix && mix.kind === POST_KIND_BUZZ && anyBuzzModeEnabled_()) {
         let buzzed = false;
         try {
           // ★引用専用モードでは、メディアの無いバズ投稿は出さない
