@@ -561,7 +561,8 @@ function requestPreviewFromLine_(accountKey) {
    */
   let text = '';
   try {
-    const gen = generateBuzzText_(key, null, query);
+    // ★第4引数は付くメディアの種類。ここは必ず動画になる（明示しておく）
+    const gen = generateBuzzText_(key, null, query, 'video');
     if (gen && gen.text) text = gen.text;
   } catch (e) {
     console.warn('試作用の本文生成で例外: ' + truncate_(String(e), 100));

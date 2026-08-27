@@ -129,10 +129,22 @@ function buzzTextIsClean_(text) {
  * @param {string} topic 材料（RSS/Redditから来た話題）
  * @param {number} maxLen 本文の上限（重み付き）
  */
-function buildBuzzPrompt_(accountKey, topic, maxLen, onScreen) {
+function buildBuzzPrompt_(accountKey, topic, maxLen, onScreen, mediaKind) {
   const key = String(accountKey || '').toUpperCase();
   const limit = Number(maxLen) || 240;
   const shows = String(onScreen || '').trim();
+
+  /*
+   * ★★静止画なのか動画なのかを必ず伝える（2026-08-27）。
+   *
+   * 以前は付くものが写真でも "the footage attached" と書いていた。
+   * LLMは動画が付く前提で書くので、静止画1枚に
+   *   "Slow motion ruins clips like this."
+   * が付いて投稿された。読み手には、存在しない動画について
+   * 語っているように見える。事実に反する投稿は伸びても信用を削る。
+   */
+  const isStill = String(mediaKind || '') === 'image';
+  const mediaWord = isStill ? 'a single still photo' : 'a video clip';
 
   const common = [
     '# Your job',
@@ -245,17 +257,29 @@ function buildBuzzPrompt_(accountKey, topic, maxLen, onScreen) {
     '',
     '# The one rule that decides whether this works',
     'Media IS attached. The reader sees it before they read a single word.',
+    'What is attached is ' + mediaWord + '.',
     shows
       ? ('What they see is: ' + shows.slice(0, 200) + '\n' +
          'Your post MUST make sense while that is on screen.\n' +
-         'Anchor the opening to something visible in it — the material, the\n' +
-         'motion, the moment it changes. Then bring in your take on the topic.\n' +
-         'If your post would read exactly the same with a different clip\n' +
+         'Anchor the opening to something visible in it. Then bring in\n' +
+         'your take on the topic.\n' +
+         'If your post would read exactly the same with a different image\n' +
          'behind it, it is wrong. Rewrite it so it could not.')
       : ('Write about the thing itself, concretely enough that an image of it\n' +
          'would match your words.'),
-    'Do NOT narrate it ("this video shows...", "watch how..."). React to it',
-    'like someone who just watched it and had one strong thought.',
+    /*
+     * ★静止画の回に動きの話を禁じる。ここが今回の事故の直接の原因。
+     *   検索語に含まれる撮り方(slow motion)を画面の説明だと誤解して
+     *   「スローが台無し」と書いた。語の側は別途直したが、
+     *   話題の見出しに動画由来の語が入ることは今後もある。
+     */
+    isStill
+      ? ('It is a PHOTO. Nothing moves. Do NOT mention slow motion, speed,\n' +
+         'frame rate, replays, "watch him", "at full speed", or anything that\n' +
+         'only makes sense for a video. Writing about motion here is a lie\n' +
+         'the reader can see. React to the still image and the topic instead.')
+      : 'Do NOT narrate it ("this video shows...", "watch how...").',
+    'React to it like someone who just saw it and had one strong thought.',
     '',
     '# Output',
     'Return ONLY the post text. No quotes, no explanation, no code fences.'
@@ -512,11 +536,22 @@ function mediaFailureReason_() { return lastMediaFailure_; }
  * @param {Array} candidates 画像へ降りる場合の候補
  * @param {string} query 素材検索の手掛かり
  * @param {string} topicTitle 元投稿の見出し（サムネイルの中身の説明）
+ * @param {string} subject 撮り方を含まない被写体（写真検索と本文説明に使う）
  * @return {?{kind:string, describes:string, source:string,
  *            videoAsset:?Object, imageUrls:!Array<string>}}
  */
-function prepareBuzzMedia_(accountKey, candidates, query, topicTitle) {
+function prepareBuzzMedia_(accountKey, candidates, query, topicTitle, subject) {
   lastMediaFailure_ = '';
+
+  /*
+   * ★★describes には query ではなく subject を使う（2026-08-27）。
+   *
+   * query は素材検索用に語尾へ撮り方が付いている（Aなら "macro slow motion"）。
+   * それを「画面に何が映っているか」としてLLMへ渡すと、静止画しか付いて
+   * いない回にも「スローモーションが台無し」と書く。実際に投稿された。
+   * 撮り方は検索の都合であって、読み手が見るものではない。
+   */
+  const shows = String(subject || query || '').trim();
 
   /*
    * --- 0) 組み立て済みの動画（36_Render.gs、2026-08-24）---
@@ -539,7 +574,7 @@ function prepareBuzzMedia_(accountKey, candidates, query, topicTitle) {
                   Math.round(done.bytes / 1024) + 'KB)');
       return {
         kind: 'video',
-        describes: String(query || ''),
+        describes: shows,
         source: 'rendered',
         // ★本文は描画を頼んだ時のものを使う。字幕と食い違わせない
         renderedText: String(done.text || ''),
@@ -561,8 +596,8 @@ function prepareBuzzMedia_(accountKey, candidates, query, topicTitle) {
     if (asset) {
       return {
         kind: 'video',
-        // ★在庫のQuery列＝その映像の説明。無ければ検索語そのものを使う
-        describes: String(asset.describes || query || ''),
+        // ★在庫のQuery列＝その映像の説明。無ければ被写体を使う
+        describes: String(asset.describes || shows),
         source: String(asset.source || 'stock'),
         videoAsset: asset,
         imageUrls: []
@@ -595,7 +630,7 @@ function prepareBuzzMedia_(accountKey, candidates, query, topicTitle) {
   if (mediaUploadEnabled_() && imgs.length) {
     return {
       kind: 'image',
-      describes: String(topicTitle || query || ''),
+      describes: String(topicTitle || shows),
       source: 'source-image',
       videoAsset: null,
       imageUrls: imgs
@@ -603,14 +638,19 @@ function prepareBuzzMedia_(accountKey, candidates, query, topicTitle) {
   }
 
   // --- 3) ストック写真（最後の砦）---
+  /*
+   * ★写真は被写体だけで引く（2026-08-27）。
+   *   query をそのまま渡すと "macro" が効いてマクロ撮影の自然写真が返る。
+   *   実際に、ライフガードの話題にカタツムリの接写が付いて投稿された。
+   */
   let photos = [];
-  try { photos = stockPhotoUrls_(query, 2) || []; }
+  try { photos = stockPhotoUrls_(shows, 2) || []; }
   catch (e) { lastPhotoFailure_ = '検索で例外: ' + truncate_(String(e), 60); }
 
   if (mediaUploadEnabled_() && photos.length) {
     return {
       kind: 'image',
-      describes: String(query || ''),
+      describes: shows,
       source: 'stock-photo',
       videoAsset: null,
       imageUrls: photos
@@ -964,7 +1004,8 @@ function runBuzzCycle_(accountKey, opts) {
   try {
     prepared = prepareBuzzMedia_(key, ranked,
                                  buzzMediaQuery_(key, topic),
-                                 String((topic && topic.title) || ''));
+                                 String((topic && topic.title) || ''),
+                                 buzzMediaSubject_(key, topic));
   } catch (e) {
     console.warn('バズ用メディアの用意で例外: ' + truncate_(String(e), 120));
   }
@@ -1018,7 +1059,7 @@ function runBuzzCycle_(accountKey, opts) {
   let generated = null;
   for (let t = 0; t < topicTries; t++) {
     lastBuzzGenFailure_ = '';
-    generated = generateBuzzText_(key, ranked[t], prepared.describes);
+    generated = generateBuzzText_(key, ranked[t], prepared.describes, prepared.kind);
     if (generated) break;
     console.log('話題 ' + (t + 1) + '/' + topicTries + ' では作れませんでした (' + key + ')。');
   }
@@ -1202,6 +1243,23 @@ function buzzMediaQuery_(accountKey, topic) {
 }
 
 /**
+ * 撮り方を含まない被写体を返す。写真検索と、本文へ渡す画面説明に使う。
+ *
+ * ★buzzMediaQuery_ と対で使う。あちらは動画在庫を引くための語
+ * （語尾に macro / slow motion 等が付く）、こちらは読み手が実際に
+ * 見るものの説明。混ぜると、静止画に「スローモーション」と書く。
+ */
+function buzzMediaSubject_(accountKey, topic) {
+  if (topic && String(topic.title || '').trim() &&
+      typeof buzzSubjectFromTopic_ === 'function') {
+    return buzzSubjectFromTopic_(accountKey, topic);
+  }
+  // 話題が無い回は在庫の語をそのまま使う。在庫と噛み合っている語なので
+  // 撮り方が混ざっていても「実際にその映像が在庫にある」点は保たれる。
+  return rotatingStockQuery_(accountKey);
+}
+
+/**
  * そのアカウントの検索語を1つ、順番に返す。
  *
  * ★ランダムにしない。ランダムだと短期間で同じ語が続くことがあり、
@@ -1231,7 +1289,7 @@ function rotatingStockQuery_(accountKey) {
  *
  * @return {?{text:string, region:string, model:string, qualityScore:number}}
  */
-function generateBuzzText_(accountKey, topic, shows) {
+function generateBuzzText_(accountKey, topic, shows, mediaKind) {
   const key = String(accountKey || '').toUpperCase();
   const region = pickRegionByJstHour_();
   const maxLen = getTweetMaxLen_(key);
@@ -1286,7 +1344,7 @@ function generateBuzzText_(accountKey, topic, shows) {
         'Write about what is happening on screen and what you think about it.'
       ].filter(Boolean).join('\n');
 
-  const systemPrompt = buildBuzzPrompt_(key, topicText, maxLen, onScreen);
+  const systemPrompt = buildBuzzPrompt_(key, topicText, maxLen, onScreen, mediaKind);
 
   let lastText = '';
   let critique = '';

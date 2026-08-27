@@ -666,11 +666,49 @@ function isBuzzStopword_(w) {
  * @param {Object} topic collectBuzzCandidates_ の1件
  * @return {string} ストック検索に渡す英語キーワード
  */
-function buzzVideoQueryFromTopic_(accountKey, topic) {
+/**
+ * 話題から「被写体だけ」を取り出す。撮り方（macro / slow motion 等）は付けない。
+ *
+ * ★★2026-08-27。「スローモーションがこのクリップを台無しにしている」という
+ * 本文が、カタツムリの静止画に付いて投稿された事故の修正。
+ *
+ * 【何が起きていたか】
+ * buzzVideoQueryFromTopic_ は素材検索用に語尾へ撮り方を足す。Aなら
+ *   "lifeguard reaction pool" + " macro slow motion"
+ * これは動画在庫を引くための語であって、画面の説明ではない。
+ * ところが 28_Buzz.gs はこの文字列をそのまま describes（＝画面に何が
+ * 映っているか）としてLLMへ渡していた。LLMは "slow motion" を
+ * 「スローモーション映像が付いている」と読み、それを前提に書いた。
+ *
+ * さらに写真へ落ちた回は、同じ語で Pexels を引くので
+ * "macro" がそのまま効き、マクロ撮影の自然写真（カタツムリ）が返る。
+ * 語尾ひとつで、本文も画像も両方おかしくなっていた。
+ *
+ * 被写体と撮り方を分ければ、両方が同時に直る。
+ *   ・写真検索には被写体だけを渡す（マクロ写真が返らない）
+ *   ・LLMには被写体だけを渡す（動きの話を書かない）
+ *
+ * @return {string} 撮り方を含まない被写体の語
+ */
+function buzzSubjectFromTopic_(accountKey, topic) {
   const key = String(accountKey || '').toUpperCase();
   const title = String((topic && topic.title) || '');
 
-  const words = title
+  const words = buzzSubjectWords_(title);
+
+  // ★撮り方を含まない既定の被写体。ここに slow motion 等を入れない
+  const fallback = (key === 'B') ? 'woman summer portrait' : 'crowd reaction celebration';
+
+  if (!words.length) return fallback;
+
+  const built = words.join(' ').toLowerCase();
+  if (!stockQueryIsSafe_(built)) return fallback;
+  return built;
+}
+
+/** 見出しから検索に使える名詞を最大3語。両方の関数で同じ規則を使う。 */
+function buzzSubjectWords_(title) {
+  return String(title || '')
     .replace(/https?:\/\/\S+/g, ' ')
     .replace(/[^A-Za-z0-9\s-]/g, ' ')
     .split(/\s+/)
@@ -678,6 +716,13 @@ function buzzVideoQueryFromTopic_(accountKey, topic) {
       return w.length >= 4 && w.length <= 18 && !isBuzzStopword_(w) && !/^\d+$/.test(w);
     })
     .slice(0, 3);
+}
+
+function buzzVideoQueryFromTopic_(accountKey, topic) {
+  const key = String(accountKey || '').toUpperCase();
+  const title = String((topic && topic.title) || '');
+
+  const words = buzzSubjectWords_(title);
 
   /*
    * ★語尾に撮り方を足す。
