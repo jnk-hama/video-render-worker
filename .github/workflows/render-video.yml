@@ -100,23 +100,6 @@ jobs:
           python3 scripts/render_video.py --payload payload.json --out out.mp4
           ls -lh out.mp4
 
-      # ★品質確認専用（一時）。前回と同じ手段を再利用する。
-      #   job_id が "quality-check-" で始まる回だけ動く。
-      - name: "[QC] フレームをログへ焼き出す"
-        if: startsWith(steps.payload.outputs.job_id, 'quality-check-')
-        run: |
-          set -euo pipefail
-          mkdir -p qc
-          ffmpeg -y -hide_banner -loglevel error -i out.mp4 \
-            -vf "select='eq(n\,5)+eq(n\,25)+eq(n\,55)+eq(n\,90)+eq(n\,130)+eq(n\,170)',scale=480:-1" \
-            -vsync 0 qc/f_%02d.png
-          for f in qc/f_*.png; do
-            echo "===QC-FRAME-BEGIN $f==="
-            base64 -w0 "$f"
-            echo ""
-            echo "===QC-FRAME-END==="
-          done
-
       # ★Release へ上げる理由：
       #   artifact は取得に認証と解凍が要り、GAS から扱いにくい。
       #   Release アセットなら1回のGETでMP4そのものが取れる。
