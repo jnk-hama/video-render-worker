@@ -52,6 +52,7 @@
 
 import argparse
 import json
+import math
 import os
 import random
 import shlex
@@ -62,6 +63,29 @@ import tempfile
 # 1本のクリップの上限。極端に長いものを拾うと転送で時間を食う
 MAX_DOWNLOAD_BYTES = 80 * 1024 * 1024
 DOWNLOAD_TIMEOUT_SEC = 60
+
+"""
+★★以下3つは MoneyPrinterTurbo（harry0703、MITライセンス、117,416スター）を
+  読んで取り込んだ知見（2026-08-28）。あちらのコードは移植していない。
+  「どういう問題に、どういう数字で対処しているか」だけを参考にした。
+"""
+
+# 映像の尺に持たせる余裕（秒）。
+# ★FFmpegはフレームレートの丸めで最終尺がわずかに短くなることがある。
+#   映像が音声より1フレームでも短いと -shortest がナレーションを切る。
+#   長い方へ倒しておけば、余った映像は -shortest が音声に合わせて切るだけ。
+VIDEO_DURATION_SAFETY_MARGIN = 0.5
+
+# 素材として受け付ける最小の辺（px）。これ未満は 1080x1920 へ引き伸ばすと
+# 明らかにぼやける。無料ストックには小さい素材が混ざっている。
+MIN_MATERIAL_DIMENSION = 480
+
+# BGMの音量比。ナレーションを1.0としたときの倍率。
+# ★0.2 より上げるとナレーションが聞き取りにくくなる。
+BGM_VOLUME = 0.2
+
+# 終わりのBGMフェードアウト（秒）。ぶつ切りで終わると素人臭くなる。
+BGM_FADEOUT_SEC = 3.0
 
 
 def log(msg):
@@ -94,6 +118,40 @@ def download(url, dest):
         log('  取得できませんでした（次のクリップへ）: %s' % e)
         return False
     return os.path.exists(dest) and os.path.getsize(dest) > 1024
+
+
+def probe_resolution(path):
+    """
+    素材の縦横を測る。取れなければ (0, 0)。
+
+    ★★2026-08-28追加。MoneyPrinterTurbo が
+      is_material_resolution_acceptable で同じ足切りをしていた。
+    """
+    try:
+        out = subprocess.run(
+            ['ffprobe', '-v', 'error', '-select_streams', 'v:0',
+             '-show_entries', 'stream=width,height',
+             '-of', 'csv=p=0:s=x', path],
+            capture_output=True, text=True, timeout=30).stdout.strip()
+        wv, hv = out.split('x')[:2]
+        return int(wv), int(hv)
+    except Exception:
+        return 0, 0
+
+
+def resolution_is_acceptable(path):
+    """
+    引き伸ばしても見られる大きさか。
+
+    ★無料ストックには小さい素材が混ざっている。1080x1920 へ
+      引き伸ばすと明らかにぼやけ、「くそ動画」の一因になる。
+      測れなかった場合は通す。測れないことを理由に素材を捨てると、
+      ffprobe が無い環境で全部落ちる。
+    """
+    rw, rh = probe_resolution(path)
+    if not rw or not rh:
+        return True
+    return rw >= MIN_MATERIAL_DIMENSION and rh >= MIN_MATERIAL_DIMENSION
 
 
 def normalize(src, dest, start, duration, w, h, fps):
@@ -602,10 +660,34 @@ def main():
     # ★モードTは背景を作り終えているので、素材の取得は一切行わない
     if parts is None:
       if mode == 'A' and target_seconds > 0:
-        # ★音声の長さに映像を合わせる。合わせないと喋り終わった後に
-        #   無音の絵が続く（または途中で映像が尽きる）
-        target = max(1, int(round(target_seconds / want_each)))
-        log('音声 %.1f秒 に合わせて %d カット' % (target_seconds, target))
+        """
+        ★★2026-08-28、round() を切り上げへ直した。
+          ナレーションが途中で切れる不具合の修正。
+
+        【何が起きていたか】
+        round() は半分の確率で切り捨てる。切り捨てると映像が音声より短くなり、
+        仕上げの -shortest は「短い方」に合わせるので、
+        **ナレーションが言い終わる前に動画が終わる。**
+
+          ナレーション 9.0秒 / 1カット1.4秒
+            round(9.0 / 1.4) = round(6.43) = 6カット = 8.40秒
+            → 0.6秒ぶん、喋っている途中で切れる
+
+        実際に8パターンで計算したところ5パターンで切れていた。頻度が高い。
+        文の途中で切れる動画は、内容が良くても最後まで見てもらえない。
+
+        【なぜ余裕も足すのか】
+        MoneyPrinterTurbo が同じ問題に安全余裕で対処していた
+        （_get_required_video_duration。「FFmpegはフレームレートの丸めで
+        最終尺がわずかに短くなることがある」）。こちらも fps の丸めで
+        数フレームぶん足りなくなり得るので、切り上げに加えて余裕を持たせる。
+        余った映像は -shortest が音声に合わせて切るので、長い方へ倒すのが安全。
+        """
+        need = target_seconds + VIDEO_DURATION_SAFETY_MARGIN
+        target = max(1, int(math.ceil(need / want_each)))
+        log('音声 %.1f秒 に合わせて %d カット（映像 %.2f秒・余裕 %.1f秒込み）'
+            % (target_seconds, target, target * want_each,
+               VIDEO_DURATION_SAFETY_MARGIN))
       elif mode == 'B':
         target = len(clips)
       else:
@@ -631,6 +713,23 @@ def main():
           log('[%d/%d] %s' % (len(parts) + 1, target, str(url)[:110]))
 
           if not download(url, src):
+              continue
+
+          """
+          ★小さすぎる素材はここで捨てる（2026-08-28追加）。
+
+          1080x1920 へ引き伸ばせば形にはなるが、明らかにぼやける。
+          プールに予備を積んであるので、1本捨てても次が使われる。
+          静止画は Ken Burns で寄せるため、この足切りの対象にしない。
+          """
+          if not looks_like_image(url, src) and not resolution_is_acceptable(src):
+              rw, rh = probe_resolution(src)
+              log('  解像度が足りないので使いません（%dx%d < %d）'
+                  % (rw, rh, MIN_MATERIAL_DIMENSION))
+              try:
+                  os.remove(src)
+              except OSError:
+                  pass
               continue
 
           if mode == 'B':
@@ -686,6 +785,32 @@ def main():
     # ------------------------------------------------------------------
     cmd = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-i', joined]
 
+    """
+    ★★BGM（2026-08-28追加）。
+
+    無音、あるいは声だけの動画は、内容が良くても素人の作ったものに見える。
+    MoneyPrinterTurbo は BGM をナレーションの 0.2 倍で重ね、終わりを
+    3秒かけて絞っている。数字はそのまま参考にした（BGM_VOLUME /
+    BGM_FADEOUT_SEC）。0.2 より上げるとナレーションが埋もれる。
+
+    ★音源は同梱しない。あちらの resource/songs には29曲入っているが、
+      コードのMITライセンスが音源にも及ぶとは限らず、確認できていない。
+      **確認できない権利の素材を投稿に載せない**（PART 1 の方針と同じ）。
+      使う音源は job の bgm で明示的に渡す。
+    """
+    bgm_path = None
+    bgm_src = str(job.get('bgm') or '').strip()
+    if bgm_src:
+        if bgm_src.startswith(('http://', 'https://', 'file://')):
+            cand = os.path.join(work, 'bgm_src')
+            bgm_path = cand if download(bgm_src, cand) else None
+            if not bgm_path:
+                log('BGMを取得できませんでした（BGM無しで続行）: %s' % bgm_src[:80])
+        elif os.path.exists(bgm_src):
+            bgm_path = bgm_src
+        else:
+            log('BGMが見つかりません（BGM無しで続行）: %s' % bgm_src[:80])
+
     if audio_path:
         cmd += ['-i', audio_path]
     else:
@@ -693,8 +818,17 @@ def main():
         #   プラットフォームによって扱いが不安定になるため。
         cmd += ['-f', 'lavfi', '-i',
                 'anullsrc=channel_layout=stereo:sample_rate=44100']
+
+    """
+    ★BGMは本編より短いことがあるので、尽きたら頭から繰り返す
+      （-stream_loop -1）。長い分は下の -shortest が切る。
+    """
+    if bgm_path:
+        cmd += ['-stream_loop', '-1', '-i', bgm_path]
+
     cmd += ['-shortest']
 
+    # --- 映像フィルタ（字幕）---
     # ★モードTは字幕そのものが本体。ここを 'A' で決め打ちにすると
     #   背景だけの真っ黒な動画が出る（実際に一度そうなった）
     if mode in ('A', 'T') and captions:
@@ -702,6 +836,39 @@ def main():
         with open(assfile, 'w', encoding='utf-8') as f:
             f.write(build_ass(captions, w, h, font_size, center=(mode == 'T')))
         cmd += ['-vf', 'ass=' + assfile.replace('\\', '/').replace(':', r'\:')]
+
+    """
+    ★音声フィルタ。BGMがある回だけ、2本を混ぜて1本にする。
+
+      [1:a] ナレーション（または無音）
+      [2:a] BGM … 音量を落とし、終わりをフェードアウトする
+
+    amix の duration=first は「1本目（ナレーション）の長さで終える」。
+    これを付けないと、繰り返し続けるBGM側に引きずられて終わらなくなる。
+    normalize=0 は amix の自動音量調整を切る指定。切らないと
+    混ぜた瞬間にナレーションの音量まで一緒に下がる。
+    """
+    if bgm_path:
+        """
+        ★フェードアウトを始める位置は「完成後の尺」から逆算する。
+          -shortest が効くので、完成尺は映像と音声の短い方になる。
+          どちらかが取れない時はフェードを諦める（BGMは重ねる）。
+        """
+        vid_len = probe_duration(joined)
+        aud_len = float(target_seconds or 0)
+        lens = [x for x in (vid_len, aud_len) if x and x > 0]
+        final_len = min(lens) if lens else 0.0
+        fade_start = max(0.0, final_len - BGM_FADEOUT_SEC)
+        bgm_chain = 'volume=%.2f' % BGM_VOLUME
+        if fade_start > 0:
+            bgm_chain += ',afade=t=out:st=%.2f:d=%.2f' % (
+                fade_start, BGM_FADEOUT_SEC)
+        cmd += ['-filter_complex',
+                '[2:a]%s[bgm];[1:a][bgm]amix=inputs=2:duration=first:normalize=0[aout]'
+                % bgm_chain,
+                '-map', '0:v', '-map', '[aout]']
+        log('BGMを重ねます（音量 %.2f / 終わり %.1f秒でフェードアウト）'
+            % (BGM_VOLUME, BGM_FADEOUT_SEC))
 
     cmd += ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
             '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
