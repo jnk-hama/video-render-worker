@@ -1,5 +1,7 @@
-# 一時的な確認用。Pixabay音源APIから実際にBGMが取れるかを実測する。
-# 確認が終わったら削除する。
+# 一時的な確認用。403の意味を対照実験で確定させる。
+# 同じキーで 画像API / 動画API / 音源API を叩き分ける。
+#   画像が200で音源が403 → キーは有効。音源APIだけ権限が無い
+#   全部403             → キー自体かIPの問題
 name: verify-audio-api
 
 on:
@@ -10,66 +12,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: 音源APIから実際に取得できるか
-        env:
-          # ★Secret から読む。GitHub がログ中の値を自動で伏せる。
-          #   ワークフローの入力欄に貼ると実行履歴に平文で残るため使わない。
-          PIXA_KEY: ${{ secrets.PIXABAY_API_KEY }}
-        run: |
-          set -uo pipefail
-          if [ -z "${PIXA_KEY}" ]; then
-            echo "❌ Secret PIXABAY_API_KEY が未設定です。"
-            echo "   Settings → Secrets and variables → Actions → New repository secret"
-            exit 1
-          fi
-          code=$(curl -s -o /tmp/audio.json -w "%{http_code}" \
-            -G "https://pixabay.com/api/audio/" \
-            --data-urlencode "key=${PIXA_KEY}" \
-            --data-urlencode "q=lofi" \
-            --data-urlencode "per_page=5" || echo "000")
-          echo "検索 → HTTP ${code}"
-          if [ "$code" != "200" ]; then
-            echo "取得できませんでした。応答:"
-            head -c 300 /tmp/audio.json
-            exit 0
-          fi
-          # ★キーが応答に含まれ得るので、必要な項目だけ選んで出す
-          python3 - <<'PY'
-          import json
-          d = json.load(open('/tmp/audio.json'))
-          print('総ヒット数:', d.get('totalHits'))
-          hits = d.get('hits') or []
-          print('取得件数:', len(hits))
-          if hits:
-              print('1件目のキー一覧:', sorted(hits[0].keys()))
-          for h in hits[:5]:
-              print('---')
-              for k in ('id', 'duration', 'tags', 'audio', 'previewURL', 'user'):
-                  if k in h:
-                      v = str(h[k])
-                      print('  %s: %s' % (k, v[:110]))
-          PY
-
-      - name: 実ファイルをダウンロードできるか
+      - name: 同じキーで3つのエンドポイントを叩き比べる
         env:
           PIXA_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
           set -uo pipefail
-          url=$(python3 - <<'PY'
+          if [ -z "${PIXA_KEY}" ]; then echo "❌ Secret 未設定"; exit 1; fi
+          for ep in "api/" "api/videos/" "api/audio/"; do
+            code=$(curl -s -o /tmp/r.json -w "%{http_code}" \
+              -G "https://pixabay.com/${ep}" \
+              --data-urlencode "key=${PIXA_KEY}" \
+              --data-urlencode "q=lofi" \
+              --data-urlencode "per_page=3" || echo "000")
+            echo "=== ${ep} → HTTP ${code}"
+            # ★応答にキーが混ざり得るので、件数だけを取り出す
+            python3 - <<'PY'
           import json
           try:
-              d = json.load(open('/tmp/audio.json'))
+              d = json.load(open('/tmp/r.json'))
+              print('   totalHits:', d.get('totalHits'), '/ hits:', len(d.get('hits') or []))
               h = (d.get('hits') or [{}])[0]
-              print(h.get('audio') or h.get('previewURL') or '')
+              if h:
+                  print('   1件目のキー:', sorted(h.keys())[:14])
           except Exception:
-              print('')
+              print('   （JSONではない応答）', open('/tmp/r.json').read()[:120])
           PY
-          )
-          if [ -z "$url" ]; then echo "URLが取れませんでした"; exit 0; fi
-          echo "取得先のホスト: $(echo "$url" | sed -E 's#^(https?://[^/]+)/.*#\1#')"
-          code=$(curl -s -L -o /tmp/bgm.mp3 -w "%{http_code}" "$url" || echo "000")
-          echo "ダウンロード → HTTP ${code}"
-          ls -la /tmp/bgm.mp3 2>/dev/null || true
-          # ★本当に音声として成立しているかを ffprobe で確かめる
-          ffprobe -v error -show_entries format=duration,format_name \
-            -of default=noprint_wrappers=1 /tmp/bgm.mp3 2>&1 | head -5
+          done
