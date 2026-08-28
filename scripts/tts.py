@@ -58,7 +58,22 @@ async def _synth(text, voice, rate, out_path):
     ★stream() を使う。save() だと音声しか得られず、単語の時刻が捨てられる。
     """
     edge_tts = _require_edge_tts()
-    comm = edge_tts.Communicate(text, voice, rate=rate)
+    """
+    ★★2026-08-28、GitHub Actionsで初めて実走させて発見した。
+
+    edge-tts 7.2.8 は Communicate() の boundary 既定値を
+    'SentenceBoundary' に変えていた（本コード執筆時は 'WordBoundary' が
+    既定だった）。boundary を明示しないと、来るイベントは文単位になり、
+    下の "elif t == 'WordBoundary':" に一つも一致しない。
+
+    結果、音声合成そのものは成功するのに words が常に空になり、
+    「単語の時刻が取れませんでした」を経て、モードTは
+    「narration か captions が要ります」で毎回落ちていた。
+    ネットワークとは無関係の、ライブラリ側のデフォルト変更が原因。
+    開発環境はWebSocketを通さずTTSを試せないため、今まで一度も
+    気づけなかった。
+    """
+    comm = edge_tts.Communicate(text, voice, rate=rate, boundary='WordBoundary')
 
     words = []
     with open(out_path, 'wb') as f:
