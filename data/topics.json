@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-26T23:10:37+00:00",
+ "generated_at": "2026-08-28T01:53:59+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,15 +7,6 @@
     "id": "t3_1vwasmm",
     "title": "Insane situational awareness from this lifeguard as he spots a drowning kid surrounded by people",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vwasmm/insane_situational_awareness_from_this_lifeguard/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vtnoxg",
-    "title": "Nikolay Rusev from Bulgaria makes a near impossible dyno",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vtnoxg/nikolay_rusev_from_bulgaria_makes_a_near/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,6 +31,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1vz58to",
+    "title": "The way this pilot's emergency oxygen mask automatically adjusts to fit.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vz58to/the_way_this_pilots_emergency_oxygen_mask/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1vvmelo",
     "title": "Next-level Body control",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vvmelo/nextlevel_body_control/",
@@ -49,91 +49,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vxiglv",
-    "title": "Party trick",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vxiglv/party_trick/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1vy8c5s",
+    "title": "Dolly Parton started the Imagination Library in 1995 as a tribute to her father, who couldn't read or write. In 2018, she explained it was to give kids \"early access to books\". Now, over 325 MILLION books have been gifted.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vy8c5s/dolly_parton_started_the_imagination_library_in/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vv491s",
-    "title": "Refusing assistance from a guide",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vv491s/refusing_assistance_from_a_guide/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1vuhjwz",
+    "title": "Just bumped into this poster",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vuhjwz/just_bumped_into_this_poster/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vvfu4s",
-    "title": "Man slips on own piss",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vvfu4s/man_slips_on_own_piss/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1vw4dbs",
+    "title": "Son who lives abroad returns home and video calls his father",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vw4dbs/son_who_lives_abroad_returns_home_and_video_calls/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vukc2m",
-    "title": "Hornet nest",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vukc2m/hornet_nest/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1vyps2s",
+    "title": "Empire State Building lit up for Dolly 💗",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vyps2s/empire_state_building_lit_up_for_dolly/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vucbqj",
-    "title": "Man gets angry because a full bus couldn't pick him up",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vucbqj/man_gets_angry_because_a_full_bus_couldnt_pick/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1vv8nyt",
+    "title": "HMB while I defuse this accidental bomb",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1vv8nyt/hmb_while_i_defuse_this_accidental_bomb/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vw0g0n",
-    "title": "Chainsaw-Crafty Raccoon (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1vw0g0n/chainsawcrafty_raccoon_source_link_in_description/",
-    "subreddit": "toptalent",
+    "id": "t3_1vxch6y",
+    "title": "HMB while I car doughnuts surf",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1vxch6y/hmb_while_i_car_doughnuts_surf/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vv7mxp",
-    "title": "A group of kids unleashing \"Killing in the Name\" (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1vv7mxp/a_group_of_kids_unleashing_killing_in_the_name/",
-    "subreddit": "toptalent",
+    "id": "t3_1vuuxah",
+    "title": "HMB while I hold a beer",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1vuuxah/hmb_while_i_hold_a_beer/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vvoma6",
-    "title": "Central Park and Times Square drum solos by Yoyoka Soma (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1vvoma6/central_park_and_times_square_drum_solos_by/",
-    "subreddit": "toptalent",
+    "id": "t3_1vzgveq",
+    "title": "HMB while i catch a cigarette",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1vzgveq/hmb_while_i_catch_a_cigarette/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vy06ch",
-    "title": "Frame by frame battle between MJ and Tanjiro (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1vy06ch/frame_by_frame_battle_between_mj_and_tanjiro/",
-    "subreddit": "toptalent",
+    "id": "t3_1vyxipg",
+    "title": "Buckingham Palace pays tribute to Dolly Parton by performing “9 to 5\"",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vyxipg/buckingham_palace_pays_tribute_to_dolly_parton_by/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vv93n4",
-    "title": "Woman Learns About Her Sister's Duolingo Streak",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1vv93n4/woman_learns_about_her_sisters_duolingo_streak/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1vvgl16",
+    "title": "This guy built over 1,000 homes for squirrels and fitted some of them with cameras to see how they live!",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vvgl16/this_guy_built_over_1000_homes_for_squirrels_and/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,28 +141,37 @@
   ],
   "B": [
    {
-    "id": "t3_1vuh8na",
-    "title": "anime_irl",
-    "url": "https://www.reddit.com/r/anime_irl/comments/1vuh8na/anime_irl/",
-    "subreddit": "anime_irl",
+    "id": "t3_1vx1wi5",
+    "title": "Eris [Mushoku Tensei]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vx1wi5/eris_mushoku_tensei/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vw63g8",
-    "title": "anime_irl",
-    "url": "https://www.reddit.com/r/anime_irl/comments/1vw63g8/anime_irl/",
-    "subreddit": "anime_irl",
+    "id": "t3_1vy5nty",
+    "title": "Karen [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vy5nty/karen_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vvmmfw",
-    "title": "Anime_irl",
-    "url": "https://www.reddit.com/r/anime_irl/comments/1vvmmfw/anime_irl/",
-    "subreddit": "anime_irl",
+    "id": "t3_1vyz7za",
+    "title": "Miyabi [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vyz7za/miyabi_zenless_zone_zero/",
+    "subreddit": "awwnime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vuqn62",
+    "title": "Gorgeous Glaceon [Pokemon]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vuqn62/gorgeous_glaceon_pokemon/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -204,28 +213,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vtynk0",
-    "title": "Clementine from The Walking Dead by me!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1vtynk0/clementine_from_the_walking_dead_by_me/",
+    "id": "t3_1vx00wm",
+    "title": "my yani neko cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vx00wm/my_yani_neko_cosplay/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vv7wvf",
-    "title": "anime_irl",
-    "url": "https://www.reddit.com/r/anime_irl/comments/1vv7wvf/anime_irl/",
-    "subreddit": "anime_irl",
+    "id": "t3_1vve2vc",
+    "title": "I flew from Japan to New York and went on 3 anime pilgrimages!",
+    "url": "https://www.reddit.com/r/anime/comments/1vve2vc/i_flew_from_japan_to_new_york_and_went_on_3_anime/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": false,
+    "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vx2k2z",
-    "title": "Anime_irl",
-    "url": "https://www.reddit.com/r/anime_irl/comments/1vx2k2z/anime_irl/",
-    "subreddit": "anime_irl",
+    "id": "t3_1vyt2qc",
+    "title": "So anyway, I started blasting [Kill la Kill]",
+    "url": "https://www.reddit.com/r/anime/comments/1vyt2qc/so_anyway_i_started_blasting_kill_la_kill/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vy08t5",
+    "title": "Favorite weird/random in-universe clothing that characters wear?",
+    "url": "https://www.reddit.com/r/anime/comments/1vy08t5/favorite_weirdrandom_inuniverse_clothing_that/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vzygt1",
+    "title": "Anime like this are reminder that there's NO such thing as \"Carried by Animation\" because this has Some of the Most Beautiful/Creative Animation I've seen in an action anime yet it doesn't have even a fraction of popularity those big shows have [Elusive Samurai]",
+    "url": "https://www.reddit.com/r/anime/comments/1vzygt1/anime_like_this_are_reminder_that_theres_no_such/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vw9hn1",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 9 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1vw9hn1/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": false,
     "source": "rss"
