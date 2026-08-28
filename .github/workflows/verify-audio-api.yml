@@ -1,42 +1,74 @@
-# 一時的な確認用。音源APIの実在とライセンス条件を、推測ではなく実測する。
+# 一時的な確認用。Pixabay音源APIから実際にBGMが取れるかを実測する。
 # 確認が終わったら削除する。
 name: verify-audio-api
 
 on:
   workflow_dispatch:
+    inputs:
+      pixabay_key:
+        description: 'Pixabay APIキー（ログには出しません）'
+        required: true
+        type: string
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Pixabay のエンドポイントが実在するか
+      - name: 音源APIから実際に取得できるか
+        env:
+          # ★入力を直接シェルへ展開しない。ログにも出さない
+          PIXA_KEY: ${{ inputs.pixabay_key }}
         run: |
           set -uo pipefail
-          # ★キーはわざとダミー。知りたいのは「エンドポイントがあるか」だけ。
-          #   404 = 存在しない / 400・401 = 存在するがキーが不正
-          for p in "api/" "api/videos/" "api/audio/" "api/music/"; do
-            code=$(curl -s -o /tmp/body.txt -w "%{http_code}" \
-              "https://pixabay.com/${p}?key=DUMMY_NOT_A_REAL_KEY&q=lofi" || echo "000")
-            echo "--- https://pixabay.com/${p} → HTTP ${code}"
-            head -c 200 /tmp/body.txt; echo ""
-          done
+          code=$(curl -s -o /tmp/audio.json -w "%{http_code}" \
+            -G "https://pixabay.com/api/audio/" \
+            --data-urlencode "key=${PIXA_KEY}" \
+            --data-urlencode "q=lofi" \
+            --data-urlencode "per_page=5" || echo "000")
+          echo "検索 → HTTP ${code}"
+          if [ "$code" != "200" ]; then
+            echo "取得できませんでした。応答:"
+            head -c 300 /tmp/audio.json
+            exit 0
+          fi
+          # ★キーが応答に含まれ得るので、必要な項目だけ選んで出す
+          python3 - <<'PY'
+          import json
+          d = json.load(open('/tmp/audio.json'))
+          print('総ヒット数:', d.get('totalHits'))
+          hits = d.get('hits') or []
+          print('取得件数:', len(hits))
+          if hits:
+              print('1件目のキー一覧:', sorted(hits[0].keys()))
+          for h in hits[:5]:
+              print('---')
+              for k in ('id', 'duration', 'tags', 'audio', 'previewURL', 'user'):
+                  if k in h:
+                      v = str(h[k])
+                      print('  %s: %s' % (k, v[:110]))
+          PY
 
-      - name: Freesound の検索とCC0フィルタ
+      - name: 実ファイルをダウンロードできるか
+        env:
+          PIXA_KEY: ${{ inputs.pixabay_key }}
         run: |
           set -uo pipefail
-          # トークン無し → 401 なら「エンドポイントは在る、認証が要る」
-          code=$(curl -s -o /tmp/fs.txt -w "%{http_code}" \
-            'https://freesound.org/apiv2/search/text/?query=loop&filter=license:%22Creative%20Commons%200%22' || echo "000")
-          echo "--- freesound search（トークン無し）→ HTTP ${code}"
-          head -c 300 /tmp/fs.txt; echo ""
-
-      - name: Freesound のプレビューURLが認証不要か
-        run: |
-          set -uo pipefail
-          # ★実在する音源のプレビューURLの形。認証不要ならここが200になる。
-          #   ID 1234 は Freesound に古くから在る音源。
-          code=$(curl -s -o /dev/null -w "%{http_code}" -L \
-            "https://cdn.freesound.org/previews/0/1234_1-hq.mp3" || echo "000")
-          echo "--- freesound preview CDN → HTTP ${code}"
-          echo "（200なら認証不要。403/401なら要認証）"
+          url=$(python3 - <<'PY'
+          import json
+          try:
+              d = json.load(open('/tmp/audio.json'))
+              h = (d.get('hits') or [{}])[0]
+              print(h.get('audio') or h.get('previewURL') or '')
+          except Exception:
+              print('')
+          PY
+          )
+          if [ -z "$url" ]; then echo "URLが取れませんでした"; exit 0; fi
+          echo "取得先のホスト: $(echo "$url" | sed -E 's#^(https?://[^/]+)/.*#\1#')"
+          code=$(curl -s -L -o /tmp/bgm.mp3 -w "%{http_code}" "$url" || echo "000")
+          echo "ダウンロード → HTTP ${code}"
+          ls -la /tmp/bgm.mp3 2>/dev/null || true
+          # ★本当に音声として成立しているかを ffprobe で確かめる
+          ffprobe -v error -show_entries format=duration,format_name \
+            -of default=noprint_wrappers=1 /tmp/bgm.mp3 2>&1 | head -5
