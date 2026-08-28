@@ -844,6 +844,27 @@ def main():
     """
     bgm_path = None
     bgm_src = str(job.get('bgm') or '').strip()
+
+    """
+    ★"random" と書けば assets/bgm/ から1本選ぶ（2026-08-28）。
+
+    GAS側が曲名を知らなくて済むようにする。曲を足したり入れ替えたり
+    しても、GAS側のコードは触らなくてよい。
+    """
+    if bgm_src.lower() == 'random':
+        here = os.path.dirname(os.path.abspath(__file__))
+        bgm_dir = os.path.join(os.path.dirname(here), 'assets', 'bgm')
+        pool = []
+        if os.path.isdir(bgm_dir):
+            pool = sorted(f for f in os.listdir(bgm_dir)
+                          if f.lower().endswith(('.mp3', '.m4a', '.ogg', '.wav')))
+        if pool:
+            bgm_src = os.path.join(bgm_dir, rng.choice(pool))
+            log('BGMを選びました: %s' % os.path.basename(bgm_src))
+        else:
+            log('assets/bgm/ に音源がありません。BGM無しで続行します。')
+            bgm_src = ''
+
     if bgm_src:
         if bgm_src.startswith(('http://', 'https://', 'file://')):
             cand = os.path.join(work, 'bgm_src')
