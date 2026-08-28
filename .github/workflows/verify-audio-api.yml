@@ -1,0 +1,42 @@
+# 一時的な確認用。音源APIの実在とライセンス条件を、推測ではなく実測する。
+# 確認が終わったら削除する。
+name: verify-audio-api
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pixabay のエンドポイントが実在するか
+        run: |
+          set -uo pipefail
+          # ★キーはわざとダミー。知りたいのは「エンドポイントがあるか」だけ。
+          #   404 = 存在しない / 400・401 = 存在するがキーが不正
+          for p in "api/" "api/videos/" "api/audio/" "api/music/"; do
+            code=$(curl -s -o /tmp/body.txt -w "%{http_code}" \
+              "https://pixabay.com/${p}?key=DUMMY_NOT_A_REAL_KEY&q=lofi" || echo "000")
+            echo "--- https://pixabay.com/${p} → HTTP ${code}"
+            head -c 200 /tmp/body.txt; echo ""
+          done
+
+      - name: Freesound の検索とCC0フィルタ
+        run: |
+          set -uo pipefail
+          # トークン無し → 401 なら「エンドポイントは在る、認証が要る」
+          code=$(curl -s -o /tmp/fs.txt -w "%{http_code}" \
+            'https://freesound.org/apiv2/search/text/?query=loop&filter=license:%22Creative%20Commons%200%22' || echo "000")
+          echo "--- freesound search（トークン無し）→ HTTP ${code}"
+          head -c 300 /tmp/fs.txt; echo ""
+
+      - name: Freesound のプレビューURLが認証不要か
+        run: |
+          set -uo pipefail
+          # ★実在する音源のプレビューURLの形。認証不要ならここが200になる。
+          #   ID 1234 は Freesound に古くから在る音源。
+          code=$(curl -s -o /dev/null -w "%{http_code}" -L \
+            "https://cdn.freesound.org/previews/0/1234_1-hq.mp3" || echo "000")
+          echo "--- freesound preview CDN → HTTP ${code}"
+          echo "（200なら認証不要。403/401なら要認証）"
