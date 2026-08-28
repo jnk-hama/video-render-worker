@@ -780,6 +780,50 @@ def main():
          '-f', 'concat', '-safe', '0', '-i', listfile,
          '-c', 'copy', joined])
 
+    """
+    ★★2026-08-28。映像が音声より短い回に、最後の絵を伸ばして埋める。
+
+    【切り上げ修正だけでは塞がらなかった穴】
+    カット数を切り上げても、素材の取得が失敗すれば目標本数に届かない。
+    実測した例（素材4本中3本が404）：
+
+      音声 12.0秒 に合わせて 9 カット
+      使えたクリップ: 3 本（目標 9）
+      完成: 4.5秒
+
+    **12秒のナレーションが4.5秒で切れた。** ログは「3本（目標9）」と
+    正しく言っているのに、そのまま出力していた。半分以上が黙って消える。
+    ストックCDNは普通に欠けるので、これは珍しい事故ではない。
+
+    【なぜ黒画面ではなく静止で埋めるのか】
+    Pixelle-Video は不足分を黒画面で埋めていた（color=c=black を連結）。
+    黒はプレイヤーの読み込み失敗と見分けが付かず、事故に見える。
+    tpad の stop_mode=clone は最後のフレームを保持するので、
+    「間を取っている」ように見え、少なくとも壊れて見えない。
+    """
+    need_len = float(target_seconds or 0)
+    if need_len > 0:
+        vid_len = probe_duration(joined) or 0.0
+        # 0.05秒は測定誤差。これ未満のズレで再エンコードしない
+        if vid_len > 0 and vid_len < need_len - 0.05:
+            short_by = need_len - vid_len
+            padded = os.path.join(work, 'padded.mp4')
+            log('映像が音声より %.2f秒 短いので、最後の絵を伸ばして埋めます'
+                '（%.2f秒 → %.2f秒）' % (short_by, vid_len, need_len))
+            try:
+                run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+                     '-i', joined, '-an',
+                     '-vf', 'tpad=stop_mode=clone:stop_duration=%.2f' % short_by,
+                     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
+                     '-pix_fmt', 'yuv420p', padded])
+                if os.path.exists(padded) and os.path.getsize(padded) > 1024:
+                    joined = padded
+                else:
+                    log('  埋められませんでした。そのまま続行します。')
+            except Exception as e:
+                # ★ここで落とさない。埋められなくても動画は出す
+                log('  埋める処理に失敗（そのまま続行）: %s' % str(e)[:80])
+
     # ------------------------------------------------------------------
     # 仕上げ
     # ------------------------------------------------------------------
