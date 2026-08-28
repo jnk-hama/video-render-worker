@@ -4,11 +4,6 @@ name: verify-audio-api
 
 on:
   workflow_dispatch:
-    inputs:
-      pixabay_key:
-        description: 'Pixabay APIキー（ログには出しません）'
-        required: true
-        type: string
 
 jobs:
   verify:
@@ -17,10 +12,16 @@ jobs:
     steps:
       - name: 音源APIから実際に取得できるか
         env:
-          # ★入力を直接シェルへ展開しない。ログにも出さない
-          PIXA_KEY: ${{ inputs.pixabay_key }}
+          # ★Secret から読む。GitHub がログ中の値を自動で伏せる。
+          #   ワークフローの入力欄に貼ると実行履歴に平文で残るため使わない。
+          PIXA_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
           set -uo pipefail
+          if [ -z "${PIXA_KEY}" ]; then
+            echo "❌ Secret PIXABAY_API_KEY が未設定です。"
+            echo "   Settings → Secrets and variables → Actions → New repository secret"
+            exit 1
+          fi
           code=$(curl -s -o /tmp/audio.json -w "%{http_code}" \
             -G "https://pixabay.com/api/audio/" \
             --data-urlencode "key=${PIXA_KEY}" \
@@ -51,7 +52,7 @@ jobs:
 
       - name: 実ファイルをダウンロードできるか
         env:
-          PIXA_KEY: ${{ inputs.pixabay_key }}
+          PIXA_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
           set -uo pipefail
           url=$(python3 - <<'PY'
