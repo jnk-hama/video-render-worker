@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-29T00:28:09+00:00",
+ "generated_at": "2026-08-29T06:29:01+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -49,37 +49,82 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vy8c5s",
-    "title": "Dolly Parton started the Imagination Library in 1995 as a tribute to her father, who couldn't read or write. In 2018, she explained it was to give kids \"early access to books\". Now, over 325 MILLION books have been gifted.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1vy8c5s/dolly_parton_started_the_imagination_library_in/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1vyw8oj",
+    "title": "Before and after of Syapru beshi, one of the affected areas of today's flash flooding in Nepal.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vyw8oj/before_and_after_of_syapru_beshi_one_of_the/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w0isy8",
-    "title": "A simple couple with an extraordinary legacy.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w0isy8/a_simple_couple_with_an_extraordinary_legacy/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1vw7e68",
+    "title": "A 150-million-year-old Lepidotus fish fossil preserved from Holzmaden, Germany",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vw7e68/a_150millionyearold_lepidotus_fish_fossil/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vw4dbs",
-    "title": "Son who lives abroad returns home and video calls his father",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1vw4dbs/son_who_lives_abroad_returns_home_and_video_calls/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1vvb6jz",
+    "title": "Massive street art in Melbourne",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vvb6jz/massive_street_art_in_melbourne/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyps2s",
-    "title": "Empire State Building lit up for Dolly 💗",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1vyps2s/empire_state_building_lit_up_for_dolly/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1vvo5hy",
+    "title": "The correct way to eat Sushi",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vvo5hy/the_correct_way_to_eat_sushi/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vy3dmn",
+    "title": "Pyramids of Giza, photographed in 1962.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vy3dmn/pyramids_of_giza_photographed_in_1962/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w01fwc",
+    "title": "WCGW Road Raging With Your Door Open",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w01fwc/wcgw_road_raging_with_your_door_open/",
+    "subreddit": "WinStupidPrizes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vvfu4s",
+    "title": "Man slips on own piss",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vvfu4s/man_slips_on_own_piss/",
+    "subreddit": "WinStupidPrizes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w0p772",
+    "title": "Let's provoke a boxer for no reason",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w0p772/lets_provoke_a_boxer_for_no_reason/",
+    "subreddit": "WinStupidPrizes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vvbyrn",
+    "title": "Thief on a motorcycle gets caught",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vvbyrn/thief_on_a_motorcycle_gets_caught/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -89,51 +134,6 @@
     "title": "HMB while I defuse this accidental bomb",
     "url": "https://www.reddit.com/r/holdmybeer/comments/1vv8nyt/hmb_while_i_defuse_this_accidental_bomb/",
     "subreddit": "holdmybeer",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vxch6y",
-    "title": "HMB while I car doughnuts surf",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1vxch6y/hmb_while_i_car_doughnuts_surf/",
-    "subreddit": "holdmybeer",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vzgveq",
-    "title": "HMB while i catch a cigarette",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1vzgveq/hmb_while_i_catch_a_cigarette/",
-    "subreddit": "holdmybeer",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w0ngiv",
-    "title": "HMB while I tank an incoming motorcycle",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1w0ngiv/hmb_while_i_tank_an_incoming_motorcycle/",
-    "subreddit": "holdmybeer",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vyxipg",
-    "title": "Buckingham Palace pays tribute to Dolly Parton by performing “9 to 5\"",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vyxipg/buckingham_palace_pays_tribute_to_dolly_parton_by/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vzgb2r",
-    "title": "Group narrowly escapes massive flood by running uphill",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vzgb2r/group_narrowly_escapes_massive_flood_by_running/",
-    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -168,64 +168,73 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vxf3fw",
-    "title": "The breeze has a secret to tell you...",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vxf3fw/the_breeze_has_a_secret_to_tell_you/",
-    "subreddit": "animegifs",
+    "id": "t3_1w095nv",
+    "title": "My True Form/Final Form Sukuna cosplay for ANIMENYC",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w095nv/my_true_formfinal_form_sukuna_cosplay_for_animenyc/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vw9z4e",
-    "title": "A First Glimpse Of Paradise",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vw9z4e/a_first_glimpse_of_paradise/",
-    "subreddit": "animegifs",
+    "id": "t3_1vxmjdx",
+    "title": "I wore my old Rukia cosplay 16 years later At Anime NYC!",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vxmjdx/i_wore_my_old_rukia_cosplay_16_years_later_at/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxcvm8",
-    "title": "He Had It Coming — Should’ve Kept His Hands To Himself",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vxcvm8/he_had_it_coming_shouldve_kept_his_hands_to/",
-    "subreddit": "animegifs",
+    "id": "t3_1vvbacp",
+    "title": "Azula from Avatar: The Last Airbender",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vvbacp/azula_from_avatar_the_last_airbender/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vvs2f0",
-    "title": "Marine tries the old pin against the wall and wink method of flirting.",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vvs2f0/marine_tries_the_old_pin_against_the_wall_and/",
-    "subreddit": "animegifs",
+    "id": "t3_1vwo3aq",
+    "title": "My Luke Skywalker Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vwo3aq/my_luke_skywalker_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vx17gm",
-    "title": "South Bank photo shoot📷",
-    "url": "https://www.reddit.com/r/streetwear/comments/1vx17gm/south_bank_photo_shoot/",
-    "subreddit": "streetwear",
+    "id": "t3_1vx00wm",
+    "title": "my yani neko cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vx00wm/my_yani_neko_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vwh9z1",
-    "title": "Throw on a fit or throwing a fit?",
-    "url": "https://www.reddit.com/r/streetwear/comments/1vwh9z1/throw_on_a_fit_or_throwing_a_fit/",
-    "subreddit": "streetwear",
+    "id": "t3_1vve2vc",
+    "title": "I flew from Japan to New York and went on 3 anime pilgrimages!",
+    "url": "https://www.reddit.com/r/anime/comments/1vve2vc/i_flew_from_japan_to_new_york_and_went_on_3_anime/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyyer8",
-    "title": "Yesterday’s work fit",
-    "url": "https://www.reddit.com/r/streetwear/comments/1vyyer8/yesterdays_work_fit/",
-    "subreddit": "streetwear",
+    "id": "t3_1vyt2qc",
+    "title": "So anyway, I started blasting [Kill la Kill]",
+    "url": "https://www.reddit.com/r/anime/comments/1vyt2qc/so_anyway_i_started_blasting_kill_la_kill/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vy08t5",
+    "title": "Favorite weird/random in-universe clothing that characters wear?",
+    "url": "https://www.reddit.com/r/anime/comments/1vy08t5/favorite_weirdrandom_inuniverse_clothing_that/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -252,15 +261,6 @@
     "id": "t3_1vwue3n",
     "title": "How both traveler sleep",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vwue3n/how_both_traveler_sleep/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vv2tq5",
-    "title": "Happy Birthday, Arlecchino!",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vv2tq5/happy_birthday_arlecchino/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
