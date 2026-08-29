@@ -51,11 +51,13 @@
 """
 
 import argparse
+import io
 import json
 import math
 import os
 import random
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -289,16 +291,160 @@ def ass_escape(text):
             .strip())
 
 
-# ★1文字あたりの幅 ÷ フォントサイズ。DejaVu Sans Bold を実際に描画して測った値。
-#   110pxで "HAD NO BUSINESS"（15文字）が約960px → 64/110 ≒ 0.58。
-#   はみ出す側の失敗の方が痛いので、少し大きめの 0.60 を使う。
-CHAR_WIDTH_RATIO = 0.60
+"""
+★★2026-08-28、フォントを Anton へ変更し、文字幅の比率を測り直した。
+
+【なぜ変えたか】
+DejaVu Sans は Linux の標準フォントで、機能はするが縦型ショート動画の
+字幕としては幅を取りすぎる。Anton は縦長・高ウェイトで、この用途の
+定番。同じ文字数が **6割の幅** に収まるので、同じ画面に大きく出せる。
+
+【比率を測り直した理由（ここが重要）】
+CHAR_WIDTH_RATIO は fit_caption が「何文字で折るか」を決める唯一の根拠。
+フォントを変えたのに比率を変えないと、折る位置がずれて画面からはみ出す。
+
+実測（同じ文字列 "HAD NO BUSINESS" 15文字をサイズ110で描画し、
+白画素の左端と右端から実幅を測った）:
+
+    DejaVu Sans Bold   1127px → 0.683
+    Archivo             999px → 0.605
+    Anton               698px → 0.423   ← 採用
+
+★旧コードは 0.60 を使っていたが、DejaVu の実測は 0.683 だった。
+  11文字を size140 で出すと、実際の描画は 1004px。
+  使える幅として想定していた 960px を超え、左右の余白が
+  60px の想定に対し 37〜39px しか残っていなかった（実測）。
+  画面外には出ていなかったが、根拠のない数字で動いていた。
+
+はみ出す側の失敗の方が痛いので、実測値に少し余裕を足して使う。
+"""
+
+# 字幕に使うフォント。ワークフローが google/fonts から取得して置く。
+# ★google/fonts のリポジトリは 3.3GB あるので clone しない。
+#   必要な1ファイルだけ raw から取る（Anton は 168KB）。
+CAPTION_FONT_NAME = 'Anton'
+CAPTION_FONT_FILE = 'Anton-Regular.ttf'
+CAPTION_FONT_URL = ('https://raw.githubusercontent.com/google/fonts/main/'
+                    'ofl/anton/Anton-Regular.ttf')
+
+# 1文字あたりの幅 ÷ フォントサイズ。上の実測値に余裕を足したもの。
+CHAR_WIDTH_RATIO = 0.45          # Anton（実測 0.423）
+CHAR_WIDTH_RATIO_FALLBACK = 0.70  # DejaVu（実測 0.683）
 
 # 字幕は最大2行まで。3行以上は映像を隠しすぎる
 MAX_CAPTION_LINES = 2
 
+# 字幕の黒縁の太さ。明るい映像の上で文字を読ませるために要る。
+# ★幅の計算に効く。縁は文字の左右へこの分だけはみ出すので、
+#   使える幅から左右2本ぶん引いておかないと余白がその分だけ痩せる
+#   （実測：引く前は狙い60pxに対し42pxしか残らなかった）。
+CAPTION_OUTLINE = 7
 
-def fit_caption(words, w, font_size):
+
+def caption_font():
+    """
+    字幕に使うフォントを決める。
+
+    @return (フォント名, フォントを置いたディレクトリ or None, 文字幅の比率)
+
+    ★見つからなければ黙って DejaVu へ降りる。フォントが無いことを
+      理由に動画を1本落とすのは損。ただし比率は必ず一緒に切り替える。
+      比率だけ Anton のまま DejaVu で描くと、1.5倍の幅で描かれて
+      画面からはみ出す（比率とフォントは必ず対で扱う）。
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    for d in (os.path.join(os.path.dirname(here), 'assets', 'fonts'),
+              os.path.join(here, 'fonts')):
+        if os.path.exists(os.path.join(d, CAPTION_FONT_FILE)):
+            return CAPTION_FONT_NAME, d, CHAR_WIDTH_RATIO
+    log('%s が見つかりません。DejaVu Sans で描きます。' % CAPTION_FONT_FILE)
+    return 'DejaVu Sans', None, CHAR_WIDTH_RATIO_FALLBACK
+
+
+# 幅を測る時の基準サイズと下地。
+# ★幅はフォントサイズに正比例する（実測：Anton "PERFORMANCE" は
+#   size100で306px / size140で429px、比率はどちらも0.278）。
+#   だから測るのは一度、基準サイズだけでよい。
+# ★下地は「どんなに長い行でも切れない」幅にする。狭いと画面端で
+#   文字が欠け、欠けたぶん細く測れてしまう（DejaVuの15文字で実際に起きた）。
+MEASURE_FONT_SIZE = 100
+MEASURE_CANVAS_W = 4000
+MEASURE_CANVAS_H = 300
+
+
+def measure_char_ratio(text, font_name, font_dir):
+    """
+    その文字列を libass に実際に描かせて幅を測り、
+    「1文字あたりの幅 ÷ フォントサイズ」を返す。測れなければ None。
+
+    ★★2026-08-29、固定値をやめて実測に切り替えた。
+
+    【なぜ固定値では駄目か】
+    1文字あたりの幅は文字列の中身で大きく変わる。同じ Anton でも
+    実測（libass、基準サイズ100）でこれだけ開く:
+
+        "WOW"              0.350   ← W が並ぶと太い
+        "PERFORMANCE"      0.278
+        "HAD NO BUSINESS"  0.244   ← 空白が混ざると細い
+
+    最も太い側に合わせれば短い語が小さく出るし、細い側に合わせれば
+    長い行が画面からはみ出す。**どの一つの数字を選んでも必ず外れる。**
+    実測なら外れない。
+
+    【ffmpegを1回余分に叩くコストについて】
+    1回およそ0.18秒（実測、8回で1.45秒）。字幕20枚で4秒ほど。
+    描画ジョブの持ち時間は20分なので、精度に対して十分に安い。
+
+    【measure に失敗した時】
+    Noneを返し、呼び出し側は従来の固定値へ降りる。字幕の大きさが
+    多少ずれるだけで済ませ、動画を1本落とさない。
+    """
+    body = str(text or '').strip()
+    if not body:
+        return None
+    d = tempfile.mkdtemp(prefix='measure-')
+    try:
+        ass = os.path.join(d, 'm.ass')
+        with io.open(ass, 'w', encoding='utf-8') as f:
+            f.write(build_ass_head(MEASURE_CANVAS_W, MEASURE_CANVAS_H,
+                                   MEASURE_FONT_SIZE, font_name,
+                                   outline=0) + '\n')
+            f.write('Dialogue: 0,0:00:00.00,0:00:02.00,Pop,,0,0,0,,'
+                    '{\\an5\\pos(%d,%d)}%s\n'
+                    % (MEASURE_CANVAS_W // 2, MEASURE_CANVAS_H // 2, body))
+        arg = 'ass=' + ass.replace('\\', '/').replace(':', r'\:')
+        if font_dir:
+            arg += ':fontsdir=' + font_dir.replace('\\', '/').replace(':', r'\:')
+        # ★縦を1pxへ潰してから読む。1080x1920を素で走査すると
+        #   200万バイトをPythonで舐めることになり、そこだけで遅くなる。
+        #   面積平均で潰せば、文字のある列は必ず下地より明るくなる。
+        raw = subprocess.run(
+            ['ffmpeg', '-v', 'error', '-f', 'lavfi',
+             '-i', 'color=c=black:s=%dx%d:d=0.1:r=1'
+             % (MEASURE_CANVAS_W, MEASURE_CANVAS_H),
+             '-vf', arg + ',format=gray,scale=%d:1:flags=area' % MEASURE_CANVAS_W,
+             '-frames:v', '1', '-f', 'rawvideo', '-'],
+            capture_output=True).stdout
+    except Exception as e:
+        log('字幕の幅を測れませんでした（固定値で描きます）: %s' % e)
+        return None
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+    if len(raw) < MEASURE_CANVAS_W:
+        return None
+    # ★下地は yuv の黒（0ではない）。行の最小値を下地とみなす
+    base = min(raw)
+    on = [i for i, v in enumerate(raw) if v > base + 1]
+    if not on:
+        return None
+    width = on[-1] - on[0] + 1
+    if width >= MEASURE_CANVAS_W - 2:
+        return None                       # 下地に収まっていない。信用しない
+    return width / float(len(body) * MEASURE_FONT_SIZE)
+
+
+def fit_caption(words, w, font_size, ratio=None, h_hint=0):
     """
     画面幅に収まる文字サイズと、改行位置を決める。
 
@@ -312,12 +458,12 @@ def fit_caption(words, w, font_size):
 
     @return (フォントサイズ, [1行目の語数, ...])
     """
-    usable = w - 120                       # 左右60pxずつ余白
+    usable = w - 120 - CAPTION_OUTLINE * 2   # 左右60pxずつ余白＋黒縁
     floor = max(40, int(font_size * 0.5))  # これ以下は読めない
 
     size = font_size
     while True:
-        per_char = CHAR_WIDTH_RATIO * size
+        per_char = (ratio or CHAR_WIDTH_RATIO) * size
         lines = []
         cur = []
         for wd in words:
@@ -333,22 +479,53 @@ def fit_caption(words, w, font_size):
         # 1語だけで幅を超える場合も、これ以上は折れない
         too_wide = any(len(' '.join(ln)) * per_char > usable for ln in lines)
         if (len(lines) <= MAX_CAPTION_LINES and not too_wide) or size <= floor:
+            """
+            ★★2026-08-28、縮小だけでなく拡大もするようにした。
+
+            【なぜ要るか】
+            フォントを Anton（縦長・細身）へ替えたら、字幕が
+            画面の4割しか使わなくなった（実測 429px / 1080px）。
+            この関数は「入らなければ縮める」しかせず、
+            **余っていても広げない**作りだった。
+            DejaVu は元から幅を取るので問題が表に出ていなかっただけで、
+            細いフォントに替えた瞬間に「小さくて読みにくい字幕」になる。
+
+            縦型ショート動画の字幕は、画面幅をしっかり使ってこそ効く。
+            一番長い行が使える幅に届くまで広げる。
+
+            【上限を置く理由】
+            1語だけの回（"WOW" など）に上限が無いと、文字が画面から
+            はみ出すほど巨大になる。基準サイズの2.2倍で止める。
+            さらに2行ぶんの高さが画面の1/4を超えないようにする。
+            """
+            longest = max((len(' '.join(ln)) for ln in lines), default=0)
+            if longest:
+                ceiling = int(font_size * 2.2)
+                if h_hint:
+                    # 行の高さはおよそ font_size * 1.25。
+                    # ★実際の行数で割る。MAX_CAPTION_LINES で決め打ちすると、
+                    #   1行しかない回まで2行ぶんの上限で抑え込まれ、
+                    #   短い語（"WOW" など）が小さいまま出る。
+                    ceiling = min(ceiling,
+                                  int((h_hint * 0.25) / (len(lines) * 1.25)))
+                grown = int(usable / (longest * (ratio or CHAR_WIDTH_RATIO)))
+                size = max(size, min(grown, ceiling))
             return size, [len(ln) for ln in lines]
         size -= 6
 
 
-def build_ass(captions, w, h, font_size, center=False):
+def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE):
     """
-    単語ごとに色が変わる字幕（karaoke）を作る。
+    ASSのヘッダ（[Script Info] と [V4+ Styles]）を作る。
 
-    ★これが「トップYouTuber特有の字幕」の正体。
-      \\k タグで単語ごとに PrimaryColour へ塗り替わる。
-      さらに \\t でわずかに拡大させ、ポップして出るように見せる。
+    ★実測（measure_char_ratio）でも本番と同じスタイル定義を使う。
+      別々に書くと、片方だけ Bold を直した時に測った幅と描いた幅が
+      食い違う。同じ関数から出すことで、その事故を構造的に潰す。
 
-    ★ミュート再生でも内容が伝わることが要件なので、
-      画面中央よりやや下に大きく置く。
+    @param outline 黒縁の太さ。測る時だけ0にする（縁の分だけ太く
+                   測れてしまい、字幕が実際より小さく出るため）
     """
-    head = [
+    return '\n'.join([
         '[Script Info]',
         'ScriptType: v4.00+',
         'PlayResX: %d' % w,
@@ -363,12 +540,31 @@ def build_ass(captions, w, h, font_size, center=False):
          'Alignment, MarginL, MarginR, MarginV, Encoding'),
         # PrimaryColour(塗られた後)=黄 / SecondaryColour(塗られる前)=白
         # 太い黒縁を付けないと、明るい映像の上で読めなくなる
-        ('Style: Pop,DejaVu Sans,%d,&H0000FFFF,&H00FFFFFF,&H00000000,'
-         '&H80000000,-1,0,0,0,100,100,0,0,1,7,3,5,60,60,60,1' % font_size),
+        # ★Bold は Anton では -1 にしない。Anton は元から極太で、
+        #   さらに合成太字を掛けると輪郭が潰れる（実測して判断）
+        ('Style: Pop,%s,%d,&H0000FFFF,&H00FFFFFF,&H00000000,'
+         '&H80000000,%d,0,0,0,100,100,0,0,1,%d,3,5,60,60,60,1'
+         % (font_name, font_size,
+            0 if font_name == CAPTION_FONT_NAME else -1, outline)),
         '',
         '[Events]',
-        'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
-    ]
+        'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
+    ])
+
+
+def build_ass(captions, w, h, font_size, center=False,
+              font_name='DejaVu Sans', ratio=None, font_dir=None):
+    """
+    単語ごとに色が変わる字幕（karaoke）を作る。
+
+    ★これが「トップYouTuber特有の字幕」の正体。
+      \\k タグで単語ごとに PrimaryColour へ塗り替わる。
+      さらに \\t でわずかに拡大させ、ポップして出るように見せる。
+
+    ★ミュート再生でも内容が伝わることが要件なので、
+      画面中央よりやや下に大きく置く。
+    """
+    head = build_ass_head(w, h, font_size, font_name).split('\n')
 
     """
     ★置く高さは、背景に映像があるかどうかで変える。
@@ -396,8 +592,27 @@ def build_ass(captions, w, h, font_size, center=False):
         if not words:
             continue
 
-        size, line_breaks = fit_caption(words, w, font_size)
-        fs = '' if size >= font_size else ('\\fs%d' % size)
+        """
+        ★★2026-08-29、ここに2つ不具合があった。
+
+        (1) 幅の見積りが固定値だった。
+            実際に描く文字列で実測し、その1枚だけに使う。
+            文字の並びで幅は 0.244〜0.350 まで変わるので（Anton実測）、
+            1枚ごとに測らないと必ずどちらかへ外れる。
+            ★描くのは wd.upper()。測る側も大文字で測らないと、
+              小文字の細い字で測って大文字で描くことになり細く出る。
+
+        (2) fit_caption が拡大しても、その結果を捨てていた。
+            `size >= font_size` の時に \\fs を付けない書き方だったため、
+            拡大した回は必ず基準サイズで描かれていた。
+            拡大の実装を入れても画面上は何も変わらず、
+            実測しても幅が 429px から1pxも動かなかった原因がこれ。
+        """
+        shown = ' '.join(wd.upper() for wd in words)
+        measured = measure_char_ratio(shown, font_name, font_dir) or ratio
+
+        size, line_breaks = fit_caption(words, w, font_size, measured, h)
+        fs = '' if size == font_size else ('\\fs%d' % size)
 
         # 折り返す語の位置（そこへ来る前に \N を挟む）
         breaks = {}
@@ -582,7 +797,9 @@ def main():
     os.makedirs(work, exist_ok=True)
     rng = random.Random(seed if seed is not None else os.urandom(8))
 
-    log('モード %s / クリップ %d本' % (mode, len(clips)))
+    font_name, font_dir, font_ratio = caption_font()
+    log('モード %s / クリップ %d本 / 字幕フォント %s（幅は1枚ずつ実測'
+        '／測れない時の予備 %.2f）' % (mode, len(clips), font_name, font_ratio))
 
     # ------------------------------------------------------------------
     # モードA: 先に音声を作る。尺も字幕の時刻もここで決まる
@@ -899,8 +1116,19 @@ def main():
     if mode in ('A', 'T') and captions:
         assfile = os.path.join(work, 'caption.ass')
         with open(assfile, 'w', encoding='utf-8') as f:
-            f.write(build_ass(captions, w, h, font_size, center=(mode == 'T')))
-        cmd += ['-vf', 'ass=' + assfile.replace('\\', '/').replace(':', r'\:')]
+            f.write(build_ass(captions, w, h, font_size,
+                              center=(mode == 'T'),
+                              font_name=font_name, ratio=font_ratio,
+                              font_dir=font_dir))
+
+        """
+        ★fontsdir で libass に探し場所を教える。
+          fc-cache を叩いてシステムへ登録する必要はない。
+        """
+        assarg = 'ass=' + assfile.replace('\\', '/').replace(':', r'\:')
+        if font_dir:
+            assarg += ':fontsdir=' + font_dir.replace('\\', '/').replace(':', r'\:')
+        cmd += ['-vf', assarg]
 
     """
     ★音声フィルタ。BGMがある回だけ、2本を混ぜて1本にする。
