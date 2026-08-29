@@ -86,7 +86,44 @@ const GITHUB_QUERY_ROTATION = [
   'prompts in:name,description stars:>800 pushed:>{since}',
   'skills in:name,description stars:>500 pushed:>{since}',
   'cheatsheet in:name,description stars:>500 pushed:>{since}',
+
+  /*
+   * --- 固定ソース（2026-08-29追加）---
+   *
+   * ★ここだけ検索ではなく **リポジトリを名指し** する。
+   *   'repo:owner/name' と書くと fetchGitHubRepo_ が検索APIを使わず
+   *   GET /repos/owner/name を直接叩く。
+   *
+   * 【なぜ名指しが要るか】
+   * system-design-primer は 366,597スター。上の道具の帯（上限30,000）では
+   * 絶対に届かず、下の資料の帯は awesome / prompts / skills / cheatsheet で
+   * 絞っているので topics（design, interview, programming）が一致しない。
+   * つまり **今の検索条件では一生出てこない**。だから名指しする。
+   *
+   * 【なぜこのリポジトリか】
+   * Aの読み手（海外エンジニア）にとって、大規模システム設計と面接対策は
+   * 「後で読むために保存する」動機が最も強い題材の一つ。
+   * 我々が狙っているのは、いいねではなくブックマークである。
+   */
+  'repo:donnemartin/system-design-primer',
 ];
+
+/**
+ * 名指しで取るリポジトリのうち、**帰属表示が要る**ものの一覧。
+ *
+ * ★★2026-08-29、ライセンス本文を読んで確認した。
+ *
+ * system-design-primer の LICENSE.txt は CC BY 4.0（GitHubのAPI上は
+ * NOASSERTION と表示されるので、API任せでは分からない）。
+ * リンクを貼るだけなら帰属表示の義務は生じないが、この先この中身から
+ * 台本を作るなら必要になる。**出典を書く癖を最初から付けておく。**
+ *
+ * ★ここに無いリポジトリには何も足さない。要らない一文を毎回入れると
+ *   本文の文字数を食う。
+ */
+const GITHUB_ATTRIBUTION = {
+  'donnemartin/system-design-primer': 'CC BY 4.0'
+};
 
 /**
  * 紹介するリポジトリを1件取得する。
@@ -94,6 +131,15 @@ const GITHUB_QUERY_ROTATION = [
  */
 function fetchGitHubRepo_() {
   const query = getProp_('GITHUB_QUERY', defaultGitHubQuery_());
+
+  /*
+   * ★'repo:owner/name' は検索ではなく名指し。
+   *   検索APIは同じ条件でも並びが揺れるうえ、qualifierの扱いも一定しない。
+   *   名指しなら GET /repos/... が必ずその1件を返す。決定的である。
+   */
+  if (query.indexOf('repo:') === 0) {
+    return fetchGitHubRepoByName_(query.slice(5).trim());
+  }
 
   const url = GITHUB_SEARCH_URL +
     '?q=' + encodeURIComponent(query) +
@@ -145,6 +191,59 @@ function fetchGitHubRepo_() {
   if (!repo) {
     console.warn('GitHub 応答から必要なフィールドを取り出せませんでした: ' +
                  truncate_(JSON.stringify(picked), 300));
+    return null;
+  }
+
+  rememberGitHubRepo_(repo.fullName);
+  return repo;
+}
+
+/**
+ * リポジトリを名指しで1件取る。
+ *
+ * ★gh_recent による除外を通さない。固定ソースは「順番が来たら必ず出す」
+ *   ものなので、一度紹介したことを理由に飛ばしてはいけない。
+ *   ただし記録はする（検索の帯が同じものを引いた時に重複させないため）。
+ *
+ * @param {string} fullName 'owner/name'
+ * @return {?Object} 取れなければ null（呼び出し側は投稿を諦める）
+ */
+function fetchGitHubRepoByName_(fullName) {
+  if (!fullName || fullName.indexOf('/') === -1) {
+    console.warn('固定ソースの指定が不正です: ' + fullName);
+    return null;
+  }
+
+  let res;
+  try {
+    res = fetchWithRetry_('https://api.github.com/repos/' + fullName, {
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'User-Agent': 'gas-x-line-bot'   // GitHub APIはUser-Agent必須
+      },
+      muteHttpExceptions: true
+    });
+  } catch (err) {
+    console.warn('GitHub API への接続に失敗（固定ソース ' + fullName + '）: ' + err);
+    return null;
+  }
+
+  const code = res.getResponseCode();
+  if (code !== 200) {
+    console.warn('GitHub API エラー ' + code + '（固定ソース ' + fullName + '）: ' +
+                 truncate_(res.getContentText(), 300));
+    return null;
+  }
+
+  let repo;
+  try {
+    repo = normalizeGitHubRepo_(JSON.parse(res.getContentText()));
+  } catch (e) {
+    console.warn('GitHub 応答の解釈に失敗（固定ソース ' + fullName + '）: ' + e);
+    return null;
+  }
+  if (!repo) {
+    console.warn('固定ソースから必要なフィールドを取り出せませんでした: ' + fullName);
     return null;
   }
 
@@ -263,6 +362,18 @@ function buildGitHubFacts_(repo) {
     lines.push('- Topics: ' + repo.topics.join(', '));
   }
   if (repo.pushedAt) lines.push('- Last pushed: ' + repo.pushedAt);
+
+  /*
+   * ★★2026-08-29、帰属表示が要るリポジトリだけ一文を足す。
+   *
+   * CC BY のような表示義務のあるライセンスは、GitHubのAPIでは
+   * NOASSERTION としか返らないことがある（system-design-primer が実際そう）。
+   * APIの license 欄を信じず、こちらで確認した一覧だけを根拠にする。
+   */
+  const credit = GITHUB_ATTRIBUTION[repo.fullName];
+  if (credit) {
+    lines.push('- License: ' + credit + ' (attribution required)');
+  }
   lines.push('');
 
   /*
@@ -323,6 +434,11 @@ function buildGitHubFacts_(repo) {
   lines.push('  "game changer", "must-have", "bookmark this". Those read as bot copy.');
   lines.push('- Use the URL exactly as given. Do not invent features, benchmarks,');
   lines.push('  pricing, install steps, or anything not listed above.');
+  if (credit) {
+    lines.push('- This repository is licensed ' + credit + '. The URL above is the');
+    lines.push('  credit -- keep it in the post. Do not quote or paraphrase its');
+    lines.push('  contents; point to it.');
+  }
   return lines.join('\n');
 }
 
