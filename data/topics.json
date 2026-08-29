@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-29T12:28:04+00:00",
+ "generated_at": "2026-08-29T18:28:38+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -67,15 +67,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vvb6jz",
-    "title": "Massive street art in Melbourne",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vvb6jz/massive_street_art_in_melbourne/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1vvo5hy",
     "title": "The correct way to eat Sushi",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vvo5hy/the_correct_way_to_eat_sushi/",
@@ -88,6 +79,15 @@
     "id": "t3_1vy3dmn",
     "title": "Pyramids of Giza, photographed in 1962.",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vy3dmn/pyramids_of_giza_photographed_in_1962/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w106gi",
+    "title": "Sunscreen under UV camera",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w106gi/sunscreen_under_uv_camera/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -121,34 +121,25 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vyxipg",
-    "title": "Buckingham Palace pays tribute to Dolly Parton by performing “9 to 5\"",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vyxipg/buckingham_palace_pays_tribute_to_dolly_parton_by/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1vw0g0n",
+    "title": "Chainsaw-Crafty Raccoon (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1vw0g0n/chainsawcrafty_raccoon_source_link_in_description/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzgb2r",
-    "title": "Group narrowly escapes massive flood by running uphill",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vzgb2r/group_narrowly_escapes_massive_flood_by_running/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1vvoma6",
+    "title": "Central Park and Times Square drum solos by Yoyoka Soma (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1vvoma6/central_park_and_times_square_drum_solos_by/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1vviia5",
-    "title": "I'm down for the swirl",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vviia5/im_down_for_the_swirl/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1vw6zlr",
     "title": "Kojima level of naming",
@@ -177,100 +168,109 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vxf3fw",
-    "title": "The breeze has a secret to tell you...",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vxf3fw/the_breeze_has_a_secret_to_tell_you/",
-    "subreddit": "animegifs",
+    "id": "t3_1vwd37k",
+    "title": "Wait, this wasn't part of the deal...",
+    "url": "https://www.reddit.com/r/Animemes/comments/1vwd37k/wait_this_wasnt_part_of_the_deal/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vw9z4e",
-    "title": "A First Glimpse Of Paradise",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vw9z4e/a_first_glimpse_of_paradise/",
-    "subreddit": "animegifs",
+    "id": "t3_1vzmbga",
+    "title": "Gintama: yoshiwara in flames",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vzmbga/gintama_yoshiwara_in_flames/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxcvm8",
-    "title": "He Had It Coming — Should’ve Kept His Hands To Himself",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vxcvm8/he_had_it_coming_shouldve_kept_his_hands_to/",
-    "subreddit": "animegifs",
+    "id": "t3_1vw5g1a",
+    "title": "False memory ep 6 , ka: daniel kim",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vw5g1a/false_memory_ep_6_ka_daniel_kim/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vvs2f0",
-    "title": "Marine tries the old pin against the wall and wink method of flirting.",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vvs2f0/marine_tries_the_old_pin_against_the_wall_and/",
-    "subreddit": "animegifs",
+    "id": "t3_1vvoo6r",
+    "title": "Bleach tybw episode 45",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vvoo6r/bleach_tybw_episode_45/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vve2vc",
-    "title": "I flew from Japan to New York and went on 3 anime pilgrimages!",
-    "url": "https://www.reddit.com/r/anime/comments/1vve2vc/i_flew_from_japan_to_new_york_and_went_on_3_anime/",
-    "subreddit": "anime",
+    "id": "t3_1vw39ue",
+    "title": "False memory ep 6 , generational 🙌",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vw39ue/false_memory_ep_6_generational/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyt2qc",
-    "title": "So anyway, I started blasting [Kill la Kill]",
-    "url": "https://www.reddit.com/r/anime/comments/1vyt2qc/so_anyway_i_started_blasting_kill_la_kill/",
-    "subreddit": "anime",
+    "id": "t3_1vxaxyf",
+    "title": "Key Animator: Anthony Nguyen | One Piece #1175",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vxaxyf/key_animator_anthony_nguyen_one_piece_1175/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vy08t5",
-    "title": "Favorite weird/random in-universe clothing that characters wear?",
-    "url": "https://www.reddit.com/r/anime/comments/1vy08t5/favorite_weirdrandom_inuniverse_clothing_that/",
-    "subreddit": "anime",
+    "id": "t3_1w095nv",
+    "title": "My True Form/Final Form Sukuna cosplay for ANIMENYC",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w095nv/my_true_formfinal_form_sukuna_cosplay_for_animenyc/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzlxph",
-    "title": "Imagine if this is how we open the Door to khaenri'ah",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vzlxph/imagine_if_this_is_how_we_open_the_door_to/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1vxmjdx",
+    "title": "I wore my old Rukia cosplay 16 years later At Anime NYC!",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vxmjdx/i_wore_my_old_rukia_cosplay_16_years_later_at/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyo4ya",
-    "title": "All that for 5 primogems",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vyo4ya/all_that_for_5_primogems/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1vwo3aq",
+    "title": "My Luke Skywalker Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vwo3aq/my_luke_skywalker_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vwue3n",
-    "title": "How both traveler sleep",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vwue3n/how_both_traveler_sleep/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1vx00wm",
+    "title": "my yani neko cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vx00wm/my_yani_neko_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w0m4c9",
-    "title": "Da Wei in tears rn :(",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w0m4c9/da_wei_in_tears_rn/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1vznqzz",
+    "title": "[DISC] My Tsundere Girlfriend's Thick-Thighed Troubles - Chapter 1",
+    "url": "https://www.reddit.com/r/manga/comments/1vznqzz/disc_my_tsundere_girlfriends_thickthighed/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vw2vo8",
+    "title": "[ART] A new illustration by Shiro Manta - My Senpai is Annoying (Senpai ga Urusai Kouhai no Hanashi)",
+    "url": "https://www.reddit.com/r/manga/comments/1vw2vo8/art_a_new_illustration_by_shiro_manta_my_senpai/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
