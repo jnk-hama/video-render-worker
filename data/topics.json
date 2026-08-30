@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-29T18:28:38+00:00",
+ "generated_at": "2026-08-30T00:28:10+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -16,15 +16,6 @@
     "id": "t3_1vz58to",
     "title": "The way this pilot's emergency oxygen mask automatically adjusts to fit.",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vz58to/the_way_this_pilots_emergency_oxygen_mask/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vvmelo",
-    "title": "Next-level Body control",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vvmelo/nextlevel_body_control/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -49,6 +40,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1vxypjd",
+    "title": "Tony Hawk pushing his body to the absolute limit to land what is possibly his last 720 at age 52.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vxypjd/tony_hawk_pushing_his_body_to_the_absolute_limit/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1vyw8oj",
     "title": "Before and after of Syapru beshi, one of the affected areas of today's flash flooding in Nepal.",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vyw8oj/before_and_after_of_syapru_beshi_one_of_the/",
@@ -67,9 +67,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vvo5hy",
-    "title": "The correct way to eat Sushi",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vvo5hy/the_correct_way_to_eat_sushi/",
+    "id": "t3_1w106gi",
+    "title": "Sunscreen under UV camera",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w106gi/sunscreen_under_uv_camera/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -85,37 +85,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w106gi",
-    "title": "Sunscreen under UV camera",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w106gi/sunscreen_under_uv_camera/",
+    "id": "t3_1vzobcp",
+    "title": "Joseph Nguthiru, a Kenyan entrepreneur is changing the future of packaging by turning an invasive plant into a biodegradable alternative to plastic",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vzobcp/joseph_nguthiru_a_kenyan_entrepreneur_is_changing/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzwm2p",
-    "title": "Which one will fall in??? Great trap design",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vzwm2p/which_one_will_fall_in_great_trap_design/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w01fwc",
+    "title": "WCGW Road Raging With Your Door Open",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w01fwc/wcgw_road_raging_with_your_door_open/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxnqwd",
-    "title": "Upgrades people upgrades",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vxnqwd/upgrades_people_upgrades/",
-    "subreddit": "Unexpected",
+    "id": "t3_1vx4j6i",
+    "title": "I mean… if your goal was the destroy your toilet, well you did a pretty good job",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1vx4j6i/i_mean_if_your_goal_was_the_destroy_your_toilet/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vvzuc2",
-    "title": "When TSA scans finds weapons in your bag",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vvzuc2/when_tsa_scans_finds_weapons_in_your_bag/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w0ruje",
+    "title": "She definitely pissed herself",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w0ruje/she_definitely_pissed_herself/",
+    "subreddit": "WinStupidPrizes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w0ciof",
+    "title": "Tried to show off your skills in balancing, you balanced a failure",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w0ciof/tried_to_show_off_your_skills_in_balancing_you/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -124,15 +133,6 @@
     "id": "t3_1vw0g0n",
     "title": "Chainsaw-Crafty Raccoon (source link in description)",
     "url": "https://www.reddit.com/r/toptalent/comments/1vw0g0n/chainsawcrafty_raccoon_source_link_in_description/",
-    "subreddit": "toptalent",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vvoma6",
-    "title": "Central Park and Times Square drum solos by Yoyoka Soma (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1vvoma6/central_park_and_times_square_drum_solos_by/",
     "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
@@ -195,15 +195,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vvoo6r",
-    "title": "Bleach tybw episode 45",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vvoo6r/bleach_tybw_episode_45/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1vw39ue",
     "title": "False memory ep 6 , generational 🙌",
     "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vw39ue/false_memory_ep_6_generational/",
@@ -222,55 +213,64 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w095nv",
-    "title": "My True Form/Final Form Sukuna cosplay for ANIMENYC",
-    "url": "https://www.reddit.com/r/cosplay/comments/1w095nv/my_true_formfinal_form_sukuna_cosplay_for_animenyc/",
-    "subreddit": "cosplay",
+    "id": "t3_1vyrcbo",
+    "title": "Building SakugaGo (a unified animator & sakuga aggregator) – Looking for community feedback!",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vyrcbo/building_sakugago_a_unified_animator_sakuga/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxmjdx",
-    "title": "I wore my old Rukia cosplay 16 years later At Anime NYC!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1vxmjdx/i_wore_my_old_rukia_cosplay_16_years_later_at/",
-    "subreddit": "cosplay",
+    "id": "t3_1w1kvic",
+    "title": "Osaka gyaruo inspired",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w1kvic/osaka_gyaruo_inspired/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vwo3aq",
-    "title": "My Luke Skywalker Cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1vwo3aq/my_luke_skywalker_cosplay/",
-    "subreddit": "cosplay",
+    "id": "t3_1vx17gm",
+    "title": "South Bank photo shoot📷",
+    "url": "https://www.reddit.com/r/streetwear/comments/1vx17gm/south_bank_photo_shoot/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vx00wm",
-    "title": "my yani neko cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1vx00wm/my_yani_neko_cosplay/",
-    "subreddit": "cosplay",
+    "id": "t3_1vwh9z1",
+    "title": "Throw on a fit or throwing a fit?",
+    "url": "https://www.reddit.com/r/streetwear/comments/1vwh9z1/throw_on_a_fit_or_throwing_a_fit/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vznqzz",
-    "title": "[DISC] My Tsundere Girlfriend's Thick-Thighed Troubles - Chapter 1",
-    "url": "https://www.reddit.com/r/manga/comments/1vznqzz/disc_my_tsundere_girlfriends_thickthighed/",
-    "subreddit": "manga",
+    "id": "t3_1vyyer8",
+    "title": "Yesterday’s work fit",
+    "url": "https://www.reddit.com/r/streetwear/comments/1vyyer8/yesterdays_work_fit/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vw2vo8",
-    "title": "[ART] A new illustration by Shiro Manta - My Senpai is Annoying (Senpai ga Urusai Kouhai no Hanashi)",
-    "url": "https://www.reddit.com/r/manga/comments/1vw2vo8/art_a_new_illustration_by_shiro_manta_my_senpai/",
-    "subreddit": "manga",
+    "id": "t3_1vzlxph",
+    "title": "Imagine if this is how we open the Door to khaenri'ah",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vzlxph/imagine_if_this_is_how_we_open_the_door_to/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vyo4ya",
+    "title": "All that for 5 primogems",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vyo4ya/all_that_for_5_primogems/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
