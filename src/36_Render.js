@@ -174,6 +174,90 @@ function buildCaptions_(text, totalSeconds) {
  * @param {string} text 投稿本文（字幕の元）
  * @return {?{jobId:string}} 依頼できたら
  */
+/**
+ * モードTの配色。**アカウントごとの定数**であって、毎回作るものではない。
+ *
+ * ★★2026-08-29追加。指示書ではLLMに色を出力させる案だったが、採らなかった。
+ *   色を毎回LLMに選ばせると、同じアカウントの動画の色が回ごとに変わる。
+ *   ブランドが崩れるし、決定論的な構成という前提にも反する。
+ *   色は「その日の判断」ではなく「アカウントの持ち物」である。
+ *
+ * ★アクセント色は、背景ではなく **本文色から離れている** ことが要件。
+ *   実測したコントラスト比（対 背景#09090b / 対 本文#f4f4f5）:
+ *     Sky   #38bdf8 …  9.29 / 1.95  ← 明るいが本文と同化して強調にならない
+ *     Lime  #a3e635 … 13.19 / 1.37  ← 同上
+ *     Blue  #3b82f6 …  5.41 / 3.35
+ *     Violet#8b5cf6 …  4.70 / 3.85  ← 採用
+ */
+const RENDER_THEME = {
+  bg_color_hex: '#09090b',      // Zinc 950
+  text_color_hex: '#f4f4f5',    // Zinc 100
+  accent_color_hex: '#8b5cf6'   // Violet 500
+};
+
+/**
+ * 強調しない語。冠詞・前置詞・助動詞など、色を変えても意味が無いもの。
+ * ★「短い語を外す」だけでは the / and / for が残るので、名指しで落とす。
+ */
+const RENDER_STOPWORDS = (
+  'the a an and or but for nor so yet of to in on at by with from into over ' +
+  'is are was were be been being do does did done have has had will would ' +
+  'can could should may might must this that these those it its you your ' +
+  'my our their his her they we he she i not no if then than as up out'
+).split(' ');
+
+/**
+ * 本文から「色を変える語」を選ぶ。
+ *
+ * ★★LLMに選ばせない（2026-08-29）。
+ *   台本そのものは既にLLMが書いているが、そこへ強調語のキーを足すと
+ *   「AI社員の共通契約」第3条（キー名の追加・変更の禁止）に触れる。
+ *   契約を破ってシステムが止まった実例が E-002 / E-005。
+ *   強調語は本文さえあれば決まるので、こちらで決めれば契約に触れずに済む。
+ *
+ * 【選び方：文の最後の実語を1つ】
+ * 英語は文の終わりに要点が来る。"make you dangerous" / "gives you the
+ * answer" / "out of excuses" ——効かせたい語は末尾にある。
+ *
+ * ★最初は「3語ごとの塊で最長の語」にしたが、実際に走らせて捨てた。
+ *   塊が文の切れ目をまたぐため、"Phind. Google hands" という塊ができ、
+ *   文字数で Google(6) が Phind(5) に勝つ。**商品名が塗られず、
+ *   関係のない語が塗られる。** 長さは重要度の代わりにならなかった。
+ *
+ * ★カウントダウン動画では "Number three." の three が塗られる。
+ *   これは狙ったものではないが、順位が目立つのは都合がよい。
+ *
+ * @param {string} text 読み上げる本文
+ * @return {!Array<string>} 強調する語（重複なし）
+ */
+function pickHighlightWords_(text) {
+  // 文で切る。区切りが無ければ全体を1文として扱う
+  const sentences = String(text || '').split(/(?<=[.!?])\s+/);
+  const out = [];
+  sentences.forEach(function (sen) {
+    const words = sen.split(/\s+/).filter(String);
+    /*
+     * ★短い文は塗らない（実測して足した規則）。
+     *   文ごとに1語塗ると、"Bolt." や "Number two." のような
+     *   1〜2語の断片まで対象になり、**字幕18枚中14枚（77%）が紫**になった。
+     *   ほぼ全部が強調色では、強調の意味が消える。
+     *
+     *   そもそも1語だけの行は、その行全体が既に強調である。
+     *   同じ行に対比する相手がいないので、色を変えても浮かない。
+     */
+    if (words.length < 3) return;
+    // 後ろから見て、最初に見つかった実語を採る
+    for (let i = words.length - 1; i >= 0; i--) {
+      const bare = words[i].replace(/[^0-9A-Za-z]/g, '');
+      if (!bare) continue;
+      if (RENDER_STOPWORDS.indexOf(bare.toLowerCase()) !== -1) continue;
+      if (out.indexOf(bare) === -1) out.push(bare);
+      return;   // 1文につき1語だけ
+    }
+  });
+  return out;
+}
+
 function requestRender_(accountKey, clips, text) {
   const key = String(accountKey || '').toUpperCase();
   if (!renderEnabled_()) {
@@ -251,6 +335,17 @@ function requestRender_(accountKey, clips, text) {
       .trim();
     // ★TTSが使えなかった回の予備。均等割りだが、字幕が消えるよりよい
     payload.captions = buildCaptions_(text, seconds);
+  }
+
+  /*
+   * ★配色と強調語はモードTだけに送る（2026-08-29）。
+   *   モードAは映像の上に字幕を乗せるので、暗い背景色は使わないし、
+   *   映像の上での見え方を実測していない。**測っていないものは送らない。**
+   *   描画側は未指定なら従来の黄/白で描くので、Aの挙動は変わらない。
+   */
+  if (mode === 'T') {
+    payload.design_tokens = RENDER_THEME;
+    payload.highlight_words = pickHighlightWords_(payload.narration);
   }
 
   let res;
