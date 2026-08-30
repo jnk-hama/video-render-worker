@@ -56,6 +56,7 @@ import json
 import math
 import os
 import random
+import re
 import shlex
 import shutil
 import subprocess
@@ -341,6 +342,107 @@ MAX_CAPTION_LINES = 2
 CAPTION_OUTLINE = 7
 
 
+def hex_to_ass(value, alpha=0x00):
+    """
+    '#rrggbb' を ASS の色表記へ変換する。読めなければ None。
+
+    ★★ASSの色は &HAABBGGRR。**BGRの順で、RGBではない。**
+      #8b5cf6（紫）をRGBのまま &H008B5CF6 と書くと、libassは
+      B=8b G=5c R=f6 と読んで **水色** で描く。
+      色が違って出るだけでエラーは出ないので、気づけない類の間違い。
+      だからここは単体テストを先に書いてから実装した。
+
+    ★AA は透明度。0x00 が不透明、値が大きいほど透ける
+      （ASSはこの向き。CSSの opacity とは逆）。
+
+    @return {?string} '&HAABBGGRR' 形式。読めない入力は None
+    """
+    if not isinstance(value, str):
+        return None
+    h = value.strip().lstrip('#')
+    if len(h) != 6:
+        return None
+    try:
+        r = int(h[0:2], 16)
+        g = int(h[2:4], 16)
+        b = int(h[4:6], 16)
+    except ValueError:
+        return None
+    return '&H%02X%02X%02X%02X' % (alpha & 0xFF, b, g, r)
+
+
+def hex_to_ffmpeg(value):
+    """
+    '#rrggbb' を ffmpeg の color= 用へ変換する。読めなければ None。
+
+    ★こちらは **RGBのまま**（0xRRGGBB）。ASSと逆なので混ぜないこと。
+    """
+    if not isinstance(value, str):
+        return None
+    h = value.strip().lstrip('#')
+    if len(h) != 6:
+        return None
+    try:
+        int(h, 16)
+    except ValueError:
+        return None
+    return '0x' + h.lower()
+
+
+def build_theme(tokens, highlight_words):
+    """
+    design_tokens と強調語の一覧から、描画に使う色一式を作る。
+
+    ★★2026-08-29、Semantic Highlighting のために足した。
+
+    【なぜ「1語だけ色を変える」のか】
+    全部の文字を同じ強さで出すと、視聴者はどこを読めばよいか分からない。
+    1文につき最も効く1語だけ色を変えると、その語が先に目に入る。
+
+    【なぜ本文色と離れた色でないと効かないのか（実測）】
+    背景 #09090b に対するコントラスト比と、本文 #f4f4f5 に対する比:
+
+        #38bdf8 Sky   … 対背景 9.29 / 対本文 1.95
+        #a3e635 Lime  … 対背景13.19 / 対本文 1.37
+        #8b5cf6 Violet… 対背景 4.70 / 対本文 3.85  ← 採用
+        #3b82f6 Blue  … 対背景 5.41 / 対本文 3.35
+
+    背景に対して明るいだけの色は、隣の本文（オフホワイト）と同化して
+    **強調にならない**。離すべき相手は背景ではなく本文の方である。
+
+    @return {?dict} 使わない時は None（呼び出し側は現行の黄/白のまま）
+    """
+    tokens = tokens if isinstance(tokens, dict) else {}
+    text = hex_to_ass(tokens.get('text_color_hex'))
+    accent = hex_to_ass(tokens.get('accent_color_hex'))
+    if not text and not accent:
+        return None
+
+    """
+    ★塗られる前は同じ色を薄くして出す。別の色にすると、カラオケが
+      「色が変わる」ではなく「別物に入れ替わる」ように見える。
+    """
+    dim = 0x80
+    return {
+        'primary': text,
+        'secondary': hex_to_ass(tokens.get('text_color_hex'), dim) if text else None,
+        'accent': accent,
+        'accent_dim': hex_to_ass(tokens.get('accent_color_hex'), dim) if accent else None,
+        'words': set(normalize_word(w) for w in (highlight_words or [])
+                     if normalize_word(w)),
+    }
+
+
+def normalize_word(w):
+    """
+    強調語の照合用に、記号を落として小文字へ揃える。
+
+    ★字幕は wd.upper() で描くので、そのままでは一致しない。
+      また "answer." のように句点が付くため、記号も落とす必要がある。
+    """
+    return re.sub(r'[^0-9A-Za-z]', '', str(w or '')).lower()
+
+
 def caption_font():
     """
     字幕に使うフォントを決める。
@@ -514,7 +616,8 @@ def fit_caption(words, w, font_size, ratio=None, h_hint=0):
         size -= 6
 
 
-def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE):
+def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
+                   primary=None, secondary=None):
     """
     ASSのヘッダ（[Script Info] と [V4+ Styles]）を作る。
 
@@ -524,7 +627,15 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE):
 
     @param outline 黒縁の太さ。測る時だけ0にする（縁の分だけ太く
                    測れてしまい、字幕が実際より小さく出るため）
+    @param primary   塗られた後の色（ASS表記）。None なら現行の黄
+    @param secondary 塗られる前の色（ASS表記）。None なら現行の白
+
+    ★★色を引数にしたのは design_tokens を受けるため（2026-08-29）。
+      **既定値は現行のハードコード値と同一**にしてある。
+      色を渡さない限り、出力は1バイトも変わらない。
     """
+    primary = primary or '&H0000FFFF'      # 黄
+    secondary = secondary or '&H00FFFFFF'  # 白
     return '\n'.join([
         '[Script Info]',
         'ScriptType: v4.00+',
@@ -542,9 +653,9 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE):
         # 太い黒縁を付けないと、明るい映像の上で読めなくなる
         # ★Bold は Anton では -1 にしない。Anton は元から極太で、
         #   さらに合成太字を掛けると輪郭が潰れる（実測して判断）
-        ('Style: Pop,%s,%d,&H0000FFFF,&H00FFFFFF,&H00000000,'
+        ('Style: Pop,%s,%d,%s,%s,&H00000000,'
          '&H80000000,%d,0,0,0,100,100,0,0,1,%d,3,5,60,60,60,1'
-         % (font_name, font_size,
+         % (font_name, font_size, primary, secondary,
             0 if font_name == CAPTION_FONT_NAME else -1, outline)),
         '',
         '[Events]',
@@ -553,7 +664,8 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE):
 
 
 def build_ass(captions, w, h, font_size, center=False,
-              font_name='DejaVu Sans', ratio=None, font_dir=None):
+              font_name='DejaVu Sans', ratio=None, font_dir=None,
+              theme=None):
     """
     単語ごとに色が変わる字幕（karaoke）を作る。
 
@@ -564,7 +676,10 @@ def build_ass(captions, w, h, font_size, center=False,
     ★ミュート再生でも内容が伝わることが要件なので、
       画面中央よりやや下に大きく置く。
     """
-    head = build_ass_head(w, h, font_size, font_name).split('\n')
+    head = build_ass_head(
+        w, h, font_size, font_name,
+        primary=(theme or {}).get('primary'),
+        secondary=(theme or {}).get('secondary')).split('\n')
 
     """
     ★置く高さは、背景に映像があるかどうかで変える。
@@ -640,11 +755,34 @@ def build_ass(captions, w, h, font_size, center=False,
             per_word = [per] * len(words)
             per_word[-1] = max(1, total_cs - per * (len(words) - 1))
 
+        """
+        ★★強調語だけ色を差し替える（2026-08-29）。
+
+        \\1c が塗られた後の色、\\2c が塗られる前の色。
+        スタイル既定はPrimary/Secondaryなので、強調語の前で上書きし、
+        **その語の直後に必ず戻す**。戻し忘れると、以降の語まで
+        全部その色で描かれる（1語だけ光らせる意味が消える）。
+
+        ★theme が無い回はこの分岐へ一切入らない。従来どおりに描く。
+        """
+        hi = (theme or {}).get('words') or set()
+        accent = (theme or {}).get('accent')
+        accent_dim = (theme or {}).get('accent_dim')
+        back = ''
+        if accent and theme.get('primary'):
+            back = '{\\1c%s\\2c%s}' % (theme['primary'],
+                                       theme.get('secondary') or theme['primary'])
+
         karaoke = ''
         for i, wd in enumerate(words):
             if breaks.get(i):
                 karaoke = karaoke.rstrip() + '\\N'
+            lit = accent and normalize_word(wd) in hi
+            if lit:
+                karaoke += '{\\1c%s\\2c%s}' % (accent, accent_dim or accent)
             karaoke += '{\\k%d}%s ' % (per_word[i], wd.upper())
+            if lit and back:
+                karaoke += back
 
         # 出だしで少し大きく → 元のサイズへ戻す（ポップ）
         effect = ('{\\pos(%d,%d)%s\\fad(60,60)'
@@ -841,10 +979,17 @@ def main():
         グラデーションを敷くと、面として認識されて文字が締まる。
         vignette は計算が軽く、CPUだけのランナーでも負荷にならない。
         """
+        """
+        ★背景色。design_tokens が無ければ従来の 0x0d0d12 のまま。
+          ffmpeg の color= は **RGBのまま**（ASSのBGRと逆）なので、
+          変換関数を取り違えないこと。
+        """
+        bg_color = hex_to_ffmpeg((job.get('design_tokens') or {})
+                                 .get('bg_color_hex')) or '0x0d0d12'
         bg = os.path.join(work, 'bg.mp4')
         run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
              '-f', 'lavfi',
-             '-i', 'color=c=0x0d0d12:s=%dx%d:d=%.2f:r=%d' % (w, h, total, fps),
+             '-i', 'color=c=%s:s=%dx%d:d=%.2f:r=%d' % (bg_color, w, h, total, fps),
              '-vf', 'vignette=a=0.7,noise=alls=6:allf=t+u,format=yuv420p',
              '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20',
              bg])
@@ -1119,7 +1264,9 @@ def main():
             f.write(build_ass(captions, w, h, font_size,
                               center=(mode == 'T'),
                               font_name=font_name, ratio=font_ratio,
-                              font_dir=font_dir))
+                              font_dir=font_dir,
+                              theme=build_theme(job.get('design_tokens'),
+                                                job.get('highlight_words'))))
 
         """
         ★fontsdir で libass に探し場所を教える。
