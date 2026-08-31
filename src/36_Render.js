@@ -230,7 +230,7 @@ const RENDER_STOPWORDS = (
  * @param {string} text 読み上げる本文
  * @return {!Array<string>} 強調する語（重複なし）
  */
-function pickHighlightWords_(text) {
+function pickHighlightWords_(text, subject) {
   // 文で切る。区切りが無ければ全体を1文として扱う
   const sentences = String(text || '').split(/(?<=[.!?])\s+/);
   const out = [];
@@ -255,6 +255,33 @@ function pickHighlightWords_(text) {
       return;   // 1文につき1語だけ
     }
   });
+
+  /*
+   * ★★商品名は無条件で塗る（2026-08-31）。
+   *
+   * 【なぜ足したか】
+   * 架空商品でデモを作って気づいた。台本
+   *   "The NOVA Pulse just sticks to your phone."
+   * に対し、文末規則が選んだのは **phone** だった。
+   * 商品名 NOVA Pulse は一度も色が付かない。
+   *
+   * ツール紹介では文末に要点が来るので機能したが、商品動画では
+   * **商品名こそ塗るべき語**である。名前を覚えてもらえなければ、
+   * 動画を見た人は検索することすらできない。用途に対して規則が
+   * 合っていなかった。
+   *
+   * 文末規則は残したまま、商品名だけを足す形にする。
+   */
+  String(subject || '').split(/\s+/).forEach(function (w) {
+    const bare = w.replace(/[^0-9A-Za-z]/g, '');
+    if (!bare || bare.length < 2) return;
+    if (RENDER_STOPWORDS.indexOf(bare.toLowerCase()) !== -1) return;
+    // 本文に実際に出てくる語だけ。出ない語を渡しても塗る対象が無い
+    const re = new RegExp('(^|[^0-9A-Za-z])' + bare + '([^0-9A-Za-z]|$)', 'i');
+    if (!re.test(String(text || ''))) return;
+    if (out.indexOf(bare) === -1) out.push(bare);
+  });
+
   return out;
 }
 

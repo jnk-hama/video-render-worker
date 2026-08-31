@@ -902,6 +902,36 @@ function failQueueRow_(ss, sheet, job, accountKey, message, region, angle, text,
     text: text || job.content || '', region: region, angle: angle, format: format
   }));
   console.error('予約投稿の失敗 row=' + job.rowIndex + ': ' + message);
+  /*
+   * ★★2026-08-31、残高切れの通知を1日1回に絞った。
+   *
+   * 【なぜ】
+   * Geminiの残高が尽きると、キューの全行が同じ理由で失敗する。
+   * 実際に「予約投稿に失敗しました」が同じ本文で3回連続で飛んだ。
+   * 原因は1つなのに通知は行数だけ出る。**通知が多いほど読まれなくなる**ので、
+   * 本当に見てほしい1回が埋もれる。
+   *
+   * ★抑制するのは残高切れだけ。他の失敗は今までどおり毎回知らせる。
+   *   原因が行ごとに違う可能性があるため、まとめてはいけない。
+   * ★1日で解除する。入金しても通知が出ないままだと、直ったのかどうかが
+   *   分からなくなる。
+   */
+  if (/残高が尽きています/.test(String(message || ''))) {
+    const today = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd');
+    if (getProp_('llm_credits_notified_on', '') === today) {
+      console.warn('残高切れの通知は本日分を送信済みのため省略します（' +
+                   accountKey + ' / ' + job.rowIndex + '行目）。');
+      return;
+    }
+    try { props_().setProperty('llm_credits_notified_on', today); } catch (e) {}
+    notifyAdmin_('🛑 Geminiの残高が尽きています\n' +
+      '**レート上限ではありません。待っても回復しません。**\n' +
+      'AI Studio で残高を入れるまで、すべての投稿が止まります。\n' +
+      'https://ai.studio/projects\n\n' +
+      '（同じ理由の通知は本日はこれ1回だけ出します）\n' + message);
+    return;
+  }
+
   notifyAdmin_('⚠️ 予約投稿に失敗しました\n' +
     'Queue ' + job.rowIndex + '行目 / ' + accountKey + '\n' + message);
 }

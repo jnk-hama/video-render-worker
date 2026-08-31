@@ -1087,6 +1087,37 @@ function generateTweet(account, link, topicHint) {
  * 良い案を持ち越して直す方式にしたので、回数で粘る必要が無くなった。
  * 1サイクルあたりの呼び出しは最大10回から6回へ減る。
  */
+/**
+ * Geminiの残高切れ。**待っても直らない**種類の失敗。
+ *
+ * ★レート上限（時間を置けば回復する）と区別するために型を分けた。
+ *   呼び出し側は instanceof で見分け、通知の出し方を変える。
+ */
+function LlmCreditsError(detail) {
+  this.name = 'LlmCreditsError';
+  this.detail = String(detail || '');
+  this.message =
+    'Gemini APIの残高が尽きています（429）。**これはレート上限ではありません。' +
+    '待っても回復しません。** AI Studio (https://ai.studio/projects) で ' +
+    '請求と残高を確認してください。' + this.detail;
+}
+LlmCreditsError.prototype = Object.create(Error.prototype);
+LlmCreditsError.prototype.constructor = LlmCreditsError;
+
+/**
+ * 429の本文が「残高切れ」かを判定する。
+ *
+ * ★本文の文言で見る。Googleは残高切れもレート上限も 429 で返すため、
+ *   HTTPコードだけでは区別できない。
+ * ★文言が変わる可能性があるので複数の語で見る。どれか当たれば残高切れ。
+ */
+function isGeminiCreditsDepleted_(body) {
+  const t = String(body || '');
+  return /prepayment\s+credits?\s+are\s+depleted/i.test(t) ||
+         /credits?\s+are\s+depleted/i.test(t) ||
+         /billing/i.test(t) && /deplet|exhaust|insufficient/i.test(t);
+}
+
 function llmMaxAttempts_() {
   const n = Number(getProp_('LLM_MAX_ATTEMPTS', '3'));
   return (isNaN(n) || n < 1) ? 3 : Math.min(5, n);
@@ -1573,7 +1604,25 @@ function callLLMOnce_(systemPrompt, userPrompt, opt) {
       throw new ModelNotFoundError(model);
     }
     if (code === 429) {
-      throw new Error('Gemini APIのレート上限に達しました（429）。' + truncate_(body, 200));
+      /*
+       * ★★2026-08-31、429を2種類に分けた。混ぜていたのが間違いだった。
+       *
+       * Geminiは「残高切れ」も 429 で返す。実際に来た本文がこれ:
+       *   "Your prepayment credits are depleted. Please go to AI Studio
+       *    at https://ai.studio/projects to manage your project and billing."
+       *
+       * これを「レート上限に達しました」と報告していた。
+       * **レート上限なら待てば直るが、残高切れは待っても永久に直らない。**
+       * 報告が間違っていると、オーナーは復旧を待って何もしないことになる。
+       * 実際、同じ通知が3回続けて飛んだのに原因が伝わっていなかった。
+       *
+       * 分類は本文で行う。HTTPコードだけでは区別できない。
+       */
+      if (isGeminiCreditsDepleted_(body)) {
+        throw new LlmCreditsError(truncate_(body, 200));
+      }
+      throw new Error('Gemini APIのレート上限に達しました（429）。' +
+                      '時間を置けば回復します。' + truncate_(body, 200));
     }
     throw new Error('Gemini APIエラー（HTTP ' + code + '）: ' + truncate_(body, 300));
   }
