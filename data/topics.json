@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-30T21:14:04+00:00",
+ "generated_at": "2026-08-31T05:43:59+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,6 +7,15 @@
     "id": "t3_1vz58to",
     "title": "The way this pilot's emergency oxygen mask automatically adjusts to fit.",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vz58to/the_way_this_pilots_emergency_oxygen_mask/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2cz46",
+    "title": "The Rotation of the Planets in Our Solar System Is Far More Fascinating Than I Ever Expected",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w2cz46/the_rotation_of_the_planets_in_our_solar_system/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -31,15 +40,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vxypjd",
-    "title": "Tony Hawk pushing his body to the absolute limit to land what is possibly his last 720 at age 52.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vxypjd/tony_hawk_pushing_his_body_to_the_absolute_limit/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1w14zhw",
     "title": "University student sinks 90 ft putt to win a new car",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w14zhw/university_student_sinks_90_ft_putt_to_win_a_new/",
@@ -49,91 +49,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w0isy8",
-    "title": "A simple couple with an extraordinary legacy.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w0isy8/a_simple_couple_with_an_extraordinary_legacy/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1vyw8oj",
+    "title": "Before and after of Syapru beshi, one of the affected areas of today's flash flooding in Nepal.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vyw8oj/before_and_after_of_syapru_beshi_one_of_the/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vy8c5s",
-    "title": "Dolly Parton started the Imagination Library in 1995 as a tribute to her father, who couldn't read or write. In 2018, she explained it was to give kids \"early access to books\". Now, over 325 MILLION books have been gifted.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1vy8c5s/dolly_parton_started_the_imagination_library_in/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w106gi",
+    "title": "Sunscreen under UV camera",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w106gi/sunscreen_under_uv_camera/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyps2s",
-    "title": "Empire State Building lit up for Dolly 💗",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1vyps2s/empire_state_building_lit_up_for_dolly/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1vy3dmn",
+    "title": "Pyramids of Giza, photographed in 1962.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vy3dmn/pyramids_of_giza_photographed_in_1962/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzbw30",
-    "title": "Alyssa Rosenzweig reverse-engineered Apple’s M1 GPU. Now the Linux driver supports graphics standards macOS doesn’t",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1vzbw30/alyssa_rosenzweig_reverseengineered_apples_m1_gpu/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1vzobcp",
+    "title": "Joseph Nguthiru, a Kenyan entrepreneur is changing the future of packaging by turning an invasive plant into a biodegradable alternative to plastic",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vzobcp/joseph_nguthiru_a_kenyan_entrepreneur_is_changing/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzwm2p",
-    "title": "Which one will fall in??? Great trap design",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vzwm2p/which_one_will_fall_in_great_trap_design/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w2fvl5",
+    "title": "Scientists asked 1,000 volunteers to bury cotton underwear across Switzerland to measure soil health creating an official \"Underpants Index\" based on how fast the fabric decomposed.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w2fvl5/scientists_asked_1000_volunteers_to_bury_cotton/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxnqwd",
-    "title": "Upgrades people upgrades",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vxnqwd/upgrades_people_upgrades/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w01fwc",
+    "title": "WCGW Road Raging With Your Door Open",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w01fwc/wcgw_road_raging_with_your_door_open/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vz0r6l",
-    "title": "He didn't hold back at all",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vz0r6l/he_didnt_hold_back_at_all/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w2dqe2",
+    "title": "Trying to look badass",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w2dqe2/trying_to_look_badass/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyxipg",
-    "title": "Buckingham Palace pays tribute to Dolly Parton by performing “9 to 5\"",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vyxipg/buckingham_palace_pays_tribute_to_dolly_parton_by/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w0ruje",
+    "title": "She definitely pissed herself",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w0ruje/she_definitely_pissed_herself/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzgb2r",
-    "title": "Group narrowly escapes massive flood by running uphill",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vzgb2r/group_narrowly_escapes_massive_flood_by_running/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w1e7aj",
+    "title": "Birthday celebration",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w1e7aj/birthday_celebration/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w0t9bk",
-    "title": "This house in Nepal defied the raging floodwaters and kept the owners safe.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w0t9bk/this_house_in_nepal_defied_the_raging_floodwaters/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1vxch6y",
+    "title": "HMB while I car doughnuts surf",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1vxch6y/hmb_while_i_car_doughnuts_surf/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -168,37 +168,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w0vu3e",
-    "title": "Miyabi in the office [Zenless Zone Zero]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w0vu3e/miyabi_in_the_office_zenless_zone_zero/",
+    "id": "t3_1w2mf6x",
+    "title": "Casual girl [Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w2mf6x/casual_girl_original/",
     "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxf3fw",
-    "title": "The breeze has a secret to tell you...",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vxf3fw/the_breeze_has_a_secret_to_tell_you/",
-    "subreddit": "animegifs",
+    "id": "t3_1w095nv",
+    "title": "My True Form/Final Form Sukuna cosplay for ANIMENYC",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w095nv/my_true_formfinal_form_sukuna_cosplay_for_animenyc/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxcvm8",
-    "title": "He Had It Coming — Should’ve Kept His Hands To Himself",
-    "url": "https://www.reddit.com/r/animegifs/comments/1vxcvm8/he_had_it_coming_shouldve_kept_his_hands_to/",
-    "subreddit": "animegifs",
+    "id": "t3_1vxmjdx",
+    "title": "I wore my old Rukia cosplay 16 years later At Anime NYC!",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vxmjdx/i_wore_my_old_rukia_cosplay_16_years_later_at/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w0foag",
-    "title": "A Little Flash In The Night",
-    "url": "https://www.reddit.com/r/animegifs/comments/1w0foag/a_little_flash_in_the_night/",
-    "subreddit": "animegifs",
+    "id": "t3_1w2evzo",
+    "title": "Dark Magician Girl cosplay at Anirevo 2026",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w2evzo/dark_magician_girl_cosplay_at_anirevo_2026/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w158sn",
+    "title": "Female Doctor Strange [live action]",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w158sn/female_doctor_strange_live_action/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vx00wm",
+    "title": "my yani neko cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1vx00wm/my_yani_neko_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -231,48 +249,21 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vz2xz6",
-    "title": "Official 30th Anniversary Poster for 'Ghost in the Shell'",
-    "url": "https://www.reddit.com/r/anime/comments/1vz2xz6/official_30th_anniversary_poster_for_ghost_in_the/",
+    "id": "t3_1vyy1xp",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 14 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1vyy1xp/rezero_starting_life_in_another_world_season_4/",
     "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    },
    {
-    "id": "t3_1vzlxph",
-    "title": "Imagine if this is how we open the Door to khaenri'ah",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vzlxph/imagine_if_this_is_how_we_open_the_door_to/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w2jy30",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 10 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w2jy30/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vyo4ya",
-    "title": "All that for 5 primogems",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vyo4ya/all_that_for_5_primogems/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vwue3n",
-    "title": "How both traveler sleep",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1vwue3n/how_both_traveler_sleep/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w0m4c9",
-    "title": "Da Wei in tears rn :(",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w0m4c9/da_wei_in_tears_rn/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    }
   ]
