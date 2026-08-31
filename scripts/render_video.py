@@ -111,7 +111,35 @@ def download(url, dest):
     1本落とす。失敗しても例外にしない（呼び出し側が次のクリップへ進む）。
 
     ★1本の欠損で動画ごと落とすと、素材CDNの一時障害で毎回失敗する。
+
+    ★★2026-08-31、リポジトリ同梱の素材を使えるようにした。
+      スキームの無いパス（'assets/demo/x.png' など）は、このリポジトリの
+      中を指しているものとして解決する。
+
+      【なぜ要るか】
+      ロゴ・イントロ・商品画像のように「毎回同じものを使う素材」は、
+      外部から毎回落とす理由が無い。同梱すれば外部が落ちても描画が
+      止まらず、通信も減る。フォントを同梱したのと同じ考え方。
+
+      ★リポジトリの外は指させない。'../' で外へ出る指定は弾く。
+        描画ジョブは外から来るので、パスをそのまま信用しない。
     """
+    if '://' not in str(url):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = os.path.normpath(os.path.join(root, str(url).lstrip('/')))
+        if not src.startswith(root + os.sep):
+            log('  リポジトリの外を指しています（使いません）: %s' % url)
+            return False
+        if not os.path.exists(src):
+            log('  同梱素材が見つかりません: %s' % url)
+            return False
+        try:
+            shutil.copyfile(src, dest)
+        except Exception as e:
+            log('  同梱素材を読めません: %s' % e)
+            return False
+        return os.path.getsize(dest) > 1024
+
     try:
         run(['curl', '-sSL', '--fail',
              '--max-time', str(DOWNLOAD_TIMEOUT_SEC),
@@ -1034,7 +1062,24 @@ def main():
     # ------------------------------------------------------------------
     # クリップを切り出して揃える
     # ------------------------------------------------------------------
+    """
+    ★★2026-08-31、本数の根拠を実際の尺に合わせた。
+
+    【何が起きていたか】
+    本数は clip_seconds から計算するのに、実際の尺は各クリップの
+    duration を使っていた（下の each の行）。この2つが食い違うと
+    尺が壊れる。実測：clip_seconds=1.6 / duration=3.2 のとき
+    **字幕16.2秒に対し動画35.2秒**（2倍以上）になった。
+
+    本番のGASは両方に同じ値を入れているので今まで表面化していない。
+    片方だけ変えた瞬間に出る類の不整合なので、根拠を1つに寄せる。
+    """
     want_each = float(job.get('clip_seconds') or 1.6)
+    given = [float(c.get('duration')) for c in (job.get('clips') or [])
+             if c and c.get('duration')]
+    if given:
+        # 実際に使うのは各クリップの duration。本数もそちらで数える
+        want_each = sum(given) / len(given)
 
     """
     ★★何本必要か（target）と、何本まで試すか（pool）を分ける。
