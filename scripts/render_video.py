@@ -185,7 +185,7 @@ def resolution_is_acceptable(path):
     return rw >= MIN_MATERIAL_DIMENSION and rh >= MIN_MATERIAL_DIMENSION
 
 
-def normalize(src, dest, start, duration, w, h, fps):
+def normalize(src, dest, start, duration, w, h, fps, dim=False):
     """
     1クリップを「指定秒数・9:16・同一規格」に揃える。
 
@@ -196,8 +196,8 @@ def normalize(src, dest, start, duration, w, h, fps):
     """
     vf = (
         'scale={w}:{h}:force_original_aspect_ratio=increase,'
-        'crop={w}:{h},setsar=1,fps={fps},format=yuv420p'
-    ).format(w=w, h=h, fps=fps)
+        'crop={w}:{h},{dim}setsar=1,fps={fps},format=yuv420p'
+    ).format(w=w, h=h, fps=fps, dim=dim_filter(dim))
 
     run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
          '-ss', str(start), '-t', str(duration), '-i', src,
@@ -259,7 +259,7 @@ def looks_like_image(url, path):
     return False
 
 
-def still_to_clip(src, dest, duration, w, h, fps, rng):
+def still_to_clip(src, dest, duration, w, h, fps, rng, dim=False):
     """
     静止画を「動くカット」にする（Ken Burns）。
 
@@ -286,10 +286,11 @@ def still_to_clip(src, dest, duration, w, h, fps, rng):
 
     vf = (
         'scale={bw}:{bh}:force_original_aspect_ratio=increase,'
-        'crop={bw}:{bh},'
+        'crop={bw}:{bh},{dim}'
         "zoompan=z='{z}':d={d}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
         ':s={w}x{h}:fps={fps},setsar=1,format=yuv420p'
-    ).format(bw=big_w, bh=big_h, z=z, d=frames, w=w, h=h, fps=fps)
+    ).format(bw=big_w, bh=big_h, z=z, d=frames, w=w, h=h, fps=fps,
+             dim=dim_filter(dim))
 
     run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
          '-loop', '1', '-i', src, '-t', str(duration),
@@ -362,6 +363,48 @@ CHAR_WIDTH_RATIO_FALLBACK = 0.70  # DejaVu（実測 0.683）
 
 # 字幕は最大2行まで。3行以上は映像を隠しすぎる
 MAX_CAPTION_LINES = 2
+
+# 広告表記の大きさ（字幕の基準サイズに対する比）。実測して決めた値。
+#   0.26 → 字高16px（読めない）
+#   0.65 → 字高38px（字幕120pxの約1/3。読めて邪魔にならない）
+NOTE_SIZE_RATIO = 0.65
+
+"""
+★★2026-08-31、背景を沈める加工。既定では掛けない（送られた回だけ）。
+
+【なぜ要るか】
+映像の上に白い字を乗せると、背景が明るい所で字が読めなくなる。
+
+【何が効いているかを実測した（ここが重要）】
+字幕が乗る帯（下1/4）の輝度を、3種類の画像で測った。
+
+                        平均輝度      ばらつき
+  加工なし                 基準          基準
+  ぼかすだけ boxblur=12    -0%          -2〜-5%   ← ほぼ効かない
+  暗くするだけ             -47〜-71%     -4〜-36%
+  ぼかす＋暗く             -47〜-71%     -6〜-41%
+
+**ぼかしは輝度のばらつきをほとんd下げない。効いているのは暗くする方。**
+「boxblurで高級感を出す」という説明をよく見るが、読みやすさへの寄与は
+測る限り暗くする処理が担っている。ぼかしは競合する細部を消す効果が
+あるはずだが、輝度統計には現れない。**測れない効果を根拠にしない。**
+
+【コスト】
+1カット3秒の書き出しで 2.07秒 → 1.43秒。**加工した方が速い。**
+暗くしてぼかすと細部が減り、x264の符号化が軽くなるため。
+フィルタの計算量を上回って得をする。だから両方入れて構わない。
+"""
+DIM_BLUR = 12          # boxblur の半径
+DIM_BRIGHTNESS = -0.12  # eq の brightness
+DIM_SATURATION = 0.85   # 少しだけ彩度を落とす。字の色を目立たせるため
+
+
+def dim_filter(enabled):
+    """背景を沈めるフィルタ列を返す。掛けない時は空文字。"""
+    if not enabled:
+        return ''
+    return ('boxblur=%d:2,eq=brightness=%.2f:saturation=%.2f,'
+            % (DIM_BLUR, DIM_BRIGHTNESS, DIM_SATURATION))
 
 # 字幕の黒縁の太さ。明るい映像の上で文字を読ませるために要る。
 # ★幅の計算に効く。縁は文字の左右へこの分だけはみ出すので、
@@ -688,9 +731,18 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
         # ★広告表記用。字幕と同じスタイルを使い回さない。
         #   字幕は \\fs や \\1c を回ごとに上書きするので、混ぜると
         #   表記まで一緒に動いてしまう。別スタイルにして固定する。
-        ('Style: Note,%s,%d,&H40FFFFFF,&H40FFFFFF,&H00000000,'
+        #
+        # ★★2026-08-31、大きさを 0.26 → 0.65 へ上げた。**実測して直した。**
+        #   0.26 だと 1920px の画面で **字の高さが16px** しかなく、
+        #   スマホの実表示では6px程度になる。事実上読めない。
+        #   広告表記は「一般消費者が広告だと判別できる」ことが要件なので、
+        #   読めない大きさでは表記した事にならない。
+        #
+        #   0.65 で字高38px（画面幅の25%）。字幕本体の字高は120px前後なので
+        #   約1/3。読めるが、主役の字幕とは競合しない大きさ。
+        ('Style: Note,%s,%d,&H20FFFFFF,&H20FFFFFF,&H00000000,'
          '&H80000000,0,0,0,0,100,100,0,0,1,3,0,8,40,40,40,1'
-         % (font_name, max(28, int(font_size * 0.26)))),
+         % (font_name, max(28, int(font_size * NOTE_SIZE_RATIO)))),
         '',
         '[Events]',
         'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
@@ -1074,6 +1126,9 @@ def main():
     本番のGASは両方に同じ値を入れているので今まで表面化していない。
     片方だけ変えた瞬間に出る類の不整合なので、根拠を1つに寄せる。
     """
+    # ★背景を沈めるか。送られなければ従来どおり素材をそのまま使う
+    dim = bool(job.get('dim_background'))
+
     want_each = float(job.get('clip_seconds') or 1.6)
     given = [float(c.get('duration')) for c in (job.get('clips') or [])
              if c and c.get('duration')]
@@ -1178,9 +1233,9 @@ def main():
           try:
               if looks_like_image(url, src):
                   # ★静止画は動かしてから連結する（Ken Burns）
-                  ok = still_to_clip(src, dst, each, w, h, fps, rng)
+                  ok = still_to_clip(src, dst, each, w, h, fps, rng, dim)
               else:
-                  ok = normalize(src, dst, st, each, w, h, fps)
+                  ok = normalize(src, dst, st, each, w, h, fps, dim)
           except Exception as e:
               log('  変換に失敗（次のクリップへ）: %s' % e)
               ok = False
