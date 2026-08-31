@@ -657,6 +657,12 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
          '&H80000000,%d,0,0,0,100,100,0,0,1,%d,3,5,60,60,60,1'
          % (font_name, font_size, primary, secondary,
             0 if font_name == CAPTION_FONT_NAME else -1, outline)),
+        # ★広告表記用。字幕と同じスタイルを使い回さない。
+        #   字幕は \\fs や \\1c を回ごとに上書きするので、混ぜると
+        #   表記まで一緒に動いてしまう。別スタイルにして固定する。
+        ('Style: Note,%s,%d,&H40FFFFFF,&H40FFFFFF,&H00000000,'
+         '&H80000000,0,0,0,0,100,100,0,0,1,3,0,8,40,40,40,1'
+         % (font_name, max(28, int(font_size * 0.26)))),
         '',
         '[Events]',
         'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
@@ -665,7 +671,7 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
 
 def build_ass(captions, w, h, font_size, center=False,
               font_name='DejaVu Sans', ratio=None, font_dir=None,
-              theme=None):
+              theme=None, disclosure=None):
     """
     単語ごとに色が変わる字幕（karaoke）を作る。
 
@@ -694,6 +700,28 @@ def build_ass(captions, w, h, font_size, center=False,
     """
     y = int(h * (0.50 if center else 0.74))
     lines = []
+
+    """
+    ★★広告表記（2026-08-31）。
+
+    【なぜ動画にも要るか】
+    アフィリエイト商品を扱う動画は、それが広告であることを分かる形で
+    示す必要がある（景表法のステマ規制／各SNSの規約）。
+    投稿本文に書くだけでは足りない。動画は本文と切り離されて
+    再生・保存・転載されるので、**動画そのものが表記を持つ**必要がある。
+
+    【なぜ画面上部か】
+    字幕は下（モードA）か中央（モードT）に出る。上に置けばどちらとも
+    衝突しない。小さく薄くするが、消しはしない。
+
+    【なぜ全編に出すか】
+    途中から見た人にも見える必要がある。冒頭数秒だけでは意味が無い。
+    """
+    if disclosure:
+        lines.append(
+            'Dialogue: 0,0:00:00.00,9:59:59.99,Note,,0,0,0,,'
+            '{\\pos(%d,%d)}%s' % (w // 2, int(h * 0.062),
+                                 ass_escape(str(disclosure))))
     for c in captions:
         text = ass_escape(c.get('text', ''))
         if not text:
@@ -1266,7 +1294,8 @@ def main():
                               font_name=font_name, ratio=font_ratio,
                               font_dir=font_dir,
                               theme=build_theme(job.get('design_tokens'),
-                                                job.get('highlight_words'))))
+                                                job.get('highlight_words')),
+                              disclosure=job.get('disclosure')))
 
         """
         ★fontsdir で libass に探し場所を教える。
