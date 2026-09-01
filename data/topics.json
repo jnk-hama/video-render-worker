@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-31T22:58:37+00:00",
+ "generated_at": "2026-09-01T05:17:00+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -49,91 +49,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vyw8oj",
-    "title": "Before and after of Syapru beshi, one of the affected areas of today's flash flooding in Nepal.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vyw8oj/before_and_after_of_syapru_beshi_one_of_the/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w0isy8",
+    "title": "A simple couple with an extraordinary legacy.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w0isy8/a_simple_couple_with_an_extraordinary_legacy/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w106gi",
-    "title": "Sunscreen under UV camera",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w106gi/sunscreen_under_uv_camera/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w2hmvb",
+    "title": "The branch manager hard at work",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w2hmvb/the_branch_manager_hard_at_work/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2fvl5",
-    "title": "Scientists asked 1,000 volunteers to bury cotton underwear across Switzerland to measure soil health creating an official \"Underpants Index\" based on how fast the fabric decomposed.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w2fvl5/scientists_asked_1000_volunteers_to_bury_cotton/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1vy8c5s",
+    "title": "Dolly Parton started the Imagination Library in 1995 as a tribute to her father, who couldn't read or write. In 2018, she explained it was to give kids \"early access to books\". Now, over 325 MILLION books have been gifted.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vy8c5s/dolly_parton_started_the_imagination_library_in/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vy3dmn",
-    "title": "Pyramids of Giza, photographed in 1962.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vy3dmn/pyramids_of_giza_photographed_in_1962/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1vyps2s",
+    "title": "Empire State Building lit up for Dolly 💗",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vyps2s/empire_state_building_lit_up_for_dolly/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzobcp",
-    "title": "Joseph Nguthiru, a Kenyan entrepreneur is changing the future of packaging by turning an invasive plant into a biodegradable alternative to plastic",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vzobcp/joseph_nguthiru_a_kenyan_entrepreneur_is_changing/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1vzgveq",
+    "title": "HMB while i catch a cigarette",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1vzgveq/hmb_while_i_catch_a_cigarette/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vzwm2p",
-    "title": "Which one will fall in??? Great trap design",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vzwm2p/which_one_will_fall_in_great_trap_design/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w2a4td",
+    "title": "HMB while I pray for Flyhalla!",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1w2a4td/hmb_while_i_pray_for_flyhalla/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2pfct",
-    "title": "Making a splash here",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w2pfct/making_a_splash_here/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w1vj41",
+    "title": "HMB, put on something that’ll blow us away",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1w1vj41/hmb_put_on_something_thatll_blow_us_away/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxnqwd",
-    "title": "Upgrades people upgrades",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vxnqwd/upgrades_people_upgrades/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w39x4y",
+    "title": "Chilean photographer captures the blood-red eyes of a white-tufted grebe",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w39x4y/chilean_photographer_captures_the_bloodred_eyes/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w1zdb4",
-    "title": "(Source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w1zdb4/source_link_in_description/",
-    "subreddit": "toptalent",
+    "id": "t3_1vyxipg",
+    "title": "Buckingham Palace pays tribute to Dolly Parton by performing “9 to 5\"",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1vyxipg/buckingham_palace_pays_tribute_to_dolly_parton_by/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2c6t0",
-    "title": "The speed and precision of this sheep shearer (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w2c6t0/the_speed_and_precision_of_this_sheep_shearer/",
-    "subreddit": "toptalent",
+    "id": "t3_1w2zson",
+    "title": "\"The Cloud\", a proposed skyscraper design from South Korea which was scrapped due to its visual similarity to the 9/11 attacks.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w2zson/the_cloud_a_proposed_skyscraper_design_from_south/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,82 +141,37 @@
   ],
   "B": [
    {
-    "id": "t3_1w0w1kj",
-    "title": "Baby by Elf Standards",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w0w1kj/baby_by_elf_standards/",
-    "subreddit": "Animemes",
+    "id": "t3_1w2mf6x",
+    "title": "Casual girl [Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w2mf6x/casual_girl_original/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxzwqx",
-    "title": "Bro is in another league",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vxzwqx/bro_is_in_another_league/",
-    "subreddit": "Animemes",
+    "id": "t3_1vy5nty",
+    "title": "Karen [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vy5nty/karen_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vz3ayr",
-    "title": "Three moms, three goals",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vz3ayr/three_moms_three_goals/",
-    "subreddit": "Animemes",
+    "id": "t3_1vyz7za",
+    "title": "Miyabi [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vyz7za/miyabi_zenless_zone_zero/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyiiom",
-    "title": "Is it still incest if you literally parallel to Adam and Eve?",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vyiiom/is_it_still_incest_if_you_literally_parallel_to/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w0taaw",
-    "title": "Dread it. Run from it. Brainrot arrives all the same",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w0taaw/dread_it_run_from_it_brainrot_arrives_all_the_same/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vzmbga",
-    "title": "Gintama: yoshiwara in flames",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1vzmbga/gintama_yoshiwara_in_flames/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w28mel",
-    "title": "False memory going off one last time .",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w28mel/false_memory_going_off_one_last_time/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w2nm9m",
-    "title": "One Piece #1176 - Nami vs Gunko",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w2nm9m/one_piece_1176_nami_vs_gunko/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w3kz8c",
-    "title": "Usopp Vs Gunko - One Piece #1176",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w3kz8c/usopp_vs_gunko_one_piece_1176/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w0vu3e",
+    "title": "Miyabi in the office [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w0vu3e/miyabi_in_the_office_zenless_zone_zero/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -225,15 +180,6 @@
     "id": "t3_1w095nv",
     "title": "My True Form/Final Form Sukuna cosplay for ANIMENYC",
     "url": "https://www.reddit.com/r/cosplay/comments/1w095nv/my_true_formfinal_form_sukuna_cosplay_for_animenyc/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vxmjdx",
-    "title": "I wore my old Rukia cosplay 16 years later At Anime NYC!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1vxmjdx/i_wore_my_old_rukia_cosplay_16_years_later_at/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
@@ -249,15 +195,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w2evzo",
-    "title": "Dark Magician Girl cosplay at Anirevo 2026",
-    "url": "https://www.reddit.com/r/cosplay/comments/1w2evzo/dark_magician_girl_cosplay_at_anirevo_2026/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1w3het0",
     "title": "My Anakin Skywalker cosplay",
     "url": "https://www.reddit.com/r/cosplay/comments/1w3het0/my_anakin_skywalker_cosplay/",
@@ -267,12 +204,66 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vznqzz",
-    "title": "[DISC] My Tsundere Girlfriend's Thick-Thighed Troubles - Chapter 1",
-    "url": "https://www.reddit.com/r/manga/comments/1vznqzz/disc_my_tsundere_girlfriends_thickthighed/",
-    "subreddit": "manga",
+    "id": "t3_1w2evzo",
+    "title": "Dark Magician Girl cosplay at Anirevo 2026",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w2evzo/dark_magician_girl_cosplay_at_anirevo_2026/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w158sn",
+    "title": "Female Doctor Strange [live action]",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w158sn/female_doctor_strange_live_action/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vyt2qc",
+    "title": "So anyway, I started blasting [Kill la Kill]",
+    "url": "https://www.reddit.com/r/anime/comments/1vyt2qc/so_anyway_i_started_blasting_kill_la_kill/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vy08t5",
+    "title": "Favorite weird/random in-universe clothing that characters wear?",
+    "url": "https://www.reddit.com/r/anime/comments/1vy08t5/favorite_weirdrandom_inuniverse_clothing_that/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w1i4rw",
+    "title": "‘Jujutsu Kaisen: The Culling Game Part 2’ Teaser Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1w1i4rw/jujutsu_kaisen_the_culling_game_part_2_teaser/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w3992g",
+    "title": "\"Spice and Wolf: Merchant Meets the Wise Wolf\" Season 2 New Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1w3992g/spice_and_wolf_merchant_meets_the_wise_wolf/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2jy30",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 10 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w2jy30/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
