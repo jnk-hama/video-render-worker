@@ -61,6 +61,32 @@ jobs:
           python3 -m pip install --quiet --disable-pip-version-check edge-tts
           python3 -c "import edge_tts; print('edge-tts ready')"
 
+      # ★★2026-09-01、切り抜きと合成のための依存。**すべてCPUで動く。**
+      #   onnxruntime は CPUExecutionProvider のみ（GPU版は入れない）。
+      #   これで「GPU推論に依存しない」を守ったまま、
+      #   ・商品画像の背景除去（U2-Net / 実測0.86秒per枚）
+      #   ・モデル映像の手首追跡（MediaPipe Pose）
+      #   ができる。どちらも無料。
+      #
+      # ★libEGL は mediapipe が dlopen する。入れないと
+      #   「libEGL.so.1: cannot open shared object file」で落ちる（実際に踏んだ）。
+      - name: 切り抜き・姿勢推定
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq --no-install-recommends libegl1 libgl1
+          python3 -m pip install --quiet --disable-pip-version-check \
+            rembg onnxruntime mediapipe
+          python3 - <<'PY'
+          import onnxruntime
+          print('onnxruntime', onnxruntime.__version__,
+                onnxruntime.get_available_providers())
+          PY
+          # 姿勢推定のモデル（5.6MB）。rembgのモデルは初回利用時に自動取得
+          mkdir -p /root/.mp
+          curl -sSL --max-time 120 -o /root/.mp/pose.task \
+            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task"
+          ls -lh /root/.mp/pose.task
+
       - name: 依頼内容を取り出す
         id: payload
         env:
