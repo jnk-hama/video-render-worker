@@ -157,7 +157,10 @@ def compose(src, product, dest, start, dur, scale_ratio=0.30,
     session = None
     if occlude:
         from rembg import new_session
-        session = new_session('u2net')
+        # ★モデルを明示する。既定(BRIA RMBG-2.0)は商用に有償契約が要る。
+        #   詳しくは cutout.py の REMBG_MODEL の説明。
+        from cutout import REMBG_MODEL
+        session = new_session(REMBG_MODEL)
 
     for i, fn in enumerate(frames):
         if i >= len(pts):

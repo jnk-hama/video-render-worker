@@ -27,6 +27,19 @@ import sys
 from collections import deque
 
 # 隣の画素との差の許容量（0-255）。これ以下なら同じ背景とみなす
+"""
+★★2026-09-01、rembg のモデルを **必ず明示する**。既定に任せない。
+
+【なぜ】
+rembg 本体は MIT だが、**モデルの重みは別ライセンス**である。
+新しい既定モデル BRIA RMBG-2.0 は **商用利用に有償契約が必要**。
+アフィリエイトは商用なので、既定のまま使うと規約違反になる。
+
+U2-Net は Apache 系で商用可。だから u2net を名指しする。
+**この引数を消してはいけない。** 消すと既定へ落ちて違反する。
+"""
+REMBG_MODEL = 'u2net'   # 商用可。既定(BRIA)へ落とさないため必ず明示する
+
 NEIGHBOR_TOLERANCE = 18
 
 # 縁の色からの距離の上限。これを超えたら背景とみなさない
@@ -206,7 +219,7 @@ def cutout_rembg(src, dest, session=None):
         return None
     try:
         if session is None:
-            session = new_session('u2net')
+            session = new_session(REMBG_MODEL)
         with open(src, 'rb') as f:
             data = remove(f.read(), session=session)
         with open(dest, 'wb') as f:
