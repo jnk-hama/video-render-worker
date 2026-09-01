@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-01T11:47:28+00:00",
+ "generated_at": "2026-09-01T16:47:57+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -40,64 +40,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vxypjd",
-    "title": "Tony Hawk pushing his body to the absolute limit to land what is possibly his last 720 at age 52.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1vxypjd/tony_hawk_pushing_his_body_to_the_absolute_limit/",
+    "id": "t3_1w0z15s",
+    "title": "What is cooler than faking out a player? Faking out two players at the same time",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w0z15s/what_is_cooler_than_faking_out_a_player_faking/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyw8oj",
-    "title": "Before and after of Syapru beshi, one of the affected areas of today's flash flooding in Nepal.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vyw8oj/before_and_after_of_syapru_beshi_one_of_the/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w0isy8",
+    "title": "A simple couple with an extraordinary legacy.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w0isy8/a_simple_couple_with_an_extraordinary_legacy/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w106gi",
-    "title": "Sunscreen under UV camera",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w106gi/sunscreen_under_uv_camera/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w2hmvb",
+    "title": "The branch manager hard at work",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w2hmvb/the_branch_manager_hard_at_work/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2fvl5",
-    "title": "Scientists asked 1,000 volunteers to bury cotton underwear across Switzerland to measure soil health creating an official \"Underpants Index\" based on how fast the fabric decomposed.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w2fvl5/scientists_asked_1000_volunteers_to_bury_cotton/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1vy8c5s",
+    "title": "Dolly Parton started the Imagination Library in 1995 as a tribute to her father, who couldn't read or write. In 2018, she explained it was to give kids \"early access to books\". Now, over 325 MILLION books have been gifted.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vy8c5s/dolly_parton_started_the_imagination_library_in/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w3wple",
-    "title": "Duane Keith Davis has been found guilty of the murder of Tupac Shakur",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w3wple/duane_keith_davis_has_been_found_guilty_of_the/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vy3dmn",
-    "title": "Pyramids of Giza, photographed in 1962.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vy3dmn/pyramids_of_giza_photographed_in_1962/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vzwm2p",
-    "title": "Which one will fall in??? Great trap design",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1vzwm2p/which_one_will_fall_in_great_trap_design/",
-    "subreddit": "Unexpected",
+    "id": "t3_1vyps2s",
+    "title": "Empire State Building lit up for Dolly 💗",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1vyps2s/empire_state_building_lit_up_for_dolly/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -106,6 +88,15 @@
     "id": "t3_1w2pfct",
     "title": "Making a splash here",
     "url": "https://www.reddit.com/r/Unexpected/comments/1w2pfct/making_a_splash_here/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1vzwm2p",
+    "title": "Which one will fall in??? Great trap design",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1vzwm2p/which_one_will_fall_in_great_trap_design/",
     "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
@@ -137,41 +128,50 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
+   },
+   {
+    "id": "t3_1w2zson",
+    "title": "\"The Cloud\", a proposed skyscraper design from South Korea which was scrapped due to its visual similarity to the 9/11 attacks.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w2zson/the_cloud_a_proposed_skyscraper_design_from_south/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
    }
   ],
   "B": [
    {
-    "id": "t3_1w0w1kj",
-    "title": "Baby by Elf Standards",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w0w1kj/baby_by_elf_standards/",
-    "subreddit": "Animemes",
+    "id": "t3_1w2mf6x",
+    "title": "Casual girl [Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w2mf6x/casual_girl_original/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vxzwqx",
-    "title": "Bro is in another league",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vxzwqx/bro_is_in_another_league/",
-    "subreddit": "Animemes",
+    "id": "t3_1vy5nty",
+    "title": "Karen [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vy5nty/karen_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vz3ayr",
-    "title": "Three moms, three goals",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vz3ayr/three_moms_three_goals/",
-    "subreddit": "Animemes",
+    "id": "t3_1vyz7za",
+    "title": "Miyabi [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1vyz7za/miyabi_zenless_zone_zero/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vyiiom",
-    "title": "Is it still incest if you literally parallel to Adam and Eve?",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vyiiom/is_it_still_incest_if_you_literally_parallel_to/",
-    "subreddit": "Animemes",
+    "id": "t3_1w0vu3e",
+    "title": "Miyabi in the office [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w0vu3e/miyabi_in_the_office_zenless_zone_zero/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -186,82 +186,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w0les1",
-    "title": "How to get the perfect pose for a summer shoot — Step by step",
-    "url": "https://www.reddit.com/r/animegifs/comments/1w0les1/how_to_get_the_perfect_pose_for_a_summer_shoot/",
+    "id": "t3_1w31g5r",
+    "title": "Even The Strongest Have A Weakness",
+    "url": "https://www.reddit.com/r/animegifs/comments/1w31g5r/even_the_strongest_have_a_weakness/",
     "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w1kvic",
-    "title": "Osaka gyaruo inspired",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w1kvic/osaka_gyaruo_inspired/",
-    "subreddit": "streetwear",
+    "id": "t3_1vyt2qc",
+    "title": "So anyway, I started blasting [Kill la Kill]",
+    "url": "https://www.reddit.com/r/anime/comments/1vyt2qc/so_anyway_i_started_blasting_kill_la_kill/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2um6q",
-    "title": "fully hand painted outfit",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w2um6q/fully_hand_painted_outfit/",
-    "subreddit": "streetwear",
+    "id": "t3_1w3992g",
+    "title": "\"Spice and Wolf: Merchant Meets the Wise Wolf\" Season 2 New Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1w3992g/spice_and_wolf_merchant_meets_the_wise_wolf/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w3w8l4",
-    "title": "Had another themed birthday party, this time cowboy.",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w3w8l4/had_another_themed_birthday_party_this_time_cowboy/",
-    "subreddit": "streetwear",
+    "id": "t3_1w1i4rw",
+    "title": "‘Jujutsu Kaisen: The Culling Game Part 2’ Teaser Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1w1i4rw/jujutsu_kaisen_the_culling_game_part_2_teaser/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1vznqzz",
-    "title": "[DISC] My Tsundere Girlfriend's Thick-Thighed Troubles - Chapter 1",
-    "url": "https://www.reddit.com/r/manga/comments/1vznqzz/disc_my_tsundere_girlfriends_thickthighed/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w1na9t",
-    "title": "[ART] Granny, You're Too Old to Ride! (Sousou no Frieren)",
-    "url": "https://www.reddit.com/r/manga/comments/1w1na9t/art_granny_youre_too_old_to_ride_sousou_no_frieren/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w0elxf",
-    "title": "[DISC] A Perceptive Guy -Oneshot",
-    "url": "https://www.reddit.com/r/manga/comments/1w0elxf/disc_a_perceptive_guy_oneshot/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w2i1ku",
-    "title": "[DISC] Turning the tables on the gyaru compilation",
-    "url": "https://www.reddit.com/r/manga/comments/1w2i1ku/disc_turning_the_tables_on_the_gyaru_compilation/",
-    "subreddit": "manga",
+    "id": "t3_1w2jy30",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 10 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w2jy30/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": false,
     "source": "rss"
    },
    {
-    "id": "t3_1vzu3r1",
-    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 3",
-    "url": "https://www.reddit.com/r/manga/comments/1vzu3r1/disc_the_story_of_a_girl_who_can_read_minds_ch_3/",
-    "subreddit": "manga",
+    "id": "t3_1vyy1xp",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 14 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1vyy1xp/rezero_starting_life_in_another_world_season_4/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": false,
     "source": "rss"
