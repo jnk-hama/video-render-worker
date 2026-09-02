@@ -28,6 +28,7 @@ Colab と GitHub Actions では問題にならない（MoneyPrinterTurbo-SETUP.m
 
 import asyncio
 import os
+import re
 
 # 100ナノ秒 → 秒
 TICKS_PER_SECOND = 10_000_000
@@ -117,6 +118,14 @@ def synthesize(text, out_path, voice=None, rate=None):
     return {'path': out_path, 'words': words, 'duration': duration}
 
 
+# 日本語の1枚あたりの文字数。語ではなく文字で区切る（下の説明）。
+JA_CHARS_PER_CHUNK = 9
+
+
+def _is_cjk(text):
+    return re.search(r'[\u3040-\u30ff\u3400-\u9fff]', str(text or '')) is not None
+
+
 def group_words(words, per_chunk=3):
     """
     単語を「画面に一度に出す塊」へまとめる。
@@ -125,11 +134,31 @@ def group_words(words, per_chunk=3):
       視線を動かさずに一目で読めるのがこの長さだから。
 
     ★塊の中の単語ごとの時刻は保持する。カラオケの塗り替えに使う。
+
+    ★★日本語（2026-09-02）は語数ではなく文字数で区切る。
+      日本語の WordBoundary は「この」「扇風機」「は」のように短い語で
+      来るので、3語だと1枚に4〜5文字しか載らず、切り替えが速すぎて
+      読めない。文字数で JA_CHARS_PER_CHUNK を超えたら次の枚へ送る。
+      語の途中では切らない（時刻は語単位でしか取れない）。
     """
     out = []
-    n = max(1, int(per_chunk))
-    for i in range(0, len(words), n):
-        grp = words[i:i + n]
+    groups = []
+    if words and _is_cjk(''.join(w['text'] for w in words)):
+        cur = []
+        for w in words:
+            # ★句読点だけの語は前の枚に付ける。「！」1文字だけの枚を作らない
+            punct = not re.search(r'[0-9A-Za-z\u3040-\u30ff\u3400-\u9fff]', w['text'])
+            if (cur and not punct
+                    and sum(len(x['text']) for x in cur) + len(w['text']) > JA_CHARS_PER_CHUNK):
+                groups.append(cur)
+                cur = []
+            cur.append(w)
+        if cur:
+            groups.append(cur)
+    else:
+        n = max(1, int(per_chunk))
+        groups = [words[i:i + n] for i in range(0, len(words), n)]
+    for grp in groups:
         if not grp:
             continue
         out.append({

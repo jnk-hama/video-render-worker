@@ -361,6 +361,27 @@ CAPTION_FONT_URL = ('https://raw.githubusercontent.com/google/fonts/main/'
 CHAR_WIDTH_RATIO = 0.45          # Anton（実測 0.423）
 CHAR_WIDTH_RATIO_FALLBACK = 0.70  # DejaVu（実測 0.683）
 
+"""
+★★2026-09-02、日本語の字幕（jmas-ai-os 側＝日本市場の部署）。
+
+Anton は欧文専用で、日本語を渡すと全部が豆腐（□）になる。
+日本語の回だけ Dela Gothic One（SIL OFL）へ切り替える。
+
+【なぜ Dela Gothic One か】
+ ・極太の1ウェイト静的フォント。TikTok の物販動画で主流の「太ゴシック」
+ ・google/fonts に静的 TTF が1本だけある（2.5MB）。漢字 7,654 字
+   （fontTools で数えた。JIS第1・第2水準を覆う）
+ ・Noto Sans JP は google/fonts に可変フォントしか無く、libass は
+   既定インスタンス（Thin＝100）で描く。細すぎて字幕にならない
+   （実際に描いて確認）。静的の Black を出す公式配布が raw では 404。
+
+【幅】全角は 1文字≒1em。半角英数が混じると縮む。字幕は1枚ずつ
+      measure_char_ratio で実測するので、ここの値は測れない時の予備。
+"""
+CAPTION_FONT_JA_NAME = 'Dela Gothic One'
+CAPTION_FONT_JA_FILE = 'DelaGothicOne-Regular.ttf'
+CHAR_WIDTH_RATIO_JA = 1.05
+
 # 字幕は最大2行まで。3行以上は映像を隠しすぎる
 MAX_CAPTION_LINES = 2
 
@@ -518,13 +539,21 @@ def normalize_word(w):
     ★字幕は wd.upper() で描くので、そのままでは一致しない。
       また "answer." のように句点が付くため、記号も落とす必要がある。
     """
-    return re.sub(r'[^0-9A-Za-z]', '', str(w or '')).lower()
+    # ★日本語の文字は残す。消すと強調語が空文字になり、一致しなくなる
+    return re.sub(r'[^0-9A-Za-z\u3040-\u30ff\u3400-\u9fff]', '', str(w or '')).lower()
 
 
-def caption_font():
+def has_cjk(text):
+    """日本語（ひらがな・カタカナ・漢字）を含むか。字幕のフォントと
+    語の連結（空白を入れるか）をこれで切り替える。"""
+    return re.search(r'[\u3040-\u30ff\u3400-\u9fff]', str(text or '')) is not None
+
+
+def caption_font(sample=''):
     """
     字幕に使うフォントを決める。
 
+    @param sample 描く文字列の見本（本文＋字幕）。日本語を含めば日本語フォント
     @return (フォント名, フォントを置いたディレクトリ or None, 文字幅の比率)
 
     ★見つからなければ黙って DejaVu へ降りる。フォントが無いことを
@@ -532,12 +561,20 @@ def caption_font():
       比率だけ Anton のまま DejaVu で描くと、1.5倍の幅で描かれて
       画面からはみ出す（比率とフォントは必ず対で扱う）。
     """
+    if has_cjk(sample):
+        name, fname, ratio = CAPTION_FONT_JA_NAME, CAPTION_FONT_JA_FILE, CHAR_WIDTH_RATIO_JA
+    else:
+        name, fname, ratio = CAPTION_FONT_NAME, CAPTION_FONT_FILE, CHAR_WIDTH_RATIO
     here = os.path.dirname(os.path.abspath(__file__))
     for d in (os.path.join(os.path.dirname(here), 'assets', 'fonts'),
               os.path.join(here, 'fonts')):
-        if os.path.exists(os.path.join(d, CAPTION_FONT_FILE)):
-            return CAPTION_FONT_NAME, d, CHAR_WIDTH_RATIO
-    log('%s が見つかりません。DejaVu Sans で描きます。' % CAPTION_FONT_FILE)
+        if os.path.exists(os.path.join(d, fname)):
+            return name, d, ratio
+    # ★日本語フォントが無い回は DejaVu へ降りても豆腐になる。黙って出さず、
+    #   ここで止める（字幕が読めない動画は投稿できない）。
+    if name == CAPTION_FONT_JA_NAME:
+        raise SystemExit('%s が見つかりません。日本語の字幕を描けません。' % fname)
+    log('%s が見つかりません。DejaVu Sans で描きます。' % fname)
     return 'DejaVu Sans', None, CHAR_WIDTH_RATIO_FALLBACK
 
 
@@ -624,7 +661,7 @@ def measure_char_ratio(text, font_name, font_dir):
     return width / float(len(body) * MEASURE_FONT_SIZE)
 
 
-def fit_caption(words, w, font_size, ratio=None, h_hint=0):
+def fit_caption(words, w, font_size, ratio=None, h_hint=0, sep=' '):
     """
     画面幅に収まる文字サイズと、改行位置を決める。
 
@@ -648,7 +685,7 @@ def fit_caption(words, w, font_size, ratio=None, h_hint=0):
         cur = []
         for wd in words:
             trial = cur + [wd]
-            if cur and len(' '.join(trial)) * per_char > usable:
+            if cur and len(sep.join(trial)) * per_char > usable:
                 lines.append(cur)
                 cur = [wd]
             else:
@@ -657,7 +694,7 @@ def fit_caption(words, w, font_size, ratio=None, h_hint=0):
             lines.append(cur)
 
         # 1語だけで幅を超える場合も、これ以上は折れない
-        too_wide = any(len(' '.join(ln)) * per_char > usable for ln in lines)
+        too_wide = any(len(sep.join(ln)) * per_char > usable for ln in lines)
         if (len(lines) <= MAX_CAPTION_LINES and not too_wide) or size <= floor:
             """
             ★★2026-08-28、縮小だけでなく拡大もするようにした。
@@ -678,7 +715,7 @@ def fit_caption(words, w, font_size, ratio=None, h_hint=0):
             はみ出すほど巨大になる。基準サイズの2.2倍で止める。
             さらに2行ぶんの高さが画面の1/4を超えないようにする。
             """
-            longest = max((len(' '.join(ln)) for ln in lines), default=0)
+            longest = max((len(sep.join(ln)) for ln in lines), default=0)
             if longest:
                 ceiling = int(font_size * 2.2)
                 if h_hint:
@@ -734,7 +771,8 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
         ('Style: Pop,%s,%d,%s,%s,&H00000000,'
          '&H80000000,%d,0,0,0,100,100,0,0,1,%d,3,5,60,60,60,1'
          % (font_name, font_size, primary, secondary,
-            0 if font_name == CAPTION_FONT_NAME else -1, outline)),
+            0 if font_name in (CAPTION_FONT_NAME, CAPTION_FONT_JA_NAME) else -1,
+            outline)),
         # ★広告表記用。字幕と同じスタイルを使い回さない。
         #   字幕は \\fs や \\1c を回ごとに上書きするので、混ぜると
         #   表記まで一緒に動いてしまう。別スタイルにして固定する。
@@ -838,10 +876,19 @@ def build_ass(captions, w, h, font_size, center=False,
             拡大の実装を入れても画面上は何も変わらず、
             実測しても幅が 429px から1pxも動かなかった原因がこれ。
         """
-        shown = ' '.join(wd.upper() for wd in words)
+        """
+        ★★日本語（2026-09-02）。語の間に空白を入れない。
+          TTS の WordBoundary は日本語でも語ごとに来るが、日本語の字幕は
+          分かち書きしない。空白を挟むと「この 扇風機 は」のように
+          見え、素人臭くなる。大文字化も掛けない（英字が混じった時に
+          商品名の綴りを変えてしまう）。
+        """
+        cjk = has_cjk(text)
+        sep = '' if cjk else ' '
+        shown = sep.join(wd if cjk else wd.upper() for wd in words)
         measured = measure_char_ratio(shown, font_name, font_dir) or ratio
 
-        size, line_breaks = fit_caption(words, w, font_size, measured, h)
+        size, line_breaks = fit_caption(words, w, font_size, measured, h, sep=sep)
         fs = '' if size == font_size else ('\\fs%d' % size)
 
         # 折り返す語の位置（そこへ来る前に \N を挟む）
@@ -895,7 +942,7 @@ def build_ass(captions, w, h, font_size, center=False,
             lit = accent and normalize_word(wd) in hi
             if lit:
                 karaoke += '{\\1c%s\\2c%s}' % (accent, accent_dim or accent)
-            karaoke += '{\\k%d}%s ' % (per_word[i], wd.upper())
+            karaoke += '{\\k%d}%s%s' % (per_word[i], wd if cjk else wd.upper(), sep)
             if lit and back:
                 karaoke += back
 
@@ -1050,7 +1097,9 @@ def main():
     os.makedirs(work, exist_ok=True)
     rng = random.Random(seed if seed is not None else os.urandom(8))
 
-    font_name, font_dir, font_ratio = caption_font()
+    font_name, font_dir, font_ratio = caption_font(
+        '%s %s' % (job.get('narration') or '',
+                   ' '.join(str(c.get('text') or '') for c in (job.get('captions') or []))))
     log('モード %s / クリップ %d本 / 字幕フォント %s（幅は1枚ずつ実測'
         '／測れない時の予備 %.2f）' % (mode, len(clips), font_name, font_ratio))
 
