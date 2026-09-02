@@ -71,6 +71,28 @@ def read_bgr(path):
     return np.frombuffer(raw, dtype=np.uint8).reshape(h, w, 3).copy(), w, h
 
 
+_lmk = None
+
+
+def _landmarker():
+    """
+    ★モデルは1度だけ作る。
+      1フレームごとに作り直すと、20フレームの動画1本で2分を超えた（実測）。
+    """
+    global _lmk
+    if _lmk is None:
+        import mediapipe as mp
+        from mediapipe.tasks import python as mpy
+        from mediapipe.tasks.python import vision
+        if not ensure_model():
+            return None
+        _lmk = vision.HandLandmarker.create_from_options(
+            vision.HandLandmarkerOptions(
+                base_options=mpy.BaseOptions(model_asset_path=POSE_MODEL),
+                running_mode=vision.RunningMode.IMAGE, num_hands=2))
+    return _lmk
+
+
 def check_hand(path):
     """
     @return {?dict} 手が見つからなければ None
@@ -78,20 +100,13 @@ def check_hand(path):
       fingers_ok  … 極端な破綻が無いか（**本数の検査ではない**）
       reason      … 落ちた理由
     """
-    import numpy as np
     import mediapipe as mp
-    from mediapipe.tasks import python as mpy
-    from mediapipe.tasks.python import vision
-    if not ensure_model():
+    lmk = _landmarker()
+    if lmk is None:
         return None
     img, w, h = read_bgr(path)
     if img is None:
         return None
-    lmk = vision.HandLandmarker.create_from_options(
-        vision.HandLandmarkerOptions(
-            base_options=mpy.BaseOptions(model_asset_path=POSE_MODEL),
-            running_mode=vision.RunningMode.IMAGE,
-            num_hands=2))
     r = lmk.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=img))
     if not r.hand_landmarks:
         return {'hands': 0, 'fingers_ok': False, 'reason': '手を検出できず'}
