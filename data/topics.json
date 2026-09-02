@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-02T11:26:33+00:00",
+ "generated_at": "2026-09-02T16:42:28+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -49,15 +49,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1vyw8oj",
-    "title": "Before and after of Syapru beshi, one of the affected areas of today's flash flooding in Nepal.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1vyw8oj/before_and_after_of_syapru_beshi_one_of_the/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1w3wple",
     "title": "Duane Keith Davis has been found guilty of the murder of Tupac Shakur",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w3wple/duane_keith_davis_has_been_found_guilty_of_the/",
@@ -94,79 +85,61 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w01fwc",
-    "title": "WCGW Road Raging With Your Door Open",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w01fwc/wcgw_road_raging_with_your_door_open/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1w106gi",
+    "title": "Sunscreen under UV camera",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w106gi/sunscreen_under_uv_camera/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2dqe2",
-    "title": "Trying to look badass",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w2dqe2/trying_to_look_badass/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1w2pfct",
+    "title": "Making a splash here",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1w2pfct/making_a_splash_here/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w3lupx",
-    "title": "Using latex paint for Frieza cosplay",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w3lupx/using_latex_paint_for_frieza_cosplay/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1vzwm2p",
+    "title": "Which one will fall in??? Great trap design",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1vzwm2p/which_one_will_fall_in_great_trap_design/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w0ruje",
-    "title": "She definitely pissed herself",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w0ruje/she_definitely_pissed_herself/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1w1zdb4",
+    "title": "(Source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1w1zdb4/source_link_in_description/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w1e7aj",
-    "title": "Birthday celebration",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w1e7aj/birthday_celebration/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1w2c6t0",
+    "title": "The speed and precision of this sheep shearer (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1w2c6t0/the_speed_and_precision_of_this_sheep_shearer/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2y17z",
+    "title": "Vivi Vassileva (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1w2y17z/vivi_vassileva_source_link_in_description/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1w0w1kj",
-    "title": "Baby by Elf Standards",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w0w1kj/baby_by_elf_standards/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1vz3ayr",
-    "title": "Three moms, three goals",
-    "url": "https://www.reddit.com/r/Animemes/comments/1vz3ayr/three_moms_three_goals/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w3ewrf",
-    "title": "Throuple route confirmed",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w3ewrf/throuple_route_confirmed/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1w28mel",
     "title": "False memory going off one last time .",
@@ -204,28 +177,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w1kvic",
-    "title": "Osaka gyaruo inspired",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w1kvic/osaka_gyaruo_inspired/",
-    "subreddit": "streetwear",
+    "id": "t3_1w095nv",
+    "title": "My True Form/Final Form Sukuna cosplay for ANIMENYC",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w095nv/my_true_formfinal_form_sukuna_cosplay_for_animenyc/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w3w8l4",
-    "title": "Had another themed birthday party, this time cowboy.",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w3w8l4/had_another_themed_birthday_party_this_time_cowboy/",
-    "subreddit": "streetwear",
+    "id": "t3_1w2y7tv",
+    "title": "The Symbiote is Overtaking Me",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w2y7tv/the_symbiote_is_overtaking_me/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2um6q",
-    "title": "fully hand painted outfit",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w2um6q/fully_hand_painted_outfit/",
-    "subreddit": "streetwear",
+    "id": "t3_1w3het0",
+    "title": "My Anakin Skywalker cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w3het0/my_anakin_skywalker_cosplay/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2evzo",
+    "title": "Dark Magician Girl cosplay at Anirevo 2026",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w2evzo/dark_magician_girl_cosplay_at_anirevo_2026/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w41s8p",
+    "title": "My Sakura Miku Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w41s8p/my_sakura_miku_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
