@@ -39,6 +39,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    # ★★2026-09-03、同じジョブを二重に描かないための鍵。
+    #   依頼側は「25分待っても動画が来なければ再依頼」する作りなので、
+    #   混雑で遅れた回は**古い実行と新しい実行が並ぶ**。両方が同じ
+    #   Storageのパスへ上げると、後から終わった方（＝古い依頼の結果）が
+    #   上書きしてしまう。job_id ごとに1本だけ走らせ、新しい方を優先する。
+    #   ★ job_id は client_payload をそのまま参照する（この時点では
+    #     まだ検証前なので、鍵として使うだけで、シェルへは渡さない）。
+    concurrency:
+      group: render-${{ github.event.client_payload.job.job_id || github.event.client_payload.job_id || github.run_id }}
+      cancel-in-progress: true
+
     steps:
       - uses: actions/checkout@v4
 
