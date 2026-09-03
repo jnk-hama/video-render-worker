@@ -543,9 +543,28 @@ DIM_SATURATION = 0.85   # 少しだけ彩度を落とす。字の色を目立た
 
 
 def dim_filter(enabled):
-    """背景を沈めるフィルタ列を返す。掛けない時は空文字。"""
+    """
+    背景を沈めるフィルタ列を返す。掛けない時は空文字。
+
+    @param enabled False / True（ぼかし＋暗く） / 'dark'（暗くするだけ）
+
+    ★★2026-09-03、'dark' を足した。
+
+    【なぜ分けるか】
+    #066 で実測したとおり、字幕の読みやすさに効いているのは
+    **暗くすること**で、ぼかしはほぼ効いていない。一方ぼかしは
+    エンコード時間を確実に食う（GitHub Actionsの無料枠2,000分/月に効く）。
+
+    さらに日本部門の映像は**背景そのものが主役**（商品を使っている場面）
+    なので、ぼかすと見せたいものが見えなくなる。読みやすさは黒縁と
+    暗さで足りているため、既定を 'dark' にできるようにした。
+    """
     if not enabled:
         return ''
+    chain = ''
+    if enabled is not True and str(enabled).lower() != 'blur':
+        # 'dark' 等：暗くするだけ
+        return 'eq=brightness=%.2f:saturation=%.2f,' % (DIM_BRIGHTNESS, DIM_SATURATION)
     return ('boxblur=%d:2,eq=brightness=%.2f:saturation=%.2f,'
             % (DIM_BLUR, DIM_BRIGHTNESS, DIM_SATURATION))
 
@@ -1361,8 +1380,9 @@ def main():
     本番のGASは両方に同じ値を入れているので今まで表面化していない。
     片方だけ変えた瞬間に出る類の不整合なので、根拠を1つに寄せる。
     """
-    # ★背景を沈めるか。送られなければ従来どおり素材をそのまま使う
-    dim = bool(job.get('dim_background'))
+    # ★背景を沈めるか。False / True（ぼかし＋暗く） / 'dark'（暗くするだけ）
+    #   送られなければ従来どおり素材をそのまま使う
+    dim = job.get('dim_background') or False
 
     want_each = float(job.get('clip_seconds') or 1.6)
     given = [float(c.get('duration')) for c in (job.get('clips') or [])
