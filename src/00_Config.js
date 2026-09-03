@@ -47,7 +47,15 @@
  *   自動で埋める仕組みは入れない（GASにビルド工程が無いため、
  *   入れるなら push 前のスクリプトが要る。今はそこまでしない）。
  */
-const BUILD_STAMP = '2026-09-03a';
+const BUILD_STAMP = '2026-09-03b';
+
+/*
+ * Geminiの残高切れで生成を休む時間（時間）。決定#075。
+ * 残高切れは時間で解けないので、2時間おきの試行を続けても通知が積まれるだけ。
+ * 6時間ごとに1回だけ試し、入金済みならその回から自然に戻る。
+ */
+const LLM_PAUSED_UNTIL_PROP = 'llm_paused_until';
+const LLM_PAUSE_HOURS = 6;
 
 /** アカウント定義。C, D を増やしたい場合はここに足すだけでよい（+ コールバック関数の追加）。 */
 const ACCOUNTS = Object.freeze({

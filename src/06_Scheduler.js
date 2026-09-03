@@ -276,6 +276,29 @@ function processQueueCore_() {
     return;
   }
 
+  /*
+   * ★★2026-09-03、残高切れの自動休止。
+   *
+   * 【なぜ要るか】
+   * Geminiの残高が尽きると、2時間ごとにキューの全行が同じ理由で失敗する。
+   * 失敗しても消費は起きないが、**通知だけが積まれ、ログが埋まり、
+   * 本当の異常が見えなくなる**。原因が「時間では解けないもの」だと
+   * 分かっているのに、同じ試行を繰り返す意味が無い。
+   *
+   * 【なぜ緊急停止ではなく期限つきか】
+   * 緊急停止は手で解除するまで戻らない。入金しても止まったままになり、
+   * 「なぜ動かない」を探す時間が生まれる。期限が来れば自分で1回試し、
+   * まだ駄目ならまた休む。入金すればその回から自然に動き出す。
+   */
+  const pausedUntil = Number(getProp_(LLM_PAUSED_UNTIL_PROP, '0')) || 0;
+  if (pausedUntil && Date.now() < pausedUntil) {
+    const at = Utilities.formatDate(new Date(pausedUntil), 'Asia/Tokyo', 'MM/dd HH:mm');
+    console.warn('LLMの残高切れで休止中のためスキップ（' + at + 'に再開）。');
+    noteCycleOutcome_(CYCLE_STOPPED, 'Geminiの残高切れで休止中（' + at + 'に再開）');
+    endCycle_();
+    return;
+  }
+
   const lock = LockService.getScriptLock();
 
   // トリガーの実行が重なった場合に、同じ行を二重投稿しないための排他制御。
@@ -917,6 +940,19 @@ function failQueueRow_(ss, sheet, job, accountKey, message, region, angle, text,
    *   分からなくなる。
    */
   if (/残高が尽きています/.test(String(message || ''))) {
+    /*
+     * ★試行そのものを止める（2026-09-03）。
+     *   通知を1日1回に絞っても、キューは2時間おきに全行を試し続ける。
+     *   残高切れは時間で解けないので、6時間休んでから1回だけ試す。
+     *   入金済みならその回から動き出し、まだなら再び休む。
+     */
+    try {
+      props_().setProperty(LLM_PAUSED_UNTIL_PROP,
+                           String(Date.now() + LLM_PAUSE_HOURS * 60 * 60 * 1000));
+    } catch (e) {
+      console.warn('残高切れの休止を記録できません: ' + e);
+    }
+
     const today = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd');
     if (getProp_('llm_credits_notified_on', '') === today) {
       console.warn('残高切れの通知は本日分を送信済みのため省略します（' +
@@ -928,6 +964,7 @@ function failQueueRow_(ss, sheet, job, accountKey, message, region, angle, text,
       '**レート上限ではありません。待っても回復しません。**\n' +
       'AI Studio で残高を入れるまで、すべての投稿が止まります。\n' +
       'https://ai.studio/projects\n\n' +
+      '生成の試行は' + LLM_PAUSE_HOURS + '時間休みます（入金後は自動で戻ります）。\n' +
       '（同じ理由の通知は本日はこれ1回だけ出します）\n' + message);
     return;
   }

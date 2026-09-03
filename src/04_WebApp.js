@@ -460,6 +460,21 @@ function handleLineEvent_(event) {
         : '🔕 返信案の生成をオフにしました。\nメンション通知だけ届きます。');
       break;
 
+    case 'notify_mute': {
+      const until = muteNotifications_(cmd.hours);
+      replyToLine_(replyToken,
+        '🔕 通知を止めました。\n' +
+        Utilities.formatDate(until, 'Asia/Tokyo', 'MM/dd HH:mm') + ' に自動で戻ります。\n' +
+        '※投稿は止めていません。止めるなら「緊急停止」。\n' +
+        '「通知再開」ですぐ戻せます。', mainMenuQuickReply_());
+      break;
+    }
+
+    case 'notify_unmute':
+      unmuteNotifications_();
+      replyToLine_(replyToken, '🔔 通知を戻しました。', mainMenuQuickReply_());
+      break;
+
     case 'emergency_stop':
       triggerEmergencyStop_(null, 'LINEから手動で停止しました。');
       replyToLine_(replyToken,
@@ -695,6 +710,20 @@ function parseCommand_(rawText) {
   //
   // 通知文はすべて緊急停止の解除語として「再開」を案内しているため、
   // こちらを正とする。トリガーの作り直しは案内どおり「スタート」を使う。
+  /*
+   * --- 通知の消音（2026-09-03）---
+   * 「通知停止」= 全部黙らせる。既定24時間、「通知停止 3日」で日数指定。
+   * 投稿は止めない（止めたいなら「緊急停止」）。原因を直している間、
+   * 同じ通知が鳴り続けるのを避けるためのもの。
+   */
+  m = text.match(/^通知(?:停止|オフ|off|ミュート)\s*(?:(\d+)\s*(時間|日)?)?$/i);
+  if (m) {
+    const n = Number(m[1] || 0);
+    const hours = !n ? 24 : (m[2] === '時間' ? n : n * 24);
+    return { type: 'notify_mute', hours: hours };
+  }
+  if (/^通知(?:再開|オン|on|解除)$/i.test(text)) return { type: 'notify_unmute' };
+
   if (/^(緊急停止|全停止|止めて|emergency)$/i.test(text)) return { type: 'emergency_stop' };
   if (/^(再開|復帰|resume|解除)$/i.test(text))            return { type: 'emergency_resume' };
 
@@ -1701,6 +1730,8 @@ function helpText_() {
     '',
     '▼ 緊急時',
     '  緊急停止 … 投稿を即座に止める（トリガーは残る）',
+    '  通知停止 … 通知だけ黙らせる（既定24時間 / 「通知停止 3日」）',
+    '  通知再開 … 通知を戻す',
     '  再開     … 停止を解除する',
     '  ※401/402/403、429の連続、原因不明エラー3回で自動停止します',
     '',

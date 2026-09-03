@@ -145,6 +145,20 @@ function checkSilence_(log) {
   const allPaced = recent.every(function (r) { return r.k === CYCLE_PACED; });
   if (allPaced) return;
 
+  /*
+   * ★★2026-09-03、意図的に止めている間は鳴らさない。
+   *
+   * 緊急停止も残高切れの自動休止も、**オーナーが既に知っている状態**。
+   * それを「投稿ゼロです」と知らせるのは、自分で消した電気を
+   * 「暗いですよ」と報告するのと同じで、通知の価値を下げるだけ。
+   * 止めた覚えが無いのに止まっている場合は、緊急停止の通知が別で出る。
+   */
+  const allStopped = recent.every(function (r) { return r.k === CYCLE_STOPPED; });
+  if (allStopped) {
+    console.warn('停止中のため沈黙アラートは送りません（' + recent.length + 'サイクル）。');
+    return;
+  }
+
   // 理由ごとに数える。内訳が分かれば次の手が決まる。
   const counts = {};
   recent.forEach(function (r) { counts[r.k] = (counts[r.k] || 0) + 1; });

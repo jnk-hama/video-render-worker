@@ -123,7 +123,63 @@ function clearPendingAction_(userId) {
  * トリガー実行の失敗はエディタを開かないと気づけないため、
  * 「設定し忘れて通知が来ない」状態を作らないようにしている。
  */
+/* ------------------------------------------------------------------ */
+/* 通知の一時停止（2026-09-03、オーナー指示「一旦通知も止めて」）        */
+/* ------------------------------------------------------------------ */
+/*
+ * 【なぜ要るか】
+ * Geminiの残高が尽きた状態では、キューの全行が同じ理由で失敗し、
+ * 2時間ごとに同じ通知が届く。原因は1つで、しかも**オーナーは既に
+ * 知っている**。直すまでの間、同じ話を鳴らし続ける価値は無い。
+ *
+ * 【なぜ「消す」ではなく「期限つきで黙らせる」か】
+ * 恒久的に切ると、直した後に戻し忘れて**本当の異常に気づけなくなる**。
+ * 期限が来れば自動で戻るので、戻し忘れが起きない。
+ *
+ * 【この判定を通らないもの】
+ * 無い。全部止める。LINEから「通知停止」で入れ、「通知再開」で解く。
+ */
+const NOTIFY_MUTE_UNTIL_PROP = 'notify_mute_until';
+
+/** @return {number} 消音の期限（epoch ms）。設定が無ければ0 */
+function notifyMuteUntil_() {
+  const raw = getProp_(NOTIFY_MUTE_UNTIL_PROP, '');
+  if (!raw) return 0;
+  const at = Number(raw);
+  return isFinite(at) && at > 0 ? at : 0;
+}
+
+/** 消音中か。期限切れなら記録も消して通常へ戻す。 */
+function isNotifyMuted_() {
+  const until = notifyMuteUntil_();
+  if (!until) return false;
+  if (Date.now() < until) return true;
+  try { props_().deleteProperty(NOTIFY_MUTE_UNTIL_PROP); } catch (e) {}
+  return false;
+}
+
+/** @param {number} hours 何時間黙らせるか @return {Date} 解除予定時刻 */
+function muteNotifications_(hours) {
+  const h = Math.max(1, Math.min(24 * 14, Number(hours) || 24));
+  const until = Date.now() + h * 60 * 60 * 1000;
+  props_().setProperty(NOTIFY_MUTE_UNTIL_PROP, String(until));
+  return new Date(until);
+}
+
+function unmuteNotifications_() {
+  try { props_().deleteProperty(NOTIFY_MUTE_UNTIL_PROP); } catch (e) {}
+}
+
 function notifyAdmin_(text) {
+  if (isNotifyMuted_()) {
+    // 送らないが、何を言おうとしたかはログに残す。
+    // 消音は「聞こえなくする」であって「記録しない」ではない。
+    console.warn('通知は消音中のため送信しませんでした（' +
+                 Utilities.formatDate(new Date(notifyMuteUntil_()),
+                   'Asia/Tokyo', 'MM/dd HH:mm') + 'まで）: ' +
+                 truncate_(String(text || ''), 200));
+    return;
+  }
   try {
     const to = adminNotifyTarget_();
     if (to) pushToLine_(to, text);
@@ -160,7 +216,19 @@ const NOTIFY_MAX_INTERVAL_MS = 48 * 60 * 60 * 1000; // 48時間
 
 /** 文面の同一性を見るための短いハッシュ。暗号用途ではない。 */
 function notifyHash_(text) {
-  const s = String(text || '');
+  /*
+   * ★★2026-09-03、行番号を無視して比べる。
+   *
+   * 「Queue 157行目」「Queue 158行目」は**原因が同じでも文面が違う**ため、
+   * 間引きが一度も効かず、失敗のたびに通知が飛んでいた（実際に18:10と
+   * 20:10へ同じ内容が届いた）。数字を潰してから比べれば、
+   * 「同じことを言っている」と判定できる。
+   *
+   * 数字が意味を持つ通知（残数・スコア）も潰れるが、
+   * その場合も「値が変わっただけで内容は同じ」ことが多い。
+   * 鳴らしすぎるより、まとめる方を選ぶ。
+   */
+  const s = String(text || '').replace(/\d+/g, '#');
   let h = 5381;
   for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
   return h.toString(36);
