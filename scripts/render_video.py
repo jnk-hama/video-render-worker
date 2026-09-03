@@ -472,6 +472,34 @@ CHAR_WIDTH_RATIO_JA = 1.05
 # 字幕は最大2行まで。3行以上は映像を隠しすぎる
 MAX_CAPTION_LINES = 2
 
+"""
+★★安全領域（2026-09-03）。
+
+【なぜ要るか】
+SNSのUIは動画の**上に重なって表示される**。今までの置き方を実測したところ、
+1080x1920 で字幕が x 46〜1007 / y 1382〜1471 に描かれていた。
+TikTokの縦画面では、右端のアイコン列（いいね・コメント・共有・音源）と
+下部の本文・音源テロップがこの範囲に重なる。つまり**字幕の右端が
+アイコンに隠れる**。広告表記も y 139〜174 にあり、上部の検索・タブと重なる。
+
+【数字の出どころ】
+UI各部の占有範囲は、TikTokが公開している安全領域の指針に基づく
+（右 140px / 下 320px / 上 160px を目安に、余裕を足した）。
+★この数値は公式の指針を私の記憶から書いたもので、**この環境からは
+  公式ページへ到達できず再確認していない**（推定ではないが、未再確認）。
+  実機のスクリーンショットに重ねて詰めるのが確実。
+
+【なぜ中央からずらすか】
+右だけ広く空けるので、中心も左へ動かさないと文字が右へ寄る。
+中心 = (左余白 + (幅 - 右余白)) / 2。
+"""
+SAFE_AREAS = {
+    # 何も指定しない回。従来どおり（英語圏部門のXはUIの重なりが浅い）
+    'none':   {'left': 60, 'right': 60,  'caption_y': 0.74, 'note_y': 0.062},
+    # TikTok / リール系。右のアイコン列と下部テロップを避ける
+    'tiktok': {'left': 60, 'right': 200, 'caption_y': 0.60, 'note_y': 0.105},
+}
+
 # 広告表記の大きさ（字幕の基準サイズに対する比）。実測して決めた値。
 #   0.26 → 字高16px（読めない）
 #   0.65 → 字高38px（字幕120pxの約1/3。読めて邪魔にならない）
@@ -750,7 +778,7 @@ def measure_char_ratio(text, font_name, font_dir):
     return width / float(len(body) * MEASURE_FONT_SIZE)
 
 
-def fit_caption(words, w, font_size, ratio=None, h_hint=0, sep=' '):
+def fit_caption(words, w, font_size, ratio=None, h_hint=0, sep=' ', usable=None):
     """
     画面幅に収まる文字サイズと、改行位置を決める。
 
@@ -764,7 +792,8 @@ def fit_caption(words, w, font_size, ratio=None, h_hint=0, sep=' '):
 
     @return (フォントサイズ, [1行目の語数, ...])
     """
-    usable = w - 120 - CAPTION_OUTLINE * 2   # 左右60pxずつ余白＋黒縁
+    # 呼び出し側が安全領域から出した幅を優先する。無ければ従来どおり
+    usable = usable or (w - 120 - CAPTION_OUTLINE * 2)
     floor = max(40, int(font_size * 0.5))  # これ以下は読めない
 
     size = font_size
@@ -908,7 +937,7 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
 
 def build_ass(captions, w, h, font_size, center=False,
               font_name='DejaVu Sans', ratio=None, font_dir=None,
-              theme=None, disclosure=None):
+              theme=None, disclosure=None, safe=None):
     """
     単語ごとに色が変わる字幕（karaoke）を作る。
 
@@ -935,7 +964,15 @@ def build_ass(captions, w, h, font_size, center=False,
       真っ黒の帯になった（実際にフレームを抜いて確認）。
       文字が主役の回に、その文字を隅へ寄せる理由が無い。
     """
-    y = int(h * (0.50 if center else 0.74))
+    safe = safe or SAFE_AREAS['none']
+    """
+    ★モードT（背景が単色）は中央のまま。UIと重なる位置に文字を置かない、
+      という目的は同じだが、あちらは画面全部が文字の場なので上下中央でよい。
+    """
+    y = int(h * (0.50 if center else safe['caption_y']))
+    # 右を広く空けたぶん、中心も左へ寄せる（寄せないと文字が右へ張り出す）
+    center_x = (safe['left'] + (w - safe['right'])) // 2
+    usable_w = (w - safe['left'] - safe['right']) - CAPTION_OUTLINE * 2
     lines = []
 
     """
@@ -957,7 +994,7 @@ def build_ass(captions, w, h, font_size, center=False,
     if disclosure:
         lines.append(
             'Dialogue: 0,0:00:00.00,9:59:59.99,Note,,0,0,0,,'
-            '{\\pos(%d,%d)}%s' % (w // 2, int(h * 0.062),
+            '{\\pos(%d,%d)}%s' % (center_x, int(h * safe['note_y']),
                                  ass_escape(str(disclosure))))
     for c in captions:
         text = ass_escape(c.get('text', ''))
@@ -1000,7 +1037,8 @@ def build_ass(captions, w, h, font_size, center=False,
         shown = sep.join(wd if cjk else wd.upper() for wd in words)
         measured = measure_char_ratio(shown, font_name, font_dir) or ratio
 
-        size, line_breaks = fit_caption(words, w, font_size, measured, h, sep=sep)
+        size, line_breaks = fit_caption(words, w, font_size, measured, h,
+                                        sep=sep, usable=usable_w)
         fs = '' if size == font_size else ('\\fs%d' % size)
 
         # 折り返す語の位置（そこへ来る前に \N を挟む）
@@ -1090,7 +1128,7 @@ def build_ass(captions, w, h, font_size, center=False,
         # 出だしで少し大きく → 元のサイズへ戻す（ポップ）
         effect = ('{\\pos(%d,%d)%s\\fad(60,60)'
                   '\\fscx70\\fscy70\\t(0,110,\\fscx106\\fscy106)'
-                  '\\t(110,190,\\fscx100\\fscy100)}' % (w // 2, y, fs))
+                  '\\t(110,190,\\fscx100\\fscy100)}' % (center_x, y, fs))
 
         lines.append('Dialogue: 0,%s,%s,Pop,,0,0,0,,%s%s'
                      % (ass_time(start), ass_time(end), effect, karaoke.strip()))
@@ -1601,7 +1639,10 @@ def main():
                               font_dir=font_dir,
                               theme=build_theme(job.get('design_tokens'),
                                                 job.get('highlight_words')),
-                              disclosure=job.get('disclosure')))
+                              disclosure=job.get('disclosure'),
+                              safe=SAFE_AREAS.get(
+                                  str(job.get('safe_area') or 'none').lower(),
+                                  SAFE_AREAS['none'])))
 
         """
         ★fontsdir で libass に探し場所を教える。
