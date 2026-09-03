@@ -529,6 +529,8 @@ def build_theme(tokens, highlight_words):
         'accent_dim': hex_to_ass(tokens.get('accent_color_hex'), dim) if accent else None,
         'words': set(normalize_word(w) for w in (highlight_words or [])
                      if normalize_word(w)),
+        # ★日本語は語の中に埋まって来るので、位置を取るために原文も持つ
+        'words_raw': [str(w).strip() for w in (highlight_words or []) if str(w).strip()],
     }
 
 
@@ -729,6 +731,29 @@ def fit_caption(words, w, font_size, ratio=None, h_hint=0, sep=' '):
                 size = max(size, min(grown, ceiling))
             return size, [len(ln) for ln in lines]
         size -= 6
+
+
+def split_by_highlight(word, raws):
+    """
+    日本語の1語を「強調語の前 / 強調語 / 後ろ」へ割る。
+
+    @return [(文字列, 光らせるか), ...]。該当が無ければ [(word, False)]
+    """
+    best = None
+    for h in raws or []:
+        at = word.find(h)
+        if at >= 0 and (best is None or at < best[0]):
+            best = (at, h)
+    if not best:
+        return [(word, False)]
+    at, h = best
+    out = []
+    if word[:at]:
+        out.append((word[:at], False))
+    out.append((h, True))
+    if word[at + len(h):]:
+        out.append((word[at + len(h):], False))
+    return out
 
 
 def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
@@ -936,15 +961,44 @@ def build_ass(captions, w, h, font_size, center=False,
                                        theme.get('secondary') or theme['primary'])
 
         karaoke = ''
+        raws = (theme or {}).get('words_raw') or []
         for i, wd in enumerate(words):
             if breaks.get(i):
                 karaoke = karaoke.rstrip() + '\\N'
-            lit = accent and normalize_word(wd) in hi
-            if lit:
-                karaoke += '{\\1c%s\\2c%s}' % (accent, accent_dim or accent)
-            karaoke += '{\\k%d}%s%s' % (per_word[i], wd if cjk else wd.upper(), sep)
-            if lit and back:
-                karaoke += back
+
+            """
+            ★★2026-09-02、日本語の強調語。
+
+            英語は空白で語が切れるので、語まるごとで一致を見れば足りる。
+            日本語は「図書館より静かな二」のような塊で1枚に来るので、
+            完全一致では**一度も光らない**。かといって塊ごと光らせると
+            行全体が着色され、「どこを読むか」を示す目的が消える
+            （どちらも実際に描いて確認した）。
+            強調語の位置で3つに割り、その部分だけ塗る。
+            持ち時間（\\k）は文字数の比で割り振る。
+            """
+            if cjk and accent and raws:
+                parts = split_by_highlight(wd, raws)
+            else:
+                parts = [(wd if cjk else wd.upper(),
+                          bool(accent) and normalize_word(wd) in hi)]
+
+            total_len = sum(len(t) for t, _ in parts) or 1
+            spent = 0
+            for n, (piece, lit) in enumerate(parts):
+                # 端数は最後の断片へ寄せる。合計が per_word[i] からずれると
+                # 音と色のずれが後ろの語まで積み上がる
+                if n == len(parts) - 1:
+                    cs = max(1, per_word[i] - spent)
+                else:
+                    cs = max(1, int(round(per_word[i] * len(piece) / total_len)))
+                    spent += cs
+                if lit:
+                    karaoke += '{\\1c%s\\2c%s}' % (accent, accent_dim or accent)
+                karaoke += '{\\k%d}%s' % (cs, piece)
+                if lit and back:
+                    karaoke += back
+            karaoke += sep
 
         # 出だしで少し大きく → 元のサイズへ戻す（ポップ）
         effect = ('{\\pos(%d,%d)%s\\fad(60,60)'
