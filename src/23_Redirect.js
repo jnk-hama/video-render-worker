@@ -235,8 +235,12 @@ function buildClickStats_() {
  * クリック数は営業上の情報なので、誰でも読める状態にはしない。
  */
 function handleClickStatsRequest_(params) {
+  // ★★2026-09-03、こちらも「未設定なら素通し」だった。
+  //   クリック数は営業上の情報なので、未設定なら開けない側へ倒す。
+  //   比較も timingSafeEquals_ を使う（1文字ずつの早期リターンで
+  //   「何文字目まで合っていたか」を応答時間として渡さない）。
   const adminToken = getProp_('ADMIN_TOKEN', '');
-  if (adminToken && String((params && params.token) || '') !== adminToken) {
+  if (!adminToken || !timingSafeEquals_(String((params && params.token) || ''), adminToken)) {
     return ContentService
       .createTextOutput(JSON.stringify({ error: 'forbidden' }))
       .setMimeType(ContentService.MimeType.JSON);

@@ -1792,8 +1792,34 @@ function doGet(e) {
     return handleTaskRequest_(params);
   }
 
-  const adminToken = getProp_('ADMIN_TOKEN');
-  if (adminToken && params.token !== adminToken) {
+  /*
+   * ★★2026-09-03、セキュリティ点検で閉じた。
+   *
+   * 【何が問題だったか】
+   * `if (adminToken && ...)` は **未設定なら素通し**という書き方だった。
+   * ADMIN_TOKEN は既定で空なので、exec のURLを知った者は誰でも
+   * 状態確認ページ（アカウントの連携状況・投稿数などの営業情報）を
+   * 開け、?auth=A で認証フローも開始できた。
+   * このリポジトリをPrivateに保つことでURLを秘密にしているが、
+   * **URLは秘密ではなく設定値**（ログ・ブラウザ履歴・共有で漏れる）。
+   * 秘密に頼る守りは1本にしない。
+   *
+   * 【なぜ「未設定なら閉じる」か】
+   * 設定し忘れがそのまま公開状態になる作りは、いつか必ず事故になる。
+   * 閉じておけば、困るのはオーナーだけで、直し方も画面に出せる。
+   */
+  const adminToken = getProp_('ADMIN_TOKEN', '');
+  if (!adminToken) {
+    return renderPage_(
+      '設定が必要です',
+      'ADMIN_TOKEN が未設定のため、この画面は開けません。\n' +
+      'スクリプトプロパティに ADMIN_TOKEN を設定してから、' +
+      'URLへ &token=... を付けてアクセスしてください。\n' +
+      '（?go= のクリック計測、?legal= の公開ページ、OAuthコールバックは' +
+      'この設定に関係なく動きます）',
+      false);
+  }
+  if (!timingSafeEquals_(String(params.token || ''), adminToken)) {
     return renderPage_('アクセスできません', 'token パラメータが正しくありません。', false);
   }
 
