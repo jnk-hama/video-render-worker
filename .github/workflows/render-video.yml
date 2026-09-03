@@ -81,23 +81,6 @@ jobs:
       #
       # ★libEGL は mediapipe が dlopen する。入れないと
       #   「libEGL.so.1: cannot open shared object file」で落ちる（実際に踏んだ）。
-      - name: 切り抜き・姿勢推定
-        run: |
-          set -euo pipefail
-          sudo apt-get install -y -qq --no-install-recommends libegl1 libgl1
-          python3 -m pip install --quiet --disable-pip-version-check \
-            rembg onnxruntime mediapipe
-          python3 - <<'PY'
-          import onnxruntime
-          print('onnxruntime', onnxruntime.__version__,
-                onnxruntime.get_available_providers())
-          PY
-          # 姿勢推定のモデル（5.6MB）。rembgのモデルは初回利用時に自動取得
-          mkdir -p /root/.mp
-          curl -sSL --max-time 120 -o /root/.mp/pose.task \
-            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task"
-          ls -lh /root/.mp/pose.task
-
       - name: 依頼内容を取り出す
         id: payload
         env:
@@ -140,6 +123,46 @@ jobs:
                 'clips:', len(d.get('clips') or []),
                 'captions:', len(d.get('captions') or []))
           PY
+
+      # ★★2026-09-03、条件付きにした。**無料枠の使い方の問題**。
+      #   rembg / onnxruntime / mediapipe の導入と姿勢推定モデルの取得で
+      #   毎回2〜3分かかるが、通常の描画（モードA/B/T）はこれを一切使わない。
+      #   private リポジトリの無料枠は2,000分/月で、1本あたりの時間が
+      #   そのまま本数の上限になる。使わない回に積まないことが、
+      #   1日に出せる本数を増やす一番安い方法。
+      #
+      #   合成を使う回（payload に product か hold がある回）だけ導入する。
+      - name: 合成が要るか判定
+        id: needs
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          d = json.load(open('payload.json'))
+          if isinstance(d.get('job'), dict):
+              d = d['job']
+          need = bool(d.get('product') or d.get('hold') or d.get('cutout'))
+          print('compose=%s' % ('true' if need else 'false'))
+          PY
+          cat "$GITHUB_OUTPUT"
+
+      - name: 切り抜き・姿勢推定
+        if: steps.needs.outputs.compose == 'true'
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq --no-install-recommends libegl1 libgl1
+          python3 -m pip install --quiet --disable-pip-version-check \
+            rembg onnxruntime mediapipe
+          python3 - <<'PY'
+          import onnxruntime
+          print('onnxruntime', onnxruntime.__version__,
+                onnxruntime.get_available_providers())
+          PY
+          # 姿勢推定のモデル（5.6MB）。rembgのモデルは初回利用時に自動取得
+          mkdir -p /root/.mp
+          curl -sSL --max-time 120 -o /root/.mp/pose.task \
+            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task"
+          ls -lh /root/.mp/pose.task
 
       - name: 描画
         id: render
