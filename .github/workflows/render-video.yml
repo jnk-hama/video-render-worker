@@ -126,6 +126,44 @@ jobs:
           python3 scripts/render_video.py --payload payload.json --out out.mp4
           ls -lh out.mp4
 
+      # ★★2026-09-02、日本市場の部署（jmas-ai-os）向け。
+      #   TikTok / Instagram の投稿APIは「公開URLから動画を取りに来る」方式で、
+      #   このリポジトリは private なので Release アセットは取りに来られない。
+      #   依頼側が upload:{bucket,path} を付けてきた回だけ Supabase Storage の
+      #   公開バケットへ置く。鍵は Actions の Secrets からのみ読む（コードに書かない）。
+      #   Secrets が無い・upload が無い回は何もしない（英語圏の部署＝GAS 経路は
+      #   従来どおり Release で回収する）。
+      - name: Supabase Storage へ上げる
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          TARGET=$(python3 - <<'PY'
+          import json
+          d = json.load(open('payload.json'))
+          if isinstance(d.get('job'), dict):
+              d = d['job']
+          u = d.get('upload') or {}
+          if u.get('bucket') and u.get('path'):
+              print('%s/%s' % (u['bucket'], u['path'].lstrip('/')))
+          PY
+          )
+          if [ -z "$TARGET" ]; then
+            echo "upload の指定なし。Storage へは上げません。"
+            exit 0
+          fi
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+            echo "::error::upload が指定されたが SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY が Secrets にない"
+            exit 1
+          fi
+          # x-upsert: 同じ job を描き直した回に「既に存在する」で落ちないように
+          code=$(curl -sS -o upload.log -w '%{http_code}'             -X POST "${SUPABASE_URL%/}/storage/v1/object/${TARGET}"             -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}"             -H "Content-Type: video/mp4" -H "x-upsert: true"             --data-binary @out.mp4)
+          if [ "$code" != "200" ]; then
+            echo "::error::Storage へのアップロード失敗 HTTP $code"; cat upload.log; exit 1
+          fi
+          echo "アップロード完了: ${SUPABASE_URL%/}/storage/v1/object/public/${TARGET}"
+
       # ★Release へ上げる理由：
       #   artifact は取得に認証と解凍が要り、GAS から扱いにくい。
       #   Release アセットなら1回のGETでMP4そのものが取れる。
