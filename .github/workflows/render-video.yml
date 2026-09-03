@@ -102,12 +102,23 @@ jobs:
           fi
           # ★client_payload は最上位10プロパティまで（GitHub APIの制限）。
           #   GAS は {"job": {...}} と1個に畳んで送る。旧い平置きも読む。
+          #
+          # ★★2026-09-03、セキュリティ点検で検証を足した。
+          #   job_id をそのまま $GITHUB_OUTPUT へ書いていたため、
+          #   改行を含む job_id を送れば**任意の output を注入できた**
+          #   （後段の `gh release create` へ渡る値を差し替えられる）。
+          #   タグ名として意味のある文字だけに絞り、外れたら止める。
+          #   依頼できるのはリポジトリへ書ける者だけだが、依頼の中身は
+          #   外部（Supabase / GAS）で組み立てられるので信用しない。
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json
+          import json, re, sys
           d = json.load(open('payload.json'))
           if isinstance(d.get('job'), dict):
               d = d['job']
-          print('job_id=%s' % d.get('job_id', ''))
+          job_id = str(d.get('job_id', ''))
+          if not re.fullmatch(r'[A-Za-z0-9._-]{1,64}', job_id):
+              sys.exit('job_id が不正です（英数字 . _ - の1〜64文字のみ）: %r' % job_id[:80])
+          print('job_id=%s' % job_id)
           PY
           python3 - <<'PY'
           import json
@@ -139,14 +150,22 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
+          # ★bucket / path も検証する。`..` や絶対パスを混ぜられると
+          #   バケット内の別の場所（他ジョブの動画）へ上書きできてしまう。
           TARGET=$(python3 - <<'PY'
-          import json
+          import json, re, sys
           d = json.load(open('payload.json'))
           if isinstance(d.get('job'), dict):
               d = d['job']
           u = d.get('upload') or {}
-          if u.get('bucket') and u.get('path'):
-              print('%s/%s' % (u['bucket'], u['path'].lstrip('/')))
+          bucket, path = str(u.get('bucket') or ''), str(u.get('path') or '')
+          if not bucket and not path:
+              raise SystemExit(0)          # 指定なし。上げない
+          if not re.fullmatch(r'[a-z0-9][a-z0-9._-]{1,62}', bucket):
+              sys.exit('bucket が不正です: %r' % bucket[:80])
+          if not re.fullmatch(r'[A-Za-z0-9._/-]{1,128}', path) or '..' in path or path.startswith('/'):
+              sys.exit('path が不正です: %r' % path[:120])
+          print('%s/%s' % (bucket, path))
           PY
           )
           if [ -z "$TARGET" ]; then
@@ -172,13 +191,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           JOB_ID: ${{ steps.payload.outputs.job_id }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           TAG="render-${JOB_ID}"
+          # ★${{ }} を run の中で直接展開しない（値に引用符や改行が
+          #   入るとコマンドが壊れる／注入される）。env 経由で渡す。
           gh release create "$TAG" out.mp4 \
             --title "$TAG" \
-            --notes "clips_used=${{ steps.render.outputs.clips_used }} bytes=${{ steps.render.outputs.bytes }}" \
-            --repo "${{ github.repository }}"
+            --notes "bytes=$(stat -c%s out.mp4)" \
+            --repo "$GH_REPO"
           echo "アップロード完了: $TAG"
 
       # ★★2026-08-25 追加。放っておくと Release が無限に積もる。

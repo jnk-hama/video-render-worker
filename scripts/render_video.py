@@ -140,11 +140,28 @@ def download(url, dest):
             return False
         return os.path.getsize(dest) > 1024
 
+    """
+    ★★2026-09-03、セキュリティ点検で3点足した。
+
+    (1) --proto / --proto-redir で http(s) 以外を落とす。
+        curl は file:// も gopher:// も喋る。素材URLは依頼者が決めるが、
+        依頼の中身は外部（Supabase / GAS）で組み立てられるので、
+        `file:///etc/passwd` のような指定が通る余地を残さない。
+        転送先（-L の飛び先）にも同じ制限を掛ける。
+
+    (2) URLの前に `--` を置く。`-o /path` のような**URLに見せかけた
+        オプション**を渡されると、curl はそれをオプションとして解釈する
+        （引数の注入）。`--` 以降は必ずURLとして扱われる。
+
+    (3) 素材の置き場所は外部の公開サーバーなので、これで機能は落ちない。
+    """
     try:
         run(['curl', '-sSL', '--fail',
+             '--proto', '=https,http',
+             '--proto-redir', '=https,http',
              '--max-time', str(DOWNLOAD_TIMEOUT_SEC),
              '--max-filesize', str(MAX_DOWNLOAD_BYTES),
-             '-o', dest, url])
+             '-o', dest, '--', url])
     except Exception as e:
         log('  取得できませんでした（次のクリップへ）: %s' % e)
         return False
