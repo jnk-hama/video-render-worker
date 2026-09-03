@@ -90,6 +90,24 @@ BGM_VOLUME = 0.2
 # 終わりのBGMフェードアウト（秒）。ぶつ切りで終わると素人臭くなる。
 BGM_FADEOUT_SEC = 3.0
 
+"""
+★★効果音（2026-09-03）。
+
+【なぜ自前で作った音を同梱するか】
+外部の音源サイトから落とすと、ライセンス確認が毎回発生し、
+配布元が消えれば描画が止まる。ffmpeg の合成音（サイン波・ピンクノイズ）で
+作れば **第三者の権利が最初から無い**。生成コマンドは
+assets/sfx/README.md に残してあるので、いつでも作り直せる。
+
+【音量】
+ピークを -6dB へ揃えてある。ここで倍率を掛けるだけで狙った大きさになる。
+0.35 より上げるとナレーションの語頭を食う（BGMの 0.2 と同じ考え方）。
+"""
+SFX_VOLUME = 0.35
+SFX_DIR_NAME = 'sfx'
+# 台本の fx タグと同じ名前にする。新しい出力項目をGeminiに足さないため
+SFX_TAGS = ('fire', 'neon', 'pop', 'shock', 'clean')
+
 
 def log(msg):
     print(msg, flush=True)
@@ -166,6 +184,58 @@ def download(url, dest):
         log('  取得できませんでした（次のクリップへ）: %s' % e)
         return False
     return os.path.exists(dest) and os.path.getsize(dest) > 1024
+
+
+def resolve_sfx(cues, total_seconds):
+    """
+    効果音の指定を「ファイルと鳴らす秒数」の並びへ直す。
+
+    受け付ける形（1件ぶん）:
+      {"tag": "pop", "at": 1.2}        … 秒で指定
+      {"tag": "pop", "at_ratio": 0.35} … 全体の尺に対する割合で指定
+
+    ★なぜ割合を受けるか：依頼側（Supabase）は**音声の尺を知らない**。
+      尺が決まるのはTTSを実行するこちら側なので、依頼側は
+      「台本の何文字目あたり」を割合として渡し、秒への変換はここでやる。
+      これなら依頼側に推定を書かせずに済む（推定値を持ち込まない）。
+
+    @return [(パス, 秒), ...]。鳴らせないものは黙って落とす
+    """
+    if not cues:
+        return []
+    here = os.path.dirname(os.path.abspath(__file__))
+    sfx_dir = os.path.join(os.path.dirname(here), 'assets', SFX_DIR_NAME)
+    out = []
+    for cue in cues:
+        if not isinstance(cue, dict):
+            continue
+        tag = str(cue.get('tag') or '').strip().lower()
+        if tag not in SFX_TAGS:
+            log('  知らない効果音タグなので飛ばします: %r' % tag)
+            continue
+        path = os.path.join(sfx_dir, tag + '.mp3')
+        if not os.path.exists(path):
+            log('  効果音が見つかりません: %s' % path)
+            continue
+
+        if cue.get('at') is not None:
+            at = float(cue.get('at') or 0)
+        else:
+            at = float(cue.get('at_ratio') or 0) * float(total_seconds or 0)
+
+        # 尺の外へ置くと ffmpeg は黙って捨てる。手前へ寄せる
+        if total_seconds and at > total_seconds - 0.3:
+            at = max(0.0, total_seconds - 0.3)
+        out.append((path, max(0.0, at)))
+
+    # 同じ瞬間に何本も重ねない（音が濁るだけで、意味が増えない）
+    out.sort(key=lambda x: x[1])
+    kept = []
+    for path, at in out:
+        if kept and at - kept[-1][1] < 0.25:
+            continue
+        kept.append((path, at))
+    return kept
 
 
 def probe_resolution(path):
@@ -1508,6 +1578,15 @@ def main():
     if bgm_path:
         cmd += ['-stream_loop', '-1', '-i', bgm_path]
 
+    """
+    ★★効果音（2026-09-03）。BGMの後ろへ入力として並べる。
+      adelay で鳴らす位置まで無音を挟み、最後に全部を1本へ混ぜる。
+      短いファイル（0.1〜0.6秒）なので、本数が増えても負荷は小さい。
+    """
+    sfx_cues = resolve_sfx(job.get('sfx'), target_seconds or probe_duration(joined))
+    for path, _ in sfx_cues:
+        cmd += ['-i', path]
+
     cmd += ['-shortest']
 
     # --- 映像フィルタ（字幕）---
@@ -1544,7 +1623,7 @@ def main():
     normalize=0 は amix の自動音量調整を切る指定。切らないと
     混ぜた瞬間にナレーションの音量まで一緒に下がる。
     """
-    if bgm_path:
+    if bgm_path or sfx_cues:
         """
         ★フェードアウトを始める位置は「完成後の尺」から逆算する。
           -shortest が効くので、完成尺は映像と音声の短い方になる。
@@ -1555,16 +1634,53 @@ def main():
         lens = [x for x in (vid_len, aud_len) if x and x > 0]
         final_len = min(lens) if lens else 0.0
         fade_start = max(0.0, final_len - BGM_FADEOUT_SEC)
-        bgm_chain = 'volume=%.2f' % BGM_VOLUME
-        if fade_start > 0:
-            bgm_chain += ',afade=t=out:st=%.2f:d=%.2f' % (
-                fade_start, BGM_FADEOUT_SEC)
-        cmd += ['-filter_complex',
-                '[2:a]%s[bgm];[1:a][bgm]amix=inputs=2:duration=first:normalize=0[aout]'
-                % bgm_chain,
+
+        """
+        入力の並びは固定:
+          0 = 映像 / 1 = ナレーション（か無音） / 2 = BGM（あれば）
+          その後ろに効果音が1本ずつ。ここでずれると別の音を混ぜるので、
+          番号は上の cmd を組んだ順とそろえる。
+        """
+        chains = []
+        mix_labels = ['[1:a]']
+        idx = 2
+
+        if bgm_path:
+            bgm_chain = 'volume=%.2f' % BGM_VOLUME
+            if fade_start > 0:
+                bgm_chain += ',afade=t=out:st=%.2f:d=%.2f' % (
+                    fade_start, BGM_FADEOUT_SEC)
+            chains.append('[%d:a]%s[bgm]' % (idx, bgm_chain))
+            mix_labels.append('[bgm]')
+            idx += 1
+
+        for n, (path, at) in enumerate(sfx_cues):
+            # adelay はミリ秒。all=1 で全チャンネルへ同じ遅延を掛ける
+            chains.append('[%d:a]volume=%.2f,adelay=%d:all=1[sfx%d]'
+                          % (idx, SFX_VOLUME, int(round(at * 1000)), n))
+            mix_labels.append('[sfx%d]' % n)
+            idx += 1
+
+        """
+        ★duration=first は「1本目（ナレーション）の長さで終える」。
+          これが無いと、繰り返すBGM側に引きずられて終わらなくなる。
+          normalize=0 は amix の自動音量調整を切る指定。切らないと
+          混ぜた瞬間にナレーションの音量まで一緒に下がる。
+          ★効果音を足しても同じ。inputs の数だけが変わる。
+        """
+        chains.append('%samix=inputs=%d:duration=first:normalize=0[aout]'
+                      % (''.join(mix_labels), len(mix_labels)))
+        cmd += ['-filter_complex', ';'.join(chains),
                 '-map', '0:v', '-map', '[aout]']
-        log('BGMを重ねます（音量 %.2f / 終わり %.1f秒でフェードアウト）'
-            % (BGM_VOLUME, BGM_FADEOUT_SEC))
+
+        if bgm_path:
+            log('BGMを重ねます（音量 %.2f / 終わり %.1f秒でフェードアウト）'
+                % (BGM_VOLUME, BGM_FADEOUT_SEC))
+        if sfx_cues:
+            log('効果音を %d 本重ねます（音量 %.2f）: %s'
+                % (len(sfx_cues), SFX_VOLUME,
+                   ', '.join('%s@%.1fs' % (os.path.basename(p), t)
+                             for p, t in sfx_cues)))
 
     cmd += ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
             '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
