@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-03T16:33:32+00:00",
+ "generated_at": "2026-09-03T21:09:27+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -85,88 +85,61 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w2pfct",
-    "title": "Making a splash here",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w2pfct/making_a_splash_here/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w2a4td",
+    "title": "HMB while I pray for Flyhalla!",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1w2a4td/hmb_while_i_pray_for_flyhalla/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w1zdb4",
-    "title": "(Source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w1zdb4/source_link_in_description/",
-    "subreddit": "toptalent",
+    "id": "t3_1w1vj41",
+    "title": "HMB, put on something that’ll blow us away",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1w1vj41/hmb_put_on_something_thatll_blow_us_away/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2c6t0",
-    "title": "The speed and precision of this sheep shearer (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w2c6t0/the_speed_and_precision_of_this_sheep_shearer/",
-    "subreddit": "toptalent",
+    "id": "t3_1w1moqw",
+    "title": "Can’t handle the slurp 😛",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w1moqw/cant_handle_the_slurp/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6at0g",
-    "title": "WIP Bleach Art: Dr. Doom Reimagined in a Bleach-Inspired Style ⚔️ (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w6at0g/wip_bleach_art_dr_doom_reimagined_in_a/",
-    "subreddit": "toptalent",
+    "id": "t3_1w55fgt",
+    "title": "\"As we all know, Susie is a pervert...\" (from 1:56)",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w55fgt/as_we_all_know_susie_is_a_pervert_from_156/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2y17z",
-    "title": "Vivi Vassileva (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w2y17z/vivi_vassileva_source_link_in_description/",
-    "subreddit": "toptalent",
+    "id": "t3_1w1i1mr",
+    "title": "It's just around the corner, how hard can it be?",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w1i1mr/its_just_around_the_corner_how_hard_can_it_be/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5nqp3",
-    "title": "KEVIN KNIGHT III: BEYOND THE HELMET EP 1. THE JOURNEY BEGINS \"(source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w5nqp3/kevin_knight_iii_beyond_the_helmet_ep_1_the/",
-    "subreddit": "toptalent",
+    "id": "t3_1w0c3ok",
+    "title": "“Christmas Lights” 😭💀",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w0c3ok/christmas_lights/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1w0w1kj",
-    "title": "Baby by Elf Standards",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w0w1kj/baby_by_elf_standards/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w4idhc",
-    "title": "The live action isn't looking so bad ISHOWROBIN",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w4idhc/the_live_action_isnt_looking_so_bad_ishowrobin/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w3ewrf",
-    "title": "Throuple route confirmed",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w3ewrf/throuple_route_confirmed/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1w28mel",
     "title": "False memory going off one last time .",
@@ -195,37 +168,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w1kvic",
-    "title": "Osaka gyaruo inspired",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w1kvic/osaka_gyaruo_inspired/",
-    "subreddit": "streetwear",
+    "id": "t3_1w095nv",
+    "title": "My True Form/Final Form Sukuna cosplay for ANIMENYC",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w095nv/my_true_formfinal_form_sukuna_cosplay_for_animenyc/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5mrnb",
-    "title": "i get it cracking like a bad back",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w5mrnb/i_get_it_cracking_like_a_bad_back/",
-    "subreddit": "streetwear",
+    "id": "t3_1w2y7tv",
+    "title": "The Symbiote is Overtaking Me",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w2y7tv/the_symbiote_is_overtaking_me/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2um6q",
-    "title": "fully hand painted outfit",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w2um6q/fully_hand_painted_outfit/",
-    "subreddit": "streetwear",
+    "id": "t3_1w3het0",
+    "title": "My Anakin Skywalker cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w3het0/my_anakin_skywalker_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5st3i",
-    "title": "Quebec City, I am in you 🫵🏼",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w5st3i/quebec_city_i_am_in_you/",
-    "subreddit": "streetwear",
+    "id": "t3_1w5dorb",
+    "title": "Cosplays from Anime NYC 2026",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w5dorb/cosplays_from_anime_nyc_2026/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w41s8p",
+    "title": "My Sakura Miku Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w41s8p/my_sakura_miku_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -270,6 +252,15 @@
     "id": "t3_1w2i1ku",
     "title": "[DISC] Turning the tables on the gyaru compilation",
     "url": "https://www.reddit.com/r/manga/comments/1w2i1ku/disc_turning_the_tables_on_the_gyaru_compilation/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2vr52",
+    "title": "NSFW/Ecchi/Nude Manga With Good Writing?",
+    "url": "https://www.reddit.com/r/manga/comments/1w2vr52/nsfwecchinude_manga_with_good_writing/",
     "subreddit": "manga",
     "views": 0,
     "has_media": false,
