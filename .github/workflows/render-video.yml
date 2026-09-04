@@ -215,7 +215,7 @@ jobs:
           if [ "$code" != "200" ]; then
             echo "::error::Storage へのアップロード失敗 HTTP $code"; cat upload.log; exit 1
           fi
-          echo "アップロード完了: ${SUPABASE_URL%/}/storage/v1/object/public/${TARGET}"
+          echo "アップロード完了: ${URL_CLEAN}/storage/v1/object/public/${TARGET}"
 
       # ★Release へ上げる理由：
       #   artifact は取得に認証と解凍が要り、GAS から扱いにくい。
