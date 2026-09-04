@@ -229,8 +229,11 @@ jobs:
         run: |
           set -euo pipefail
           TAG="render-${JOB_ID}"
-          # ★${{ }} を run の中で直接展開しない（値に引用符や改行が
+          # ★GitHubの式展開を run の中で直接使わない（値に引用符や改行が
           #   入るとコマンドが壊れる／注入される）。env 経由で渡す。
+          #   ※この注意書きに式の記法そのものを書くと、**コメントであっても
+          #     GitHubが式として解釈し、ワークフロー全体がパースできなくなる**
+          #     （実際に「An expression was expected」で起動不能になった）。
           gh release create "$TAG" out.mp4 \
             --title "$TAG" \
             --notes "bytes=$(stat -c%s out.mp4)" \
