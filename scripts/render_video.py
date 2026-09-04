@@ -108,6 +108,249 @@ SFX_DIR_NAME = 'sfx'
 # 台本の fx タグと同じ名前にする。新しい出力項目をGeminiに足さないため
 SFX_TAGS = ('fire', 'neon', 'pop', 'shock', 'clean')
 
+# ------------------------------------------------------------------
+# 前景合成（決定#087）。透過した商品画像を背景動画へ直接重ねる。
+#
+# ★この工程は「素材の利用許諾が済んでいる」ことを前提に動く。
+#   許諾の判断は上流（依頼を組み立てる側）で完結させる取り決めで、
+#   ここでは条件を付けずに渡された素材をそのまま処理する。
+# ------------------------------------------------------------------
+FG_WIDTH_RATIO = 0.62      # 画面幅に対する前景の幅
+FG_HEIGHT_RATIO = 0.42     # 画面高に対する前景の高さ（縦長の商品はこちらで決まる）
+FG_Y_RATIO = 0.44          # 前景の中心を画面のどこに置くか（0=上, 1=下）
+FG_ZOOM = 0.10             # 尺全体で何割ゆっくり拡大するか
+FG_SWAY_PX = 18            # 上下に揺れる幅（片側）
+FG_SWAY_SEC = 5.0          # 揺れの周期
+FG_SHADOW_ALPHA = 0.55     # 影の濃さ
+FG_SHADOW_BLUR = 30        # 影のぼかし半径
+FG_SHADOW_DROP = 34        # 影を下へずらす量
+
+
+def has_alpha(path):
+    """
+    その画像がアルファ面を持っているか。
+
+    ★持っていない画像に alphaextract を掛けると
+      "Requested planes not available" でフィルタ構築ごと落ちる（実測）。
+      掛ける前に必ず確かめる。
+    """
+    try:
+        p = subprocess.run(
+            ['ffprobe', '-v', 'error', '-select_streams', 'v:0',
+             '-show_entries', 'stream=pix_fmt', '-of', 'csv=p=0', path],
+            capture_output=True, text=True, timeout=20)
+        pix = (p.stdout or '').strip().lower()
+    except Exception:
+        return False
+    # rgba / bgra / yuva420p / pal8 など。pal8 は透過色を持ち得る
+    return ('a' in pix.replace('yuv', '').replace('gbr', '')) or pix == 'pal8'
+
+
+def probe_size(path):
+    """幅と高さ。測れなければ (None, None)。"""
+    try:
+        p = subprocess.run(
+            ['ffprobe', '-v', 'error', '-select_streams', 'v:0',
+             '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x',
+             path], capture_output=True, text=True, timeout=20)
+        w, h = (p.stdout or '').strip().split('x')[:2]
+        return int(w), int(h)
+    except Exception:
+        return None, None
+
+
+def trim_alpha(path):
+    """
+    透明な余白を詰める。詰められたら True。
+
+    【なぜ要るか（実測）】
+    ASPの商品画像は商品の周りに大きな白い余白があることが多い。背景を抜くと
+    その余白は「透明」として残り、そのまま枠へ収めると**余白ごと縮められて
+    商品が痩せる**。実測では画面の24%しか占めず、参考にした動画
+    （商品が主役）とは別物の絵になった。
+
+    【やり方】
+    アルファ面を白黒画像として取り出し、cropdetect に黒縁として測らせる。
+    PIL や numpy を足さずに ffmpeg だけで完結する。
+
+    ★測れない・結果が不自然な場合は何もしない。詰められなくても動画は
+      成立するので、ここで落とさない。
+    """
+    try:
+        p = subprocess.run(
+            ['ffmpeg', '-hide_banner', '-loglevel', 'info', '-y',
+             '-loop', '1', '-i', path, '-t', '0.3', '-r', '10',
+             '-vf', 'format=rgba,alphaextract,'
+                    'cropdetect=limit=0.02:round=2:reset=0',
+             '-f', 'null', '-'],
+            capture_output=True, text=True, timeout=60)
+    except Exception as e:
+        log('  余白を測れませんでした（そのまま使います）: %s' % str(e)[:80])
+        return False
+
+    found = re.findall(r'crop=(\d+):(\d+):(\d+):(\d+)', p.stderr or '')
+    if not found:
+        return False
+    cw, chh, cx, cy = (int(v) for v in found[-1])
+    if cw < 16 or chh < 16:
+        log('  余白の判定が不自然（%dx%d）。そのまま使います。' % (cw, chh))
+        return False
+
+    src_w, src_h = probe_size(path)
+    if src_w and src_h and cw >= src_w - 2 and chh >= src_h - 2:
+        return False                      # 詰める余白が無い
+
+    tmp = path + '.trim.png'
+    try:
+        run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+             '-i', path, '-vf', 'crop=%d:%d:%d:%d' % (cw, chh, cx, cy),
+             '-frames:v', '1', tmp])
+    except Exception as e:
+        log('  余白を詰められませんでした（そのまま使います）: %s' % str(e)[:80])
+        return False
+
+    if os.path.exists(tmp) and os.path.getsize(tmp) > 512:
+        os.replace(tmp, path)
+        log('  余白を詰めました: %sx%s → %dx%d' % (src_w, src_h, cw, chh))
+        return True
+    return False
+
+
+def prepare_foreground(src, dest):
+    """
+    前景を「アルファ付きPNG」に揃える。
+
+    既に透過済みなら何もしない。透過していなければ cutout.py で背景を抜く
+    （rembg。使えない回は自前の領域成長へ降りる。cutout.py 側の設計）。
+
+    ★抜けなかった場合は False を返し、呼び出し側は前景の合成を丸ごと
+      諦めて動画自体は出す。**1枚の素材の失敗で動画を落とさない。**
+      素材CDNの一時障害で毎回失敗するようになるため（download() と同じ方針）。
+    """
+    if has_alpha(src):
+        shutil.copyfile(src, dest)
+        trim_alpha(dest)          # 透過済みの素材にも余白はある
+        return True
+
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from cutout import cutout
+        info = cutout(src, dest)
+        if os.path.exists(dest) and os.path.getsize(dest) > 1024:
+            log('  背景を抜きました（方式 %s）' % info.get('method', '不明'))
+            trim_alpha(dest)      # 抜いた後に残る透明の余白を詰める
+            return True
+        log('  背景を抜けませんでした。前景の合成は行いません。')
+    except Exception as e:
+        log('  背景を抜く処理に失敗（前景なしで続行）: %s' % str(e)[:120])
+    return False
+
+
+def foreground_filter(w, h, fps, seconds, spec):
+    """
+    前景（透過PNG）を背景動画の上へ重ねる filter_complex を組み立てる。
+
+    【なぜ影を別レイヤーにするか（実測して直した）】
+    影を焼いた1枚のPNGを作ってから重ねる書き方は**使えない**。
+    overlay は「下地を不透明として扱う」ため、透過画像の上へ重ねると
+    下地（＝影）のアルファが 255 に潰れ、影が黒い塊になる。
+    背景動画（不透明）の上で、影 → 前景 の順に別々に重ねる。
+
+    【なぜ枝ごとに format=rgba を書くか（実測して直した）】
+    scale や split を通るとアルファ面の指定が落ちることがあり、
+    alphaextract が "Requested planes not available" で落ちる。
+    枝の入口で毎回 rgba を宣言する。冗長に見えるが、ここは冗長にする。
+
+    【動き】
+    ・zoompan で尺全体をかけて FG_ZOOM ぶんゆっくり拡大する
+    ・overlay の y に sin を入れて上下に漂わせる
+    静止画のまま貼ると「画像を貼っただけ」に見えるうえ、
+    フレーム間の差分が無くなる。
+    """
+    """
+    ★枠は「幅」と「高さ」の両方で決める。
+
+    正方形に収める作りにすると、縦長の商品（ボトル・スプレー等）が
+    幅ではなく高さで頭打ちになり、画面の2割しか占めない痩せた絵になる。
+    実際にそうなったので直した。幅 fw × 高さ fh の枠に収めれば、
+    横長は幅で、縦長は高さで決まる。
+    """
+    fw = int(w * float(spec.get('width_ratio') or FG_WIDTH_RATIO))
+    fw -= fw % 2                                   # 偶数に揃える
+    fh = int(h * float(spec.get('height_ratio') or FG_HEIGHT_RATIO))
+    fh -= fh % 2
+    y_ratio = float(spec.get('y_ratio') or FG_Y_RATIO)
+    zoom = float(spec.get('zoom') if spec.get('zoom') is not None else FG_ZOOM)
+    sway = float(spec.get('sway_px') if spec.get('sway_px') is not None
+                 else FG_SWAY_PX)
+    period = float(spec.get('sway_sec') or FG_SWAY_SEC)
+    shadow_on = spec.get('shadow') is not False    # 既定は付ける
+
+    frames = max(2, int(round(seconds * fps)))
+    # ★1フレームあたりの増分から出す。d を尺に合わせないと
+    #   途中で拡大が止まり、残りが静止画になる
+    step = zoom / frames
+    zexpr = "min(zoom+%.6f,%.4f)" % (step, 1.0 + zoom)
+
+    """
+    ★商品そのものを切り取らせない作り。
+
+    zoompan は出力サイズを固定したまま寄るので、素直に掛けると
+    拡大した分だけ**商品の端が画面外へ出る**。
+    そこで、商品を目標幅 fw に収めたうえで、周囲に透明な余白を足して
+    枠より一回り大きい canvas にしておく。寄ると最初に食われるのは余白で、
+    z が上限に達した時に商品がちょうど収まりきる。
+    見かけの大きさは fw/(1+zoom) → fw へ、zoom ぶん大きくなる。
+    """
+    cw = int(fw * (1.0 + zoom)) + 2
+    cw -= cw % 2
+    ch = int(fh * (1.0 + zoom)) + 2
+    ch -= ch % 2
+
+    y_center = "(%.4f*H-h/2)" % y_ratio
+    sway_expr = "" if sway <= 0 else "+%.1f*sin(2*PI*t/%.3f)" % (sway, period)
+
+    # 枠に収めてから、寄る余地ぶんの透明な余白を足す
+    fit = ("[1:v]format=rgba,"
+           "scale=%d:%d:force_original_aspect_ratio=decrease,"
+           "pad=%d:%d:(ow-iw)/2:(oh-ih)/2:color=0x00000000,"
+           "setsar=1,format=rgba" % (fw, fh, cw, ch))
+
+    chains = [
+        fit + (",split=3[fgbase][shcol_in][shalpha_in]"
+               if shadow_on else "[fgbase]")
+    ]
+
+    if shadow_on:
+        chains += [
+            # 影の色（真っ黒）。アルファは捨てて色面だけ作る
+            "[shcol_in]format=rgba,lut=r=0:g=0:b=0,format=rgb24[shcol]",
+            # 影の形（元のアルファをぼかしたもの）
+            "[shalpha_in]format=rgba,alphaextract,boxblur=%d:2,format=gray[shalpha]"
+            % FG_SHADOW_BLUR,
+            "[shcol][shalpha]alphamerge,colorchannelmixer=aa=%.2f,format=rgba,"
+            "zoompan=z='%s':d=%d:s=%dx%d:fps=%d,format=rgba[shadow]"
+            % (FG_SHADOW_ALPHA, zexpr, frames, cw, ch, fps),
+        ]
+
+    chains.append(
+        "[fgbase]zoompan=z='%s':d=%d:s=%dx%d:fps=%d,format=rgba[fg]"
+        % (zexpr, frames, cw, ch, fps))
+
+    if shadow_on:
+        chains.append(
+            "[0:v][shadow]overlay=x='(W-w)/2':y='%s+%d%s':format=auto[withshadow]"
+            % (y_center, FG_SHADOW_DROP, sway_expr))
+        base = "[withshadow]"
+    else:
+        base = "[0:v]"
+
+    chains.append(
+        "%s[fg]overlay=x='(W-w)/2':y='%s%s':format=auto:shortest=1,"
+        "format=yuv420p[v]" % (base, y_center, sway_expr))
+
+    return ';'.join(chains)
+
 
 def log(msg):
     print(msg, flush=True)
@@ -1661,6 +1904,58 @@ def main():
             except Exception as e:
                 # ★ここで落とさない。埋められなくても動画は出す
                 log('  埋める処理に失敗（そのまま続行）: %s' % str(e)[:80])
+
+    # ------------------------------------------------------------------
+    # 前景の合成（決定#087）
+    # ------------------------------------------------------------------
+    # 背景動画の上に、透過した商品画像を直接重ねる。白い枠や下敷きは置かない。
+    #
+    # ★字幕を焼く前に済ませる。順番が逆だと、前景が字幕の上に乗って
+    #   文字が読めなくなる。読めない字幕は無いのと同じ。
+    #
+    # ★ここで失敗しても動画は出す。前景が無いだけの動画は成立するが、
+    #   例外で落とすとその回の動画が丸ごと消える。
+    fg_spec = job.get('foreground')
+    if isinstance(fg_spec, dict) and fg_spec.get('url'):
+        try:
+            raw = os.path.join(work, 'fg_raw')
+            png = os.path.join(work, 'fg.png')
+            log('前景を合成します: %s' % str(fg_spec.get('url'))[:100])
+
+            if not download(str(fg_spec['url']), raw,
+                            market=job.get('target_market')):
+                raise RuntimeError('前景の素材を取得できませんでした')
+
+            if not prepare_foreground(raw, png):
+                raise RuntimeError('前景を透過できませんでした')
+
+            fg_seconds = float(target_seconds or probe_duration(joined) or 0)
+            if fg_seconds <= 0:
+                raise RuntimeError('尺が測れないため前景を合成できません')
+
+            composed = os.path.join(work, 'composed.mp4')
+            run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+                 '-i', joined, '-loop', '1', '-i', png,
+                 '-filter_complex',
+                 foreground_filter(w, h, fps, fg_seconds, fg_spec),
+                 '-map', '[v]', '-an',
+                 '-t', '%.3f' % fg_seconds,
+                 '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
+                 '-pix_fmt', 'yuv420p', composed])
+
+            if os.path.exists(composed) and os.path.getsize(composed) > 1024:
+                joined = composed
+                log('  前景を重ねました（%.1f秒 / 幅 %d%% / %.0f%%拡大）'
+                    % (fg_seconds,
+                       int(100 * float(fg_spec.get('width_ratio')
+                                       or FG_WIDTH_RATIO)),
+                       100 * float(fg_spec.get('zoom')
+                                   if fg_spec.get('zoom') is not None
+                                   else FG_ZOOM)))
+            else:
+                log('  前景の合成に失敗しました。前景なしで続行します。')
+        except Exception as e:
+            log('  前景の合成を飛ばします（動画は出します）: %s' % str(e)[:160])
 
     # ------------------------------------------------------------------
     # 仕上げ
