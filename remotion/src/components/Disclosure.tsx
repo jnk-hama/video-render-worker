@@ -1,5 +1,6 @@
 import React from "react";
 import { useVideoConfig } from "remotion";
+import { JP_FONT } from "../lib/fonts";
 
 /*
  * 広告表記（決定#065）。
@@ -16,7 +17,7 @@ export const Disclosure: React.FC<{ text: string }> = ({ text }) => {
         right: 0,
         top: height * 0.105,
         textAlign: "center",
-        fontFamily: "'Dela Gothic One', sans-serif",
+        fontFamily: JP_FONT,
         fontSize: 30,
         color: "#ffffff",
         opacity: 0.92,

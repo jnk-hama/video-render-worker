@@ -8,6 +8,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import { JP_FONT } from "../lib/fonts";
 import type { InSituScene } from "../types";
 import { handheld, layerTransform, useCameraValue } from "../lib/camera";
 
@@ -200,7 +201,7 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
             top: `${Math.max(0.08, yRatio - heightRatio / 2 - 0.16) * 100}%`,
             textAlign: "center",
             color: "#fff",
-            fontFamily: "'Dela Gothic One', sans-serif",
+            fontFamily: JP_FONT,
             fontSize: 76,
             lineHeight: 1.15,
             textShadow: "0 4px 18px rgba(0,0,0,0.85)",
@@ -222,7 +223,7 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
             top: `${Math.min(0.9, yRatio + heightRatio / 2 + 0.06) * 100}%`,
             textAlign: "center",
             color: accent,
-            fontFamily: "'Dela Gothic One', sans-serif",
+            fontFamily: JP_FONT,
             fontSize: 38,
             letterSpacing: 2,
             textShadow: "0 3px 12px rgba(0,0,0,0.9)",

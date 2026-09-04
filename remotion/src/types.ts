@@ -96,4 +96,10 @@ export type VideoScript = {
   scenes: Scene[];
   /** アクセント色。製品の色に合わせる */
   accent?: string;
+  /**
+   * 日本語フォントのdata URI。描画側（render.mjs）がリポジトリ同梱の
+   * TTFから作って入れる。依頼側は指定しない。
+   * ★ネットワークからフォントを取りに行かないための仕組み。
+   */
+  fontDataUri?: string | null;
 };

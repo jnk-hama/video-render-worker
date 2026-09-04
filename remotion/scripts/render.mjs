@@ -33,6 +33,60 @@ const raw = JSON.parse(fs.readFileSync(payloadPath, "utf8"));
 // 依頼は {job:{...}} で包まれてくる（GitHub の client_payload 制限のため）
 const script = raw.job ?? raw;
 
+/*
+ * ★既存の依頼（ffmpeg版の payload）をそのまま受ける（決定#088）。
+ *
+ * 依頼側（process-job / GAS）の台本生成は変えない、というのが方針。
+ * AI社員の出力契約（キー名の追加・変更の禁止）に触れないためでもある。
+ * なので**変換はここで行う**。依頼側に足すのは renderer の1項目だけ。
+ *
+ *   clips[i]        → シーンi の背景
+ *   foreground.url  → 製品（あれば insitu、無ければ背景だけのシーン）
+ *   captions        → そのまま
+ *   design_tokens   → accent
+ */
+const adaptLegacyPayload = (s) => {
+  if (Array.isArray(s.scenes) && s.scenes.length) return s; // 既にRemotion形式
+
+  const clips = Array.isArray(s.clips) ? s.clips : [];
+  if (!clips.length) return s;
+
+  const each = Number(s.clip_seconds) || 3.0;
+  const product = s.foreground && s.foreground.url ? s.foreground.url : null;
+  // 運鏡は順に変える。同じ動きが続くと単調になる
+  const moves = ["orbit", "push_in", "pan_right", "pull_out"];
+
+  s.scenes = clips.map((c, i) => {
+    const seconds = Number(c.duration) || each;
+    const camera = moves[i % moves.length];
+    // ★製品は最初のシーンにだけ置く。全シーンに出すとくどく、
+    //   背景が変わるたびに製品が瞬間移動して見える
+    if (product && i === 0) {
+      return {
+        kind: "insitu",
+        seconds,
+        camera,
+        backgroundUrl: c.url,
+        productUrl: product,
+        heightRatio: Number(s.foreground.height_ratio) || 0.42,
+        yRatio: Number(s.foreground.y_ratio) || 0.58,
+        ambient: s.foreground.ambient === undefined ? 0.25 : Number(s.foreground.ambient),
+      };
+    }
+    return { kind: "talk", seconds, camera, backgroundUrl: c.url, headline: "" };
+  });
+
+  s.market = s.target_market || s.market || "ja";
+  s.accent = (s.design_tokens && s.design_tokens.accent_color_hex) || s.accent || "#8b5cf6";
+  s.width = Number(s.width) || 1080;
+  s.height = Number(s.height) || 1920;
+  s.fps = Number(s.fps) || 30;
+  console.log(`既存形式の依頼を ${s.scenes.length} シーンへ変換しました`);
+  return s;
+};
+
+adaptLegacyPayload(script);
+
 // ★最低限の検査。壊れた台本で長時間まわしてから落ちるのを防ぐ
 for (const key of ["width", "height", "fps", "scenes"]) {
   if (script[key] === undefined) {
@@ -48,6 +102,90 @@ const totalSeconds = script.scenes.reduce((s, x) => s + Number(x.seconds || 0), 
 if (!(totalSeconds > 0)) {
   console.error("尺が0秒です");
   process.exit(1);
+}
+
+/*
+ * ★製品画像だけ data URI にして埋め込む（実測して直した）。
+ *
+ * 【何が起きたか】
+ * 環境光（ambient）は、製品の形＝アルファでCSSマスクを切る。ところが
+ * 別オリジンの画像をマスクに使うと Chrome が取得を拒否し（ERR_FAILED）、
+ * 1本目の描画では**環境光が丸ごと効いていなかった**。
+ * `<Img>` は表示できるのにマスクだけ失敗するので、絵を見ても気づきにくい。
+ *
+ * 【なぜ data URI か】
+ * 同一オリジン扱いになるので、CORSの設定に依存しない。素材の置き場所が
+ * Supabase Storage でもASPのCDNでも、こちら側だけで完結する。
+ * 背景動画は大きいのでURLのまま（OffthreadVideo は別オリジンでも読める）。
+ */
+const MAX_INLINE_BYTES = 8 * 1024 * 1024;
+
+const toDataUri = async (url) => {
+  if (!url || url.startsWith("data:")) return url;
+  if (!/^https?:\/\//i.test(url)) return url; // ローカルパスはそのまま
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`製品画像を取得できません: HTTP ${res.status} ${url}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  if (buf.byteLength > MAX_INLINE_BYTES) {
+    throw new Error(`製品画像が大きすぎます（${buf.byteLength}バイト）`);
+  }
+  const type = res.headers.get("content-type") || "image/png";
+  return `data:${type};base64,${buf.toString("base64")}`;
+};
+
+/*
+ * ★音声もローカルのファイルなら data URI にする。
+ *   <Audio> は file:// を読めず、public/ 経由も404になった（実測）ので、
+ *   フォント・製品画像と同じ手筋に揃える。13秒のmp3で約100KB。
+ */
+const fileToDataUri = (p, mime) => {
+  if (!p || /^(https?:|data:)/i.test(p)) return p;
+  if (!fs.existsSync(p)) {
+    console.warn(`  音声が見つかりません（無音で続行）: ${p}`);
+    return null;
+  }
+  const buf = fs.readFileSync(p);
+  return `data:${mime};base64,${buf.toString("base64")}`;
+};
+
+for (const key of ["narrationUrl", "bgmUrl"]) {
+  if (script[key]) {
+    script[key] = fileToDataUri(script[key], "audio/mpeg");
+  }
+}
+
+for (const scene of script.scenes) {
+  if (scene.kind !== "insitu" || !scene.productUrl) continue;
+  try {
+    scene.productUrl = await toDataUri(scene.productUrl);
+    console.log("  製品画像を埋め込みました（CSSマスクのため）");
+  } catch (e) {
+    // ★埋め込めなくても描画は続ける。環境光が効かないだけで動画は成立する
+    console.warn(`  製品画像を埋め込めませんでした（環境光なしで続行）: ${e.message}`);
+  }
+}
+
+/*
+ * ★日本語フォントをリポジトリ同梱のTTFから埋め込む。
+ *   ffmpeg版（libass）と同じファイルを使うので、書体が1バイトも違わない。
+ *   ネットワークへ取りに行かないので、外部の障害で描画が落ちない。
+ */
+const FONT_BY_MARKET = {
+  ja: "assets/ja/fonts/DelaGothicOne-Regular.ttf",
+  en: "assets/en/fonts/Anton-Regular.ttf",
+};
+
+try {
+  const rel = FONT_BY_MARKET[script.market] ?? FONT_BY_MARKET.ja;
+  // remotion/ の1つ上がリポジトリの根
+  const fontPath = path.resolve("..", rel);
+  const buf = fs.readFileSync(fontPath);
+  script.fontDataUri = `data:font/ttf;base64,${buf.toString("base64")}`;
+  console.log(`フォント: ${rel}（${(buf.byteLength / 1024).toFixed(0)}KB）を埋め込みました`);
+} catch (e) {
+  // ★読めなくても描画は続ける。ただし書体が変わる事実は必ず残す
+  console.warn(`フォントを読めませんでした（既定の書体で続行）: ${e.message}`);
+  script.fontDataUri = null;
 }
 
 const started = Date.now();

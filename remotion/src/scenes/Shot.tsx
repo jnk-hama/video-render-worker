@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { JP_FONT } from "../lib/fonts";
 import type { ShotScene } from "../types";
 import { layerTransform, useCameraValue } from "../lib/camera";
 
@@ -45,7 +46,7 @@ export const Shot: React.FC<{ scene: ShotScene; accent: string }> = ({ scene, ac
         <div style={{
           position: "absolute", left: 60, right: 60, top: height * 0.14,
           textAlign: "center", color: "#fff",
-          fontFamily: "'Dela Gothic One', sans-serif", fontSize: 82, lineHeight: 1.12,
+          fontFamily: JP_FONT, fontSize: 82, lineHeight: 1.12,
           textShadow: "0 4px 18px rgba(0,0,0,0.8)",
         }}>{scene.headline}</div>
       ) : null}

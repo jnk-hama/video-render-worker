@@ -6,6 +6,7 @@ import { Talk } from "./scenes/Talk";
 import { Shot } from "./scenes/Shot";
 import { Captions } from "./components/Captions";
 import { Disclosure } from "./components/Disclosure";
+import { FontFace } from "./lib/fonts";
 
 /*
  * シーンの振り分け（ルーティング）。
@@ -45,6 +46,9 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      {/* ★最初に置く。フォントが当たる前に文字が描かれないように */}
+      <FontFace dataUri={script.fontDataUri} />
+
       {sequences}
 
       {/* 字幕は全シーンを貫いて出す。シーンの切れ目で消さない */}

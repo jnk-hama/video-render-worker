@@ -169,11 +169,76 @@ jobs:
             "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task"
           ls -lh /root/.mp/pose.task
 
-      - name: 描画
+      # ★★2026-09-04、描画方式の呼び分け（決定#088）。
+      #   payload の renderer が "remotion" の回だけ Remotion で描く。
+      #   既定は従来どおり ffmpeg。**いつでも切り戻せる形にしておく**
+      #   （新しい方が壊れた日に、依頼側の1項目を消すだけで戻る）。
+      - name: 描画方式を決める
+        id: renderer
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          d = json.load(open('payload.json'))
+          if isinstance(d.get('job'), dict):
+              d = d['job']
+          r = str(d.get('renderer') or 'ffmpeg').strip().lower()
+          # 知らない値は既定へ落とす。未知の文字列で分岐を素通りさせない
+          if r not in ('ffmpeg', 'remotion'):
+              r = 'ffmpeg'
+          print('engine=%s' % r)
+          PY
+          cat "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------------------
+      # ffmpeg 版（従来）
+      # ------------------------------------------------------------------
+      - name: 描画（ffmpeg）
         id: render
+        if: steps.renderer.outputs.engine == 'ffmpeg'
         run: |
           set -euo pipefail
           python3 scripts/render_video.py --payload payload.json --out out.mp4
+          ls -lh out.mp4
+
+      # ------------------------------------------------------------------
+      # Remotion 版（評価中）
+      # ------------------------------------------------------------------
+      - name: Node
+        if: steps.renderer.outputs.engine == 'remotion'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: remotion/package-lock.json
+
+      - name: Chrome Headless Shell をキャッシュから戻す
+        if: steps.renderer.outputs.engine == 'remotion'
+        uses: actions/cache@v4
+        with:
+          # ★毎回ダウンロードすると1本あたり1〜2分増える。
+          #   1日16本なら月に約500〜1,000分。無料枠2,000分に対して致命的。
+          path: ~/.cache/remotion
+          key: remotion-chrome-${{ runner.os }}
+
+      - name: ナレーションを作る（Remotion用）
+        if: steps.renderer.outputs.engine == 'remotion'
+        run: |
+          set -euo pipefail
+          # ★ffmpeg版はTTSを内部で回すが、Remotion版は音声を外から受け取る。
+          #   同じ台本から同じ音声・同じ字幕時刻を作るために切り出してある。
+          python3 scripts/make_narration.py \
+            --payload payload.json --audio narration.mp3 --out payload_tts.json
+          ls -lh narration.mp3 || echo "音声なしで続行します"
+
+      - name: 描画（Remotion）
+        if: steps.renderer.outputs.engine == 'remotion'
+        run: |
+          set -euo pipefail
+          cd remotion
+          npm ci --no-audit --no-fund
+          node scripts/render.mjs --payload ../payload_tts.json --out ../out.mp4
+          cd ..
           ls -lh out.mp4
 
       # ★★2026-09-02、日本市場の部署（jmas-ai-os）向け。
