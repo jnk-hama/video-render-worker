@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-04T16:29:02+00:00",
+ "generated_at": "2026-09-04T20:53:39+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -31,6 +31,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1w6ftx4",
+    "title": "People find a clever way to rescue a trapped kitten",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w6ftx4/people_find_a_clever_way_to_rescue_a_trapped/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1w546r5",
     "title": "Breathtaking scenery in Iceland at 1AM",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w546r5/breathtaking_scenery_in_iceland_at_1am/",
@@ -40,46 +49,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w14zhw",
-    "title": "University student sinks 90 ft putt to win a new car",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w14zhw/university_student_sinks_90_ft_putt_to_win_a_new/",
-    "subreddit": "nextfuckinglevel",
+    "id": "t3_1w5b7mo",
+    "title": "Fishermen off Coronel cut rope and buoys from an orca's tail after it approached their boat",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w5b7mo/fishermen_off_coronel_cut_rope_and_buoys_from_an/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2hmvb",
-    "title": "The branch manager hard at work",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w2hmvb/the_branch_manager_hard_at_work/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w3wple",
+    "title": "Duane Keith Davis has been found guilty of the murder of Tupac Shakur",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w3wple/duane_keith_davis_has_been_found_guilty_of_the/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4jfzi",
-    "title": "Meet Dr. Mariangela Hungaria",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w4jfzi/meet_dr_mariangela_hungaria/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w4i9xh",
+    "title": "Students get smudged by indigenous elders for peace and blessings throughout the year",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w4i9xh/students_get_smudged_by_indigenous_elders_for/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4osw6",
-    "title": "Tiny hero girl stops runaway horse",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w4osw6/tiny_hero_girl_stops_runaway_horse/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w6t60v",
+    "title": "A person stuck in tunnel after the flash flood getting rescued after 9 days",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w6t60v/a_person_stuck_in_tunnel_after_the_flash_flood/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w3kp3o",
-    "title": "A baby Water Buffalo around his family",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w3kp3o/a_baby_water_buffalo_around_his_family/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w4alby",
+    "title": "An incredible variety of moths attracted to an illuminated sheet. This technique is called light sheeting",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w4alby/an_incredible_variety_of_moths_attracted_to_an/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -103,37 +112,28 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w39x4y",
-    "title": "Chilean photographer captures the blood-red eyes of a white-tufted grebe",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w39x4y/chilean_photographer_captures_the_bloodred_eyes/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w1zdb4",
+    "title": "(Source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1w1zdb4/source_link_in_description/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2zson",
-    "title": "\"The Cloud\", a proposed skyscraper design from South Korea which was scrapped due to its visual similarity to the 9/11 attacks.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w2zson/the_cloud_a_proposed_skyscraper_design_from_south/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w2c6t0",
+    "title": "The speed and precision of this sheep shearer (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1w2c6t0/the_speed_and_precision_of_this_sheep_shearer/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6aih9",
-    "title": "In 1989, a pelican named Katta-kun began going to a kindergarten in Japan where it played and interacted with the children as if it were one of them.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w6aih9/in_1989_a_pelican_named_kattakun_began_going_to_a/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w3l98u",
-    "title": "The implosion of the Titan submarine (OceanGate) was so rapid that the pain wasn't even registered by the brain. They didn't feel anything at all. Utterly instantaneous.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w3l98u/the_implosion_of_the_titan_submarine_oceangate/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w6v8ny",
+    "title": "Bucket drumming with phonk sounds so cool (Source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1w6v8ny/bucket_drumming_with_phonk_sounds_so_cool_source/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,102 +141,129 @@
   ],
   "B": [
    {
-    "id": "t3_1w0w1kj",
-    "title": "Baby by Elf Standards",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w0w1kj/baby_by_elf_standards/",
-    "subreddit": "Animemes",
+    "id": "t3_1w28mel",
+    "title": "False memory going off one last time .",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w28mel/false_memory_going_off_one_last_time/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4idhc",
-    "title": "The live action isn't looking so bad ISHOWROBIN",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w4idhc/the_live_action_isnt_looking_so_bad_ishowrobin/",
-    "subreddit": "Animemes",
+    "id": "t3_1w2nm9m",
+    "title": "One Piece #1176 - Nami vs Gunko",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w2nm9m/one_piece_1176_nami_vs_gunko/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w31g5r",
-    "title": "Even The Strongest Have A Weakness",
-    "url": "https://www.reddit.com/r/animegifs/comments/1w31g5r/even_the_strongest_have_a_weakness/",
-    "subreddit": "animegifs",
+    "id": "t3_1w3kz8c",
+    "title": "Usopp Vs Gunko - One Piece #1176",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w3kz8c/usopp_vs_gunko_one_piece_1176/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w1kvic",
-    "title": "Osaka gyaruo inspired",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w1kvic/osaka_gyaruo_inspired/",
-    "subreddit": "streetwear",
+    "id": "t3_1w2y7tv",
+    "title": "The Symbiote is Overtaking Me",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w2y7tv/the_symbiote_is_overtaking_me/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5mrnb",
-    "title": "i get it cracking like a bad back",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w5mrnb/i_get_it_cracking_like_a_bad_back/",
-    "subreddit": "streetwear",
+    "id": "t3_1w5dorb",
+    "title": "Cosplays from Anime NYC 2026",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w5dorb/cosplays_from_anime_nyc_2026/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2um6q",
-    "title": "fully hand painted outfit",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w2um6q/fully_hand_painted_outfit/",
-    "subreddit": "streetwear",
+    "id": "t3_1w3het0",
+    "title": "My Anakin Skywalker cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w3het0/my_anakin_skywalker_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5st3i",
-    "title": "Quebec City, I am in you 🫵🏼",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w5st3i/quebec_city_i_am_in_you/",
-    "subreddit": "streetwear",
+    "id": "t3_1w41s8p",
+    "title": "My Sakura Miku Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w41s8p/my_sakura_miku_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6448i",
-    "title": "Inazuma if it was released today (Vesna corner because yes)",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w6448i/inazuma_if_it_was_released_today_vesna_corner/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w2evzo",
+    "title": "Dark Magician Girl cosplay at Anirevo 2026",
+    "url": "https://www.reddit.com/r/cosplay/comments/1w2evzo/dark_magician_girl_cosplay_at_anirevo_2026/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2l83z",
-    "title": "The Downfall of Universal Supports might be one of the saddest part of Genshin",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w2l83z/the_downfall_of_universal_supports_might_be_one/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w1na9t",
+    "title": "[ART] Granny, You're Too Old to Ride! (Sousou no Frieren)",
+    "url": "https://www.reddit.com/r/manga/comments/1w1na9t/art_granny_youre_too_old_to_ride_sousou_no_frieren/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w41lza",
-    "title": "Just realized that if we recommend a New Player to get Mizuki as their free Standard Character for the SSW, they will have to go to Natlan for the Boss Mats. Fontaine for the Stellar Buff. Inazuma for the Talent Mats. Snezhnaya for the Artifact. Mrs Worldwide.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w41lza/just_realized_that_if_we_recommend_a_new_player/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w1h5qa",
+    "title": "[DISC] - This guy loves demons too much. - Oneshot by @medatarou1",
+    "url": "https://www.reddit.com/r/manga/comments/1w1h5qa/disc_this_guy_loves_demons_too_much_oneshot_by/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w50sgz",
-    "title": "Just a reminder you can summon your train anywhere on the tracks, not just at the station.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w50sgz/just_a_reminder_you_can_summon_your_train/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w74ue5",
+    "title": "[Art] - For Urumin - 'Damedol: The Useless Idol and Her Only Fan in the World' Illustration by Kishirimo",
+    "url": "https://www.reddit.com/r/manga/comments/1w74ue5/art_for_urumin_damedol_the_useless_idol_and_her/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w4axbo",
+    "title": "I found the whole Making-Of Documentary as well as the Storyboard of Your Name (Kimi No Na Wa).",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w4axbo/i_found_the_whole_makingof_documentary_as_well_as/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2i1ku",
+    "title": "[DISC] Turning the tables on the gyaru compilation",
+    "url": "https://www.reddit.com/r/manga/comments/1w2i1ku/disc_turning_the_tables_on_the_gyaru_compilation/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2vr52",
+    "title": "NSFW/Ecchi/Nude Manga With Good Writing?",
+    "url": "https://www.reddit.com/r/manga/comments/1w2vr52/nsfwecchinude_manga_with_good_writing/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
