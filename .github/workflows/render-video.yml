@@ -217,19 +217,41 @@ jobs:
           #   人の貼り付けミスを、こちら側で吸収する。
           #   ★整形した値は表示しない。マスクをすり抜ける可能性があるため、
           #     形が正しいかどうかだけを出す。
-          URL_CLEAN=$(printf '%s' "$SUPABASE_URL" | tr -d '[:space:]')
-          KEY_CLEAN=$(printf '%s' "$SUPABASE_SERVICE_ROLE_KEY" | tr -d '[:space:]')
-          case "$URL_CLEAN" in
-            https://*) ;;
-            http://*)  ;;
-            *) URL_CLEAN="https://$URL_CLEAN" ;;
+          # ★空白・改行・前後の引用符を落とす
+          RAW=$(printf '%s' "$SUPABASE_URL" | tr -d '[:space:]' | tr -d '\042\047')
+          KEY_CLEAN=$(printf '%s' "$SUPABASE_SERVICE_ROLE_KEY" | tr -d '[:space:]' | tr -d '\042\047')
+
+          # ★ホスト名だけ取り出す。値が
+          #     https://xxx.supabase.co/rest/v1  … パス付き
+          #     https://supabase.com/dashboard/project/xxx … 管理画面のURL
+          #     xxx.supabase.co                  … スキーム無し
+          #     xxx                              … プロジェクトrefだけ
+          #   のどれで貼られていても同じ形へ寄せる。
+          #   どれが原因かを人に調べさせるより、全部受けた方が早い。
+          HOST=${RAW#http://}
+          HOST=${HOST#https://}
+          HOST=${HOST%%/*}
+          case "$HOST" in
+            *.*) ;;                       # 既にドメイン
+            ?*)  HOST="${HOST}.supabase.co" ;;   # プロジェクトrefだけだった場合
           esac
-          URL_CLEAN="${URL_CLEAN%/}"
-          if ! printf '%s' "$URL_CLEAN" | grep -qE '^https?://[A-Za-z0-9.-]+(:[0-9]+)?$'; then
-            echo "::error::SUPABASE_URL の形が正しくありません（期待: https://<project-ref>.supabase.co）"
+          URL_CLEAN="https://$HOST"
+
+          # ★管理画面のURL（supabase.com/dashboard/...）を貼られた場合。
+          #   ホストだけ取ると supabase.com になり、形式検査は通ってしまうが
+          #   アップロード先としては誤り。ここで明示的に弾く。
+          if [ "$HOST" = "supabase.com" ] || [ "$HOST" = "www.supabase.com" ]; then
+            echo "::error::管理画面のURLが入っています。Project Settings の Project URL" \
+                 "（https://<project-ref>.supabase.co）を入れてください"
             exit 1
           fi
-          echo "URLの形式: OK / 鍵の長さ: ${#KEY_CLEAN} 文字"
+          if ! printf '%s' "$HOST" | grep -qE '^[A-Za-z0-9][A-Za-z0-9.-]*\.[A-Za-z]{2,}$'; then
+            # ★値は出さない。長さと形だけ出す（マスクをすり抜けさせない）
+            echo "::error::SUPABASE_URL からホスト名を取り出せません（長さ ${#RAW} 文字）。" \
+                 "期待する形: https://<project-ref>.supabase.co"
+            exit 1
+          fi
+          echo "URLの形式: OK（ホスト ${#HOST} 文字） / 鍵の長さ: ${#KEY_CLEAN} 文字"
           # x-upsert: 同じ job を描き直した回に「既に存在する」で落ちないように
           code=$(curl -sS -o upload.log -w '%{http_code}'             -X POST "${URL_CLEAN}/storage/v1/object/${TARGET}"             -H "Authorization: Bearer ${KEY_CLEAN}"             -H "Content-Type: video/mp4" -H "x-upsert: true"             --data-binary @out.mp4)
           if [ "$code" != "200" ]; then
