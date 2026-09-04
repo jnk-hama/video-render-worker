@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-04T11:26:06+00:00",
+ "generated_at": "2026-09-04T16:29:02+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -76,9 +76,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w0o1ev",
-    "title": "Human helps a king cobra beat the heat in India.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w0o1ev/human_helps_a_king_cobra_beat_the_heat_in_india/",
+    "id": "t3_1w3kp3o",
+    "title": "A baby Water Buffalo around his family",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w3kp3o/a_baby_water_buffalo_around_his_family/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -141,46 +141,19 @@
   ],
   "B": [
    {
-    "id": "t3_1w2mf6x",
-    "title": "Casual girl [Original]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w2mf6x/casual_girl_original/",
-    "subreddit": "awwnime",
+    "id": "t3_1w0w1kj",
+    "title": "Baby by Elf Standards",
+    "url": "https://www.reddit.com/r/Animemes/comments/1w0w1kj/baby_by_elf_standards/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6odus",
-    "title": "Cute Momo [Dandadan]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w6odus/cute_momo_dandadan/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w3znns",
-    "title": "Blushing Miku [Vocaloid]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w3znns/blushing_miku_vocaloid/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w4wlgn",
-    "title": "Flustered [Original]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w4wlgn/flustered_original/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w0vu3e",
-    "title": "Miyabi in the office [Zenless Zone Zero]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w0vu3e/miyabi_in_the_office_zenless_zone_zero/",
-    "subreddit": "awwnime",
+    "id": "t3_1w4idhc",
+    "title": "The live action isn't looking so bad ISHOWROBIN",
+    "url": "https://www.reddit.com/r/Animemes/comments/1w4idhc/the_live_action_isnt_looking_so_bad_ishowrobin/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -195,28 +168,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w3992g",
-    "title": "\"Spice and Wolf: Merchant Meets the Wise Wolf\" Season 2 New Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1w3992g/spice_and_wolf_merchant_meets_the_wise_wolf/",
-    "subreddit": "anime",
+    "id": "t3_1w1kvic",
+    "title": "Osaka gyaruo inspired",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w1kvic/osaka_gyaruo_inspired/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4fdun",
-    "title": "Kurumi tries on lingerie [Date A Live]",
-    "url": "https://www.reddit.com/r/anime/comments/1w4fdun/kurumi_tries_on_lingerie_date_a_live/",
-    "subreddit": "anime",
+    "id": "t3_1w5mrnb",
+    "title": "i get it cracking like a bad back",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w5mrnb/i_get_it_cracking_like_a_bad_back/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w1i4rw",
-    "title": "‘Jujutsu Kaisen: The Culling Game Part 2’ Teaser Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1w1i4rw/jujutsu_kaisen_the_culling_game_part_2_teaser/",
-    "subreddit": "anime",
+    "id": "t3_1w2um6q",
+    "title": "fully hand painted outfit",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w2um6q/fully_hand_painted_outfit/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w5st3i",
+    "title": "Quebec City, I am in you 🫵🏼",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w5st3i/quebec_city_i_am_in_you/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -249,30 +231,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w0t73u",
-    "title": "That wasn't Alyosha....",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w0t73u/that_wasnt_alyosha/",
+    "id": "t3_1w50sgz",
+    "title": "Just a reminder you can summon your train anywhere on the tracks, not just at the station.",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w50sgz/just_a_reminder_you_can_summon_your_train/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w2jy30",
-    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 10 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1w2jy30/mushoku_tensei_jobless_reincarnation_season_3/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w5ba2y",
-    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 15 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1w5ba2y/rezero_starting_life_in_another_world_season_4/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
     "source": "rss"
    }
   ]
