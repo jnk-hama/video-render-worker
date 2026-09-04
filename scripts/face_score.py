@@ -32,7 +32,7 @@ import sys
 PASS_THRESHOLD = 0.42
 REF_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    'assets', 'influencer', 'anna')
+    'assets', 'en', 'influencer', 'anna')   # ★Aライン専用（決定#082で移動）
 
 _app = None
 

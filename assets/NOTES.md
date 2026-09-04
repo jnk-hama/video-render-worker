@@ -1,21 +1,41 @@
-# 同梱素材の使い分け（部門をまたいで混ぜない）
+# 同梱素材の置き場所（部門で分ける）
 
-★★2026-09-04、決定#079。**ここを間違えると、日本語の商品紹介に
-英語圏部門のAIモデル映像が出る**。実際に一度そうなりかけた（下記）。
+★★2026-09-04、決定#082。**注意ではなく構造で分ける。**
 
-| ファイル | どの部門のものか | 用途 |
-|---|---|---|
-| `b-beach-sunset.mp4` / `b-pool-yellow.mp4` | **Aライン（英語圏）** | AIモデル「アンナ」系の検証用。日本語部門では使わない |
-| `neutral-gradient.mp4` | **共通** | 素材が1本も取れなかった時の逃げ場。暗いグラデーションだけで、
-どんな題材にも不適切にならない。ffmpegで生成（第三者の権利なし） |
-| `bgm/*.mp3` | 共通 | CC0 |
-| `sfx/*.mp3` | 共通 | ffmpegで生成（第三者の権利なし）。`sfx/README.md` に生成コマンド |
-| `fonts/Anton-Regular.ttf` | Aライン（英語） | 描画側が文字種で自動選択 |
-| `fonts/DelaGothicOne-Regular.ttf` | Bライン（日本語） | 同上 |
-| `influencer/anna/*` | Aライン | 顔の一貫性の基準画像 |
-| `demo/nova-pulse.png` | 共通（検証用） | 架空のガジェット。実商品として出さない |
+```
+assets/
+  shared/   両部門で使う      bgm/ sfx/ demo/ neutral-gradient.mp4
+  en/       Aライン専用       fonts/(Anton) clips/(b-*.mp4) influencer/(anna)
+  ja/       Bライン専用       fonts/(Dela Gothic One)
+```
 
-## 踏んだ失敗
+## 守られ方（実測で確認済み）
+
+依頼に `target_market: "ja" | "en"` を入れる。描画側は次のように振る舞う。
+
+| 状況 | 挙動 |
+|---|---|
+| `ja` の依頼が `assets/en/…` を指した | **描かずに停止** |
+| `en` の依頼が `assets/ja/…` を指した | **描かずに停止** |
+| 本文が日本語なのに `target_market: "en"` | **描かずに停止** |
+| 値が `ja` / `en` 以外 | **描かずに停止** |
+| 未指定 | 本文の文字種から推定し、警告を出して続行（下記） |
+
+★「使わずに次のクリップへ」ではなく**止める**。黙って別の映像に
+  差し替わる方が危険で、出来上がった動画を見るまで誰も気づかない。
+
+## 未指定をまだエラーにしていない理由
+
+英語圏部門（GAS）は `clasp push` が済むまで古いコードのままで、
+このフラグを送らない。ここで落とすと、描画側を更新した瞬間に
+**Aラインが全部止まる**。デプロイの順番で壊れる設計は既に2度踏んでいる
+（#076 のcron認証、#079 のYAMLパース）。
+
+**切り替え条件**：GAS（`36_Render.js`）と Supabase（`handleWaitingRender`）の
+**両方が送っていることを実走で確認できたら**、`resolve_market()` の
+「指定なし」分岐を `SystemExit` に変える。
+
+## 踏んだ失敗（消さずに残す）
 
 決定#069でJSON2Videoを外した時、Pexelsが素材を返さなかった場合の
 フォールバックを `assets/b-beach-sunset.mp4` にした。これは
@@ -23,13 +43,14 @@
 出てくると内容と全く噛み合わない。TikTokの審査に出す動画でこれが
 起きれば、内容の不一致として不利にもなる。
 
-→ `neutral-gradient.mp4` に変更した。素材が無い回は「暗い背景に字幕」
-   という形になり、少なくとも**題材と矛盾しない**。
+→ `shared/neutral-gradient.mp4` に変更し、さらに置き場所自体を分けた。
 
-## 生成コマンド（neutral-gradient.mp4）
+## neutral-gradient.mp4 の作り方
 
 ```bash
 ffmpeg -y -f lavfi -i "gradients=s=1080x1920:c0=0x0b0b12:c1=0x1b1230:x0=200:y0=200:x1=900:y1=1700:d=12:speed=0.06,format=yuv420p" \
   -t 12 -r 30 -vf "noise=alls=6:allf=t+u,eq=brightness=-0.02" \
-  -c:v libx264 -preset veryfast -crf 26 assets/neutral-gradient.mp4
+  -c:v libx264 -preset veryfast -crf 26 assets/shared/neutral-gradient.mp4
 ```
+
+効果音の作り方は `shared/sfx/README.md`。

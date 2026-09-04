@@ -124,7 +124,7 @@ def run(cmd, **kw):
     return p
 
 
-def download(url, dest):
+def download(url, dest, market=None):
     """
     1本落とす。失敗しても例外にしない（呼び出し側が次のクリップへ進む）。
 
@@ -144,10 +144,32 @@ def download(url, dest):
     """
     if '://' not in str(url):
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        src = os.path.normpath(os.path.join(root, str(url).lstrip('/')))
+        rel = str(url).lstrip('/')
+        src = os.path.normpath(os.path.join(root, rel))
         if not src.startswith(root + os.sep):
             log('  リポジトリの外を指しています（使いません）: %s' % url)
             return False
+
+        """
+        ★★2026-09-04、部門をまたいだ素材を**描かずに落とす**（決定#082）。
+
+        assets/en/ の映像がBライン（日本語）の動画に混ざる事故を、
+        注意ではなく構造で潰す。ここは「使わずに次のクリップへ」ではなく
+        **例外で止める**。黙って別の映像に差し替わる方が危険で、
+        出来上がった動画を見るまで誰も気づかないため。
+        """
+        if market:
+            for other in MARKETS:
+                if other == market:
+                    continue
+                if rel.startswith('assets/%s/' % other):
+                    raise SystemExit(
+                        '部門をまたいだ素材が指定されました（描画を中止）。\n'
+                        '  依頼の市場: %s / 素材: %s\n'
+                        '  assets/%s/ は %s ライン専用です。'
+                        '両部門で使うものは assets/shared/ に置いてください。'
+                        % (market, rel, other, other))
+
         if not os.path.exists(src):
             log('  同梱素材が見つかりません: %s' % url)
             return False
@@ -204,7 +226,7 @@ def resolve_sfx(cues, total_seconds):
     if not cues:
         return []
     here = os.path.dirname(os.path.abspath(__file__))
-    sfx_dir = os.path.join(os.path.dirname(here), 'assets', SFX_DIR_NAME)
+    sfx_dir = os.path.join(os.path.dirname(here), 'assets', SHARED_DIR, SFX_DIR_NAME)
     out = []
     for cue in cues:
         if not isinstance(cue, dict):
@@ -465,6 +487,25 @@ Anton は欧文専用で、日本語を渡すと全部が豆腐（□）にな�
 【幅】全角は 1文字≒1em。半角英数が混じると縮む。字幕は1枚ずつ
       measure_char_ratio で実測するので、ここの値は測れない時の予備。
 """
+"""
+★★2026-09-04、部門ごとに素材を分けた（決定#082）。
+
+【なぜ】
+Pexelsが素材を返さなかった時のフォールバックが、Aライン（英語圏・
+AIモデル）の映像を指していた。日本語の商品紹介動画にそれが出る形で、
+実際に一度そうなりかけた。「気をつける」では防げないので、
+**置き場所で分ける**。
+
+    assets/shared/ … 両部門（bgm / sfx / 逃げ場の映像）
+    assets/en/     … Aライン専用（Anton / アンナ / 検証用クリップ）
+    assets/ja/     … Bライン専用（Dela Gothic One）
+
+依頼の target_market と違う側のディレクトリを指したら、
+**描かずに落とす**（download() 内で検査）。取り違えを構造で潰す。
+"""
+MARKETS = ('ja', 'en')
+SHARED_DIR = 'shared'
+
 CAPTION_FONT_JA_NAME = 'Dela Gothic One'
 CAPTION_FONT_JA_FILE = 'DelaGothicOne-Regular.ttf'
 CHAR_WIDTH_RATIO_JA = 1.05
@@ -679,6 +720,48 @@ def normalize_word(w):
     return re.sub(r'[^0-9A-Za-z\u3040-\u30ff\u3400-\u9fff]', '', str(w or '')).lower()
 
 
+def resolve_market(job, sample_text):
+    """
+    この依頼がどちらの部門のものかを決める。
+
+    @return 'ja' | 'en'
+
+    ★★2026-09-04（決定#082）。
+
+    【なぜ未指定を即エラーにしないか】
+    英語圏部門（GAS）は現在このフラグを送っていない。ここで落とすと、
+    描画側を更新した瞬間に**Aラインが全部止まる**。デプロイの順番で
+    壊れる設計は、既に2度踏んでいる（#076のcron、#079のYAML）。
+
+    したがって当面は:
+      ・指定あり  … その値を使う。不正な値なら**落とす**（呼び出し側のバグ）
+      ・指定なし  … 本文の文字種から推定し、警告を出す
+      ・指定と中身が食い違う … **落とす**（取り違えの本体はこれ）
+
+    ★依頼側（GAS / Supabase）の両方が送るようになったら、
+      「指定なし」も落とす側へ倒す。切り替え条件は assets/NOTES.md に書いた。
+    """
+    given = str(job.get('target_market') or '').strip().lower()
+    inferred = 'ja' if has_cjk(sample_text) else 'en'
+
+    if not given:
+        log('★target_market が未指定です。本文から %s と判断しました。'
+            '（依頼側で明示してください）' % inferred)
+        return inferred
+
+    if given not in MARKETS:
+        raise SystemExit('target_market が不正です: %r（%s のいずれか）'
+                         % (given, ' / '.join(MARKETS)))
+
+    if given != inferred:
+        raise SystemExit(
+            '依頼の市場と本文の言語が食い違っています（描画を中止）。\n'
+            '  target_market=%s ですが、本文は %s に見えます。\n'
+            '  取り違えたまま描くと、別部門のアカウントへ出す動画になります。'
+            % (given, inferred))
+    return given
+
+
 def has_cjk(text):
     """日本語（ひらがな・カタカナ・漢字）を含むか。字幕のフォントと
     語の連結（空白を入れるか）をこれで切り替える。"""
@@ -699,10 +782,14 @@ def caption_font(sample=''):
     """
     if has_cjk(sample):
         name, fname, ratio = CAPTION_FONT_JA_NAME, CAPTION_FONT_JA_FILE, CHAR_WIDTH_RATIO_JA
+        market = 'ja'
     else:
         name, fname, ratio = CAPTION_FONT_NAME, CAPTION_FONT_FILE, CHAR_WIDTH_RATIO
+        market = 'en'
     here = os.path.dirname(os.path.abspath(__file__))
-    for d in (os.path.join(os.path.dirname(here), 'assets', 'fonts'),
+    root = os.path.dirname(here)
+    # ★市場ごとのフォントだけを見る。混ざらないよう探索先も分ける
+    for d in (os.path.join(root, 'assets', market, 'fonts'),
               os.path.join(here, 'fonts')):
         if os.path.exists(os.path.join(d, fname)):
             return name, d, ratio
@@ -1295,9 +1382,15 @@ def main():
     os.makedirs(work, exist_ok=True)
     rng = random.Random(seed if seed is not None else os.urandom(8))
 
-    font_name, font_dir, font_ratio = caption_font(
-        '%s %s' % (job.get('narration') or '',
-                   ' '.join(str(c.get('text') or '') for c in (job.get('captions') or []))))
+    sample_text = '%s %s' % (
+        job.get('narration') or '',
+        ' '.join(str(c.get('text') or '') for c in (job.get('captions') or [])))
+
+    # ★どちらの部門の依頼か。素材の取り違えはここで止める（決定#082）
+    market = resolve_market(job, sample_text)
+    log('部門: %s ライン' % market)
+
+    font_name, font_dir, font_ratio = caption_font(sample_text)
     log('モード %s / クリップ %d本 / 字幕フォント %s（幅は1枚ずつ実測'
         '／測れない時の予備 %.2f）' % (mode, len(clips), font_name, font_ratio))
 
@@ -1457,7 +1550,7 @@ def main():
           dst = os.path.join(work, 'part_%02d.mp4' % i)
           log('[%d/%d] %s' % (len(parts) + 1, target, str(url)[:110]))
 
-          if not download(url, src):
+          if not download(url, src, market=market):
               continue
 
           """
@@ -1598,7 +1691,7 @@ def main():
     """
     if bgm_src.lower() == 'random':
         here = os.path.dirname(os.path.abspath(__file__))
-        bgm_dir = os.path.join(os.path.dirname(here), 'assets', 'bgm')
+        bgm_dir = os.path.join(os.path.dirname(here), 'assets', SHARED_DIR, 'bgm')
         pool = []
         if os.path.isdir(bgm_dir):
             pool = sorted(f for f in os.listdir(bgm_dir)
@@ -1607,13 +1700,13 @@ def main():
             bgm_src = os.path.join(bgm_dir, rng.choice(pool))
             log('BGMを選びました: %s' % os.path.basename(bgm_src))
         else:
-            log('assets/bgm/ に音源がありません。BGM無しで続行します。')
+            log('assets/shared/bgm/ に音源がありません。BGM無しで続行します。')
             bgm_src = ''
 
     if bgm_src:
         if bgm_src.startswith(('http://', 'https://', 'file://')):
             cand = os.path.join(work, 'bgm_src')
-            bgm_path = cand if download(bgm_src, cand) else None
+            bgm_path = cand if download(bgm_src, cand, market=market) else None
             if not bgm_path:
                 log('BGMを取得できませんでした（BGM無しで続行）: %s' % bgm_src[:80])
         elif os.path.exists(bgm_src):
