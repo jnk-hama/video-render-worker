@@ -143,7 +143,33 @@ def has_alpha(path):
     except Exception:
         return False
     # rgba / bgra / yuva420p / pal8 など。pal8 は透過色を持ち得る
-    return ('a' in pix.replace('yuv', '').replace('gbr', '')) or pix == 'pal8'
+    if not (('a' in pix.replace('yuv', '').replace('gbr', '')) or pix == 'pal8'):
+        return False
+
+    """
+    ★★2026-09-04、ここで**実際に透明な画素があるか**まで確かめる。
+
+    【何が起きたか（実測）】
+    商品画像は RGBA で保存されていても、アルファが全面255
+    （＝完全に不透明）のことがある。「アルファ面がある＝抜き済み」と
+    判断すると背景を抜く工程を飛ばし、**背景の四角がそのまま動画に乗る**。
+    実際に nova-pulse.png で四角い箱が映った（アルファのYMIN=255）。
+
+    アルファの最小値を見れば一発で分かる。255なら透明な画素は1つも無い。
+    """
+    try:
+        p = subprocess.run(
+            ['ffmpeg', '-hide_banner', '-loglevel', 'info', '-y', '-i', path,
+             '-vf', 'format=rgba,alphaextract,signalstats,'
+                    'metadata=print:key=lavfi.signalstats.YMIN',
+             '-f', 'null', '-'],
+            capture_output=True, text=True, timeout=60)
+        m = re.findall(r'YMIN=(\d+)', p.stderr or '')
+        if not m:
+            return True          # 測れないなら抜き済みとして扱う（従来の挙動）
+        return int(m[-1]) < 250  # 完全に不透明なら「抜き済み」ではない
+    except Exception:
+        return True
 
 
 def probe_size(path):

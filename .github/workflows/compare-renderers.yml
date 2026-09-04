@@ -1,0 +1,180 @@
+# 同じ台本を ffmpeg版 と Remotion版 の両方で描き、左右に並べた1本にする。
+#
+# 【なぜ専用のワークフローにするか】
+# 2本を別々に実行すると、TTSが2回走って音声がわずかに違う可能性が残る。
+# **1回の実行で音声を1つだけ作り、両方に同じものを使う**ことで、
+# 差が「描画方式の違いだけ」になる。比較の意味がここにかかっている。
+#
+# ★本番の経路（render-video.yml）には一切触らない。比較のためだけの口。
+name: compare-renderers
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload_json:
+        description: '比較する台本のJSON（renderer は無視される）'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: FFmpeg
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg fonts-noto-cjk
+          ffmpeg -version | head -1
+
+      - name: TTS と切り抜きの依存
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq --no-install-recommends libegl1 libgl1
+          python3 -m pip install --quiet --disable-pip-version-check \
+            edge-tts rembg onnxruntime
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: remotion/package-lock.json
+
+      - name: Chrome Headless Shell をキャッシュから戻す
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/remotion
+          key: remotion-chrome-${{ runner.os }}
+
+      - name: 依頼を受け取る
+        env:
+          PAYLOAD_JSON: ${{ inputs.payload_json }}
+        run: |
+          set -euo pipefail
+          # ★式展開を run の中で直接使わない。env 経由で渡す
+          printf '%s' "$PAYLOAD_JSON" > payload.json
+          python3 -c "import json;d=json.load(open('payload.json'));print('台本を受け取りました')"
+
+      - name: 前景を透過する（両方式で同じ画像を使う）
+        run: |
+          set -euo pipefail
+          python3 scripts/prepare_foreground_cli.py \
+            --payload payload.json --out payload_fg.json --work .fgwork
+
+      - name: ナレーションを1つだけ作る
+        id: tts
+        run: |
+          set -euo pipefail
+          # ★ここで作った音声を両方に使う。2回作ると差が音声にも出る
+          python3 scripts/make_narration.py \
+            --payload payload_fg.json --audio narration.mp3 --out payload_tts.json
+          if [ -f narration.mp3 ]; then
+            echo "has_audio=true" >> "$GITHUB_OUTPUT"
+            ls -lh narration.mp3
+          else
+            echo "has_audio=false" >> "$GITHUB_OUTPUT"
+            echo "★音声を作れませんでした。無音で比較します"
+          fi
+
+      - name: 描画（ffmpeg）
+        run: |
+          set -euo pipefail
+          START=$(date +%s)
+          python3 scripts/render_video.py --payload payload_tts.json --out a_ffmpeg.mp4
+          echo "ffmpeg_seconds=$(( $(date +%s) - START ))" >> "$GITHUB_OUTPUT"
+          ls -lh a_ffmpeg.mp4
+        id: render_ffmpeg
+
+      - name: 描画（Remotion）
+        id: render_remotion
+        run: |
+          set -euo pipefail
+          START=$(date +%s)
+          cd remotion
+          npm ci --no-audit --no-fund
+          node scripts/render.mjs --payload ../payload_tts.json --out ../b_remotion.mp4
+          cd ..
+          echo "remotion_seconds=$(( $(date +%s) - START ))" >> "$GITHUB_OUTPUT"
+          ls -lh b_remotion.mp4
+
+      - name: 左右に並べる
+        run: |
+          set -euo pipefail
+          # ★尺が違うと短い方で切れる。長い方に合わせて最後の絵を伸ばす
+          A=$(ffprobe -v error -show_entries format=duration -of csv=p=0 a_ffmpeg.mp4)
+          B=$(ffprobe -v error -show_entries format=duration -of csv=p=0 b_remotion.mp4)
+          echo "ffmpeg版 ${A}秒 / Remotion版 ${B}秒"
+
+          # 音声は ffmpeg版のものを使う（同じ narration.mp3 由来なので同一）
+          ffmpeg -y -hide_banner -loglevel error \
+            -i a_ffmpeg.mp4 -i b_remotion.mp4 \
+            -filter_complex "
+              [0:v]scale=540:960,pad=540:1030:0:70:color=0x101014,
+                   drawtext=text='ffmpeg':fontsize=34:fontcolor=white:
+                   x=(w-text_w)/2:y=18:
+                   fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf[a];
+              [1:v]scale=540:960,pad=540:1030:0:70:color=0x101014,
+                   drawtext=text='Remotion':fontsize=34:fontcolor=0x7cc4ff:
+                   x=(w-text_w)/2:y=18:
+                   fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf[b];
+              [a][b]hstack=inputs=2,format=yuv420p[v]" \
+            -map "[v]" -map 0:a? -shortest \
+            -c:v libx264 -preset veryfast -crf 21 -c:a aac -b:a 128k \
+            compare.mp4
+          ls -lh compare.mp4
+
+      - name: 実測値をまとめる
+        run: |
+          set -euo pipefail
+          {
+            echo "## 描画方式の比較（実測）"
+            echo ""
+            echo "| 方式 | 描画にかかった時間 | 出力 |"
+            echo "|---|---|---|"
+            echo "| ffmpeg | ${{ steps.render_ffmpeg.outputs.ffmpeg_seconds }}秒 | $(stat -c%s a_ffmpeg.mp4) バイト |"
+            echo "| Remotion | ${{ steps.render_remotion.outputs.remotion_seconds }}秒 | $(stat -c%s b_remotion.mp4) バイト |"
+            echo ""
+            echo "ナレーション: ${{ steps.tts.outputs.has_audio }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Supabase Storage へ上げる
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+            echo "Secrets が無いので Storage へは上げません"; exit 0
+          fi
+          # ★render-video.yml と同じ掃除。許可文字だけ残す
+          RAW=$(printf '%s' "$SUPABASE_URL" | tr -cd 'A-Za-z0-9:/._-')
+          KEY_CLEAN=$(printf '%s' "$SUPABASE_SERVICE_ROLE_KEY" | tr -cd 'A-Za-z0-9._-')
+          HOST=${RAW#http://}; HOST=${HOST#https://}; HOST=${HOST%%/*}
+          case "$HOST" in *.*) ;; ?*) HOST="${HOST}.supabase.co" ;; esac
+          URL_CLEAN="https://$HOST"
+
+          for f in compare.mp4 a_ffmpeg.mp4 b_remotion.mp4; do
+            code=$(curl -sS -o up.log -w '%{http_code}' \
+              -X POST "${URL_CLEAN}/storage/v1/object/videos/${f}" \
+              -H "Authorization: Bearer ${KEY_CLEAN}" \
+              -H "Content-Type: video/mp4" -H "x-upsert: true" \
+              --data-binary @"$f")
+            if [ "$code" != "200" ]; then
+              echo "::error::${f} のアップロード失敗 HTTP $code"; cat up.log; exit 1
+            fi
+            echo "${URL_CLEAN}/storage/v1/object/public/videos/${f}"
+          done
+
+      - name: 失敗時のログ
+        if: failure()
+        run: |
+          ls -la || true
+          tail -50 up.log 2>/dev/null || true

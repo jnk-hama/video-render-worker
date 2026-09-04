@@ -221,6 +221,16 @@ jobs:
           path: ~/.cache/remotion
           key: remotion-chrome-${{ runner.os }}
 
+      - name: 前景を透過する（Remotion用）
+        if: steps.renderer.outputs.engine == 'remotion'
+        run: |
+          set -euo pipefail
+          # ★ffmpeg版は描画の中で透過するが、Remotion版はNodeで描くので
+          #   同じ処理を呼べない。透過だけ外へ出して、両方式が同じ画像を使う。
+          #   これが無いと Remotion版だけ背景の四角が乗る（実測）。
+          python3 scripts/prepare_foreground_cli.py \
+            --payload payload.json --out payload_fg.json --work .fgwork
+
       - name: ナレーションを作る（Remotion用）
         if: steps.renderer.outputs.engine == 'remotion'
         run: |
@@ -228,7 +238,7 @@ jobs:
           # ★ffmpeg版はTTSを内部で回すが、Remotion版は音声を外から受け取る。
           #   同じ台本から同じ音声・同じ字幕時刻を作るために切り出してある。
           python3 scripts/make_narration.py \
-            --payload payload.json --audio narration.mp3 --out payload_tts.json
+            --payload payload_fg.json --audio narration.mp3 --out payload_tts.json
           ls -lh narration.mp3 || echo "音声なしで続行します"
 
       - name: 描画（Remotion）

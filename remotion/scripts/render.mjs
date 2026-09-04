@@ -122,14 +122,39 @@ const MAX_INLINE_BYTES = 8 * 1024 * 1024;
 
 const toDataUri = async (url) => {
   if (!url || url.startsWith("data:")) return url;
-  if (!/^https?:\/\//i.test(url)) return url; // ローカルパスはそのまま
+
+  /*
+   * ★スキームの無いパスは「リポジトリ同梱の素材」として扱う。
+   *   ffmpeg版の download() が assets/... を受けるのと同じ約束にする。
+   *   依頼側が2つの描画方式で違う書き方をしなくて済む。
+   */
+  let buf;
+  let type = "image/png";
+  if (!/^https?:\/\//i.test(url)) {
+    /*
+     * ★実在するパスはそのまま読む。
+     *   前段（prepare_foreground_cli.py）が作った透過PNGは作業ディレクトリに
+     *   置かれ、リポジトリの外を指すこともある。ここで弾くと、せっかく
+     *   抜いた画像が使われず404になる（実測してこの順に直した）。
+     *   リポジトリ相対の書き方も引き続き受ける。
+     */
+    const local = fs.existsSync(url) ? path.resolve(url) : path.resolve("..", url);
+    if (!fs.existsSync(local)) {
+      throw new Error(`前景の画像が見つかりません: ${url}`);
+    }
+    buf = fs.readFileSync(local);
+    if (/\.jpe?g$/i.test(url)) type = "image/jpeg";
+    if (/\.webp$/i.test(url)) type = "image/webp";
+    return `data:${type};base64,${buf.toString("base64")}`;
+  }
+
   const res = await fetch(url);
   if (!res.ok) throw new Error(`製品画像を取得できません: HTTP ${res.status} ${url}`);
-  const buf = Buffer.from(await res.arrayBuffer());
+  buf = Buffer.from(await res.arrayBuffer());
   if (buf.byteLength > MAX_INLINE_BYTES) {
     throw new Error(`製品画像が大きすぎます（${buf.byteLength}バイト）`);
   }
-  const type = res.headers.get("content-type") || "image/png";
+  type = res.headers.get("content-type") || "image/png";
   return `data:${type};base64,${buf.toString("base64")}`;
 };
 
@@ -160,8 +185,16 @@ for (const scene of script.scenes) {
     scene.productUrl = await toDataUri(scene.productUrl);
     console.log("  製品画像を埋め込みました（CSSマスクのため）");
   } catch (e) {
-    // ★埋め込めなくても描画は続ける。環境光が効かないだけで動画は成立する
-    console.warn(`  製品画像を埋め込めませんでした（環境光なしで続行）: ${e.message}`);
+    /*
+     * ★埋め込めなかったら**製品ごと外す**。
+     *   URLを残したまま描くと、Chromeが読めずに404になり、
+     *   「製品が出ない」ではなく「フレームを取り出せない」で描画ごと落ちる。
+     *   絵としては物足りなくなるが、動画は必ず出る方を選ぶ。
+     */
+    console.warn(`  製品画像を使えません（製品なしで続行）: ${e.message}`);
+    scene.kind = "talk";
+    scene.headline = scene.headline ?? "";
+    delete scene.productUrl;
   }
 }
 
@@ -186,6 +219,54 @@ try {
   // ★読めなくても描画は続ける。ただし書体が変わる事実は必ず残す
   console.warn(`フォントを読めませんでした（既定の書体で続行）: ${e.message}`);
   script.fontDataUri = null;
+}
+
+/*
+ * ★リポジトリ同梱の素材（背景動画・BGM）を配る小さな口を立てる。
+ *
+ * 【なぜ必要か】
+ * ffmpeg版は `assets/shared/neutral-gradient.mp4` のようなスキームの無い
+ * パスをそのまま読める。Remotion（Chrome）はURLしか読めない。
+ * 依頼側に2つの書き方をさせないため、こちら側で吸収する。
+ *
+ * 【なぜ data URI にしないのか】
+ * 動画は数MBある。base64 は33%増えるうえ、inputProps に載せると
+ * ブラウザへ丸ごと渡ることになる。ファイルはURLで渡す方が軽い。
+ *
+ * ★配るのはリポジトリの中だけ。`..` を含むパスは弾く。
+ */
+const repoRoot = path.resolve("..");
+let assetServer = null;
+let assetBase = "";
+
+const localAssets = script.scenes.some(
+  (s) => s.backgroundUrl && !/^(https?:|data:)/i.test(s.backgroundUrl),
+);
+
+if (localAssets) {
+  const http = await import("node:http");
+  assetServer = http.createServer((req, res) => {
+    const rel = decodeURIComponent((req.url || "").replace(/^\/+/, "").split("?")[0]);
+    const full = path.resolve(repoRoot, rel);
+    if (!full.startsWith(repoRoot + path.sep) || !fs.existsSync(full)) {
+      res.writeHead(404).end("not found");
+      return;
+    }
+    const ext = path.extname(full).toLowerCase();
+    const mime = { ".mp4": "video/mp4", ".mp3": "audio/mpeg", ".png": "image/png",
+                   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webm": "video/webm",
+                   ".ttf": "font/ttf" }[ext] || "application/octet-stream";
+    res.writeHead(200, { "Content-Type": mime, "Access-Control-Allow-Origin": "*" });
+    fs.createReadStream(full).pipe(res);
+  });
+  await new Promise((r) => assetServer.listen(0, "127.0.0.1", r));
+  assetBase = `http://127.0.0.1:${assetServer.address().port}/`;
+  for (const s of script.scenes) {
+    if (s.backgroundUrl && !/^(https?:|data:)/i.test(s.backgroundUrl)) {
+      s.backgroundUrl = assetBase + s.backgroundUrl.replace(/^\/+/, "");
+    }
+  }
+  console.log(`同梱素材の配信口: ${assetBase}`);
 }
 
 const started = Date.now();
@@ -232,6 +313,8 @@ await renderMedia({
     }
   },
 });
+
+if (assetServer) assetServer.close();
 
 const elapsed = (Date.now() - started) / 1000;
 const size = fs.statSync(outPath).size;
