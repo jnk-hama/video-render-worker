@@ -326,6 +326,19 @@ function requestRender_(accountKey, clips, text) {
   const payload = {
     job_id: jobId,
     account: key,
+    /*
+     * ★★2026-09-04、どちらの部門の依頼かを明示する（決定#082）。
+     *
+     * 描画ワーカーは assets/en/ と assets/ja/ を分けており、
+     * この値と違う側の素材を掴んだら**描かずに止める**。
+     * こちらは英語圏（Aライン）なので 'en' で固定。
+     *
+     * ★送らなくても今は動く（描画側が本文の文字種から推定する）。
+     *   ただし推定に頼る限り、英語の本文で日本語部門の素材を掴んでも
+     *   気づけない。両部門が送るようになった時点で、描画側は
+     *   「未指定なら落とす」へ切り替える予定（assets/NOTES.md）。
+     */
+    target_market: 'en',
     mode: mode,
     width: 1080, height: 1920, fps: 30,
     clip_seconds: RENDER_CLIP_SECONDS,
