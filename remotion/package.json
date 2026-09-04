@@ -1,0 +1,21 @@
+{
+  "name": "jmas-remotion-renderer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "縦型ショート動画の描画（Remotion）。ffmpeg版と並行して評価中",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "node scripts/render.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.410",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.410"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "5.9.3"
+  }
+}

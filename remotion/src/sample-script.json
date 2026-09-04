@@ -1,0 +1,44 @@
+{
+  "jobId": "sample",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "market": "ja",
+  "accent": "#FF3D8A",
+  "disclosure": "PR / アフィリエイト広告を含みます",
+  "captions": [
+    { "text": "朝の肌が違うって言われた", "start": 0.0, "end": 2.6, "highlight": "肌" },
+    { "text": "使うのは三十秒だけ", "start": 2.6, "end": 5.2, "highlight": "30秒" },
+    { "text": "詳細はプロフのリンクから", "start": 5.2, "end": 8.0, "highlight": "今すぐ" }
+  ],
+  "scenes": [
+    {
+      "kind": "insitu",
+      "seconds": 3.0,
+      "camera": "orbit",
+      "fx": "pop",
+      "backgroundUrl": "https://example.invalid/bathroom.mp4",
+      "productUrl": "https://example.invalid/product.png",
+      "heightRatio": 0.42,
+      "yRatio": 0.58,
+      "ambient": 0.25,
+      "headline": "朝の肌が変わる",
+      "label": "実感"
+    },
+    {
+      "kind": "shot",
+      "seconds": 2.5,
+      "camera": "push_in",
+      "fx": "clean",
+      "shotUrl": "https://example.invalid/ui.png",
+      "headline": "30秒"
+    },
+    {
+      "kind": "talk",
+      "seconds": 2.5,
+      "camera": "hold",
+      "fx": "shock",
+      "headline": "詳細はプロフのリンクから"
+    }
+  ]
+}
