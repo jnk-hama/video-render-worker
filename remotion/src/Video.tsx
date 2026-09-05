@@ -1,7 +1,13 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, useVideoConfig } from "remotion";
 import type { VideoScript } from "./types";
-import { HookTelop } from "./components/HookTelop";
+import {
+  HookTelop,
+  PALETTE_FOR_TELOP,
+  TELOP_STYLES,
+  seedOf,
+  shuffledBySeed,
+} from "./components/HookTelop";
 import { InSitu } from "./scenes/InSitu";
 import { Talk } from "./scenes/Talk";
 import { Shot } from "./scenes/Shot";
@@ -44,6 +50,19 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
    * ★1フレームを samples 回描いて重ねるので、**描画時間が素直に
    *   samples 倍近くまで増える**。数字は実測して決めること。
    */
+  /*
+   * 巨大テロップの演出・色を、**job_id から決める**（2026-09-05）。
+   *
+   * ★乱数は使わない。同じjobを描き直すと前と違う動画が出てしまい、
+   *   検証ができなくなる（描き直しは設計された経路。E-017）。
+   *   CLAUDE.md の「確率で出力が揺れる処理を構成に持ち込まない」に従う。
+   * ★並べ替えなので、5シーンなら5種類が1回ずつ出る。
+   *   同じ演出・同じ色が隣り合わない。
+   */
+  const seed = seedOf(script.jobId ?? "");
+  const telopStyles = shuffledBySeed(TELOP_STYLES, seed);
+  const telopColors = shuffledBySeed(PALETTE_FOR_TELOP, seed ^ 0x9e3779b9);
+
   const blur = script.quality?.blurSamples ?? 0;
   const shutter = script.quality?.shutterAngle ?? 180;
 
@@ -69,7 +88,12 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
             無いのと同じ（字幕と同じ理由。ここは譲らない）。
         */}
         {telop ? (
-          <HookTelop text={telop} durationInFrames={durationInFrames} index={i} />
+          <HookTelop
+            text={telop}
+            durationInFrames={durationInFrames}
+            style={telopStyles[i % telopStyles.length]}
+            color={telopColors[i % telopColors.length]}
+          />
         ) : null}
       </Sequence>
     );

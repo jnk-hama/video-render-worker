@@ -57,6 +57,13 @@ const adaptLegacyPayload = (s) => {
    *   scenes形式で依頼が来た回は巨大テロップが**黙って消える**状態だった。
    *   （今の依頼側は clips 形式なので表には出ていなかったが、埋まっていた）
    */
+  /*
+   * 巨大テロップの演出・色は job_id から決める（乱数を使わない）。
+   * 依頼側は snake_case で送ってくるので、ここで寄せる。
+   * ★空でも構わない。その場合は全動画で同じ並びになるだけで、壊れない。
+   */
+  s.jobId = s.jobId || s.job_id || "";
+
   if (Array.isArray(s.hook_telops)) {
     s.hookTelops = s.hook_telops.map((t) => (typeof t === "string" && t.trim() ? t.trim() : null));
     const n = s.hookTelops.filter(Boolean).length;
