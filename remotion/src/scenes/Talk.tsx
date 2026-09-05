@@ -1,6 +1,5 @@
 import React from "react";
 import { AbsoluteFill, Img, OffthreadVideo, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { JP_FONT } from "../lib/fonts";
 import type { TalkScene } from "../types";
 import { handheld, layerTransform, useCameraValue } from "../lib/camera";
 
@@ -47,23 +46,7 @@ export const Talk: React.FC<{ scene: TalkScene; accent: string }> = ({ scene, ac
         </AbsoluteFill>
       ) : null}
 
-      <div style={{
-        position: "absolute", left: 60, right: 60, top: height * 0.17,
-        textAlign: "center", color: "#fff",
-        fontFamily: JP_FONT, fontSize: 88, lineHeight: 1.14,
-        textShadow: "0 4px 20px rgba(0,0,0,0.85)",
-        transform: `translateY(${interpolate(enter, [0, 1], [18, 0])}px)`,
-        opacity: interpolate(enter, [0, 0.4, 1], [0, 1, 1]),
-      }}>{scene.headline}</div>
-
-      {scene.sub ? (
-        <div style={{
-          position: "absolute", left: 80, right: 80, top: height * 0.30,
-          textAlign: "center", color: accent,
-          fontFamily: JP_FONT, fontSize: 40,
-          textShadow: "0 3px 12px rgba(0,0,0,0.9)",
-        }}>{scene.sub}</div>
-      ) : null}
+      {/* ★文字は字幕（Captions）1本に統一する。上下の二重表示を避ける */}
     </AbsoluteFill>
   );
 };

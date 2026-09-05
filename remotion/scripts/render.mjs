@@ -59,9 +59,14 @@ const adaptLegacyPayload = (s) => {
   s.scenes = clips.map((c, i) => {
     const seconds = Number(c.duration) || each;
     const camera = moves[i % moves.length];
-    // ★製品は最初のシーンにだけ置く。全シーンに出すとくどく、
-    //   背景が変わるたびに製品が瞬間移動して見える
-    if (product && i === 0) {
+    /*
+     * ★製品は**最初と最後**に置く（2026-09-05）。
+     *   最初だけにすると中盤が背景だけになって間延びする（実測で確認）。
+     *   全シーンに出すと、背景が変わるたびに製品が瞬間移動して見える。
+     *   「掴み → 説明 → もう一度見せて終わる」は実写の広告でも一般的な形。
+     */
+    const showProduct = i === 0 || i === clips.length - 1;
+    if (product && showProduct) {
       return {
         kind: "insitu",
         seconds,
@@ -269,6 +274,43 @@ if (localAssets) {
   console.log(`同梱素材の配信口: ${assetBase}`);
 }
 
+/*
+ * ★★品質の設定（決定#090）。
+ *
+ * 【なぜ描画側で決めるか】
+ * 品質は「無料枠の残り」と「1本あたりの時間」で決まる話で、台本の内容
+ * とは関係がない。依頼側（LLMの出力）に持たせると、台本の都合で画質が
+ * 変わってしまう。**ここで一元的に決める。**
+ *
+ * RENDER_QUALITY=high  60fps / CRF 18 / モーションブラー有効
+ *                low   30fps / CRF 23 / ブラー無し（従来）
+ * 既定は low。**重い設定を既定にしない**（気づかないうちに枠を食う）。
+ */
+const quality = (process.env.RENDER_QUALITY || "low").toLowerCase();
+
+/*
+ * ★3段階にした。**実測で「blurだけが桁違いに重い」と分かったため。**
+ *   4コア環境の実測（9秒の動画）:
+ *     low  30fps ブラー無し   64秒（動画1秒あたり  7.11秒）
+ *     high 60fps ブラー4      313秒（動画1秒あたり 34.83秒）← 4.9倍
+ *   1フレームを4回描いて重ねるので当然だが、**60fpsとブラーを
+ *   一緒くたにすると、どちらが重いのか分からなくなる**。分けた。
+ */
+const PRESETS = {
+  low:  { fps: 30, crf: 23, jpeg: 90,  blur: 0, shutter: 180 },
+  mid:  { fps: 60, crf: 18, jpeg: 100, blur: 0, shutter: 180 },
+  soft: { fps: 60, crf: 18, jpeg: 100, blur: 2, shutter: 150 },
+  high: { fps: 60, crf: 18, jpeg: 100, blur: 4, shutter: 160 },
+};
+const preset = PRESETS[quality] ?? PRESETS.low;
+
+script.fps = preset.fps;
+script.quality = { blurSamples: preset.blur, shutterAngle: preset.shutter };
+console.log(
+  `品質: ${quality}（${preset.fps}fps / CRF${preset.crf} / ` +
+    `ブラー${preset.blur === 0 ? "なし" : preset.blur + "サンプル"}）`,
+);
+
 const started = Date.now();
 console.log(
   `台本: ${script.scenes.length}シーン / ${totalSeconds.toFixed(1)}秒 / ` +
@@ -302,6 +344,14 @@ await renderMedia({
   codec: "h264",
   outputLocation: outPath,
   inputProps: { script },
+  /*
+   * ★CRFは「小さいほど高画質・大きいファイル」。
+   *   18 は視覚的にほぼ無劣化と言われる領域。23 は従来値（ffmpeg版と同じ）。
+   *   ★ファイルが大きくなると TikTok へのアップロードも遅くなる。
+   *     画質だけ見て決めない。
+   */
+  crf: preset.crf,
+  jpegQuality: preset.jpeg,
   // ★並列数はランナーのコア数に任せる。固定すると2コアの無料ランナーで
   //   詰まるか、逆に使い切れない
   concurrency: null,

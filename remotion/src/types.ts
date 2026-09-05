@@ -102,4 +102,14 @@ export type VideoScript = {
    * ★ネットワークからフォントを取りに行かないための仕組み。
    */
   fontDataUri?: string | null;
+  /**
+   * 高品質設定（決定#090）。描画側が決めて入れる。
+   * ★依頼側は指定しない。品質の判断を台本生成側に散らさない。
+   */
+  quality?: {
+    /** モーションブラーのサンプル数。0で無効 */
+    blurSamples: number;
+    /** シャッター角。180度が実写のフィルムに近い */
+    shutterAngle: number;
+  };
 };

@@ -8,7 +8,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { JP_FONT } from "../lib/fonts";
 import type { InSituScene } from "../types";
 import { handheld, layerTransform, useCameraValue } from "../lib/camera";
 
@@ -48,32 +47,36 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
    * 奥行きの割り当て。
    *   背景 0.85 … カメラより奥。動きは控えめ
    *   製品 1.25 … カメラより手前。同じカメラでも大きく動く
-   * 差（0.40）が視差の強さ。0.6を超えると「浮いて滑る」ので上げない。
+   * 差（0.28）が視差の強さ。
+   * ★2026-09-05、0.40 → 0.28 へ弱めた（オーナー指摘「企業PR感」）。
+   *   視差は強いほど「立体的に作り込んだ映像」に見える。
+   *   実際にスマホで撮った動画の視差は、これくらい控えめ。
    */
-  const BG_DEPTH = 0.85;
-  const FG_DEPTH = 1.25;
+  const BG_DEPTH = 0.9;
+  const FG_DEPTH = 1.18;
 
   const heightRatio = scene.heightRatio ?? 0.42;
   const yRatio = scene.yRatio ?? 0.58;
   const ambient = scene.ambient ?? 0.25;
 
   // 製品の登場。下からわずかに持ち上げて置く（置かれた感）
+  // ★damping を上げて跳ね返りを消す。バウンドは広告の動き
   const enter = spring({
     frame,
     fps,
-    config: { damping: 26, mass: 0.9, stiffness: 90 },
-    durationInFrames: Math.round(fps * 0.9),
+    config: { damping: 200, mass: 0.8, stiffness: 55 },
+    durationInFrames: Math.round(fps * 1.1),
   });
-  const enterY = interpolate(enter, [0, 1], [26, 0]);
+  const enterY = interpolate(enter, [0, 1], [14, 0]);
   const enterOpacity = interpolate(enter, [0, 0.35, 1], [0, 1, 1]);
 
   // 製品だけの微振動。背景の揺れと位相をずらすと「別の物体」に見える
-  const micro = handheld(frame + 41, fps, 0.6);
+  const micro = handheld(frame + 41, fps, 0.45);
 
   const productH = height * heightRatio;
   // 接地影は製品の真下。寄るほど濃く・小さくなる（距離が縮むと影が締まる）
   const shadowW = productH * 0.62 * (1 / cam.zoom);
-  const shadowOpacity = interpolate(cam.zoom, [1, 1.15], [0.42, 0.55], {
+  const shadowOpacity = interpolate(cam.zoom, [1, 1.1], [0.34, 0.44], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -105,7 +108,7 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
       <AbsoluteFill
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 38%, rgba(0,0,0,0.55) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.10) 38%, rgba(0,0,0,0.45) 100%)",
         }}
       />
 
@@ -128,7 +131,7 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
             height: shadowW * 0.19,
             borderRadius: "50%",
             background:
-              "radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0) 72%)",
+              "radial-gradient(ellipse at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.28) 45%, rgba(0,0,0,0) 72%)",
             opacity: shadowOpacity * enterOpacity,
             filter: "blur(10px)",
           }}
@@ -155,7 +158,7 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
             // 落ち影。接地影とは別に、製品自身の輪郭から出る影
             filter: `drop-shadow(0 ${productH * 0.03}px ${
               productH * 0.05
-            }px rgba(0,0,0,0.55))`,
+            }px rgba(0,0,0,0.42))`,
           }}
         >
           <Img
@@ -191,47 +194,13 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
         </div>
       </AbsoluteFill>
 
-      {/* ---------- 文字：製品の上に重ねない ---------- */}
-      {scene.headline ? (
-        <div
-          style={{
-            position: "absolute",
-            left: 60,
-            right: 60,
-            top: `${Math.max(0.08, yRatio - heightRatio / 2 - 0.16) * 100}%`,
-            textAlign: "center",
-            color: "#fff",
-            fontFamily: JP_FONT,
-            fontSize: 76,
-            lineHeight: 1.15,
-            textShadow: "0 4px 18px rgba(0,0,0,0.85)",
-            opacity: interpolate(frame, [0, Math.round(fps * 0.4)], [0, 1], {
-              extrapolateRight: "clamp",
-            }),
-          }}
-        >
-          {scene.headline}
-        </div>
-      ) : null}
+      {/*
+        ★文字はここに出さない（2026-09-05、オーナー指摘）。
 
-      {scene.label ? (
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: `${Math.min(0.9, yRatio + heightRatio / 2 + 0.06) * 100}%`,
-            textAlign: "center",
-            color: accent,
-            fontFamily: JP_FONT,
-            fontSize: 38,
-            letterSpacing: 2,
-            textShadow: "0 3px 12px rgba(0,0,0,0.9)",
-          }}
-        >
-          {scene.label}
-        </div>
-      ) : null}
+        以前は見出しを上に、字幕を下に出していたが、同じ文が上下に
+        二重に流れた。同じ情報を2箇所に出すと、同じ尺で伝わる情報量が
+        半分になる。**画面の文字は字幕（Captions）1本に統一する。**
+      */}
     </AbsoluteFill>
   );
 };

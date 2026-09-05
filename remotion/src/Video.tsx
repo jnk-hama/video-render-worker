@@ -7,6 +7,7 @@ import { Shot } from "./scenes/Shot";
 import { Captions } from "./components/Captions";
 import { Disclosure } from "./components/Disclosure";
 import { FontFace } from "./lib/fonts";
+import { CameraMotionBlur } from "@remotion/motion-blur";
 
 /*
  * シーンの振り分け（ルーティング）。
@@ -32,14 +33,34 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
   const { fps } = useVideoConfig();
   const accent = script.accent ?? "#8b5cf6";
 
+  /*
+   * モーションブラー（決定#090）。
+   *
+   * ★**映像だけに掛ける。文字には掛けない。**
+   *   字幕がぶれると読めなくなる。ミュート再生で読めない字幕は
+   *   無いのと同じなので、ここは絶対に譲らない。
+   *
+   * ★1フレームを samples 回描いて重ねるので、**描画時間が素直に
+   *   samples 倍近くまで増える**。数字は実測して決めること。
+   */
+  const blur = script.quality?.blurSamples ?? 0;
+  const shutter = script.quality?.shutterAngle ?? 180;
+
   let cursor = 0;
   const sequences = script.scenes.map((scene, i) => {
     const from = cursor;
     const durationInFrames = Math.max(1, Math.round(scene.seconds * fps));
     cursor += durationInFrames;
+    const body = renderScene(scene, accent);
     return (
       <Sequence key={i} from={from} durationInFrames={durationInFrames}>
-        {renderScene(scene, accent)}
+        {blur > 0 ? (
+          <CameraMotionBlur shutterAngle={shutter} samples={blur}>
+            {body}
+          </CameraMotionBlur>
+        ) : (
+          body
+        )}
       </Sequence>
     );
   });
