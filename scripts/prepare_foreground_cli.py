@@ -44,6 +44,19 @@ def main():
     src = os.path.join(args.work, "fg_raw")
     dst = os.path.join(args.work, "fg.png")
 
+    """
+    ★★2026-09-05、キャッシュ（決定#089）。
+
+    前段（fg_cache.py --check）が既に透過済みPNGを置いていたら、
+    **抜き直さない**。透過は2コアで33秒、その前のrembg導入で20秒かかる。
+    同じ商品で何本も作るので、ここが一番大きく効く。
+    """
+    if os.path.exists(dst) and os.path.getsize(dst) > 1024:
+        job["foreground"] = dict(fg, url=dst)
+        print("キャッシュの透過画像を使います: %s" % dst)
+        json.dump(raw, open(args.out, "w", encoding="utf-8"), ensure_ascii=False)
+        return
+
     if not rv.download(str(url), src, market=job.get("target_market")):
         # ★落とせなくても止めない。前景なしで描く（既存の方針と揃える）
         print("前景の素材を取得できませんでした。前景なしで通します。")

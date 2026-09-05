@@ -151,8 +151,23 @@ jobs:
           PY
           cat "$GITHUB_OUTPUT"
 
-      - name: 切り抜き・姿勢推定
+      # ★★2026-09-05、透過のキャッシュ（決定#089）。
+      #   透過は 2コアで33秒、その前の rembg 導入で20秒。合わせて53秒。
+      #   同じ商品で何本も作るので、1度抜いたら二度と抜かない。
+      #   **当たれば rembg を入れる必要すら無くなる**ので、重い導入の前に見る。
+      - name: 透過キャッシュを確認
+        id: fgcache
         if: steps.needs.outputs.compose == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          python3 scripts/fg_cache.py --check \
+            --payload payload.json --dest .fgwork/fg.png
+
+      - name: 切り抜き・姿勢推定
+        if: steps.needs.outputs.compose == 'true' && steps.fgcache.outputs.hit != 'true'
         run: |
           set -euo pipefail
           sudo apt-get install -y -qq --no-install-recommends libegl1 libgl1
@@ -190,6 +205,37 @@ jobs:
           PY
           cat "$GITHUB_OUTPUT"
 
+      # ★透過は描画方式によらず1回だけ。結果はキャッシュへ置いて次回使い回す
+      - name: 前景を透過する
+        if: steps.needs.outputs.compose == 'true'
+        run: |
+          set -euo pipefail
+          python3 scripts/prepare_foreground_cli.py \
+            --payload payload.json --out payload_fg.json --work .fgwork
+
+      - name: 透過をキャッシュへ保存
+        if: steps.needs.outputs.compose == 'true' && steps.fgcache.outputs.hit != 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          # ★失敗しても止めない。今回の動画はもう作れる状態にある
+          python3 scripts/fg_cache.py --put \
+            --payload payload.json --src .fgwork/fg.png || true
+
+      # 透過を通した回は payload_fg.json、通していない回は payload.json を使う
+      - name: 使う依頼ファイルを決める
+        id: pf
+        run: |
+          set -euo pipefail
+          if [ -f payload_fg.json ]; then
+            echo "file=payload_fg.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "file=payload.json" >> "$GITHUB_OUTPUT"
+          fi
+          cat "$GITHUB_OUTPUT"
+
       # ------------------------------------------------------------------
       # ffmpeg 版（従来）
       # ------------------------------------------------------------------
@@ -198,7 +244,8 @@ jobs:
         if: steps.renderer.outputs.engine == 'ffmpeg'
         run: |
           set -euo pipefail
-          python3 scripts/render_video.py --payload payload.json --out out.mp4
+          python3 scripts/render_video.py \
+            --payload ${{ steps.pf.outputs.file }} --out out.mp4
           ls -lh out.mp4
 
       # ------------------------------------------------------------------
@@ -221,16 +268,6 @@ jobs:
           path: ~/.cache/remotion
           key: remotion-chrome-${{ runner.os }}
 
-      - name: 前景を透過する（Remotion用）
-        if: steps.renderer.outputs.engine == 'remotion'
-        run: |
-          set -euo pipefail
-          # ★ffmpeg版は描画の中で透過するが、Remotion版はNodeで描くので
-          #   同じ処理を呼べない。透過だけ外へ出して、両方式が同じ画像を使う。
-          #   これが無いと Remotion版だけ背景の四角が乗る（実測）。
-          python3 scripts/prepare_foreground_cli.py \
-            --payload payload.json --out payload_fg.json --work .fgwork
-
       - name: ナレーションを作る（Remotion用）
         if: steps.renderer.outputs.engine == 'remotion'
         run: |
@@ -238,7 +275,7 @@ jobs:
           # ★ffmpeg版はTTSを内部で回すが、Remotion版は音声を外から受け取る。
           #   同じ台本から同じ音声・同じ字幕時刻を作るために切り出してある。
           python3 scripts/make_narration.py \
-            --payload payload_fg.json --audio narration.mp3 --out payload_tts.json
+            --payload ${{ steps.pf.outputs.file }} --audio narration.mp3 --out payload_tts.json
           ls -lh narration.mp3 || echo "音声なしで続行します"
 
       - name: 描画（Remotion）
