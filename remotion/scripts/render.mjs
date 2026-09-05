@@ -60,12 +60,19 @@ const adaptLegacyPayload = (s) => {
     const seconds = Number(c.duration) || each;
     const camera = moves[i % moves.length];
     /*
-     * ★製品は**最初と最後**に置く（2026-09-05）。
-     *   最初だけにすると中盤が背景だけになって間延びする（実測で確認）。
-     *   全シーンに出すと、背景が変わるたびに製品が瞬間移動して見える。
-     *   「掴み → 説明 → もう一度見せて終わる」は実写の広告でも一般的な形。
+     * ★製品は**3シーン目以降**に置く（決定#093、PASONA5段）。
+     *
+     *   1 Problem / 2 Agitation … 商品を出さない
+     *   3 Solution 以降        … 商品を出す
+     *
+     *   早く出すほど「広告だ」と判断されてスワイプされる。台本側でも
+     *   「3より前で商品名を出してはならない」と指示しており、
+     *   **画と言葉の両方で同じ約束を守る**。
+     *
+     *   ★シーンが3未満（移行中の3シーン台本など）の回は、
+     *     最初と最後に出す従来の形へ落とす。
      */
-    const showProduct = i === 0 || i === clips.length - 1;
+    const showProduct = clips.length >= 5 ? i >= 2 : (i === 0 || i === clips.length - 1);
     if (product && showProduct) {
       return {
         kind: "insitu",
@@ -298,6 +305,13 @@ const quality = (process.env.RENDER_QUALITY || "low").toLowerCase();
  */
 const PRESETS = {
   low:  { fps: 30, crf: 23, jpeg: 90,  blur: 0, shutter: 180 },
+  /*
+   * ★std が本番の既定（決定#093）。30秒×30fps×12本 で月1,440分、
+   *   無料枠2,000分に収まる。CRFだけ18へ上げる（符号化の負荷は軽く、
+   *   フレーム描画の回数は増えないため、時間はほとんど変わらない）。
+   *   60fpsは30秒構成だと月2,520分で枠を超えるので既定にしない。
+   */
+  std:  { fps: 30, crf: 18, jpeg: 100, blur: 0, shutter: 180 },
   mid:  { fps: 60, crf: 18, jpeg: 100, blur: 0, shutter: 180 },
   soft: { fps: 60, crf: 18, jpeg: 100, blur: 2, shutter: 150 },
   high: { fps: 60, crf: 18, jpeg: 100, blur: 4, shutter: 160 },

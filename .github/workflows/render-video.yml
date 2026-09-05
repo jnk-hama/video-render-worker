@@ -287,11 +287,12 @@ jobs:
           #     mid  60fps ブラー無し   7.90秒/秒
           #     soft 60fps ブラー2     19.42秒/秒
           #     high 60fps ブラー4     35.64秒/秒
-          #   2コア換算・13秒の動画・12本/日で月あたり:
-          #     low 720分 / mid 1,080分 / soft 2,520分 / high 3,960分
-          #   **無料枠2,000分に収まるのは low と mid だけ。**
-          #   ブラーを入れたい時は本数を減らすか、有料枠を使う判断が要る。
-          RENDER_QUALITY: ${{ vars.RENDER_QUALITY || 'mid' }}
+          #   ★決定#093で尺が30秒になったため既定は std（30fps/CRF18）。
+          #     2コア換算・30秒の動画・12本/日で月あたり:
+          #       std(30fps) 1,440分 / mid(60fps) 2,520分 ★超過
+          #     60fpsは13秒構成なら載るが、30秒構成では枠を超える。
+          #     尺と滑らかさは同時に取れない。構成（PASONA）を優先した。
+          RENDER_QUALITY: ${{ vars.RENDER_QUALITY || 'std' }}
         run: |
           set -euo pipefail
           cd remotion
