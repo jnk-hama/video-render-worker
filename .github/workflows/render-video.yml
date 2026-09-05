@@ -484,11 +484,25 @@ jobs:
           #   ※この注意書きに式の記法そのものを書くと、**コメントであっても
           #     GitHubが式として解釈し、ワークフロー全体がパースできなくなる**
           #     （実際に「An expression was expected」で起動不能になった）。
-          gh release create "$TAG" out.mp4 \
-            --title "$TAG" \
-            --notes "bytes=$(stat -c%s out.mp4)" \
-            --repo "$GH_REPO"
-          echo "アップロード完了: $TAG"
+          # ★★2026-09-05、**同じ job を描き直すと必ず失敗していた**ので直した。
+          #   実行#45（job 994fef3d…）が Release で落ちた。同じ job を
+          #   08:36（実行#44）と08:51（実行#45）の2回描いており、2回目の
+          #   `gh release create` が「タグが既にある」で失敗していた。
+          #   Storage側は x-upsert を付けてあるので通り、Release だけが落ちる。
+          #
+          #   ★描き直しは**設計された動作**である。依頼側は「25分待っても
+          #     動画が来なければ再依頼」する作りなので、混雑した回は必ずここを通る。
+          #   タグがあれば資産だけ差し替える（--clobber）。
+          if gh release create "$TAG" out.mp4 \
+               --title "$TAG" \
+               --notes "bytes=$(stat -c%s out.mp4)" \
+               --repo "$GH_REPO"; then
+            echo "アップロード完了: $TAG"
+          else
+            echo "Release が既にあるので、資産だけ差し替えます: $TAG"
+            gh release upload "$TAG" out.mp4 --clobber --repo "$GH_REPO"
+            echo "差し替え完了: $TAG"
+          fi
 
       # ★★2026-08-25 追加。放っておくと Release が無限に積もる。
       #
