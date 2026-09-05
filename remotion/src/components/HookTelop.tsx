@@ -54,13 +54,49 @@ const LINE_HEIGHT = 1.0;
 const BAND_TOP_RATIO = 0.07;
 const BAND_BOTTOM_RATIO = 0.56;
 
-/**
- * 1文字の横幅の見積り（em）。
- * ★和文は全角なのでほぼ 1.0。ASCIIは半分弱。letterSpacing -0.03em を引く。
- *   実測ではなく見積りなので、上の WIDTH_MARGIN で余白を持たせてある。
+/*
+ * 【1文字の横幅（2026-09-05・実測に置き換えた）】
+ *
+ * ★前の版は「ASCIIは0.58em」と**見積りで書いていた。間違っていた。**
+ *   実際にTTFの hmtx を読むと、
+ *     Dela Gothic One（日本語）の英大文字 … 平均 0.911em（W は 1.096em）
+ *     Anton（英語）の英大文字            … 平均 0.474em
+ *   つまり日本語書体では**35%以上小さく見積もっており**、「AI」「SNS」
+ *   「3秒」のようにASCIIを含むフックは計算より広くなって**画面から
+ *   はみ出す**。英語書体では逆に大きく見積もって無駄に小さく描いていた。
+ *
+ * ★下の表は fontTools で同梱TTFから実測した値（1/1000em、コード32〜126）。
+ *   作り直す時:
+ *     python3 -c "from fontTools.ttLib import TTFont; f=TTFont(PATH); \
+ *       u=f['head'].unitsPerEm; h=f['hmtx']; c=f.getBestCmap(); \
+ *       print([round(h[c[i]][0]/u*1000) for i in range(32,127)])"
+ * ★和文（全角）は Dela Gothic One で全て 1.000em ちょうどだった（16字で確認）。
  */
-const advanceEm = (ch: string): number =>
-  (ch.charCodeAt(0) < 0x100 ? 0.58 : 1.0) - 0.03;
+const ASCII_ADV_JA = [
+  200, 309, 501, 924, 887, 889, 771, 294, 358, 358, 479, 572, 272, 490, 272, 499, 917, 588, 835,
+  881, 924, 884, 856, 777, 876, 856, 272, 272, 547, 617, 547, 764, 862, 943, 894, 943, 893, 867,
+  860, 919, 918, 661, 884, 916, 804, 1093, 919, 971, 889, 971, 883, 924, 939, 920, 903, 1096, 880,
+  943, 865, 360, 499, 360, 615, 530, 600, 741, 744, 707, 734, 725, 470, 744, 695, 348, 323, 746,
+  316, 1098, 695, 736, 734, 734, 577, 709, 513, 695, 698, 880, 683, 698, 671, 352, 250, 352, 800,
+];
+const ASCII_ADV_EN = [
+  234, 229, 429, 546, 462, 1057, 520, 214, 291, 291, 452, 355, 236, 311, 229, 405, 494, 331, 494,
+  494, 494, 494, 494, 494, 494, 494, 242, 245, 321, 311, 321, 492, 864, 485, 479, 474, 493, 412,
+  399, 485, 499, 227, 466, 472, 397, 746, 498, 486, 472, 494, 477, 461, 396, 474, 469, 712, 484,
+  446, 410, 318, 405, 318, 474, 365, 317, 483, 501, 491, 498, 488, 280, 504, 505, 243, 263, 491,
+  248, 758, 499, 497, 501, 498, 347, 475, 305, 499, 461, 696, 459, 461, 386, 340, 216, 340, 493,
+];
+
+/** letterSpacing: -0.03em ぶん。1文字ごとに詰まる */
+const TRACKING_EM = 0.03;
+
+/** 1文字の横幅（em）。書体で違うので market で表を選ぶ */
+const advanceEm = (ch: string, market: string): number => {
+  const c = ch.codePointAt(0) ?? 0;
+  const table = market === "en" ? ASCII_ADV_EN : ASCII_ADV_JA;
+  const raw = c >= 32 && c <= 126 ? table[c - 32] / 1000 : 1.0;
+  return Math.max(0.05, raw - TRACKING_EM);
+};
 
 /**
  * シーンごとに回す色。
@@ -251,10 +287,11 @@ const fitFontSize = (
   bandHeight: number,
   cos: number,
   sin: number,
+  market: string,
 ): number => {
   const em = Math.max(
     0.5,
-    ...lines.map((l) => Array.from(l).reduce((s, c) => s + advanceEm(c), 0)),
+    ...lines.map((l) => Array.from(l).reduce((s, c) => s + advanceEm(c, market), 0)),
   );
   const tall = lines.length * LINE_HEIGHT;
   return Math.min(
@@ -264,10 +301,88 @@ const fitFontSize = (
   );
 };
 
+/** 和文（ひらがな・カタカナ・漢字）を含むか。含まなければ英語として扱う */
+const hasJapanese = (s: string): boolean =>
+  /[぀-ヿ㐀-鿿ｦ-ﾟ]/.test(s);
+
+type Candidate = { lines: string[]; quality: number };
+
+/**
+ * 日本語の候補。1〜3行のすべての切り方を、禁則と語の切れ目で採点する。
+ * ★4文字以下は改行しない（NO_BREAK_MAX_CHARS）。
+ */
+const japaneseCandidates = (chars: string[]): Candidate[] => {
+  const n = chars.length;
+  const out: Candidate[] = [{ lines: [chars.join("")], quality: 1 }];
+  if (n <= NO_BREAK_MAX_CHARS) return out;
+
+  const breaksList: number[][] = [];
+  for (let i = 1; i < n; i++) breaksList.push([i]);
+  for (let i = 1; i < n; i++) {
+    for (let j = i + 1; j < n; j++) breaksList.push([i, j]);
+  }
+
+  for (const breaks of breaksList) {
+    let quality = 1;
+    for (const b of breaks) quality *= breakQuality(chars, b);
+    if (quality === 0) continue; // 禁則
+
+    const lines = sliceAt(chars, breaks);
+    /*
+     * ★1文字だけの行は、**漢字・カタカナ・英数のときだけ許す。**
+     *   「神／ツール」の「神」は1文字でも語なので良い。
+     *   「も／う戻れ／ない」の「も」は語ではない。
+     *   単独のひらがな1文字は、ほぼ助詞か送り仮名の断片である。
+     */
+    const badSingle = lines.some((l) => {
+      const cs = Array.from(l);
+      return cs.length === 1 && (classOf(cs[0]) === "kana" || classOf(cs[0]) === "other");
+    });
+    if (badSingle) continue;
+
+    out.push({ lines, quality });
+  }
+  return out;
+};
+
+/**
+ * 英語の候補（2026-09-05）。
+ *
+ * ★**スペースでしか切らない。単語は絶対に割らない。**
+ *   日本語の規則（禁則・助詞・文字種の境界）は英語に1つも当てはまらない。
+ *   そのまま流すと ASCII は全部同じ文字種なので「INS／ANE」のように
+ *   単語の途中で切れる。**Aアカウントをこの経路に載せる前に必ず要る。**
+ * ★1語だけなら必ず1行。長くても割らない（"INSANE" を割る方法は無い）。
+ *   日本語側の「4文字以下は改行しない」に相当するのがこれ。
+ * ★スペースでの改行はどこで切っても等しく正しいので、採点は全て 1。
+ *   あとは「一番大きく描ける分け方」が選ばれる。
+ */
+const latinCandidates = (text: string): Candidate[] => {
+  const words = text.split(/\s+/).filter(Boolean);
+  const w = words.length;
+  const out: Candidate[] = [{ lines: [words.join(" ")], quality: 1 }];
+  if (w <= 1) return out;
+
+  for (let i = 1; i < w; i++) {
+    out.push({ lines: [words.slice(0, i).join(" "), words.slice(i).join(" ")], quality: 1 });
+    for (let j = i + 1; j < w; j++) {
+      out.push({
+        lines: [
+          words.slice(0, i).join(" "),
+          words.slice(i, j).join(" "),
+          words.slice(j).join(" "),
+        ],
+        quality: 1,
+      });
+    }
+  }
+  return out;
+};
+
 /**
  * 改行位置を**総当たりで**決める。
  *
- * 1〜3行のすべての切り方（15文字でも200通り未満）について
+ * すべての候補について
  *   点数 = 入る文字サイズ × 改行の良さの積
  * を出し、一番高いものを採る。同点なら行数の少ない方（先に試す方）。
  *
@@ -280,54 +395,28 @@ export const layoutTelop = (
   width: number,
   bandHeight: number,
   tiltDeg: number,
+  market: string = "ja",
 ): { lines: string[]; fontSize: number } => {
-  const chars = Array.from(text.trim());
-  const n = chars.length;
-  if (!n) return { lines: [""], fontSize: 0 };
+  const trimmed = text.trim();
+  const chars = Array.from(trimmed);
+  if (!chars.length) return { lines: [""], fontSize: 0 };
 
   const rad = (Math.abs(tiltDeg) * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
 
-  // 1行、2行、3行の順に候補を並べる（同点なら行数の少ない方が残る）
-  const candidates: number[][] = [[]];
-  if (n > NO_BREAK_MAX_CHARS) {
-    for (let i = 1; i < n; i++) candidates.push([i]);
-    for (let i = 1; i < n; i++) {
-      for (let j = i + 1; j < n; j++) candidates.push([i, j]);
-    }
-  }
+  // ★書き分けは**中身の文字**で決める。market の指定漏れで日本語が
+  //   英語の規則に落ちると単語どころか文が壊れるため、両方を見る。
+  const candidates =
+    market === "en" && !hasJapanese(trimmed)
+      ? latinCandidates(trimmed)
+      : japaneseCandidates(chars);
 
-  let best = { lines: [chars.join("")], fontSize: 0, score: -1 };
-  for (const breaks of candidates) {
-    let quality = 1;
-    for (const b of breaks) quality *= breakQuality(chars, b);
-    if (quality === 0) continue; // 禁則
-
-    const lines = sliceAt(chars, breaks);
-    /*
-     * ★1文字だけの行は、**漢字・カタカナ・英数のときだけ許す。**
-     *
-     *   「神／ツール」の「神」は1文字でも語なので良い。
-     *   「も／う戻れ／ない」の「も」は語ではない。
-     *
-     *   単独のひらがな1文字は、ほぼ助詞か送り仮名の断片である。
-     *   助詞の誤判定（「もう」の「も」を助詞と読む等）が作る切り方は、
-     *   この1行で全部落ちる。全体が1文字の時は1行の候補が残る。
-     */
-    if (
-      lines.length > 1 &&
-      lines.some((l) => {
-        const cs = Array.from(l);
-        return cs.length === 1 && (classOf(cs[0]) === "kana" || classOf(cs[0]) === "other");
-      })
-    ) {
-      continue;
-    }
-
-    const fontSize = fitFontSize(lines, width, bandHeight, cos, sin);
-    const score = fontSize * quality;
-    if (score > best.score) best = { lines, fontSize, score };
+  let best = { lines: [trimmed], fontSize: 0, score: -1 };
+  for (const c of candidates) {
+    const fontSize = fitFontSize(c.lines, width, bandHeight, cos, sin, market);
+    const score = fontSize * c.quality;
+    if (score > best.score) best = { lines: c.lines, fontSize, score };
   }
   return { lines: best.lines, fontSize: best.fontSize };
 };
@@ -340,13 +429,15 @@ export const HookTelop: React.FC<{
   style: TelopStyle;
   /** この回の色。Video.tsx が job_id から決めて渡す */
   color: string;
-}> = ({ text, durationInFrames, style, color }) => {
+  /** "ja" か "en"。書体の実寸表と改行規則の切り替えに使う */
+  market: string;
+}> = ({ text, durationInFrames, style, color, market }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
   const bandTop = height * BAND_TOP_RATIO;
   const bandHeight = height * BAND_BOTTOM_RATIO - bandTop;
-  const { lines, fontSize } = layoutTelop(text, width, bandHeight, style.tiltDeg);
+  const { lines, fontSize } = layoutTelop(text, width, bandHeight, style.tiltDeg, market);
   const blockHeight = lines.length * fontSize * LINE_HEIGHT;
   const outline = Math.max(2, fontSize * style.outlineRatio);
 

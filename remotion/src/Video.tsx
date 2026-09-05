@@ -93,6 +93,7 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
             durationInFrames={durationInFrames}
             style={telopStyles[i % telopStyles.length]}
             color={telopColors[i % telopColors.length]}
+            market={script.market ?? "ja"}
           />
         ) : null}
       </Sequence>
