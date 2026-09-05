@@ -44,9 +44,10 @@ const WIDTH_MARGIN = 0.96;
 /** 1文字の上限（画面幅比）。これ以上は1文字で画面が埋まる */
 const MAX_FONT_RATIO = 0.4;
 
-/** 4行にすると1文字が小さくなり、殴る力が消える */
-const MAX_LINES = 3;
-
+/*
+ * ★行数は1〜3。4行にすると1文字が小さくなり、殴る力が消える。
+ *   下の候補の作り方（1行・2行・3行のみ列挙）がこの上限そのもの。
+ */
 const LINE_HEIGHT = 1.0;
 
 /** 置ける帯（画面高さ比）。走る字幕は 0.6 にある */
@@ -123,26 +124,134 @@ export const shuffledBySeed = <T,>(arr: T[], seed: number): T[] => {
   return a;
 };
 
-/** 指定した行数へ、なるべく均等に割る（日本語は分かち書きしないので文字数で割る） */
-export const splitIntoLines = (text: string, lines: number): string[] => {
-  const t = text.trim();
-  const per = Math.max(1, Math.ceil(t.length / lines));
-  const out: string[] = [];
-  for (let i = 0; i < t.length; i += per) out.push(t.slice(i, i + per));
-  return out.length ? out : [t];
+/*
+ * 【改行位置（2026-09-05・オーナー指示「キリの良い改行もしてな」）】
+ *
+ * 前の版は**文字数で機械的に割っていた**ので
+ *   神ツール → 「神ツ／ール」   熱意ある人材 → 「熱意あ／る人材」
+ * のように語の途中で切れていた。
+ *
+ * ★形態素解析は入れない。CLAUDE.md の「確率で出力が揺れる処理を構成に
+ *   持ち込まない」に反するうえ、辞書を抱えると描画が重くなる。
+ *   代わりに、**印刷物の禁則処理と同じ決定論的な規則**だけで判定する。
+ *     1. 禁則（行頭・行末に置いてはいけない文字）は必ず弾く
+ *     2. 助詞の直後は語の切れ目 → 良い改行
+ *     3. 文字種の境界（漢字↔ひらがな↔カタカナ↔英数）も語の切れ目 → 良い改行
+ *     4. 行頭が助詞になる切り方は避ける
+ *   同じ文字種の途中で切るのは「悪い改行」として点を下げるだけで、
+ *   禁止はしない。**大きさの利得が十分あれば許す**（1.67倍以上）。
+ */
+
+/** この文字で行を**始めない**（行頭禁則）。小書き仮名・長音・閉じ括弧・句読点 */
+const NO_LINE_START =
+  "、。，．,.・:：;；?？!！ー―‐〜～)）]］}｝」』】〉》>'’\"”%‰℃" +
+  "ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ々ゝゞヽヾ";
+
+/** この文字で行を**終えない**（行末禁則）。開き括弧 */
+const NO_LINE_END = "(（[［{｛「『【〈《<“‘";
+
+/**
+ * 1文字の助詞。この直後は切れ目、この直前は切れ目でない。
+ * ★か・ね・よ・や（終助詞）は**入れない**。語の中に頻繁に出るため
+ *   誤判定する（「静か」の「か」を助詞と読んで「静か｜すぎる」が
+ *   正解に見えていた。**たまたま当たっていただけ**なので外した）。
+ */
+const PARTICLES = "がのをにへとでもは";
+
+/**
+ * この文字列で始まるなら、その手前は語の切れ目。
+ * ★辞書ではなく**閉じた短い一覧**。形態素解析は入れない方針のまま、
+ *   助詞でも文字種の境界でもない切れ目（接尾語・助動詞）だけを拾う。
+ *   増やす時は「語の途中に現れないか」を確かめてから足すこと。
+ */
+const SUFFIX_STARTS = ["すぎる", "すぎ", "そう", "ない", "たい", "ます", "れる"];
+
+/** 悪い改行の減点。1.0/この値 = 1.67倍。これ未満の利得なら悪い改行はしない */
+const POOR_BREAK = 0.6;
+
+type CharClass = "kanji" | "kana" | "kata" | "ascii" | "other";
+
+const classOf = (ch: string): CharClass => {
+  const c = ch.codePointAt(0) ?? 0;
+  if (c < 0x100) return "ascii";
+  if (c >= 0x3040 && c <= 0x309f) return "kana";
+  if ((c >= 0x30a0 && c <= 0x30ff) || (c >= 0xff66 && c <= 0xff9f)) return "kata";
+  if ((c >= 0x4e00 && c <= 0x9fff) || c === 0x3005) return "kanji";
+  return "other";
 };
 
 /**
- * 1〜3行のうち、**一番文字が大きくなる割り方**を選ぶ。
- *
- * 行を増やすと1行の文字数が減って字は大きくなるが、全体が縦に伸びる。
- * さらに傾けると外接する箱が縦横に広がる。3つの制約を同時に満たす
- * 最大値を、行数ごとに解いて一番大きいものを採る。
+ * 位置 i（i文字目の前）で改行した時の良さ。0なら禁則で切れない。
+ * ★純粋関数。描画せずに数値だけで検証できるようにするため。
+ */
+export const breakQuality = (chars: string[], i: number): number => {
+  const a = chars[i - 1];
+  const b = chars[i];
+  if (NO_LINE_START.includes(b)) return 0; // 行頭禁則
+  if (NO_LINE_END.includes(a)) return 0; // 行末禁則
+  if (PARTICLES.includes(b)) return 0.5; // 行頭が助詞になる切り方は避ける
+  if (PARTICLES.includes(a)) return 1; // 助詞の直後は語の切れ目
+  const rest = chars.slice(i).join("");
+  if (SUFFIX_STARTS.some((w) => rest.startsWith(w))) return 1; // 接尾語の手前
+  const ca = classOf(a);
+  const cb = classOf(b);
+  if (ca !== cb) {
+    /*
+     * ★漢字→ひらがな は**送り仮名の可能性がある**ので下げる。
+     *   「戻れない」を「戻｜れない」、「死んだ」を「死｜んだ」と切ると
+     *   語が割れる。逆向き（ひらがな→漢字）は新しい語の始まりなので満点。
+     */
+    return cb === "kana" ? 0.75 : 1;
+  }
+  return POOR_BREAK; // 同じ文字種の途中
+};
+
+/** 改行位置の配列から行へ切り出す */
+const sliceAt = (chars: string[], breaks: number[]): string[] => {
+  const out: string[] = [];
+  let prev = 0;
+  for (const b of [...breaks, chars.length]) {
+    out.push(chars.slice(prev, b).join(""));
+    prev = b;
+  }
+  return out;
+};
+
+/**
+ * この行割りで入る最大の文字サイズ。傾きを織り込む。
  *
  *   横: (幅em·cosθ + 行数·行高·sinθ) · fontSize ≤ 画面幅 · 余白
  *   縦: (幅em·sinθ + 行数·行高·cosθ) · fontSize ≤ 置ける帯の高さ
  *   上限: fontSize ≤ 画面幅 · MAX_FONT_RATIO
+ */
+const fitFontSize = (
+  lines: string[],
+  width: number,
+  bandHeight: number,
+  cos: number,
+  sin: number,
+): number => {
+  const em = Math.max(
+    0.5,
+    ...lines.map((l) => Array.from(l).reduce((s, c) => s + advanceEm(c), 0)),
+  );
+  const tall = lines.length * LINE_HEIGHT;
+  return Math.min(
+    (width * WIDTH_MARGIN) / (em * cos + tall * sin),
+    bandHeight / (em * sin + tall * cos),
+    width * MAX_FONT_RATIO,
+  );
+};
+
+/**
+ * 改行位置を**総当たりで**決める。
  *
+ * 1〜3行のすべての切り方（15文字でも200通り未満）について
+ *   点数 = 入る文字サイズ × 改行の良さの積
+ * を出し、一番高いものを採る。同点なら行数の少ない方（先に試す方）。
+ *
+ * ★総当たりにしたのは、貪欲法だと「1つ目の改行を良い位置に取ったせいで
+ *   2つ目が語の途中になる」が起きるため。候補が少ないので全部見てよい。
  * ★純粋関数にしてある。描画せずに数値だけで検証できるようにするため。
  */
 export const layoutTelop = (
@@ -151,26 +260,53 @@ export const layoutTelop = (
   bandHeight: number,
   tiltDeg: number,
 ): { lines: string[]; fontSize: number } => {
+  const chars = Array.from(text.trim());
+  const n = chars.length;
+  if (!n) return { lines: [""], fontSize: 0 };
+
   const rad = (Math.abs(tiltDeg) * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
 
-  let best = { lines: [text.trim()], fontSize: 0 };
-  for (let n = 1; n <= MAX_LINES; n++) {
-    const lines = splitIntoLines(text, n);
-    const em = Math.max(
-      0.5,
-      ...lines.map((l) => Array.from(l).reduce((s, c) => s + advanceEm(c), 0)),
-    );
-    const tall = lines.length * LINE_HEIGHT;
-    const fontSize = Math.min(
-      (width * WIDTH_MARGIN) / (em * cos + tall * sin),
-      bandHeight / (em * sin + tall * cos),
-      width * MAX_FONT_RATIO,
-    );
-    if (fontSize > best.fontSize) best = { lines, fontSize };
+  // 1行、2行、3行の順に候補を並べる（同点なら行数の少ない方が残る）
+  const candidates: number[][] = [[]];
+  for (let i = 1; i < n; i++) candidates.push([i]);
+  for (let i = 1; i < n; i++) {
+    for (let j = i + 1; j < n; j++) candidates.push([i, j]);
   }
-  return best;
+
+  let best = { lines: [chars.join("")], fontSize: 0, score: -1 };
+  for (const breaks of candidates) {
+    let quality = 1;
+    for (const b of breaks) quality *= breakQuality(chars, b);
+    if (quality === 0) continue; // 禁則
+
+    const lines = sliceAt(chars, breaks);
+    /*
+     * ★1文字だけの行は、**漢字・カタカナ・英数のときだけ許す。**
+     *
+     *   「神／ツール」の「神」は1文字でも語なので良い。
+     *   「も／う戻れ／ない」の「も」は語ではない。
+     *
+     *   単独のひらがな1文字は、ほぼ助詞か送り仮名の断片である。
+     *   助詞の誤判定（「もう」の「も」を助詞と読む等）が作る切り方は、
+     *   この1行で全部落ちる。全体が1文字の時は1行の候補が残る。
+     */
+    if (
+      lines.length > 1 &&
+      lines.some((l) => {
+        const cs = Array.from(l);
+        return cs.length === 1 && (classOf(cs[0]) === "kana" || classOf(cs[0]) === "other");
+      })
+    ) {
+      continue;
+    }
+
+    const fontSize = fitFontSize(lines, width, bandHeight, cos, sin);
+    const score = fontSize * quality;
+    if (score > best.score) best = { lines, fontSize, score };
+  }
+  return { lines: best.lines, fontSize: best.fontSize };
 };
 
 export const HookTelop: React.FC<{
