@@ -344,6 +344,33 @@ jobs:
           cd ..
           ls -lh out.mp4
 
+      # ★★2026-09-05、**出来上がった動画そのものを検査する**。
+      #
+      #   実行#41は全ステップ成功で終わったのに、音声トラックが
+      #   1本も入っていなかった（E-010）。原因は相対パスの取り違えで、
+      #   描画側は「音声が見つかりません（無音で続行）」と縮退して
+      #   成功扱いにする。**成功したかどうかを、工程ではなく成果物で
+      #   判定していなかった**ことが、見逃した本当の理由。
+      #
+      #   ナレーションを作った回（narration.mp3 がある回）は、
+      #   音声トラックが無ければ**落とす**。無音の動画を配ってから
+      #   気づくより、ここで止めた方が安い。
+      - name: 出来上がった動画を検査する
+        run: |
+          set -euo pipefail
+          ffprobe -v error -show_entries stream=index,codec_type,codec_name \
+            -show_entries format=duration -of default=nw=1 out.mp4
+          if [ -s narration.mp3 ]; then
+            if ! ffprobe -v error -select_streams a \
+                 -show_entries stream=codec_type -of csv=p=0 out.mp4 | grep -q audio; then
+              echo "::error::ナレーションを作ったのに、動画に音声トラックがありません（E-010の再発）"
+              exit 1
+            fi
+            echo "音声トラックあり。"
+          else
+            echo "ナレーションを作っていない回なので、音声の検査はしません。"
+          fi
+
       # ★★2026-09-02、日本市場の部署（jmas-ai-os）向け。
       #   TikTok / Instagram の投稿APIは「公開URLから動画を取りに来る」方式で、
       #   このリポジトリは private なので Release アセットは取りに来られない。
