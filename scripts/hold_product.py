@@ -23,7 +23,9 @@ import subprocess
 import sys
 
 SMOOTH_WINDOW = 7      # 手首座標の移動平均の窓（フレーム）
-POSE_MODEL = '/root/.mp/pose.task'
+# ★/root はActionsのランナーで書けない（実測）。HOME配下を既定にする
+POSE_MODEL = os.path.join(os.environ.get('MP_DIR',
+                          os.path.expanduser('~/.mp')), 'pose.task')
 
 # 手首から見た商品の置き方。商品画像の「握る位置」を手首へ合わせる
 GRIP_X_RATIO = 0.50    # 商品画像の横のどこを握るか（0=左端）

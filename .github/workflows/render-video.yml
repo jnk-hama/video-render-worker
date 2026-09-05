@@ -178,11 +178,32 @@ jobs:
           print('onnxruntime', onnxruntime.__version__,
                 onnxruntime.get_available_providers())
           PY
-          # 姿勢推定のモデル（5.6MB）。rembgのモデルは初回利用時に自動取得
-          mkdir -p /root/.mp
-          curl -sSL --max-time 120 -o /root/.mp/pose.task \
-            "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task"
-          ls -lh /root/.mp/pose.task
+          # ★★2026-09-05、実データで踏んだ不具合を直した。
+          #   `mkdir -p /root/.mp` で
+          #     mkdir: cannot create directory '/root': Permission denied
+          #   になり、ステップごと落ちていた。Actionsのランナーは runner
+          #   ユーザーで動くので /root は書けない。**この経路が実際に走ったのは
+          #   今回が初めて**で、それまで気づけなかった。
+          #
+          #   ★あわせて、姿勢推定のモデルは**要る回だけ**落とす。
+          #     商品の切り抜き（foreground）だけの回に 5.6MB を取りに行く
+          #     理由が無い。無料枠は1秒でも短い方がよい。
+          MP_DIR="${MP_DIR:-$HOME/.mp}"
+          if python3 - <<'PY'
+          import json, sys
+          d = json.load(open('payload.json'))
+          if isinstance(d.get('job'), dict):
+              d = d['job']
+          sys.exit(0 if (d.get('hold') or d.get('product')) else 1)
+          PY
+          then
+            mkdir -p "$MP_DIR"
+            curl -sSL --max-time 120 -o "$MP_DIR/pose.task" \
+              "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task"
+            ls -lh "$MP_DIR/pose.task"
+          else
+            echo "姿勢推定は使わない回なので、モデルは落としません。"
+          fi
 
       # ★★2026-09-04、描画方式の呼び分け（決定#088）。
       #   payload の renderer が "remotion" の回だけ Remotion で描く。

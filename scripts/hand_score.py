@@ -39,7 +39,9 @@ import os
 import subprocess
 import sys
 
-POSE_MODEL = '/root/.mp/hand.task'
+# ★/root はActionsのランナーで書けない（実測）。HOME配下を既定にする
+POSE_MODEL = os.path.join(os.environ.get('MP_DIR',
+                          os.path.expanduser('~/.mp')), 'hand.task')
 MODEL_URL = ('https://storage.googleapis.com/mediapipe-models/hand_landmarker/'
              'hand_landmarker/float16/1/hand_landmarker.task')
 
