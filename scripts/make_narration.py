@@ -105,6 +105,37 @@ def main():
             s["seconds"] = round(float(s["seconds"]) * k, 3)
         log("シーンの尺を音声に合わせました: %.2f秒 → %.2f秒" % (total, duration))
 
+    """
+    ★★2026-09-05、**既存形式（clips）でも同じ調整をする**ようにした。
+
+    上の処理は scenes を持つ台本にしか効かない。ところが依頼側
+    （process-job / GAS）が送ってくるのは今も clips 形式で、scenes へ
+    変換するのは描画の直前（render.mjs の adaptLegacyPayload）である。
+    つまり**本番の経路では一度も効いていなかった**。
+
+    実行#41でそれが出た:
+      音声 21.14秒 ／ 台本: 5シーン / 30.0秒
+    ナレーションが21秒で終わり、残り9秒が無音のまま流れる。
+    30秒のうち3割が無言の動画は、最後まで見られない。
+
+    clip_seconds（全シーン共通）と clips[].duration（個別指定）の
+    両方を同じ比率で伸縮させる。★どちらが使われるかは描画側が決めるので、
+    片方だけ直すと不整合になる。
+    """
+    clips = job.get("clips") or []
+    if not scenes and clips and duration > 0:
+        each = float(job.get("clip_seconds") or 0)
+        total = sum(float(c.get("duration") or each) for c in clips)
+        if total > 0 and abs(total - duration) > 0.2:
+            k = duration / total
+            if each:
+                job["clip_seconds"] = round(each * k, 3)
+            for c in clips:
+                if c.get("duration"):
+                    c["duration"] = round(float(c["duration"]) * k, 3)
+            log("シーンの尺を音声に合わせました: %.2f秒 → %.2f秒（clips形式）"
+                % (total, duration))
+
     json.dump(raw, open(args.out, "w", encoding="utf-8"), ensure_ascii=False)
     log("音声 %.2f秒 / %s" % (duration, args.audio))
 

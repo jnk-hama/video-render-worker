@@ -177,11 +177,22 @@ const toDataUri = async (url) => {
  */
 const fileToDataUri = (p, mime) => {
   if (!p || /^(https?:|data:)/i.test(p)) return p;
-  if (!fs.existsSync(p)) {
+  /*
+   * ★★2026-09-05、実データで踏んだ不具合を直した。
+   *   ワークフローは `cd remotion` してから描画するので、cwd はリポジトリの
+   *   remotion/ になる。ところが narration.mp3 を作るのは1つ上の階層で、
+   *   台本には相対パスのまま入っている。結果、
+   *     音声が見つかりません（無音で続行）: narration.mp3
+   *   となり、**音の無い動画が「成功」として出ていた**（実行#41）。
+   *   落ちないので気づきにくい。製品画像（toDataUri）は既に1つ上も見て
+   *   いたので、音声だけ取り残されていた。同じ探し方に揃える。
+   */
+  const local = fs.existsSync(p) ? p : path.resolve("..", p);
+  if (!fs.existsSync(local)) {
     console.warn(`  音声が見つかりません（無音で続行）: ${p}`);
     return null;
   }
-  const buf = fs.readFileSync(p);
+  const buf = fs.readFileSync(local);
   return `data:${mime};base64,${buf.toString("base64")}`;
 };
 

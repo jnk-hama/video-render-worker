@@ -150,8 +150,20 @@ def main():
             log("次回のために保存しました: %s" % path)
         except Exception as e:
             # ★保存に失敗しても止めない。今回の動画は既に出来ている
-            log("キャッシュに保存できませんでした（今回の動画には影響なし）: %s"
-                % str(e)[:120])
+            #
+            # ★★2026-09-05、**応答の本文も出す**ようにした。
+            #   実行#41では「HTTP Error 400: Bad Request」としか出ず、
+            #   原因が分からないまま描画1本分を無駄にした。本文には
+            #     mime type image/png is not supported
+            #   と書いてあった（videos バケットが video/mp4 しか許可して
+            #   いなかった）。1行読めば済む話に、描画1回分を払わない。
+            body = ""
+            try:
+                body = " / " + e.read().decode("utf-8", "replace")[:200]
+            except Exception:
+                pass
+            log("キャッシュに保存できませんでした（今回の動画には影響なし）: %s%s"
+                % (str(e)[:120], body))
         return
 
     sys.exit("--check か --put のどちらかを指定してください")

@@ -280,13 +280,29 @@ jobs:
           cache: npm
           cache-dependency-path: remotion/package-lock.json
 
+      # ★npm ci は node_modules を作り直すので、その中に置かれる
+      #   Chrome のキャッシュより**先に**済ませておく必要がある。
+      - name: 依存を入れる（Remotion）
+        if: steps.renderer.outputs.engine == 'remotion'
+        run: |
+          set -euo pipefail
+          cd remotion
+          npm ci --no-audit --no-fund
+
+      # ★★2026-09-05、実行#41で「保存されていない」ことが分かったので直した。
+      #   ログ:
+      #     Cache not found for input keys: remotion-chrome-Linux
+      #     Path Validation Error: Path(s) specified in the action for caching
+      #     do(es) not exist, hence no cache is being saved.
+      #   Remotion 4 の置き場所は ~/.cache/remotion ではなく
+      #   **<package.json のある階層>/node_modules/.remotion** だった
+      #   （@remotion/renderer の get-download-destination.js を読んで確認）。
+      #   node_modules の中なので、npm ci の**後**に戻さないと消える。
       - name: Chrome Headless Shell をキャッシュから戻す
         if: steps.renderer.outputs.engine == 'remotion'
         uses: actions/cache@v4
         with:
-          # ★毎回ダウンロードすると1本あたり1〜2分増える。
-          #   1日16本なら月に約500〜1,000分。無料枠2,000分に対して致命的。
-          path: ~/.cache/remotion
+          path: remotion/node_modules/.remotion
           key: remotion-chrome-${{ runner.os }}
 
       - name: ナレーションを作る（Remotion用）
@@ -309,15 +325,21 @@ jobs:
           #     soft 60fps ブラー2     19.42秒/秒
           #     high 60fps ブラー4     35.64秒/秒
           #   ★決定#093で尺が30秒になったため既定は std（30fps/CRF18）。
-          #     2コア換算・30秒の動画・12本/日で月あたり:
-          #       std(30fps) 1,440分 / mid(60fps) 2,520分 ★超過
-          #     60fpsは13秒構成なら載るが、30秒構成では枠を超える。
-          #     尺と滑らかさは同時に取れない。構成（PASONA）を優先した。
+          #
+          #   ★★2026-09-05、**上の4コアの数字から2コアを推定したのが間違って
+          #     いた**（実行#41で実測）。30秒/30fps/std の実測は
+          #       描画 263.7秒（動画1秒あたり 8.79秒）／ジョブ全体 384秒
+          #     で、4コアの low(4.08秒/秒) に対して約2.2倍。私は1.31倍で
+          #     見積もり、月1,440分と報告したが、**実際は約2,160分**。
+          #     推定を実測として扱わない（#079と同じ間違い）。
+          #     現在の実測に基づく月あたり（12本/日・30日）:
+          #       透過キャッシュ有 6分/本 → 2,160分 ★無料枠2,000分を超過
+          #       10本/日なら        6分/本 → 1,800分  収まる
+          #     本数か尺のどちらかを削るか、有料分を認めるかは要判断。
           RENDER_QUALITY: ${{ vars.RENDER_QUALITY || 'std' }}
         run: |
           set -euo pipefail
           cd remotion
-          npm ci --no-audit --no-fund
           node scripts/render.mjs --payload ../payload_tts.json --out ../out.mp4
           cd ..
           ls -lh out.mp4
