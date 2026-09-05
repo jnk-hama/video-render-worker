@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-05T10:43:06+00:00",
+ "generated_at": "2026-09-05T15:21:54+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -22,9 +22,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w1l9x5",
-    "title": "He is the first to write a review about that parachute",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w1l9x5/he_is_the_first_to_write_a_review_about_that/",
+    "id": "t3_1w70oug",
+    "title": "That core strength is lit",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w70oug/that_core_strength_is_lit/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,55 +40,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w70oug",
-    "title": "That core strength is lit",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w70oug/that_core_strength_is_lit/",
+    "id": "t3_1w5rrvv",
+    "title": "Kelly casually belting A5 on a fucking monday morning mind you ✨⭐️✨",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w5rrvv/kelly_casually_belting_a5_on_a_fucking_monday/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5b7mo",
-    "title": "Fishermen off Coronel cut rope and buoys from an orca's tail after it approached their boat",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w5b7mo/fishermen_off_coronel_cut_rope_and_buoys_from_an/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w2hmvb",
+    "title": "The branch manager hard at work",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w2hmvb/the_branch_manager_hard_at_work/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6t60v",
-    "title": "A person stuck in tunnel after the flash flood getting rescued after 9 days",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w6t60v/a_person_stuck_in_tunnel_after_the_flash_flood/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w4jfzi",
+    "title": "Meet Dr. Mariangela Hungaria",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w4jfzi/meet_dr_mariangela_hungaria/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w3wple",
-    "title": "Duane Keith Davis has been found guilty of the murder of Tupac Shakur",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w3wple/duane_keith_davis_has_been_found_guilty_of_the/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w4osw6",
+    "title": "Tiny hero girl stops runaway horse",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w4osw6/tiny_hero_girl_stops_runaway_horse/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4i9xh",
-    "title": "Students get smudged by indigenous elders for peace and blessings throughout the year",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w4i9xh/students_get_smudged_by_indigenous_elders_for/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w7ur18",
+    "title": "This street art goes hard.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w7ur18/this_street_art_goes_hard/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4alby",
-    "title": "An incredible variety of moths attracted to an illuminated sheet. This technique is called light sheeting",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w4alby/an_incredible_variety_of_moths_attracted_to_an/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w3kp3o",
+    "title": "A baby Water Buffalo around his family",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w3kp3o/a_baby_water_buffalo_around_his_family/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -231,48 +231,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w6448i",
-    "title": "Inazuma if it was released today (Vesna corner because yes)",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w6448i/inazuma_if_it_was_released_today_vesna_corner/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w2jy30",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 10 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w2jy30/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w2l83z",
-    "title": "The Downfall of Universal Supports might be one of the saddest part of Genshin",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w2l83z/the_downfall_of_universal_supports_might_be_one/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w41lza",
-    "title": "Just realized that if we recommend a New Player to get Mizuki as their free Standard Character for the SSW, they will have to go to Natlan for the Boss Mats. Fontaine for the Stellar Buff. Inazuma for the Talent Mats. Snezhnaya for the Artifact. Mrs Worldwide.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w41lza/just_realized_that_if_we_recommend_a_new_player/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w50sgz",
-    "title": "Just a reminder you can summon your train anywhere on the tracks, not just at the station.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w50sgz/just_a_reminder_you_can_summon_your_train/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w49hxw",
-    "title": "Hoyo got so tired of people asking where nod krai’s forest is so they’ve decided to create one in real life",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w49hxw/hoyo_got_so_tired_of_people_asking_where_nod/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    }
   ]
