@@ -242,6 +242,7 @@ for (const key of ["narrationUrl", "bgmUrl"]) {
  */
 const SFX_TAGS = ["fire", "neon", "pop", "shock", "clean"];
 if (Array.isArray(script.sfx) && script.sfx.length) {
+  const before = script.sfx.length;
   script.sfx = script.sfx
     .filter((c) => SFX_TAGS.includes(c.tag))
     .map((c) => {
@@ -254,6 +255,19 @@ if (Array.isArray(script.sfx) && script.sfx.length) {
       ? `効果音 ${script.sfx.length}個（${script.sfx.map((c) => c.tag).join(", ")}）`
       : "効果音なし",
   );
+  /*
+   * ★★鳴らすつもりだったのに1つも解決できなかったら**落とす**。
+   *
+   *   今日、無音の動画が「成功」として出た（E-010）。原因は
+   *   **工程の成功で判定し、成果物で判定していなかった**こと。
+   *   ここも同じ形をしている：音源が全部見つからなくても描画は完走し、
+   *   ログを最後まで読まない限り誰も気づかない。
+   *   1つでも残れば通す（音が1つ欠けても動画は成立する）。ゼロは設定ミス。
+   */
+  if (before > 0 && script.sfx.length === 0) {
+    console.error(`効果音を${before}個受け取ったのに、1つも読み込めませんでした`);
+    process.exit(1);
+  }
 }
 
 for (const scene of script.scenes) {
