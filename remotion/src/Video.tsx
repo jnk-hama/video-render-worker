@@ -7,7 +7,7 @@ import { Talk } from "./scenes/Talk";
 import { Shot } from "./scenes/Shot";
 import { Captions } from "./components/Captions";
 import { Disclosure } from "./components/Disclosure";
-import { FontFace } from "./lib/fonts";
+import { FontFace, JP_FONT } from "./lib/fonts";
 import { CameraMotionBlur } from "@remotion/motion-blur";
 
 /*
@@ -69,14 +69,22 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
             無いのと同じ（字幕と同じ理由。ここは譲らない）。
         */}
         {telop ? (
-          <HookTelop text={telop} durationInFrames={durationInFrames} accent={accent} />
+          <HookTelop text={telop} durationInFrames={durationInFrames} index={i} />
         ) : null}
       </Sequence>
     );
   });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "#000" }}>
+    /*
+     * ★★2026-09-05、**一番外側に書体を置いた。**
+     *   巨大テロップが1本目で何も描かれなかった原因は、その要素に
+     *   fontFamily を書き忘れたことだった。描画コンテナには
+     *   fonts-dejavu-core しか入っておらず、日本語のグリフが1つも無い。
+     *   ここに置いておけば、以後どこにテキストを足しても既定で日本語が出る。
+     *   （各コンポーネント側の指定は残す。これは保険）
+     */
+    <AbsoluteFill style={{ backgroundColor: "#000", fontFamily: JP_FONT }}>
       {/* ★最初に置く。フォントが当たる前に文字が描かれないように */}
       <FontFace dataUri={script.fontDataUri} />
 

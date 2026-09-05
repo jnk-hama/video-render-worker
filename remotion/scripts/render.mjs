@@ -46,6 +46,23 @@ const script = raw.job ?? raw;
  *   design_tokens   → accent
  */
 const adaptLegacyPayload = (s) => {
+  /*
+   * 巨大テロップ。依頼側の snake_case を Remotion側の名前へ寄せるだけ。
+   * ★空文字は null にして「出さない」を明示する。空文字のまま渡すと
+   *   高さゼロの要素が積まれて、字幕の位置が微妙にずれる。
+   *
+   * ★★**この変換だけは、下の早期returnより前に置く。**
+   *   下には「既にRemotion形式なら何もしない」「clipsが無ければ何もしない」
+   *   の2つの出口がある。前の版はこの変換をその後ろに書いていたため、
+   *   scenes形式で依頼が来た回は巨大テロップが**黙って消える**状態だった。
+   *   （今の依頼側は clips 形式なので表には出ていなかったが、埋まっていた）
+   */
+  if (Array.isArray(s.hook_telops)) {
+    s.hookTelops = s.hook_telops.map((t) => (typeof t === "string" && t.trim() ? t.trim() : null));
+    const n = s.hookTelops.filter(Boolean).length;
+    console.log(n ? `巨大テロップ ${n}枚` : "巨大テロップなし");
+  }
+
   if (Array.isArray(s.scenes) && s.scenes.length) return s; // 既にRemotion形式
 
   const clips = Array.isArray(s.clips) ? s.clips : [];
@@ -113,17 +130,6 @@ const adaptLegacyPayload = (s) => {
    *   現状は「公式の指針」と「語頭を食わない」だけが根拠で、
    *   うちのアカウントで効くかは未確認。
    */
-  /*
-   * 巨大テロップ。依頼側の snake_case を Remotion側の名前へ寄せるだけ。
-   * ★空文字は null にして「出さない」を明示する。空文字のまま渡すと
-   *   高さゼロの要素が積まれて、字幕の位置が微妙にずれる。
-   */
-  if (Array.isArray(s.hook_telops)) {
-    s.hookTelops = s.hook_telops.map((t) => (typeof t === "string" && t.trim() ? t.trim() : null));
-    const n = s.hookTelops.filter(Boolean).length;
-    console.log(n ? `巨大テロップ ${n}枚` : "巨大テロップなし");
-  }
-
   const cues = Array.isArray(s.sfx) ? s.sfx : [];
   s.sfx = cues
     .slice(1, 3)                                   // 1シーン目を落とし、2〜3のみ

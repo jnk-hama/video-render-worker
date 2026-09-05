@@ -315,6 +315,20 @@ jobs:
             --payload ${{ steps.pf.outputs.file }} --audio narration.mp3 --out payload_tts.json
           ls -lh narration.mp3 || echo "音声なしで続行します"
 
+      # ★★2026-09-05 追加。**このコンテナに日本語のフォントは無い。**
+      #   巨大テロップが1本目で1枚も描かれなかった原因が、コンポーネント側の
+      #   fontFamily 書き忘れだった。同梱の Dela Gothic One は data URI で
+      #   `JmasJP` という名前で差し込んでいるので、**その名前を書いた要素に
+      #   しか当たらない**。書き忘れた要素はグリフの無い書体へ落ちて、
+      #   エラーも出さずに透明になる。
+      #   毎回1行だけ記録しておけば、次に同じ症状が出た時に推測しなくて済む。
+      - name: 日本語フォントの前提を記録する
+        if: steps.renderer.outputs.engine == 'remotion'
+        run: |
+          set -uo pipefail
+          n=$(fc-list :lang=ja 2>/dev/null | wc -l)
+          echo "コンテナの日本語フォント: ${n} 件（0が正常。同梱フォントを data URI で差し込む設計）"
+
       - name: 描画（Remotion）
         if: steps.renderer.outputs.engine == 'remotion'
         env:
