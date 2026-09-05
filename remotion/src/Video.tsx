@@ -80,6 +80,24 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
 
       {script.narrationUrl ? <Audio src={script.narrationUrl} /> : null}
       {script.bgmUrl ? <Audio src={script.bgmUrl} volume={0.2} /> : null}
+
+      {/*
+        効果音（2026-09-05）。
+        ★音量0.35は ffmpeg版と同じ値。これより上げるとナレーションの
+          語頭を食う（BGMを0.2に絞っているのと同じ理由）。
+        ★Sequence で置く。at は「全体の尺に対する割合」で渡ってくるので、
+          総フレーム数を掛けてフレームへ直す。**秒を依頼側に推定させない**
+          という設計（依頼側はTTSの尺を知らない）をそのまま守る。
+      */}
+      {(script.sfx ?? []).map((cue, i) => (
+        <Sequence
+          key={`sfx-${i}`}
+          from={Math.round(cue.atRatio * totalFrames(script))}
+          name={`sfx:${cue.tag}`}
+        >
+          <Audio src={cue.src} volume={0.35} />
+        </Sequence>
+      ))}
     </AbsoluteFill>
   );
 };

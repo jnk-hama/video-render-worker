@@ -88,6 +88,38 @@ const adaptLegacyPayload = (s) => {
     return { kind: "talk", seconds, camera, backgroundUrl: c.url, headline: "" };
   });
 
+  /*
+   * ★★効果音（2026-09-05）。ffmpeg版の設計を**そのまま持ち込まない。**
+   *
+   * 【なぜ5つ全部を鳴らさないか】
+   * 依頼側は5シーンぶんの効果音を送ってくる（決定#072）。だが5つ全部を
+   * 毎回同じ位置で鳴らすと、**どの動画も同じリズムになる**。
+   * 台本で「揃っているとAI臭が出る」と戦っているのに、音で同じことを
+   * やっては意味がない。効果音は**句読点**であって、BGMではない。
+   *
+   * 【1シーン目を必ず落とす理由】2つある
+   *   1. TikTokの公式クリエイティブ指針が「最初の3秒に破裂音・アラーム等の
+   *      不快な音を避けろ」と明示している。1シーン目は0〜3秒。
+   *      SFXタグには shock（警告音）と fire が含まれる
+   *   2. キューは at_ratio+0.03（≒0.8秒）に置かれる。ナレーションの語頭と
+   *      ほぼ同時で、語頭を食う（BGMを0.2に絞っているのと同じ理由）
+   *
+   * 【2〜3シーン目に絞る理由】
+   * 効果音が効くのは**話が転換する点**。3番目は商品が初めて出る場所で、
+   * 中盤の離脱を引き戻せる。5番目は寸止めなので、音で押すと押し売りに
+   * 見える。**鳴らさない方が強い。**
+   *
+   * ★完走率の実データが取れたら、この配置は見直す価値がある。
+   *   現状は「公式の指針」と「語頭を食わない」だけが根拠で、
+   *   うちのアカウントで効くかは未確認。
+   */
+  const cues = Array.isArray(s.sfx) ? s.sfx : [];
+  s.sfx = cues
+    .slice(1, 3)                                   // 1シーン目を落とし、2〜3のみ
+    .filter((c) => c && typeof c.tag === "string")
+    .map((c) => ({ tag: c.tag, atRatio: Number(c.at_ratio ?? c.atRatio ?? 0) }))
+    .filter((c) => c.atRatio > 0 && c.atRatio < 1);
+
   s.market = s.target_market || s.market || "ja";
   s.accent = (s.design_tokens && s.design_tokens.accent_color_hex) || s.accent || "#8b5cf6";
   s.width = Number(s.width) || 1080;
@@ -200,6 +232,28 @@ for (const key of ["narrationUrl", "bgmUrl"]) {
   if (script[key]) {
     script[key] = fileToDataUri(script[key], "audio/mpeg");
   }
+}
+
+/*
+ * ★効果音を「タグ」から「音源そのもの」へ直す（2026-09-05）。
+ *   タグ名とファイル名は ffmpeg版（SFX_TAGS）と同じ約束にしてある。
+ *   知らないタグ・見つからない音は**黙って落とす**。音が1つ無くても
+ *   動画は成立するので、ここで描画を止める理由がない。
+ */
+const SFX_TAGS = ["fire", "neon", "pop", "shock", "clean"];
+if (Array.isArray(script.sfx) && script.sfx.length) {
+  script.sfx = script.sfx
+    .filter((c) => SFX_TAGS.includes(c.tag))
+    .map((c) => {
+      const src = fileToDataUri(path.join("..", "assets", "shared", "sfx", `${c.tag}.mp3`), "audio/mpeg");
+      return src ? { ...c, src } : null;
+    })
+    .filter(Boolean);
+  console.log(
+    script.sfx.length
+      ? `効果音 ${script.sfx.length}個（${script.sfx.map((c) => c.tag).join(", ")}）`
+      : "効果音なし",
+  );
 }
 
 for (const scene of script.scenes) {
