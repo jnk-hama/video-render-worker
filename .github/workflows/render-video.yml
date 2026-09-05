@@ -280,6 +280,18 @@ jobs:
 
       - name: 描画（Remotion）
         if: steps.renderer.outputs.engine == 'remotion'
+        env:
+          # ★★品質（決定#090）。実測に基づく既定は mid。
+          #   4コアでの実測（9秒の動画・キャッシュを温めた条件）:
+          #     low  30fps ブラー無し   4.08秒/秒
+          #     mid  60fps ブラー無し   7.90秒/秒
+          #     soft 60fps ブラー2     19.42秒/秒
+          #     high 60fps ブラー4     35.64秒/秒
+          #   2コア換算・13秒の動画・12本/日で月あたり:
+          #     low 720分 / mid 1,080分 / soft 2,520分 / high 3,960分
+          #   **無料枠2,000分に収まるのは low と mid だけ。**
+          #   ブラーを入れたい時は本数を減らすか、有料枠を使う判断が要る。
+          RENDER_QUALITY: ${{ vars.RENDER_QUALITY || 'mid' }}
         run: |
           set -euo pipefail
           cd remotion
