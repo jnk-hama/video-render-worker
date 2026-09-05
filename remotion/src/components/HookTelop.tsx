@@ -41,14 +41,31 @@ import { JP_FONT } from "../lib/fonts";
 /** 文字の外側に残す余白（画面幅比）。回転後の箱がここに収まる */
 const WIDTH_MARGIN = 0.96;
 
-/** 1文字の上限（画面幅比）。これ以上は1文字で画面が埋まる */
-const MAX_FONT_RATIO = 0.4;
+/*
+ * 1文字の上限（画面幅比）。**書体で字面の高さが違うので市場ごとに持つ。**
+ *
+ * ★実測（fontToolsで同梱TTFから）:
+ *     Dela Gothic One の和字 … 字面の高さ 0.77em
+ *     Anton の英大文字       … 字面の高さ 0.859em（sCapHeight）
+ *   **同じ fontSize なら英語の方が12%背が高い。** オーナーの
+ *   「英語はもう少し小さく」は、この差が見えていたということ。
+ * ★英語は上限をさらに下げて 0.26 にした。字面を揃えるだけなら 0.358
+ *   だが、それだと1行に入る語数が増えず「キリのいいところまで入れて」に
+ *   ならない。小さくするほど1行に詰められる。
+ */
+const MAX_FONT_RATIO_JA = 0.4;
+const MAX_FONT_RATIO_EN = 0.26;
+const maxFontRatio = (market: string): number =>
+  market === "en" ? MAX_FONT_RATIO_EN : MAX_FONT_RATIO_JA;
 
 /*
  * ★行数は1〜3。4行にすると1文字が小さくなり、殴る力が消える。
  *   下の候補の作り方（1行・2行・3行のみ列挙）がこの上限そのもの。
  */
 const LINE_HEIGHT = 1.0;
+
+/** 英語も3行まで。4行にすると1文字が小さくなり、殴る力が消える */
+const MAX_LINES_EN = 3;
 
 /** 置ける帯（画面高さ比）。走る字幕は 0.6 にある */
 const BAND_TOP_RATIO = 0.07;
@@ -91,7 +108,7 @@ const ASCII_ADV_EN = [
 const TRACKING_EM = 0.03;
 
 /** 1文字の横幅（em）。書体で違うので market で表を選ぶ */
-const advanceEm = (ch: string, market: string): number => {
+export const advanceEm = (ch: string, market: string): number => {
   const c = ch.codePointAt(0) ?? 0;
   const table = market === "en" ? ASCII_ADV_EN : ASCII_ADV_JA;
   const raw = c >= 32 && c <= 126 ? table[c - 32] / 1000 : 1.0;
@@ -297,7 +314,7 @@ const fitFontSize = (
   return Math.min(
     (width * WIDTH_MARGIN) / (em * cos + tall * sin),
     bandHeight / (em * sin + tall * cos),
-    width * MAX_FONT_RATIO,
+    width * maxFontRatio(market),
   );
 };
 
@@ -346,37 +363,98 @@ const japaneseCandidates = (chars: string[]): Candidate[] => {
 };
 
 /**
- * 英語の候補（2026-09-05）。
+ * 行数を減らすために許すサイズの落ち込み。
+ * 1行にまとめた方がこの割合まで保てるなら、行数の少ない方を採る。
+ * 「キリのいいところまで入れて」＝**行数を増やさず詰める**、の数値表現。
+ */
+const EN_PREFER_FEWER = 0.85;
+
+/**
+ * 英語の行割り（2026-09-05・オーナー指示
+ * 「英語の場合はもう少しサイズ小さくして、キリのいいところまで入れて」）。
  *
  * ★**スペースでしか切らない。単語は絶対に割らない。**
  *   日本語の規則（禁則・助詞・文字種の境界）は英語に1つも当てはまらない。
- *   そのまま流すと ASCII は全部同じ文字種なので「INS／ANE」のように
- *   単語の途中で切れる。**Aアカウントをこの経路に載せる前に必ず要る。**
- * ★1語だけなら必ず1行。長くても割らない（"INSANE" を割る方法は無い）。
- *   日本語側の「4文字以下は改行しない」に相当するのがこれ。
- * ★スペースでの改行はどこで切っても等しく正しいので、採点は全て 1。
- *   あとは「一番大きく描ける分け方」が選ばれる。
+ *   そのまま流すと ASCII は全部同じ文字種なので「INSANE」が「INS／ANE」に
+ *   なり得た。**Aアカウントをこの経路に載せる前に必ず要る。**
+ *
+ * ★1〜3行の**全ての割り方を総当たり**する。日本語側と同じ手筋。
+ *   前の版は「貪欲に詰めてから、入らなければ縮める」だったが、
+ *   **縮めた後に割り直していなかった**ので
+ *     IT COST ME EVERYTHING → 「IT COST／ME／EVERYTHING」（3行）
+ *   になっていた。EVERYTHING が1行に入らずサイズだけ下がり、
+ *   その小さいサイズなら2行で足りるのに3行のままだった。
+ *   総当たりなら、行数とサイズが必ず噛み合う。
+ *
+ * ★選び方は2段。
+ *   1. 各行数で「一番大きく描ける割り方」を出す。同点なら**行の余りが
+ *      均等な方**（IT COST／ME のように1語だけ残る割り方を避ける）
+ *   2. その中から、**サイズが最大の85%以上を保てる一番少ない行数**を採る。
+ *      「入るなら1行に詰める」を数値で表したのがこれ。
  */
-const latinCandidates = (text: string): Candidate[] => {
+const latinLayout = (
+  text: string,
+  width: number,
+  bandHeight: number,
+  cos: number,
+  sin: number,
+  market: string,
+): { lines: string[]; fontSize: number } => {
   const words = text.split(/\s+/).filter(Boolean);
   const w = words.length;
-  const out: Candidate[] = [{ lines: [words.join(" ")], quality: 1 }];
-  if (w <= 1) return out;
+  if (!w) return { lines: [""], fontSize: 0 };
 
-  for (let i = 1; i < w; i++) {
-    out.push({ lines: [words.slice(0, i).join(" "), words.slice(i).join(" ")], quality: 1 });
-    for (let j = i + 1; j < w; j++) {
-      out.push({
-        lines: [
-          words.slice(0, i).join(" "),
-          words.slice(i, j).join(" "),
-          words.slice(j).join(" "),
-        ],
-        quality: 1,
-      });
+  const emOf = (t: string) =>
+    Array.from(t).reduce((a, c) => a + advanceEm(c, market), 0);
+
+  const groupsOf = (cuts: number[]): string[] => {
+    const out: string[] = [];
+    let prev = 0;
+    for (const c of [...cuts, w]) {
+      out.push(words.slice(prev, c).join(" "));
+      prev = c;
     }
+    return out;
+  };
+
+  /** 行数ごとの最善。index は 行数-1 */
+  const best: ({ lines: string[]; fontSize: number; ragged: number } | null)[] = [];
+
+  for (let count = 1; count <= MAX_LINES_EN; count++) {
+    if (count > w) break;
+    const cutsList: number[][] = [];
+    if (count === 1) cutsList.push([]);
+    else if (count === 2) {
+      for (let i = 1; i < w; i++) cutsList.push([i]);
+    } else {
+      for (let i = 1; i < w; i++) {
+        for (let j = i + 1; j < w; j++) cutsList.push([i, j]);
+      }
+    }
+
+    let cur: { lines: string[]; fontSize: number; ragged: number } | null = null;
+    for (const cuts of cutsList) {
+      const lines = groupsOf(cuts);
+      const fontSize = fitFontSize(lines, width, bandHeight, cos, sin, market);
+      // 行の余りの二乗和。小さいほど行の長さが揃っている
+      const room = Math.max(...lines.map(emOf));
+      const ragged = lines.reduce((a, l) => a + (room - emOf(l)) ** 2, 0);
+      if (
+        !cur ||
+        fontSize > cur.fontSize + 1e-9 ||
+        (Math.abs(fontSize - cur.fontSize) <= 1e-9 && ragged < cur.ragged)
+      ) {
+        cur = { lines, fontSize, ragged };
+      }
+    }
+    best.push(cur);
   }
-  return out;
+
+  const top = Math.max(...best.map((b) => (b ? b.fontSize : 0)));
+  for (const b of best) {
+    if (b && b.fontSize >= top * EN_PREFER_FEWER) return { lines: b.lines, fontSize: b.fontSize };
+  }
+  return { lines: [words.join(" ")], fontSize: 0 };
 };
 
 /**
@@ -407,10 +485,10 @@ export const layoutTelop = (
 
   // ★書き分けは**中身の文字**で決める。market の指定漏れで日本語が
   //   英語の規則に落ちると単語どころか文が壊れるため、両方を見る。
-  const candidates =
-    market === "en" && !hasJapanese(trimmed)
-      ? latinCandidates(trimmed)
-      : japaneseCandidates(chars);
+  if (market === "en" && !hasJapanese(trimmed)) {
+    return latinLayout(trimmed, width, bandHeight, cos, sin, market);
+  }
+  const candidates = japaneseCandidates(chars);
 
   let best = { lines: [trimmed], fontSize: 0, score: -1 };
   for (const c of candidates) {
