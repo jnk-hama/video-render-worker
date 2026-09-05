@@ -96,6 +96,12 @@ export type VideoScript = {
    * ここへ来る時点で「鳴らしてよいものだけ」が入っている。
    */
   sfx?: { tag: string; atRatio: number; src: string }[];
+  /**
+   * 巨大テロップ（2026-09-05）。シーンごとに1つ。
+   * 台本の `telop_main2` がそのまま入る。**空なら出さない。**
+   * 走る字幕（captions）とは別物で、こちらは画面上部に大きく殴る。
+   */
+  hookTelops?: (string | null)[];
   captions: Caption[];
   /** 全編に出す広告表記。景表法のステマ規制対応（決定#065） */
   disclosure: string;

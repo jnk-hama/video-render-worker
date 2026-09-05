@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, useVideoConfig } from "remotion";
 import type { VideoScript } from "./types";
+import { HookTelop } from "./components/HookTelop";
 import { InSitu } from "./scenes/InSitu";
 import { Talk } from "./scenes/Talk";
 import { Shot } from "./scenes/Shot";
@@ -52,6 +53,7 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
     const durationInFrames = Math.max(1, Math.round(scene.seconds * fps));
     cursor += durationInFrames;
     const body = renderScene(scene, accent);
+    const telop = (script.hookTelops ?? [])[i];
     return (
       <Sequence key={i} from={from} durationInFrames={durationInFrames}>
         {blur > 0 ? (
@@ -61,6 +63,14 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
         ) : (
           body
         )}
+        {/*
+          ★巨大テロップは**ブラーの外**に置く。
+            文字がぶれると読めない。ミュート再生で読めない文字は
+            無いのと同じ（字幕と同じ理由。ここは譲らない）。
+        */}
+        {telop ? (
+          <HookTelop text={telop} durationInFrames={durationInFrames} accent={accent} />
+        ) : null}
       </Sequence>
     );
   });
