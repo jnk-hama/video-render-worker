@@ -271,8 +271,12 @@ for (const key of ["narrationUrl", "bgmUrl"]) {
 /*
  * ★chord は2026-09-06に追加（オーナー指示「不協和音以外のジャーン！的な
  *   耳に入ってくる音」）。Cメジャーの和音なので**構造的に不協和音にならない**。
+ * ★boom は2026-09-06に追加（オーナー指示「小さな爆発音」）。
+ * ★neon は残してあるが、B（日本市場）の台本からは外した。Aが今も送って
+ *   いる可能性があり、ここから消すと「効果音を渡したのに1つも読めない」
+ *   検査に引っかかって描画ごと落ちるため。
  */
-const SFX_TAGS = ["fire", "neon", "pop", "shock", "clean", "chord"];
+const SFX_TAGS = ["fire", "neon", "pop", "shock", "clean", "chord", "boom"];
 if (Array.isArray(script.sfx) && script.sfx.length) {
   const before = script.sfx.length;
   script.sfx = script.sfx
