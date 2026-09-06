@@ -23,6 +23,20 @@ import { CameraMotionBlur } from "@remotion/motion-blur";
  *   決めさせると出力が毎回揺れて、同じ台本から違う品質の動画が出る。
  *   確率で揺れる処理を構成に持ち込まない（CLAUDE.md の方針）。
  */
+/**
+ * 効果音の基本音量（2026-09-05）。
+ * ★上げすぎるとナレーションの語頭を食う（BGMを0.2に絞っているのと同じ理由）。
+ */
+const SFX_VOLUME = 0.5;
+
+/**
+ * タグごとの補正。**ピークを揃えても鋭い音ほどうるさく聞こえる。**
+ * 実測（mean/peak）: shock -20.3/-5.6dB、fire -12.8/-6.0dB、
+ * pop -12.4/-6.0dB、neon -14.1/-5.9dB、clean -13.3/-6.0dB。
+ * 平均とピークの差が大きいものほど耳に刺さるので、そこだけ下げる。
+ */
+const SFX_TAG_GAIN: Record<string, number> = { shock: 0.7, fire: 0.9 };
+
 const renderScene = (scene: VideoScript["scenes"][number], accent: string) => {
   switch (scene.kind) {
     case "insitu":
@@ -126,8 +140,17 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
 
       {/*
         効果音（2026-09-05）。
-        ★音量0.35は ffmpeg版と同じ値。これより上げるとナレーションの
-          語頭を食う（BGMを0.2に絞っているのと同じ理由）。
+        ★★音量を 0.35 → 0.5 へ上げた（オーナー確認「気づかなかった」）。
+          実測すると埋もれて当然だった:
+            ・音源はピーク -6dB に揃えてある（=フルスケールの半分）
+            ・そこへ0.35を掛けるので、実効ピークは約 -15dB
+            ・1つ 0.13〜0.63秒しかなく、その上にナレーション(1.0)と
+              BGM(0.2)が乗る
+          0.5にすると実効ピークは約 -12dB。ナレーションの1/4程度で、
+          「聞こえるが主張しない」範囲。**これ以上は上げない。**
+        ★タグごとに補正を掛ける。ピークを揃えても**鋭い音ほどうるさく
+          聞こえる**ため（shock はノイズヒットで平均 -20.3dB なのに
+          ピークは -5.6dB。差が大きいほど耳に刺さる）。
         ★Sequence で置く。at は「全体の尺に対する割合」で渡ってくるので、
           総フレーム数を掛けてフレームへ直す。**秒を依頼側に推定させない**
           という設計（依頼側はTTSの尺を知らない）をそのまま守る。
@@ -138,7 +161,7 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
           from={Math.round(cue.atRatio * totalFrames(script))}
           name={`sfx:${cue.tag}`}
         >
-          <Audio src={cue.src} volume={0.35} />
+          <Audio src={cue.src} volume={SFX_VOLUME * (SFX_TAG_GAIN[cue.tag] ?? 1)} />
         </Sequence>
       ))}
     </AbsoluteFill>
