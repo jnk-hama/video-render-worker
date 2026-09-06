@@ -1,17 +1,8 @@
 {
- "generated_at": "2026-09-06T04:47:02+00:00",
+ "generated_at": "2026-09-06T11:05:10+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
-   {
-    "id": "t3_1w2cz46",
-    "title": "The Rotation of the Planets in Our Solar System Is Far More Fascinating Than I Ever Expected",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w2cz46/the_rotation_of_the_planets_in_our_solar_system/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1w416k0",
     "title": "The Transformation of a Van",
@@ -49,6 +40,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1w5rrvv",
+    "title": "Kelly casually belting A5 on a fucking monday morning mind you ✨⭐️✨",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w5rrvv/kelly_casually_belting_a5_on_a_fucking_monday/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1w5b7mo",
     "title": "Fishermen off Coronel cut rope and buoys from an orca's tail after it approached their boat",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w5b7mo/fishermen_off_coronel_cut_rope_and_buoys_from_an/",
@@ -67,18 +67,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w3wple",
-    "title": "Duane Keith Davis has been found guilty of the murder of Tupac Shakur",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w3wple/duane_keith_davis_has_been_found_guilty_of_the/",
+    "id": "t3_1w7vzys",
+    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7vzys",
-    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
+    "id": "t3_1w3wple",
+    "title": "Duane Keith Davis has been found guilty of the murder of Tupac Shakur",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w3wple/duane_keith_davis_has_been_found_guilty_of_the/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -94,46 +94,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w2pfct",
-    "title": "Making a splash here",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w2pfct/making_a_splash_here/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w8581b",
+    "title": "To Assault The Bouncer Without Consequences.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w8581b/to_assault_the_bouncer_without_consequences/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6bs4f",
-    "title": "He saw something spectacular",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w6bs4f/he_saw_something_spectacular/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w3lupx",
+    "title": "Using latex paint for Frieza cosplay",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w3lupx/using_latex_paint_for_frieza_cosplay/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7j3u1",
-    "title": "Checking under the hen for eggs",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w7j3u1/checking_under_the_hen_for_eggs/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w4oxf9",
+    "title": "'Friend' pulls handbrake",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w4oxf9/friend_pulls_handbrake/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w39x4y",
-    "title": "Chilean photographer captures the blood-red eyes of a white-tufted grebe",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w39x4y/chilean_photographer_captures_the_bloodred_eyes/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w6y1d8",
+    "title": "Driving recklessly on the highway",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w6y1d8/driving_recklessly_on_the_highway/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2zson",
-    "title": "\"The Cloud\", a proposed skyscraper design from South Korea which was scrapped due to its visual similarity to the 9/11 attacks.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w2zson/the_cloud_a_proposed_skyscraper_design_from_south/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w4868u",
+    "title": "Driver gets hit by another car after punching his mirror",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w4868u/driver_gets_hit_by_another_car_after_punching_his/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -150,19 +150,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w3ewrf",
-    "title": "Throuple route confirmed",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w3ewrf/throuple_route_confirmed/",
+    "id": "t3_1w7tbzf",
+    "title": "Juicy lobster, buttery steak or something.",
+    "url": "https://www.reddit.com/r/Animemes/comments/1w7tbzf/juicy_lobster_buttery_steak_or_something/",
     "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w31g5r",
-    "title": "Even The Strongest Have A Weakness",
-    "url": "https://www.reddit.com/r/animegifs/comments/1w31g5r/even_the_strongest_have_a_weakness/",
-    "subreddit": "animegifs",
+    "id": "t3_1w2nm9m",
+    "title": "One Piece #1176 - Nami vs Gunko",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w2nm9m/one_piece_1176_nami_vs_gunko/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w7r8qf",
+    "title": "Sekiro: No Defeat Movie Version Full Staff List",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7r8qf/sekiro_no_defeat_movie_version_full_staff_list/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w3kz8c",
+    "title": "Usopp Vs Gunko - One Piece #1176",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w3kz8c/usopp_vs_gunko_one_piece_1176/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w7su0t",
+    "title": "Astounding Effects Animation by Hideki Kakita - Karas OVA #4",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7su0t/astounding_effects_animation_by_hideki_kakita/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -243,15 +270,6 @@
     "id": "t3_1w7y9f7",
     "title": "Genshin has more than 250+ unique locations. Crazy for a F2P game.",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w7y9f7/genshin_has_more_than_250_unique_locations_crazy/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w50sgz",
-    "title": "Just a reminder you can summon your train anywhere on the tracks, not just at the station.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w50sgz/just_a_reminder_you_can_summon_your_train/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
