@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-06T11:05:10+00:00",
+ "generated_at": "2026-09-06T15:35:33+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -31,18 +31,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w41qv2",
-    "title": "Impossible trickshot , but he made it",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w41qv2/impossible_trickshot_but_he_made_it/",
+    "id": "t3_1w81ms4",
+    "title": "There's certified, and then there's CERTIFIED. This guy is the latter",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w81ms4/theres_certified_and_then_theres_certified_this/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5rrvv",
-    "title": "Kelly casually belting A5 on a fucking monday morning mind you ✨⭐️✨",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w5rrvv/kelly_casually_belting_a5_on_a_fucking_monday/",
+    "id": "t3_1w41qv2",
+    "title": "Impossible trickshot , but he made it",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w41qv2/impossible_trickshot_but_he_made_it/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -58,18 +58,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w6t60v",
-    "title": "A person stuck in tunnel after the flash flood getting rescued after 9 days",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w6t60v/a_person_stuck_in_tunnel_after_the_flash_flood/",
+    "id": "t3_1w7vzys",
+    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7vzys",
-    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
+    "id": "t3_1w6t60v",
+    "title": "A person stuck in tunnel after the flash flood getting rescued after 9 days",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w6t60v/a_person_stuck_in_tunnel_after_the_flash_flood/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -140,24 +140,6 @@
    }
   ],
   "B": [
-   {
-    "id": "t3_1w4idhc",
-    "title": "The live action isn't looking so bad ISHOWROBIN",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w4idhc/the_live_action_isnt_looking_so_bad_ishowrobin/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w7tbzf",
-    "title": "Juicy lobster, buttery steak or something.",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w7tbzf/juicy_lobster_buttery_steak_or_something/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1w2nm9m",
     "title": "One Piece #1176 - Nami vs Gunko",
@@ -240,39 +222,48 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w6448i",
-    "title": "Inazuma if it was released today (Vesna corner because yes)",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w6448i/inazuma_if_it_was_released_today_vesna_corner/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w74ue5",
+    "title": "[Art] - For Urumin - 'Damedol: The Useless Idol and Her Only Fan in the World' Illustration by Kishirimo",
+    "url": "https://www.reddit.com/r/manga/comments/1w74ue5/art_for_urumin_damedol_the_useless_idol_and_her/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2l83z",
-    "title": "The Downfall of Universal Supports might be one of the saddest part of Genshin",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w2l83z/the_downfall_of_universal_supports_might_be_one/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w7v2m6",
+    "title": "[DISC] - Kokkuri-san VS a Genius Elementary School Student - Oneshot by @medatarou1",
+    "url": "https://www.reddit.com/r/manga/comments/1w7v2m6/disc_kokkurisan_vs_a_genius_elementary_school/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w41lza",
-    "title": "Just realized that if we recommend a New Player to get Mizuki as their free Standard Character for the SSW, they will have to go to Natlan for the Boss Mats. Fontaine for the Stellar Buff. Inazuma for the Talent Mats. Snezhnaya for the Artifact. Mrs Worldwide.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w41lza/just_realized_that_if_we_recommend_a_new_player/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w64yme",
+    "title": "[DISC] TS Magical Girl Mazoka - Chapter 6",
+    "url": "https://www.reddit.com/r/manga/comments/1w64yme/disc_ts_magical_girl_mazoka_chapter_6/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7y9f7",
-    "title": "Genshin has more than 250+ unique locations. Crazy for a F2P game.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w7y9f7/genshin_has_more_than_250_unique_locations_crazy/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w5v8uk",
+    "title": "[DISC] My Tsundere Girlfriend's Thick Thighs Situation - Chapter 1-2",
+    "url": "https://www.reddit.com/r/manga/comments/1w5v8uk/disc_my_tsundere_girlfriends_thick_thighs/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w2vr52",
+    "title": "NSFW/Ecchi/Nude Manga With Good Writing?",
+    "url": "https://www.reddit.com/r/manga/comments/1w2vr52/nsfwecchinude_manga_with_good_writing/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
