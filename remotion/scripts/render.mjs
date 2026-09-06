@@ -268,7 +268,11 @@ for (const key of ["narrationUrl", "bgmUrl"]) {
  *   知らないタグ・見つからない音は**黙って落とす**。音が1つ無くても
  *   動画は成立するので、ここで描画を止める理由がない。
  */
-const SFX_TAGS = ["fire", "neon", "pop", "shock", "clean"];
+/*
+ * ★chord は2026-09-06に追加（オーナー指示「不協和音以外のジャーン！的な
+ *   耳に入ってくる音」）。Cメジャーの和音なので**構造的に不協和音にならない**。
+ */
+const SFX_TAGS = ["fire", "neon", "pop", "shock", "clean", "chord"];
 if (Array.isArray(script.sfx) && script.sfx.length) {
   const before = script.sfx.length;
   script.sfx = script.sfx

@@ -36,3 +36,44 @@ done
 | `fire` | 低い衝撃音 | 衝撃・情熱系 |
 | `shock` | ノイズのヒット | 警告・問題提起 |
 | `clean` | ベル系の余韻 | 美容系・締め |
+| `chord` | **Cメジャーの和音（ジャーン）** | **フックを立てる。一番耳に入る** |
+
+## `chord` について（2026-09-06 追加）
+
+オーナー指示「不協和音以外のジャーン！的な耳に入ってくる音」。
+
+**協和音だけで作ってあるので、構造的に不協和音にならない。**
+C4 / C5 / E5 / G5 / C6（＝Cメジャーの和音）を重ね、
+立ち上がりに高域ノイズ、余韻に5kHz帯のシマーを薄く足してある。
+
+実測（生成後にFFTで確認。耳で確かめられないため数値で検証した）:
+
+| 実測ピーク | 音 | 強さ |
+|---|---|---|
+| 260.0 Hz | C4 | 0.48 |
+| 523.3 Hz | C5 | 1.00 |
+| 660.0 Hz | E5 | 0.78 |
+| 783.3 Hz | G5 | 0.78 |
+| 1046.7 Hz | C6 | 0.43 |
+
+包絡: 20msでピーク → 0.3秒で14% → 0.6秒で3% → 0.9秒で消える。
+長さ1.15秒。既存の最長（clean 0.63秒）の約2倍あるので、**短い打撃音より
+確実に耳へ残る**。ピークは他と同じ -6dB へ揃えてある。
+
+```bash
+ffmpeg -y \
+ -f lavfi -i "sine=f=261.63:d=1.1" -f lavfi -i "sine=f=523.25:d=1.1" \
+ -f lavfi -i "sine=f=659.26:d=1.1" -f lavfi -i "sine=f=783.99:d=1.1" \
+ -f lavfi -i "sine=f=1046.50:d=1.1" \
+ -f lavfi -i "anoisesrc=d=1.1:c=white:a=0.5" \
+ -f lavfi -i "anoisesrc=d=0.05:c=white:a=0.6" \
+ -filter_complex "\
+[0]volume=0.55[c1];[1]volume=1.00[c2];[2]volume=0.80[c3];\
+[3]volume=0.80[c4];[4]volume=0.45[c5];\
+[c1][c2][c3][c4][c5]amix=inputs=5:normalize=0,afade=t=out:st=0.05:d=1.05:curve=exp[chord];\
+[5]bandpass=f=5000:width_type=o:w=2,volume=0.30,afade=t=out:st=0.02:d=0.70[shimmer];\
+[6]highpass=f=1800,volume=0.55,afade=t=out:st=0.004:d=0.046[attack];\
+[chord][shimmer][attack]amix=inputs=3:normalize=0,alimiter=limit=0.95" \
+ -c:a libmp3lame -q:a 4 chord.mp3
+# そのあとピークを -6dB へ（上の一括正規化と同じ）
+```
