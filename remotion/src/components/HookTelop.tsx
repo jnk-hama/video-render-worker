@@ -39,7 +39,7 @@ import { JP_FONT } from "../lib/fonts";
  */
 
 /** 文字の外側に残す余白（画面幅比）。回転後の箱がここに収まる */
-const WIDTH_MARGIN = 0.96;
+const WIDTH_MARGIN = 0.98;
 
 /*
  * 1文字の上限（画面幅比）。**書体で字面の高さが違うので市場ごとに持つ。**
@@ -53,7 +53,7 @@ const WIDTH_MARGIN = 0.96;
  *   だが、それだと1行に入る語数が増えず「キリのいいところまで入れて」に
  *   ならない。小さくするほど1行に詰められる。
  */
-const MAX_FONT_RATIO_JA = 0.4;
+const MAX_FONT_RATIO_JA = 0.46;
 const MAX_FONT_RATIO_EN = 0.26;
 const maxFontRatio = (market: string): number =>
   market === "en" ? MAX_FONT_RATIO_EN : MAX_FONT_RATIO_JA;
@@ -67,9 +67,22 @@ const LINE_HEIGHT = 1.0;
 /** 英語も3行まで。4行にすると1文字が小さくなり、殴る力が消える */
 const MAX_LINES_EN = 3;
 
-/** 置ける帯（画面高さ比）。走る字幕は 0.6 にある */
-const BAND_TOP_RATIO = 0.07;
-const BAND_BOTTOM_RATIO = 0.56;
+/*
+ * 置ける帯（画面高さ比）。走る字幕は 0.6 にある。
+ *
+ * ★★2026-09-06、上端を 0.07 → 0.12 へ下げた。
+ *   実測すると3行になる長いフックで**上端が画面の7.0%まで達していた**。
+ *   TikTokは上部に「おすすめ／フォロー中」のタブが重なるため、
+ *   ここまで上げると隠れる危険がある。
+ *
+ *   ★TikTok公式のヘルプ記事はセーフゾーンの具体的な%を公開しておらず、
+ *     「キャプションの長さやアドオンで変わる」「テンプレートを
+ *     ダウンロードして確認せよ」としている。つまり**確定値は無い**。
+ *     ここでは確認できない数字を採用せず、「上端を下げる」という
+ *     方向だけを採った。実機に投稿できたら実測して詰め直すこと。
+ */
+const BAND_TOP_RATIO = 0.12;
+const BAND_BOTTOM_RATIO = 0.58;
 
 /*
  * 【1文字の横幅（2026-09-05・実測に置き換えた）】
@@ -121,7 +134,17 @@ export const advanceEm = (ch: string, market: string): number => {
  */
 export const PALETTE_FOR_TELOP = ["#ffe500", "#00e5ff", "#ff2d95", "#b6ff00", "#ff7a00"];
 
-/** 演出。5つを job_id で並べ替えて割り当てる */
+/**
+ * 演出。job_id で並べ替えて割り当てる。
+ *
+ * ★★2026-09-06、5種類 → 8種類へ増やし、**全体的に強くした**
+ *   （オーナー「もっとインパクト強めで。まだまだたりない」）。
+ *   足したのは次の3つの仕掛け。
+ *     ・slideRatio … 横から入る
+ *     ・shake      … 出た瞬間に細かく揺れる（着地の衝撃）
+ *     ・ringOutline… 黒縁の外側にもう1枚、色の縁を重ねる
+ *   傾きも最大12°まで広げ、出だしの拡大率も上げた。
+ */
 export type TelopStyle = {
   name: string;
   /** 傾き（度）。0で水平 */
@@ -132,16 +155,25 @@ export type TelopStyle = {
   outlineRatio: number;
   /** 出だしの拡大率。1.0で拡大なし */
   popFrom: number;
-  /** 出だしに上から落とす量（文字サイズ比）。0で落とさない */
+  /** 出だしの縦の入り（文字サイズ比）。正=上から落ちる / 負=下から突き上げる */
   dropRatio: number;
+  /** 出だしの横の入り（画面幅比）。正=右から / 負=左から / 0=なし */
+  slideRatio: number;
+  /** 着地の揺れ（文字サイズ比の振幅）。0でなし */
+  shake: number;
+  /** 黒縁の外にもう1枚、色の縁を重ねるか */
+  ringOutline: boolean;
 };
 
 export const TELOP_STYLES: TelopStyle[] = [
-  { name: "ナナメ・ゆっくり光る", tiltDeg: -7, glow: "slow", outlineRatio: 0.075, popFrom: 1.18, dropRatio: 0 },
-  { name: "点滅・極太縁", tiltDeg: 0, glow: "blink", outlineRatio: 0.11, popFrom: 1.25, dropRatio: 0 },
-  { name: "逆ナナメ・常時発光", tiltDeg: 6, glow: "steady", outlineRatio: 0.075, popFrom: 1.12, dropRatio: 0 },
-  { name: "落下・中発光", tiltDeg: -3, glow: "slow", outlineRatio: 0.09, popFrom: 1.0, dropRatio: 0.5 },
-  { name: "直立・強発光・太縁", tiltDeg: 0, glow: "steady", outlineRatio: 0.105, popFrom: 1.3, dropRatio: 0 },
+  { name: "叩きつけ", tiltDeg: -9, glow: "steady", outlineRatio: 0.12, popFrom: 1.55, dropRatio: 0, slideRatio: 0, shake: 0.05, ringOutline: false },
+  { name: "点滅・極太縁", tiltDeg: 0, glow: "blink", outlineRatio: 0.13, popFrom: 1.28, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
+  { name: "逆ナナメ突き上げ", tiltDeg: 8, glow: "slow", outlineRatio: 0.095, popFrom: 1.1, dropRatio: -0.7, slideRatio: 0, shake: 0.04, ringOutline: false },
+  { name: "落下・二重縁", tiltDeg: -4, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0.9, slideRatio: 0, shake: 0.06, ringOutline: true },
+  { name: "直立・二重縁・強発光", tiltDeg: 0, glow: "steady", outlineRatio: 0.115, popFrom: 1.35, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: true },
+  { name: "急ナナメ", tiltDeg: -12, glow: "steady", outlineRatio: 0.105, popFrom: 1.45, dropRatio: 0, slideRatio: 0, shake: 0.05, ringOutline: false },
+  { name: "横入り・二重縁", tiltDeg: 5, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0, slideRatio: -0.35, shake: 0, ringOutline: true },
+  { name: "圧縮ズーム", tiltDeg: 0, glow: "steady", outlineRatio: 0.12, popFrom: 1.85, dropRatio: 0, slideRatio: 0, shake: 0.07, ringOutline: false },
 ];
 
 const OUTLINE_DIRS: [number, number][] = [
@@ -305,12 +337,19 @@ const fitFontSize = (
   cos: number,
   sin: number,
   market: string,
+  /*
+   * ★縁の張り出し（em）。**字面だけで計算すると縁が画面から切れる。**
+   *   8方向へ ±outline ずらした複製を敷いており、色の縁を足す回は
+   *   さらに外側 1.9倍まで出る。左右・上下の両側に出るので2倍して足す。
+   */
+  padEm = 0,
 ): number => {
-  const em = Math.max(
-    0.5,
-    ...lines.map((l) => Array.from(l).reduce((s, c) => s + advanceEm(c, market), 0)),
-  );
-  const tall = lines.length * LINE_HEIGHT;
+  const em =
+    Math.max(
+      0.5,
+      ...lines.map((l) => Array.from(l).reduce((s, c) => s + advanceEm(c, market), 0)),
+    ) + padEm * 2;
+  const tall = lines.length * LINE_HEIGHT + padEm * 2;
   return Math.min(
     (width * WIDTH_MARGIN) / (em * cos + tall * sin),
     bandHeight / (em * sin + tall * cos),
@@ -399,6 +438,7 @@ const latinLayout = (
   cos: number,
   sin: number,
   market: string,
+  padEm = 0,
 ): { lines: string[]; fontSize: number } => {
   const words = text.split(/\s+/).filter(Boolean);
   const w = words.length;
@@ -435,7 +475,7 @@ const latinLayout = (
     let cur: { lines: string[]; fontSize: number; ragged: number } | null = null;
     for (const cuts of cutsList) {
       const lines = groupsOf(cuts);
-      const fontSize = fitFontSize(lines, width, bandHeight, cos, sin, market);
+      const fontSize = fitFontSize(lines, width, bandHeight, cos, sin, market, padEm);
       // 行の余りの二乗和。小さいほど行の長さが揃っている
       const room = Math.max(...lines.map(emOf));
       const ragged = lines.reduce((a, l) => a + (room - emOf(l)) ** 2, 0);
@@ -474,6 +514,8 @@ export const layoutTelop = (
   bandHeight: number,
   tiltDeg: number,
   market: string = "ja",
+  /** 縁の張り出し（em）。演出ごとに違うので呼び出し側が渡す */
+  padEm = 0,
 ): { lines: string[]; fontSize: number } => {
   const trimmed = text.trim();
   const chars = Array.from(trimmed);
@@ -486,13 +528,13 @@ export const layoutTelop = (
   // ★書き分けは**中身の文字**で決める。market の指定漏れで日本語が
   //   英語の規則に落ちると単語どころか文が壊れるため、両方を見る。
   if (market === "en" && !hasJapanese(trimmed)) {
-    return latinLayout(trimmed, width, bandHeight, cos, sin, market);
+    return latinLayout(trimmed, width, bandHeight, cos, sin, market, padEm);
   }
   const candidates = japaneseCandidates(chars);
 
   let best = { lines: [trimmed], fontSize: 0, score: -1 };
   for (const c of candidates) {
-    const fontSize = fitFontSize(c.lines, width, bandHeight, cos, sin, market);
+    const fontSize = fitFontSize(c.lines, width, bandHeight, cos, sin, market, padEm);
     const score = fontSize * c.quality;
     if (score > best.score) best = { lines: c.lines, fontSize, score };
   }
@@ -515,7 +557,18 @@ export const HookTelop: React.FC<{
 
   const bandTop = height * BAND_TOP_RATIO;
   const bandHeight = height * BAND_BOTTOM_RATIO - bandTop;
-  const { lines, fontSize } = layoutTelop(text, width, bandHeight, style.tiltDeg, market);
+  /*
+   * 縁の張り出し（em）。**黒縁までを「必ず画面に入れる」対象とする。**
+   *
+   * ★色の二重縁は外側1.9倍まで出るが、そこまで入れて計算すると
+   *   文字が14%小さくなる。**読めるかどうかを決めているのは字と黒縁**で、
+   *   外側の色の縁は装飾なので、画面端でわずかに切れても害がない。
+   *   小ささの方が実害が大きいので、黒縁までを保証対象にした。
+   */
+  const padEm = style.outlineRatio;
+  const { lines, fontSize } = layoutTelop(
+    text, width, bandHeight, style.tiltDeg, market, padEm,
+  );
   const blockHeight = lines.length * fontSize * LINE_HEIGHT;
   const outline = Math.max(2, fontSize * style.outlineRatio);
 
@@ -527,6 +580,17 @@ export const HookTelop: React.FC<{
   const pop = spring({ frame, fps, config: { damping: 14, mass: 0.5 }, durationInFrames: 10 });
   const scale = interpolate(pop, [0, 1], [style.popFrom, 1]);
   const dropY = interpolate(pop, [0, 1], [-style.dropRatio * fontSize, 0]);
+  const slideX = interpolate(pop, [0, 1], [style.slideRatio * width, 0]);
+
+  /*
+   * 着地の揺れ。**出た瞬間だけ**、8フレームで収束させる。
+   * ★止まってからも揺らさない。読めなくなるうえ、ずっと動いていると
+   *   かえって安っぽく見える。衝撃の余韻としてだけ使う。
+   */
+  const shakeX = style.shake
+    ? Math.sin(frame * 2.1) * style.shake * fontSize *
+      Math.max(0, 1 - frame / 8)
+    : 0;
 
   /*
    * ★1本目は前半55%で消していたが、それだと**見ていない時間の方が長い**。
@@ -584,7 +648,9 @@ export const HookTelop: React.FC<{
         top: bandTop + (bandHeight - blockHeight) / 2,
         height: blockHeight,
         opacity,
-        transform: `translateY(${dropY}px) rotate(${style.tiltDeg}deg) scale(${scale})`,
+        transform:
+          `translate(${slideX + shakeX}px, ${dropY}px) ` +
+          `rotate(${style.tiltDeg}deg) scale(${scale})`,
         transformOrigin: "center center",
       }}
     >
@@ -592,6 +658,27 @@ export const HookTelop: React.FC<{
         const base = { ...common, top: i * fontSize * LINE_HEIGHT };
         return (
           <React.Fragment key={i}>
+            {/*
+              ★色の縁は**黒縁より外側**に敷く（先に描く＝下に来る）。
+                黒→色の二重の輪郭になり、実際に伸びている動画でよく見る
+                「縁が2枚ある文字」になる。内側から 塗り→黒→色 の順。
+            */}
+            {style.ringOutline
+              ? OUTLINE_DIRS.map(([dx, dy], k) => (
+                  <div
+                    key={`ring-${k}`}
+                    aria-hidden
+                    style={{
+                      ...base,
+                      color,
+                      transform: `translate(${dx * outline * 1.9}px, ${dy * outline * 1.9}px)`,
+                    }}
+                  >
+                    {line}
+                  </div>
+                ))
+              : null}
+
             {/* 縁：8方向へずらした黒の複製（Captions.tsx と同じ方式） */}
             {OUTLINE_DIRS.map(([dx, dy], k) => (
               <div

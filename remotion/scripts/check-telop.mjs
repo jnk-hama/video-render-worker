@@ -37,7 +37,7 @@ try {
 const { layoutTelop, TELOP_STYLES, seedOf, shuffledBySeed, advanceEm } = mod;
 
 const W = 1080, H = 1920;
-const BAND_TOP = H * 0.07, BAND_H = H * 0.56 - BAND_TOP;
+const BAND_TOP = H * 0.12, BAND_H = H * 0.58 - BAND_TOP;
 const CAPTION_TOP = H * 0.6; // 走る字幕の上端
 
 const JA = ["沼", "神ツール", "スマホ首", "値段がバグ", "もっと安い", "夜が静かすぎる",
@@ -67,35 +67,48 @@ for (const [market, list] of [["ja", JA], ["en", EN]]) {
   }
 }
 
-console.log("\n=== 5演出 × 両市場：画面からはみ出さないか ===");
+console.log(`\n=== ${TELOP_STYLES.length}演出 × 両市場：縁まで含めて画面に収まるか ===`);
+console.log("  ★字面だけでなく**縁の張り出し**も足して測る。8方向の複製を");
+console.log("    ±outline ずらしており、色の縁を足す回は外側1.9倍まで出る。");
 let n = 0;
+let worstTop = 1e9, worstRight = -1e9;
 for (const [market, list] of [["ja", JA], ["en", EN]]) {
   for (const st of TELOP_STYLES) {
     for (const t of list) {
       n++;
-      const { lines, fontSize } = layoutTelop(t, W, BAND_H, st.tiltDeg, market);
-      const em = Math.max(...lines.map((l) =>
+      const padEm = st.outlineRatio; // 黒縁までを保証対象にする
+      const { lines, fontSize } = layoutTelop(t, W, BAND_H, st.tiltDeg, market, padEm);
+      const glyphEm = Math.max(...lines.map((l) =>
         Array.from(l).reduce((s, c) => s + advanceEm(c, market), 0)));
-      const w = em * fontSize, h = lines.length * fontSize;
+      // 縁は左右・上下の両側へ出る
+      const w = (glyphEm + padEm * 2) * fontSize;
+      const h = (lines.length + padEm * 2) * fontSize;
       const rad = Math.abs(st.tiltDeg) * Math.PI / 180;
       const bw = w * Math.cos(rad) + h * Math.sin(rad);
       const bh = w * Math.sin(rad) + h * Math.cos(rad);
       const cx = W / 2, cy = BAND_TOP + BAND_H / 2;
-      if (cx - bw / 2 < -0.5 || cx + bw / 2 > W + 0.5 ||
-          cy - bh / 2 < -0.5 || cy + bh / 2 > CAPTION_TOP + 0.5) {
-        console.log(` ★はみ出し ${market} ${st.name} 「${t}」`); fail++;
+      const top = cy - bh / 2, bottom = cy + bh / 2;
+      const left = cx - bw / 2, right = cx + bw / 2;
+      worstTop = Math.min(worstTop, top);
+      worstRight = Math.max(worstRight, right);
+      if (left < -0.5 || right > W + 0.5 || top < -0.5 || bottom > CAPTION_TOP + 0.5) {
+        console.log(` ★はみ出し ${market} ${st.name} 「${t}」 上${top.toFixed(0)} 下${bottom.toFixed(0)} 左${left.toFixed(0)} 右${right.toFixed(0)}`);
+        fail++;
       }
     }
   }
 }
 console.log(fail === 0 ? ` 全 ${n} 通り: 画面内・走る字幕(${CAPTION_TOP}px)にも当たらない` : ` ★${fail}件`);
+console.log(`  最も上に来る位置  ${worstTop.toFixed(0)}px = 画面高さの ${(worstTop / H * 100).toFixed(1)}%`);
+console.log(`  最も右に来る位置  ${worstRight.toFixed(0)}px = 画面幅の ${(worstRight / W * 100).toFixed(1)}%`);
 
 console.log("\n=== 演出の割り当てが job_id だけで決まるか（乱数を使っていないこと）===");
 const names = (id) => shuffledBySeed(TELOP_STYLES, seedOf(id)).map((x) => x.name.slice(0, 4)).join(" ");
 for (const id of ["telop-check6", "telop-check6", "a1b2c3"]) console.log(` ${id.padEnd(14)} ${names(id)}`);
 if (names("telop-check6") !== names("telop-check6")) { console.log(" ★揺れている"); fail++; }
 const dup = 5 - new Set(shuffledBySeed(TELOP_STYLES, seedOf("telop-check6")).slice(0, 5)).size;
-console.log(` 5シーン中の演出の重複: ${dup} 件`);
+console.log(` 5シーン中の演出の重複: ${dup} 件（${TELOP_STYLES.length}種類から5つ取る）`);
+if (dup !== 0) fail++;
 
 console.log("\n=== 異常系 ===");
 for (const [t, m] of [["", "ja"], [" ", "ja"], ["あ", "ja"], ["。。。", "ja"],
