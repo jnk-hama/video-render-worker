@@ -24,10 +24,17 @@ import { CameraMotionBlur } from "@remotion/motion-blur";
  *   確率で揺れる処理を構成に持ち込まない（CLAUDE.md の方針）。
  */
 /**
- * 効果音の基本音量（2026-09-05）。
- * ★上げすぎるとナレーションの語頭を食う（BGMを0.2に絞っているのと同じ理由）。
+ * 効果音の基本音量。
+ *
+ * ★2026-09-05: 0.35 → 0.5（オーナー「気づかなかった」）
+ * ★2026-09-06: 0.5 → 0.7（オーナー「効果音だけ強めて」）
+ *   音源はピーク -6dB なので、実効ピークは約 -9dB。ナレーション(1.0)の
+ *   1/3弱。**ここが上限に近い。** これ以上上げると、シーン頭に置いている
+ *   都合でナレーションの語頭と competing になる（BGMを0.2に絞っているのと
+ *   同じ理由）。次に上げたくなったら、音量ではなく
+ *   「効果音の瞬間だけBGMを下げる（ダッキング）」を先に試すこと。
  */
-const SFX_VOLUME = 0.5;
+const SFX_VOLUME = 0.7;
 
 /**
  * タグごとの補正。**ピークを揃えても鋭い音ほどうるさく聞こえる。**
@@ -35,7 +42,12 @@ const SFX_VOLUME = 0.5;
  * pop -12.4/-6.0dB、neon -14.1/-5.9dB、clean -13.3/-6.0dB。
  * 平均とピークの差が大きいものほど耳に刺さるので、そこだけ下げる。
  */
-const SFX_TAG_GAIN: Record<string, number> = { shock: 0.7, fire: 0.9 };
+const SFX_TAG_GAIN: Record<string, number> = {
+  shock: 0.7, // ノイズヒット。平均とピークの差が14.7dBで一番耳に刺さる
+  fire: 0.9, // 低い衝撃音。ブーミーになりやすい
+  chord: 1.1, // ★フックを立てる音。ここは前に出す
+  boom: 1.1, // ★同上
+};
 
 const renderScene = (scene: VideoScript["scenes"][number], accent: string) => {
   switch (scene.kind) {

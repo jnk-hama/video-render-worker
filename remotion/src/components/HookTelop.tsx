@@ -143,7 +143,16 @@ export const PALETTE_FOR_TELOP = ["#ffe500", "#00e5ff", "#ff2d95", "#b6ff00", "#
  *     ・slideRatio … 横から入る
  *     ・shake      … 出た瞬間に細かく揺れる（着地の衝撃）
  *     ・ringOutline… 黒縁の外側にもう1枚、色の縁を重ねる
- *   傾きも最大12°まで広げ、出だしの拡大率も上げた。
+ *   傾きも最大12°まで広げた。
+ *
+ * ★★2026-09-06、**動きだけ抑えた**（オーナー「1〜4枚目はやりすぎ。
+ *   テロップはもう大丈夫」）。大きさ・縁の太さ・色・傾きは評価された
+ *   部分なので**一切変えていない**。落としたのは動きだけ:
+ *     出だしの拡大率 最大1.85 → 1.32倍
+ *     落下・突き上げ 最大0.9  → 0.45（文字サイズ比）
+ *     横入り         0.35    → 0.18（画面幅比）
+ *     着地の揺れ     最大0.07 → 0.025
+ *   「大きさで殴るのが主で、動きは補助」という元の方針へ戻した。
  */
 export type TelopStyle = {
   name: string;
@@ -166,14 +175,14 @@ export type TelopStyle = {
 };
 
 export const TELOP_STYLES: TelopStyle[] = [
-  { name: "叩きつけ", tiltDeg: -9, glow: "steady", outlineRatio: 0.12, popFrom: 1.55, dropRatio: 0, slideRatio: 0, shake: 0.05, ringOutline: false },
-  { name: "点滅・極太縁", tiltDeg: 0, glow: "blink", outlineRatio: 0.13, popFrom: 1.28, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
-  { name: "逆ナナメ突き上げ", tiltDeg: 8, glow: "slow", outlineRatio: 0.095, popFrom: 1.1, dropRatio: -0.7, slideRatio: 0, shake: 0.04, ringOutline: false },
-  { name: "落下・二重縁", tiltDeg: -4, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0.9, slideRatio: 0, shake: 0.06, ringOutline: true },
-  { name: "直立・二重縁・強発光", tiltDeg: 0, glow: "steady", outlineRatio: 0.115, popFrom: 1.35, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: true },
-  { name: "急ナナメ", tiltDeg: -12, glow: "steady", outlineRatio: 0.105, popFrom: 1.45, dropRatio: 0, slideRatio: 0, shake: 0.05, ringOutline: false },
-  { name: "横入り・二重縁", tiltDeg: 5, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0, slideRatio: -0.35, shake: 0, ringOutline: true },
-  { name: "圧縮ズーム", tiltDeg: 0, glow: "steady", outlineRatio: 0.12, popFrom: 1.85, dropRatio: 0, slideRatio: 0, shake: 0.07, ringOutline: false },
+  { name: "叩きつけ", tiltDeg: -9, glow: "steady", outlineRatio: 0.12, popFrom: 1.28, dropRatio: 0, slideRatio: 0, shake: 0.02, ringOutline: false },
+  { name: "点滅・極太縁", tiltDeg: 0, glow: "blink", outlineRatio: 0.13, popFrom: 1.18, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
+  { name: "逆ナナメ突き上げ", tiltDeg: 8, glow: "slow", outlineRatio: 0.095, popFrom: 1.08, dropRatio: -0.35, slideRatio: 0, shake: 0.015, ringOutline: false },
+  { name: "落下・二重縁", tiltDeg: -4, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0.45, slideRatio: 0, shake: 0.02, ringOutline: true },
+  { name: "直立・二重縁・強発光", tiltDeg: 0, glow: "steady", outlineRatio: 0.115, popFrom: 1.2, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: true },
+  { name: "急ナナメ", tiltDeg: -12, glow: "steady", outlineRatio: 0.105, popFrom: 1.25, dropRatio: 0, slideRatio: 0, shake: 0.02, ringOutline: false },
+  { name: "横入り・二重縁", tiltDeg: 5, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0, slideRatio: -0.18, shake: 0, ringOutline: true },
+  { name: "圧縮ズーム", tiltDeg: 0, glow: "steady", outlineRatio: 0.12, popFrom: 1.32, dropRatio: 0, slideRatio: 0, shake: 0.025, ringOutline: false },
 ];
 
 const OUTLINE_DIRS: [number, number][] = [

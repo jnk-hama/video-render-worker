@@ -53,11 +53,25 @@ TikTokはスマホで見られる。**スマホの内蔵スピーカーは概ね
 | `shock` | 100% | OK |
 | `boom` | 99% | OK |
 | `neon` | 73% | OK |
-| **`fire`** | **0%** | **★スマホではほぼ聞こえない** |
+| `fire` | 97% | OK（2026-09-06に作り直した） |
 
-`fire` は110Hzのサイン波だけで出来ており、**低すぎて鳴っていないのと
-同じ**。作り直すか `boom` へ置き換える価値がある（2026-09-06 時点では
-未対応。オーナーの判断待ち）。
+**`fire` は作り直す前 0% だった。** 110Hzのサイン波だけで出来ており、
+低すぎて鳴っていないのと同じだった。240Hzから下降する胴体＋900Hz帯の
+空気感＋330Hzの余韻へ組み直し、性格（低い衝撃音）を保ったまま97%へ。
+
+```bash
+ffmpeg -y \
+ -f lavfi -i "aevalsrc='0.8*sin(2*PI*(240*t-260*t*t))':d=0.5:s=44100" \
+ -f lavfi -i "anoisesrc=d=0.5:c=pink:a=0.9" \
+ -f lavfi -i "sine=f=330:d=0.5" \
+ -filter_complex "\
+[0]afade=t=out:st=0.02:d=0.33:curve=exp[body];\
+[1]bandpass=f=900:width_type=o:w=2.2,volume=0.85,afade=t=out:st=0.015:d=0.30:curve=exp[air];\
+[2]volume=0.35,afade=t=out:st=0.01:d=0.20:curve=exp[ring];\
+[body][air][ring]amix=inputs=3:normalize=0" \
+ -c:a libmp3lame -q:a 4 fire.mp3
+# そのあとピークを -6dB へ
+```
 
 ## `boom` について（2026-09-06 追加）
 
