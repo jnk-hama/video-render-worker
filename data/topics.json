@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-07T04:50:06+00:00",
+ "generated_at": "2026-09-07T12:41:04+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -22,18 +22,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w546r5",
-    "title": "Breathtaking scenery in Iceland at 1AM",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w546r5/breathtaking_scenery_in_iceland_at_1am/",
+    "id": "t3_1w8xbvk",
+    "title": "Dutch racer Loek Hartog stopped his Porsche mid-race, grabbed a fire extinguisher and pulled British driver Ollie Millroy from his burning Ferrari during a China GT race in Shanghai. Millroy survived with five broken ribs, a fractured collarbone and a bruised lung.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w8xbvk/dutch_racer_loek_hartog_stopped_his_porsche/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w8xbvk",
-    "title": "Dutch racer Loek Hartog stopped his Porsche mid-race, grabbed a fire extinguisher and pulled British driver Ollie Millroy from his burning Ferrari during a China GT race in Shanghai. Millroy survived with five broken ribs, a fractured collarbone and a bruised lung.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w8xbvk/dutch_racer_loek_hartog_stopped_his_porsche/",
+    "id": "t3_1w546r5",
+    "title": "Breathtaking scenery in Iceland at 1AM",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w546r5/breathtaking_scenery_in_iceland_at_1am/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -103,15 +103,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w7j3u1",
-    "title": "Checking under the hen for eggs",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w7j3u1/checking_under_the_hen_for_eggs/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1w8zp4s",
     "title": "A kid staring at the camera",
     "url": "https://www.reddit.com/r/Unexpected/comments/1w8zp4s/a_kid_staring_at_the_camera/",
@@ -121,10 +112,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w39x4y",
-    "title": "Chilean photographer captures the blood-red eyes of a white-tufted grebe",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w39x4y/chilean_photographer_captures_the_bloodred_eyes/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w7j3u1",
+    "title": "Checking under the hen for eggs",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1w7j3u1/checking_under_the_hen_for_eggs/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -137,50 +128,23 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
+   },
+   {
+    "id": "t3_1w6zhst",
+    "title": "Father crosses the river with his son inside a sack so that he arrives clean at school.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w6zhst/father_crosses_the_river_with_his_son_inside_a/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
    }
   ],
   "B": [
    {
-    "id": "t3_1w6odus",
-    "title": "Cute Momo [Dandadan]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w6odus/cute_momo_dandadan/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w80d1g",
-    "title": "Kita-chan [Bocchi the Rock]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w80d1g/kitachan_bocchi_the_rock/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w3znns",
-    "title": "Blushing Miku [Vocaloid]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w3znns/blushing_miku_vocaloid/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w96t8i",
-    "title": "Twintailed Lucy [Zenless Zone Zero]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w96t8i/twintailed_lucy_zenless_zone_zero/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w4wlgn",
-    "title": "Flustered [Original]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w4wlgn/flustered_original/",
-    "subreddit": "awwnime",
+    "id": "t3_1w4idhc",
+    "title": "The live action isn't looking so bad ISHOWROBIN",
+    "url": "https://www.reddit.com/r/Animemes/comments/1w4idhc/the_live_action_isnt_looking_so_bad_ishowrobin/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -198,15 +162,6 @@
     "id": "t3_1w6sepk",
     "title": "\"I'm Dating a Dark Summoner\" New Key Visual",
     "url": "https://www.reddit.com/r/anime/comments/1w6sepk/im_dating_a_dark_summoner_new_key_visual/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w3992g",
-    "title": "\"Spice and Wolf: Merchant Meets the Wise Wolf\" Season 2 New Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1w3992g/spice_and_wolf_merchant_meets_the_wise_wolf/",
     "subreddit": "anime",
     "views": 0,
     "has_media": true,
@@ -249,6 +204,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1w9hdpk",
+    "title": "Genshin Impact Version 7.1 Special Program Preview",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w9hdpk/genshin_impact_version_71_special_program_preview/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1w73hm5",
     "title": "This cute lil radish is cutely dressed for the winter, how cute is that 🤗",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w73hm5/this_cute_lil_radish_is_cutely_dressed_for_the/",
@@ -258,18 +222,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w50sgz",
-    "title": "Just a reminder you can summon your train anywhere on the tracks, not just at the station.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w50sgz/just_a_reminder_you_can_summon_your_train/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1w8yhtl",
     "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 11 discussion",
     "url": "https://www.reddit.com/r/anime/comments/1w8yhtl/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w5ba2y",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 15 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w5ba2y/rezero_starting_life_in_another_world_season_4/",
     "subreddit": "anime",
     "views": 0,
     "has_media": false,
