@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-06T20:31:54+00:00",
+ "generated_at": "2026-09-07T04:50:06+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -31,6 +31,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1w8xbvk",
+    "title": "Dutch racer Loek Hartog stopped his Porsche mid-race, grabbed a fire extinguisher and pulled British driver Ollie Millroy from his burning Ferrari during a China GT race in Shanghai. Millroy survived with five broken ribs, a fractured collarbone and a bruised lung.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w8xbvk/dutch_racer_loek_hartog_stopped_his_porsche/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1w81ms4",
     "title": "There's certified, and then there's CERTIFIED. This guy is the latter",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w81ms4/theres_certified_and_then_theres_certified_this/",
@@ -40,55 +49,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w41qv2",
-    "title": "Impossible trickshot , but he made it",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w41qv2/impossible_trickshot_but_he_made_it/",
-    "subreddit": "nextfuckinglevel",
+    "id": "t3_1w5b7mo",
+    "title": "Fishermen off Coronel cut rope and buoys from an orca's tail after it approached their boat",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w5b7mo/fishermen_off_coronel_cut_rope_and_buoys_from_an/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7ur18",
-    "title": "This street art goes hard.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w7ur18/this_street_art_goes_hard/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w7vzys",
+    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4jfzi",
-    "title": "Meet Dr. Mariangela Hungaria",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w4jfzi/meet_dr_mariangela_hungaria/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w6t60v",
+    "title": "A person stuck in tunnel after the flash flood getting rescued after 9 days",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w6t60v/a_person_stuck_in_tunnel_after_the_flash_flood/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w4osw6",
-    "title": "Tiny hero girl stops runaway horse",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w4osw6/tiny_hero_girl_stops_runaway_horse/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w3wple",
+    "title": "Duane Keith Davis has been found guilty of the murder of Tupac Shakur",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w3wple/duane_keith_davis_has_been_found_guilty_of_the/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w86ksv",
-    "title": "Service dogs are real life heroes",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w86ksv/service_dogs_are_real_life_heroes/",
-    "subreddit": "BeAmazed",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w6y3b6",
-    "title": "This tree in California is over 4,800 years old. It was already ancient when the Egyptian Pyramids were being built, and its exact location is kept a secret to protect it.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w6y3b6/this_tree_in_california_is_over_4800_years_old_it/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w4i9xh",
+    "title": "Students get smudged by indigenous elders for peace and blessings throughout the year",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w4i9xh/students_get_smudged_by_indigenous_elders_for/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -112,18 +112,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w39x4y",
-    "title": "Chilean photographer captures the blood-red eyes of a white-tufted grebe",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w39x4y/chilean_photographer_captures_the_bloodred_eyes/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w8zp4s",
+    "title": "A kid staring at the camera",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1w8zp4s/a_kid_staring_at_the_camera/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w2zson",
-    "title": "\"The Cloud\", a proposed skyscraper design from South Korea which was scrapped due to its visual similarity to the 9/11 attacks.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w2zson/the_cloud_a_proposed_skyscraper_design_from_south/",
+    "id": "t3_1w39x4y",
+    "title": "Chilean photographer captures the blood-red eyes of a white-tufted grebe",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w39x4y/chilean_photographer_captures_the_bloodred_eyes/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -168,28 +168,19 @@
     "source": "rss"
    },
    {
+    "id": "t3_1w96t8i",
+    "title": "Twintailed Lucy [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w96t8i/twintailed_lucy_zenless_zone_zero/",
+    "subreddit": "awwnime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1w4wlgn",
     "title": "Flustered [Original]",
     "url": "https://www.reddit.com/r/awwnime/comments/1w4wlgn/flustered_original/",
     "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w8j59z",
-    "title": "Cute blush [Original]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1w8j59z/cute_blush_original/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w31g5r",
-    "title": "Even The Strongest Have A Weakness",
-    "url": "https://www.reddit.com/r/animegifs/comments/1w31g5r/even_the_strongest_have_a_weakness/",
-    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -231,9 +222,54 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w5ba2y",
-    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 15 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1w5ba2y/rezero_starting_life_in_another_world_season_4/",
+    "id": "t3_1w6448i",
+    "title": "Inazuma if it was released today (Vesna corner because yes)",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w6448i/inazuma_if_it_was_released_today_vesna_corner/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w7y9f7",
+    "title": "Genshin has more than 250+ unique locations. Crazy for a F2P game.",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w7y9f7/genshin_has_more_than_250_unique_locations_crazy/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w41lza",
+    "title": "Just realized that if we recommend a New Player to get Mizuki as their free Standard Character for the SSW, they will have to go to Natlan for the Boss Mats. Fontaine for the Stellar Buff. Inazuma for the Talent Mats. Snezhnaya for the Artifact. Mrs Worldwide.",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w41lza/just_realized_that_if_we_recommend_a_new_player/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w73hm5",
+    "title": "This cute lil radish is cutely dressed for the winter, how cute is that 🤗",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w73hm5/this_cute_lil_radish_is_cutely_dressed_for_the/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w50sgz",
+    "title": "Just a reminder you can summon your train anywhere on the tracks, not just at the station.",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w50sgz/just_a_reminder_you_can_summon_your_train/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w8yhtl",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 11 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w8yhtl/mushoku_tensei_jobless_reincarnation_season_3/",
     "subreddit": "anime",
     "views": 0,
     "has_media": false,
