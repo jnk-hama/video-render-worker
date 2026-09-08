@@ -1,21 +1,21 @@
 {
- "generated_at": "2026-09-07T21:39:32+00:00",
+ "generated_at": "2026-09-08T04:44:54+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1w70oug",
-    "title": "That core strength is lit",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w70oug/that_core_strength_is_lit/",
+    "id": "t3_1wa23nz",
+    "title": "Despite suffering from Cerebral Palsy, he never gave up on his dream..🫂❤️",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wa23nz/despite_suffering_from_cerebral_palsy_he_never/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w416k0",
-    "title": "The Transformation of a Van",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w416k0/the_transformation_of_a_van/",
+    "id": "t3_1w70oug",
+    "title": "That core strength is lit",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w70oug/that_core_strength_is_lit/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -85,9 +85,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w6y3b6",
-    "title": "This tree in California is over 4,800 years old. It was already ancient when the Egyptian Pyramids were being built, and its exact location is kept a secret to protect it.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w6y3b6/this_tree_in_california_is_over_4800_years_old_it/",
+    "id": "t3_1w9q96k",
+    "title": "Some advance human positive vibes on reddit",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w9q96k/some_advance_human_positive_vibes_on_reddit/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -121,19 +121,19 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w8v2z4",
-    "title": "It's 450 yrs old tradition (Source Link in Description).",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w8v2z4/its_450_yrs_old_tradition_source_link_in/",
-    "subreddit": "toptalent",
+    "id": "t3_1w6aih9",
+    "title": "In 1989, a pelican named Katta-kun began going to a kindergarten in Japan where it played and interacted with the children as if it were one of them.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w6aih9/in_1989_a_pelican_named_kattakun_began_going_to_a/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w8vti3",
-    "title": "Incredible Talent, POV: Dudes legs are stronger than titanium alloys 😂 (Source Link in Description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w8vti3/incredible_talent_pov_dudes_legs_are_stronger/",
-    "subreddit": "toptalent",
+    "id": "t3_1w6zhst",
+    "title": "Father crosses the river with his son inside a sack so that he arrives clean at school.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w6zhst/father_crosses_the_river_with_his_son_inside_a/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,136 +141,73 @@
   ],
   "B": [
    {
-    "id": "t3_1w4idhc",
-    "title": "The live action isn't looking so bad ISHOWROBIN",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w4idhc/the_live_action_isnt_looking_so_bad_ishowrobin/",
-    "subreddit": "Animemes",
+    "id": "t3_1w6odus",
+    "title": "Cute Momo [Dandadan]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w6odus/cute_momo_dandadan/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7r8qf",
-    "title": "Sekiro: No Defeat Movie Version Full Staff List",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7r8qf/sekiro_no_defeat_movie_version_full_staff_list/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w96t8i",
+    "title": "Twintailed Lucy [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w96t8i/twintailed_lucy_zenless_zone_zero/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7su0t",
-    "title": "Astounding Effects Animation by Hideki Kakita - Karas OVA #4",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7su0t/astounding_effects_animation_by_hideki_kakita/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w80d1g",
+    "title": "Kita-chan [Bocchi the Rock]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w80d1g/kitachan_bocchi_the_rock/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5ezv0",
-    "title": "3D Backgrounds vs 2D in Anime - OtaKing",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w5ezv0/3d_backgrounds_vs_2d_in_anime_otaking/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w7asor",
+    "title": "Naruto Director Says He 'Completely Ignored' Overseas Audience Demands While Making The Anime",
+    "url": "https://www.reddit.com/r/anime/comments/1w7asor/naruto_director_says_he_completely_ignored/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5st3i",
-    "title": "Quebec City, I am in you 🫵🏼",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w5st3i/quebec_city_i_am_in_you/",
-    "subreddit": "streetwear",
+    "id": "t3_1w6sepk",
+    "title": "\"I'm Dating a Dark Summoner\" New Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1w6sepk/im_dating_a_dark_summoner_new_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7i19w",
-    "title": "I finally have enough karma to post",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w7i19w/i_finally_have_enough_karma_to_post/",
-    "subreddit": "streetwear",
+    "id": "t3_1w4fdun",
+    "title": "Kurumi tries on lingerie [Date A Live]",
+    "url": "https://www.reddit.com/r/anime/comments/1w4fdun/kurumi_tries_on_lingerie_date_a_live/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w75s18",
-    "title": "understand understand the concept the concept",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w75s18/understand_understand_the_concept_the_concept/",
-    "subreddit": "streetwear",
+    "id": "t3_1w8yhtl",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 11 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w8yhtl/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    },
    {
-    "id": "t3_1w6bdtz",
-    "title": "Is the bandana a no? US Open fit yesterday",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w6bdtz/is_the_bandana_a_no_us_open_fit_yesterday/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w8kwyv",
-    "title": "Streetwear at The MET",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w8kwyv/streetwear_at_the_met/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w74ue5",
-    "title": "[Art] - For Urumin - 'Damedol: The Useless Idol and Her Only Fan in the World' Illustration by Kishirimo",
-    "url": "https://www.reddit.com/r/manga/comments/1w74ue5/art_for_urumin_damedol_the_useless_idol_and_her/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w7v2m6",
-    "title": "[DISC] - Kokkuri-san VS a Genius Elementary School Student - Oneshot by @medatarou1",
-    "url": "https://www.reddit.com/r/manga/comments/1w7v2m6/disc_kokkurisan_vs_a_genius_elementary_school/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w64yme",
-    "title": "[DISC] TS Magical Girl Mazoka - Chapter 6",
-    "url": "https://www.reddit.com/r/manga/comments/1w64yme/disc_ts_magical_girl_mazoka_chapter_6/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w5v8uk",
-    "title": "[DISC] My Tsundere Girlfriend's Thick Thighs Situation - Chapter 1-2",
-    "url": "https://www.reddit.com/r/manga/comments/1w5v8uk/disc_my_tsundere_girlfriends_thick_thighs/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w4bxh9",
-    "title": "[ART] Namaiki na Gal Ane o Wakaraseru Hanashi (How to Handle My Sassy Big Sis) - Volume 5 cover",
-    "url": "https://www.reddit.com/r/manga/comments/1w4bxh9/art_namaiki_na_gal_ane_o_wakaraseru_hanashi_how/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w4axbo",
-    "title": "I found the whole Making-Of Documentary as well as the Storyboard of Your Name (Kimi No Na Wa).",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w4axbo/i_found_the_whole_makingof_documentary_as_well_as/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w5ba2y",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 15 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w5ba2y/rezero_starting_life_in_another_world_season_4/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": false,
     "source": "rss"
