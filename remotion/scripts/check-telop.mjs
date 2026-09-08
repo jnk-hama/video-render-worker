@@ -34,11 +34,32 @@ try {
 } finally {
   fs.rmSync(tmp, { force: true });
 }
-const { layoutTelop, TELOP_STYLES, seedOf, shuffledBySeed, advanceEm } = mod;
+const { layoutTelop, TELOP_STYLES, seedOf, shuffledBySeed, advanceEm,
+        BAND_TOP_RATIO, BAND_BOTTOM_RATIO } = mod;
 
 const W = 1080, H = 1920;
-const BAND_TOP = H * 0.12, BAND_H = H * 0.58 - BAND_TOP;
-const CAPTION_TOP = H * 0.6; // 走る字幕の上端
+// ★★実装から読む。ここに数値をコピーすると、実装を動かした時に
+//   検査だけが古い帯を測り続ける（2026-09-09、実際にそれで見逃した）。
+const BAND_TOP = H * BAND_TOP_RATIO, BAND_H = H * BAND_BOTTOM_RATIO - BAND_TOP;
+/*
+ * ★★2026-09-09、判定の下限を変えた。
+ *
+ *   【以前】走る字幕の上端 0.6（1152px）に当たらないこと。
+ *     巨大テロップと字幕が**同時に出る**設計だったので、この条件は正しかった。
+ *
+ *   【今】Video.tsx が巨大テロップを「シーン頭の1.4秒だけ」に変え、
+ *     その区間は字幕を出さない（決定#108）。つまり2つが同時に画面へ
+ *     出ることは無く、**字幕の位置と重なるかどうかは意味を持たない**。
+ *     テストを緩めたのではなく、**守るべき条件そのものが変わった**。
+ *
+ *   【では何を守るか】SNSのUIに食われないこと。
+ *     ★TikTokは安全域の具体的な%を公開していない（テンプレートを配って
+ *       各自で確認せよ、という形）。よってここでも数字を断定できない。
+ *       下端 0.72 は「UI帯（ユーザー名・投稿文）より確実に上」という
+ *       保守的な線として置いた**推定値**である。実機に投稿できたら実測して
+ *       詰め直すこと。
+ */
+const SAFE_BOTTOM = H * 0.72;
 
 const JA = ["沼", "神ツール", "スマホ首", "値段がバグ", "もっと安い", "夜が静かすぎる",
   "もう戻れない", "熱意ある人材", "ぐっすり寝れる", "財布が死んだ", "スマホが熱い",
@@ -71,7 +92,7 @@ console.log(`\n=== ${TELOP_STYLES.length}演出 × 両市場：縁まで含め�
 console.log("  ★字面だけでなく**縁の張り出し**も足して測る。8方向の複製を");
 console.log("    ±outline ずらしており、色の縁を足す回は外側1.9倍まで出る。");
 let n = 0;
-let worstTop = 1e9, worstRight = -1e9;
+let worstTop = 1e9, worstRight = -1e9, worstBottom = -1e9;
 for (const [market, list] of [["ja", JA], ["en", EN]]) {
   for (const st of TELOP_STYLES) {
     for (const t of list) {
@@ -90,16 +111,19 @@ for (const [market, list] of [["ja", JA], ["en", EN]]) {
       const top = cy - bh / 2, bottom = cy + bh / 2;
       const left = cx - bw / 2, right = cx + bw / 2;
       worstTop = Math.min(worstTop, top);
+      // ★下端も見る。UIに食われるのは下側なので、ここが実務上いちばん効く
+      worstBottom = Math.max(worstBottom, bottom);
       worstRight = Math.max(worstRight, right);
-      if (left < -0.5 || right > W + 0.5 || top < -0.5 || bottom > CAPTION_TOP + 0.5) {
+      if (left < -0.5 || right > W + 0.5 || top < -0.5 || bottom > SAFE_BOTTOM + 0.5) {
         console.log(` ★はみ出し ${market} ${st.name} 「${t}」 上${top.toFixed(0)} 下${bottom.toFixed(0)} 左${left.toFixed(0)} 右${right.toFixed(0)}`);
         fail++;
       }
     }
   }
 }
-console.log(fail === 0 ? ` 全 ${n} 通り: 画面内・走る字幕(${CAPTION_TOP}px)にも当たらない` : ` ★${fail}件`);
+console.log(fail === 0 ? ` 全 ${n} 通り: 画面内・UIの安全域(下端${SAFE_BOTTOM}px)に収まる` : ` ★${fail}件`);
 console.log(`  最も上に来る位置  ${worstTop.toFixed(0)}px = 画面高さの ${(worstTop / H * 100).toFixed(1)}%`);
+console.log(`  最も下に来る位置  ${worstBottom.toFixed(0)}px = 画面高さの ${(worstBottom / H * 100).toFixed(1)}%`);
 console.log(`  最も右に来る位置  ${worstRight.toFixed(0)}px = 画面幅の ${(worstRight / W * 100).toFixed(1)}%`);
 
 console.log("\n=== 演出の割り当てが job_id だけで決まるか（乱数を使っていないこと）===");

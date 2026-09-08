@@ -92,6 +92,29 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
   const blur = script.quality?.blurSamples ?? 0;
   const shutter = script.quality?.shutterAngle ?? 180;
 
+  /*
+   * ★★2026-09-09、巨大テロップの出し方を変えた（オーナー指摘）。
+   *
+   *   > 大テロップはもっとも強いフックであって、下のテロップで喋ってる時は
+   *   > 出さなくていい。出しすぎると商品見えないし、ただうざいだけ。
+   *   > テロップが2個被る事は避けて。
+   *
+   *   【何が問題だったか】
+   *   巨大テロップはシーンの尺いっぱい（`durationInFrames`）出していた。
+   *   走る字幕は全編を貫いて出る。つまり**構造上、必ず両方が同時に出る**。
+   *   実際の動画では、合成した商品が上下のテロップに挟まれて見えなかった。
+   *
+   *   【どう変えたか】
+   *   巨大テロップは**シーン頭の1.4秒だけ**の一撃にする。その間は
+   *   走る字幕を出さない（下の hideCaptionWindows）。
+   *   これで「1.4秒 テロップだけ → 残り 字幕だけ＋商品が見える」になり、
+   *   2つが画面上で重なる瞬間が無くなる。
+   */
+  const TELOP_BURST_SEC = 1.4;
+
+  /** 巨大テロップが出ている区間（秒・動画全体の絶対時刻）。字幕はここを避ける */
+  const hideCaptionWindows: { start: number; end: number }[] = [];
+
   let cursor = 0;
   const sequences = script.scenes.map((scene, i) => {
     const from = cursor;
@@ -99,6 +122,25 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
     cursor += durationInFrames;
     const body = renderScene(scene, accent);
     const telop = (script.hookTelops ?? [])[i];
+
+    /*
+     * ★シーンがバーストより短い回は、シーンの尺で頭打ちにする。
+     *   そうしないと次のシーンへ食い込み、字幕を止める区間もずれる。
+     */
+    const burstFrames = Math.min(
+      durationInFrames,
+      Math.max(1, Math.round(TELOP_BURST_SEC * fps)),
+    );
+
+    if (telop) {
+      /*
+       * ★秒ではなくフレームから戻して計算する。
+       *   秒のまま足すと丸め誤差で1フレームだけ字幕と重なることがある。
+       *   実際に出る絵はフレーム単位なので、フレームを正とする。
+       */
+      hideCaptionWindows.push({ start: from / fps, end: (from + burstFrames) / fps });
+    }
+
     return (
       <Sequence key={i} from={from} durationInFrames={durationInFrames}>
         {blur > 0 ? (
@@ -114,13 +156,17 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
             無いのと同じ（字幕と同じ理由。ここは譲らない）。
         */}
         {telop ? (
-          <HookTelop
-            text={telop}
-            durationInFrames={durationInFrames}
-            style={telopStyles[i % telopStyles.length]}
-            color={telopColors[i % telopColors.length]}
-            market={script.market ?? "ja"}
-          />
+          // ★入れ子の Sequence で**本当に消す**。opacity を0にするだけだと
+          //   要素は残り、将来の変更で再び被る余地を残してしまう。
+          <Sequence from={0} durationInFrames={burstFrames}>
+            <HookTelop
+              text={telop}
+              durationInFrames={burstFrames}
+              style={telopStyles[i % telopStyles.length]}
+              color={telopColors[i % telopColors.length]}
+              market={script.market ?? "ja"}
+            />
+          </Sequence>
         ) : null}
       </Sequence>
     );
@@ -141,8 +187,16 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
 
       {sequences}
 
-      {/* 字幕は全シーンを貫いて出す。シーンの切れ目で消さない */}
-      <Captions captions={script.captions} accent={accent} />
+      {/*
+        字幕は全シーンを貫いて出す。シーンの切れ目で消さない。
+        ★ただし巨大テロップが出ている区間だけは出さない（決定#108）。
+          2つのテロップを同時に出さない、という約束はここで守る。
+      */}
+      <Captions
+        captions={script.captions}
+        accent={accent}
+        hideWindows={hideCaptionWindows}
+      />
 
       {/* 広告表記は全編。景表法のステマ規制（決定#065） */}
       <Disclosure text={script.disclosure} />

@@ -81,8 +81,25 @@ const MAX_LINES_EN = 3;
  *     ここでは確認できない数字を採用せず、「上端を下げる」という
  *     方向だけを採った。実機に投稿できたら実測して詰め直すこと。
  */
-const BAND_TOP_RATIO = 0.12;
-const BAND_BOTTOM_RATIO = 0.58;
+/*
+ * ★★2026-09-09、オーナー指摘「テロップももう少し下に配置」で下げた。
+ *   0.12〜0.58 → 0.20〜0.66。
+ *
+ *   ★**帯の高さは 0.46 のまま変えていない。** 文字サイズは帯の高さから
+ *     逆算しているので、高さを変えると全行の大きさが変わり、収まり検査
+ *     （check-telop.mjs の232通り）の前提が崩れる。**位置だけ動かす**なら
+ *     計算結果は1ピクセルも変わらない。
+ *
+ *   ★下げすぎない。TikTokの広告仕様は「ボタン・ユーザー名・キャプションが
+ *     出る領域に文字・ロゴ・要点を置くな」としており、下端はUIに食われる。
+ *     **具体的な%は公表されていない**（テンプレートを配って各自で確認せよ、
+ *     という形）ので、ここでも数字を断定せず、UI帯の手前で止めている。
+ */
+// ★検査スクリプト（check-telop.mjs）が同じ値を読めるように export する。
+//   以前は検査側が 0.12 / 0.58 を**コピーで持っており**、実装を動かしても
+//   検査は古い帯を測り続けていた（実際にそれで見逃した）。定数は1箇所に置く。
+export const BAND_TOP_RATIO = 0.20;
+export const BAND_BOTTOM_RATIO = 0.66;
 
 /*
  * 【1文字の横幅（2026-09-05・実測に置き換えた）】
@@ -174,15 +191,33 @@ export type TelopStyle = {
   ringOutline: boolean;
 };
 
+/*
+ * ★★2026-09-09、**動きと点滅を全て止めた**（オーナー指摘
+ *   「大テロップも派手すぎるから点滅とか動きはいらない」）。
+ *
+ *   popFrom / dropRatio / slideRatio / shake を全て 0（＝拡大も落下も
+ *   横入りも揺れもなし）、glow は全て "steady"（点滅も脈動もなし）。
+ *
+ *   ★**型と描画側のコードは残す。** 値を中立にすれば動きは出ない。
+ *     コード側を削ると check-telop.mjs と telop-catalog.mjs も直す必要が
+ *     あり、変更が依頼の範囲を超える（CLAUDE.md「変更は外科的に」）。
+ *     後で「やっぱり少し動かしたい」となった時も、数値1つで戻せる。
+ *
+ *   ★残した違いは**傾き・縁の太さ・二重縁の有無**だけ。いずれも静止した
+ *     見た目の差で、動かない。色は別に並べ替えて割り当てている。
+ *
+ *   ★点滅を止めるのは見た目の話だけではない。激しい明滅は光過敏性発作の
+ *     誘因になり得るし、TikTokの公式クリエイティブ指針も避けるよう促している。
+ */
 export const TELOP_STYLES: TelopStyle[] = [
-  { name: "叩きつけ", tiltDeg: -9, glow: "steady", outlineRatio: 0.12, popFrom: 1.28, dropRatio: 0, slideRatio: 0, shake: 0.02, ringOutline: false },
-  { name: "点滅・極太縁", tiltDeg: 0, glow: "blink", outlineRatio: 0.13, popFrom: 1.18, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
-  { name: "逆ナナメ突き上げ", tiltDeg: 8, glow: "slow", outlineRatio: 0.095, popFrom: 1.08, dropRatio: -0.35, slideRatio: 0, shake: 0.015, ringOutline: false },
-  { name: "落下・二重縁", tiltDeg: -4, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0.45, slideRatio: 0, shake: 0.02, ringOutline: true },
-  { name: "直立・二重縁・強発光", tiltDeg: 0, glow: "steady", outlineRatio: 0.115, popFrom: 1.2, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: true },
-  { name: "急ナナメ", tiltDeg: -12, glow: "steady", outlineRatio: 0.105, popFrom: 1.25, dropRatio: 0, slideRatio: 0, shake: 0.02, ringOutline: false },
-  { name: "横入り・二重縁", tiltDeg: 5, glow: "slow", outlineRatio: 0.1, popFrom: 1.0, dropRatio: 0, slideRatio: -0.18, shake: 0, ringOutline: true },
-  { name: "圧縮ズーム", tiltDeg: 0, glow: "steady", outlineRatio: 0.12, popFrom: 1.32, dropRatio: 0, slideRatio: 0, shake: 0.025, ringOutline: false },
+  { name: "ナナメ左・太縁", tiltDeg: -9, glow: "steady", outlineRatio: 0.12, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
+  { name: "直立・極太縁", tiltDeg: 0, glow: "steady", outlineRatio: 0.13, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
+  { name: "ナナメ右・細縁", tiltDeg: 8, glow: "steady", outlineRatio: 0.095, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
+  { name: "ナナメ左・二重縁", tiltDeg: -4, glow: "steady", outlineRatio: 0.1, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: true },
+  { name: "直立・二重縁", tiltDeg: 0, glow: "steady", outlineRatio: 0.115, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: true },
+  { name: "急ナナメ左", tiltDeg: -12, glow: "steady", outlineRatio: 0.105, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
+  { name: "ナナメ右・二重縁", tiltDeg: 5, glow: "steady", outlineRatio: 0.1, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: true },
+  { name: "直立・太縁", tiltDeg: 0, glow: "steady", outlineRatio: 0.12, popFrom: 1, dropRatio: 0, slideRatio: 0, shake: 0, ringOutline: false },
 ];
 
 const OUTLINE_DIRS: [number, number][] = [
@@ -602,8 +637,16 @@ export const HookTelop: React.FC<{
     : 0;
 
   /*
-   * ★1本目は前半55%で消していたが、それだと**見ていない時間の方が長い**。
-   *   フックは見えていないと意味がないので、シーンのほぼ全部で出す。
+   * ★★2026-09-09、意味が変わった。
+   *   以前は「シーンのほぼ全部（86%）で出す」だった。だが**それだと
+   *   走る字幕と必ず重なり、商品も隠れる**（オーナー指摘：
+   *   「出しすぎると商品見えないし、ただうざいだけ」）。
+   *
+   *   今は Video.tsx 側が **1.4秒だけ**の Sequence に入れて呼ぶ。
+   *   `durationInFrames` はその短い尺で渡ってくるので、ここは
+   *   「渡された尺のほぼ全部で出す」という同じ式のままでよい。
+   *   ★式を変えていないのは、短い尺でも 86% の位置で消え始めるのが
+   *     ちょうど良いため（1.4秒なら約1.2秒で消え始める）。
    */
   const holdUntil = Math.round(durationInFrames * 0.86);
   const opacity = interpolate(

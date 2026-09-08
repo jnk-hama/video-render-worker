@@ -55,13 +55,25 @@ const Line: React.FC<{
   );
 };
 
-export const Captions: React.FC<{ captions: Caption[]; accent: string }> = ({
-  captions,
-  accent,
-}) => {
+export const Captions: React.FC<{
+  captions: Caption[];
+  accent: string;
+  /**
+   * 字幕を出してはいけない区間（秒）。巨大テロップが出ている間がこれ。
+   *
+   * ★★2026-09-09 追加。オーナー指摘「テロップが2個被る事は避けて」。
+   *   以前は字幕が全編を貫いて出るため、巨大テロップと**構造上必ず**
+   *   重なっていた（そのぶん合成した商品も隠れていた）。
+   * ★省略された場合は従来どおり全編で出す。既存の呼び出しを壊さない。
+   */
+  hideWindows?: { start: number; end: number }[];
+}> = ({ captions, accent, hideWindows }) => {
   const frame = useCurrentFrame();
   const { fps, height } = useVideoConfig();
   const t = frame / fps;
+
+  // ★ここが「被らせない」の実体。巨大テロップの区間なら字幕を描かない
+  if ((hideWindows ?? []).some((w) => t >= w.start && t < w.end)) return null;
 
   const current = captions.find((c) => t >= c.start && t < c.end);
   if (!current) return null;
