@@ -2,6 +2,7 @@ import React from "react";
 import { interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import type { Caption } from "../types";
 import { JP_FONT } from "../lib/fonts";
+import { hasJapanese, wrapByWidth } from "./HookTelop";
 
 /*
  * 字幕。
@@ -27,6 +28,16 @@ import { JP_FONT } from "../lib/fonts";
  * ★ミュート再生で読めない字幕は、無いのと同じ。ここは太くする。
  */
 const OUTLINE_PX = 9;
+
+/*
+ * 字幕の置き場所と大きさ。**折り返しの計算と描画で同じ値を使うため定数にする。**
+ * ★ここをバラバラに持つと、計算した幅と実際に描く幅がずれて、
+ *   「収まるはずの行がブラウザ側でもう一度折り返される」ことが起きる。
+ */
+const INSET_LEFT = 60;
+/** TikTokの右側アイコン列を避ける */
+const INSET_RIGHT = 200;
+const FONT_SIZE = 108;
 const OUTLINE_DIRS: [number, number][] = [
   [-1, -1], [0, -1], [1, -1],
   [-1, 0], [1, 0],
@@ -67,9 +78,11 @@ export const Captions: React.FC<{
    * ★省略された場合は従来どおり全編で出す。既存の呼び出しを壊さない。
    */
   hideWindows?: { start: number; end: number }[];
-}> = ({ captions, accent, hideWindows }) => {
+  /** "ja" か "en"。書体の実寸表と改行規則の切り替えに使う */
+  market?: string;
+}> = ({ captions, accent, hideWindows, market = "ja" }) => {
   const frame = useCurrentFrame();
-  const { fps, height } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
   const t = frame / fps;
 
   // ★ここが「被らせない」の実体。巨大テロップの区間なら字幕を描かない
@@ -77,6 +90,23 @@ export const Captions: React.FC<{
 
   const current = captions.find((c) => t >= c.start && t < c.end);
   if (!current) return null;
+
+  /*
+   * ★★2026-09-09、**改行を自分で決めるようにした**（決定#115）。
+   *
+   *   前はブラウザの折り返しに任せていた。**日本語はどこでも折れる**ので、
+   *   本番の動画で「罪悪感ヤバいゴ／ミ箱」「スタンド付きな／ら」と
+   *   語の途中で切れていた（job 18ccc0cd のフレームで確認）。
+   *
+   *   ★巨大テロップ側は最初からこれを解いてある（禁則・助詞・文字種の境界）。
+   *     **同じ規則を書き直さない。** wrapByWidth をそのまま使う。
+   *   ★英語には掛けない。英語はブラウザが空白で折るのが正しく、
+   *     和文の規則を当てると単語が割れる。
+   */
+  const boxWidth = width - INSET_LEFT - INSET_RIGHT;
+  const text = hasJapanese(current.text)
+    ? wrapByWidth(current.text, boxWidth, FONT_SIZE, market).join("\n")
+    : current.text;
 
   // 出入りを一瞬だけ柔らかくする。パッと切り替わると読み落とす
   const inP = interpolate(t, [current.start, current.start + 0.12], [0, 1], {
@@ -87,8 +117,8 @@ export const Captions: React.FC<{
   const box: React.CSSProperties = {
     position: "absolute",
     // TikTokの安全域。右200pxはアイコン列、下は投稿文が重なる
-    left: 60,
-    right: 200,
+    left: INSET_LEFT,
+    right: INSET_RIGHT,
     /*
      * ★★2026-09-09、0.60 → 0.64 へ下げた（オーナー指摘
      *   「小テロップを少し下に下げて欲しい」）。
@@ -107,7 +137,7 @@ export const Captions: React.FC<{
     top: height * 0.64,
     textAlign: "center",
     fontFamily: JP_FONT,
-    fontSize: 108,
+    fontSize: FONT_SIZE,
     lineHeight: 1.2,
     whiteSpace: "pre-wrap",
   };
@@ -130,14 +160,14 @@ export const Captions: React.FC<{
           }}
           aria-hidden
         >
-          <Line text={current.text} highlight={current.highlight} accent={accent} outline />
+          <Line text={text} highlight={current.highlight} accent={accent} outline />
         </div>
       ))}
 
       {/* 本体 */}
       <div style={{ ...box, color: "#f4f4f5" }}>
         <Line
-          text={current.text}
+          text={text}
           highlight={current.highlight}
           accent={accent}
           outline={false}

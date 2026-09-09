@@ -1,0 +1,59 @@
+# 描画まわりの検査をまとめて回す。
+#
+# ★★2026-09-09 追加（決定#115）。
+#
+# 【なぜ要るか】
+# `check-telop.mjs` も `check-caption-wrap.mjs` も**手元でしか走っていなかった**。
+# 走らせ忘れれば、文字が画面からはみ出す版や、語の途中で切れる版が
+# そのまま main に入り、次の描画から本番の動画に出る。
+# 描画は1本7分かかるうえ、**出来上がってからでないと気づけない**。
+# ここで止めれば、押した時点で分かる。
+#
+# ★描画そのものはしない（Chromeもffmpegも要らない）。
+#   検査は全て**純粋関数を数値で確かめる**作りにしてあるので、数秒で終わる。
+name: check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "remotion/src/**"
+      - "remotion/scripts/**"
+      - "remotion/package.json"
+      - ".github/workflows/check.yml"
+  pull_request:
+    paths:
+      - "remotion/src/**"
+      - "remotion/scripts/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: remotion
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: remotion/package-lock.json
+
+      - name: 依存を入れる
+        run: npm ci
+
+      - name: 型検査
+        run: npx tsc --noEmit
+
+      - name: 巨大テロップ（収まり・行割り・演出の決定性）
+        run: node scripts/check-telop.mjs
+
+      - name: 走る字幕（改行が語を割らないこと）
+        run: node scripts/check-caption-wrap.mjs

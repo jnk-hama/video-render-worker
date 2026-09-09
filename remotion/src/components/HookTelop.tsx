@@ -519,7 +519,7 @@ const fitFontSize = (
 };
 
 /** 和文（ひらがな・カタカナ・漢字）を含むか。含まなければ英語として扱う */
-const hasJapanese = (s: string): boolean =>
+export const hasJapanese = (s: string): boolean =>
   /[぀-ヿ㐀-鿿ｦ-ﾟ]/.test(s);
 
 type Candidate = { lines: string[]; quality: number };
@@ -560,6 +560,131 @@ const japaneseCandidates = (chars: string[]): Candidate[] => {
     out.push({ lines, quality });
   }
   return out;
+};
+
+/**
+ * 決まった幅・決まった文字サイズの文を、**禁則と語の切れ目**で行に割る。
+ * 走る字幕（Captions.tsx）が使う。
+ *
+ * ============================================================
+ * 【なぜ要るか（2026-09-09・決定#115）】
+ * 字幕はブラウザの折り返しに任せていた。**日本語はどこでも折れる**ので、
+ * 実際の動画で
+ *     「罪悪感ヤバいゴ／ミ箱」   「スタンド付きな／ら」
+ * と語の途中で切れていた（本番 job 18ccc0cd のフレームで確認）。
+ *
+ * ★巨大テロップ側は最初からこの問題を解いてある（決定#093）。
+ *   **同じ規則をもう一度書かない。** `breakQuality` をそのまま使う。
+ * ★巨大テロップを2枚に絞った（#114）ぶん、字幕が出ている時間が増えた。
+ *   ここが読みにくいと、動画全体が読みにくくなる。
+ * ============================================================
+ *
+ * ★貪欲法で置く。**入るところまで詰めてから、良い切れ目まで戻る**。
+ *   総当たりにしないのは、字幕は毎フレーム描かれるため（1本の動画で
+ *   800回以上）。巨大テロップは1シーンに1回なので総当たりでよい。
+ * ★戻れる幅は BACKOFF まで。それ以上戻ると1行が短くなりすぎて、
+ *   かえって読みにくい。良い切れ目が無ければ諦めてそこで切る
+ *   （**禁則だけは必ず守る**）。
+ */
+const BACKOFF = 5;
+
+/**
+ * 仮名どうしの切れ目への追加の減点。
+ *
+ * ★`breakQuality` は「同じ文字種の途中」を一律 0.6 にしている。巨大テロップは
+ *   総当たりで**文字サイズの利得**と掛け合わせて選ぶので、それで足りていた。
+ *   だが字幕は文字サイズが固定なので、**0.6 が並ぶと差がつかず、
+ *   たまたま右端の候補が選ばれて語の途中で切れる**
+ *   （実際に「せ／いで」が出た）。
+ * ★仮名の連続はほぼ語の内側なので、ここだけさらに下げて、
+ *   助詞の直後・文字種の境界（1.0）が確実に勝つようにする。
+ * ★`breakQuality` 自体は触らない。あちらは232通りの検査が通っている。
+ */
+const KANA_RUN_PENALTY = 0.4;
+
+/**
+ * 漢字→仮名の切れ目への減点。
+ *
+ * ★文字種の境界は普通「語の切れ目」だが、**漢字の直後の仮名は送り仮名**で
+ *   あることが多く、そこは語の**内側**である（買/った、吸/い上げて）。
+ *   減点しないと「買」で行が終わって「ったせいで」が次行に来る。
+ * ★逆向き（仮名→漢字）は新しい語の始まりなので減点しない。
+ *   ここが日本語の改行で一番効く手掛かりになる。
+ */
+const OKURIGANA_PENALTY = 0.4;
+
+export const wrapByWidth = (
+  text: string,
+  maxWidthPx: number,
+  fontSize: number,
+  market: string,
+): string[] => {
+  const chars = Array.from(text);
+  if (!chars.length || fontSize <= 0 || maxWidthPx <= 0) return [text];
+
+  const lines: string[] = [];
+  let start = 0;
+  while (start < chars.length) {
+    // ① 入るところまで詰める
+    let w = 0;
+    let end = start;
+    while (end < chars.length) {
+      const adv = advanceEm(chars[end], market) * fontSize;
+      if (w + adv > maxWidthPx && end > start) break;
+      w += adv;
+      end++;
+    }
+    if (end >= chars.length) {
+      lines.push(chars.slice(start).join(""));
+      break;
+    }
+
+    // ② そこから少し戻って、一番良い切れ目を探す
+    /*
+     * ★切れ目の良さ × **その行がどれだけ幅を使えるか**で選ぶ。
+     *
+     *   良さだけで選ぶと、少し戻った所に良い切れ目があるたびに
+     *   「これ」「吸い」のような**極端に短い行**ができて行数が増える。
+     *   幅の使用率を掛けると、「同じくらい良い切れ目なら長い方」になる。
+     */
+    const lineWidth = (from: number, to: number) =>
+      chars.slice(from, to).reduce((w, c) => w + advanceEm(c, market) * fontSize, 0);
+
+    const scoreAt = (i: number): number => {
+      const q = breakQuality(chars, i);
+      if (q === 0) return 0;
+      const ca = classOf(chars[i - 1]);
+      const cb = classOf(chars[i]);
+      let base = q;
+      // 仮名どうしの途中はほぼ語の内側。ここで切らせない
+      if (ca === cb && (ca === "kana" || ca === "kata")) base *= KANA_RUN_PENALTY;
+      // 漢字の直後の仮名は送り仮名。語の内側なので下げる
+      else if (ca === "kanji" && cb === "kana") base *= OKURIGANA_PENALTY;
+      return base * (lineWidth(start, i) / maxWidthPx);
+    };
+
+    let best = end;
+    let bestQ = scoreAt(end);
+    for (let i = end - 1; i >= Math.max(start + 1, end - BACKOFF); i--) {
+      const q = scoreAt(i);
+      if (q > bestQ) {
+        bestQ = q;
+        best = i;
+      }
+    }
+    /*
+     * ★戻った先も禁則で切れない（点数0）なら、**前へ進めて**探す。
+     *   後ろへ下がり続けると1文字ずつの行ができる。
+     */
+    if (bestQ === 0) {
+      let i = end;
+      while (i < chars.length && breakQuality(chars, i) === 0) i++;
+      best = i;
+    }
+    lines.push(chars.slice(start, best).join(""));
+    start = best;
+  }
+  return lines.length ? lines : [text];
 };
 
 /**

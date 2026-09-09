@@ -196,6 +196,7 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
         captions={script.captions}
         accent={accent}
         hideWindows={hideCaptionWindows}
+        market={script.market ?? "ja"}
       />
 
       {/* 広告表記は全編。景表法のステマ規制（決定#065） */}
