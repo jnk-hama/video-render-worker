@@ -80,6 +80,15 @@ const LINE_HEIGHT = 1.0;
 /** 英語も3行まで。4行にすると1文字が小さくなり、殴る力が消える */
 const MAX_LINES_EN = 3;
 
+/**
+ * 和文を一列で出すと決めるための下限（画面幅比）。
+ *
+ * ★走る字幕は 108px（画面幅の10.0%）。巨大テロップがそれを下回ったら
+ *   もう「巨大」ではないので、一列を諦めて改行へ戻す。
+ * ★英語には掛けない（英語は語で折る latinLayout が別にある）。
+ */
+const ONE_LINE_MIN_RATIO = 0.105;
+
 /*
  * 置ける帯（画面高さ比）。走る字幕は 0.6 にある。
  *
@@ -279,6 +288,69 @@ export const shuffledBySeed = <T,>(arr: T[], seed: number): T[] => {
 };
 
 /*
+ * 【1文字ごとに傾き・大きさを変える（2026-09-09・オーナー指示）】
+ *
+ *   > 文字をナナメにしたりサイズを変えて一列にしましょう
+ *
+ * ★これは装飾ではなく**一列にするための手当て**である。
+ *   一列に固定すると1文字は必ず小さくなる（下の ONE_LINE 節）。
+ *   全部を同じ大きさで並べると「小さくなっただけ」に見えるので、
+ *   強い文字を大きく・弱い文字を小さくして、**行全体の情報量ではなく
+ *   1文字あたりの強弱で殴る**形にする。手書きテロップと同じ理屈。
+ *
+ * ★乱数は使わない。文面から種を作る（seedOf）。同じテロップは何度
+ *   描いても1ピクセルも変わらない（CLAUDE.md「確率で揺れる処理を
+ *   構成に持ち込まない」／描き直しは設計された経路・E-017）。
+ *
+ * ★大きさは**文字送りに正確に効く**。span ごとに fontSize を変えるので
+ *   1文字の幅は advanceEm × scale になる。だから収まりの計算
+ *   （fitFontSize）にも同じ scale を渡している。**見た目だけ変えて
+ *   計算に入れないと画面からはみ出す。**
+ */
+export type CharAccent = { scale: number; tilt: number };
+
+/** 大きさの並び。平均が1前後になるように組む（行全体の幅を暴れさせない） */
+const CHAR_SCALE_PATTERNS: number[][] = [
+  [1.0, 1.18, 0.88],
+  [1.14, 0.9, 1.0, 1.08],
+  [0.9, 1.16, 1.02],
+  [1.16, 0.94, 1.06, 0.9],
+];
+
+/**
+ * 傾きの並び（度）。
+ * ★±10°まで。これ以上倒すと、縁を8方向に敷いている都合で
+ *   隣の文字と食い合って読みにくくなる（実物を見て決めた上限）。
+ */
+const CHAR_TILT_PATTERNS: number[][] = [
+  [-7, 3, 8, -4],
+  [6, -8, 2, -3, 7],
+  [-5, 7, -2, 4],
+  [4, -6, 9, -3],
+];
+
+/** 傾けも大きさも変えない（英語はこれを使う。下の理由を参照） */
+const FLAT: CharAccent = { scale: 1, tilt: 0 };
+
+/**
+ * 文面から決まる、1文字ごとの傾きと大きさ。**同じ文面なら必ず同じ並び**。
+ *
+ * ★英語には掛けない。和文は1文字が1つの意味の単位なので大小を付けても
+ *   語として壊れないが、英語は**1語の中の文字がバラつくと単語に見えなくなる**。
+ *   Aアカウント（英語圏）をこの経路に載せた時に事故らないよう、ここで分ける。
+ */
+export const charAccents = (n: number, seed: number, market: string): CharAccent[] => {
+  if (market === "en") return Array.from({ length: n }, () => FLAT);
+  const scales = CHAR_SCALE_PATTERNS[seed % CHAR_SCALE_PATTERNS.length];
+  const tilts = CHAR_TILT_PATTERNS[(seed >>> 8) % CHAR_TILT_PATTERNS.length];
+  const off = (seed >>> 16) % 5;
+  return Array.from({ length: n }, (_, i) => ({
+    scale: scales[(i + off) % scales.length],
+    tilt: tilts[(i + off) % tilts.length],
+  }));
+};
+
+/*
  * 【改行位置（2026-09-05・オーナー指示「キリの良い改行もしてな」）】
  *
  * 前の版は**文字数で機械的に割っていた**ので
@@ -412,17 +484,37 @@ const fitFontSize = (
    *   さらに外側 1.9倍まで出る。左右・上下の両側に出るので2倍して足す。
    */
   padEm = 0,
+  /*
+   * ★1文字ごとの大きさ（行ごと）。span 側で fontSize を変えるので
+   *   文字送りも背の高さも実際にこの倍率で伸びる。**見た目だけ変えて
+   *   ここへ渡さないと画面からはみ出す。** 省略時は全て等倍。
+   */
+  accentLines?: CharAccent[][],
 ): number => {
+  const scaleAt = (li: number, ci: number) => accentLines?.[li]?.[ci]?.scale ?? 1;
   const em =
     Math.max(
       0.5,
-      ...lines.map((l) => Array.from(l).reduce((s, c) => s + advanceEm(c, market), 0)),
+      ...lines.map((l, li) =>
+        Array.from(l).reduce((s, c, ci) => s + advanceEm(c, market) * scaleAt(li, ci), 0),
+      ),
     ) + padEm * 2;
-  const tall = lines.length * LINE_HEIGHT + padEm * 2;
+  // ★背の高い文字がある行はその分だけ縦に張り出す。最大倍率で見ておく
+  const maxScale = Math.max(
+    1,
+    ...lines.flatMap((l, li) => Array.from(l).map((_, ci) => scaleAt(li, ci))),
+  );
+  const tall = lines.length * LINE_HEIGHT * maxScale + padEm * 2;
   return Math.min(
     (width * WIDTH_MARGIN) / (em * cos + tall * sin),
     bandHeight / (em * sin + tall * cos),
-    width * maxFontRatio(market),
+    /*
+     * ★上限は**一番大きい1文字**に掛ける。fontSize は基準値であって
+     *   実際に出る最大の字は fontSize × maxScale なので、割っておかないと
+     *   強弱を付けた分だけ上限を素通りして大きくなる
+     *   （オーナー指示「文字サイズも小さく」に反する）。
+     */
+    (width * maxFontRatio(market)) / maxScale,
   );
 };
 
@@ -585,10 +677,10 @@ export const layoutTelop = (
   market: string = "ja",
   /** 縁の張り出し（em）。演出ごとに違うので呼び出し側が渡す */
   padEm = 0,
-): { lines: string[]; fontSize: number } => {
+): { lines: string[]; fontSize: number; accents: CharAccent[][] } => {
   const trimmed = text.trim();
   const chars = Array.from(trimmed);
-  if (!chars.length) return { lines: [""], fontSize: 0 };
+  if (!chars.length) return { lines: [""], fontSize: 0, accents: [[]] };
 
   const rad = (Math.abs(tiltDeg) * Math.PI) / 180;
   const cos = Math.cos(rad);
@@ -597,18 +689,109 @@ export const layoutTelop = (
   // ★書き分けは**中身の文字**で決める。market の指定漏れで日本語が
   //   英語の規則に落ちると単語どころか文が壊れるため、両方を見る。
   if (market === "en" && !hasJapanese(trimmed)) {
-    return latinLayout(trimmed, width, bandHeight, cos, sin, market, padEm);
+    const r = latinLayout(trimmed, width, bandHeight, cos, sin, market, padEm);
+    return { ...r, accents: r.lines.map((l) => Array.from(l).map(() => FLAT)) };
   }
+
+  /*
+   * ★1文字ごとの傾き・大きさは**文面から**決める。行割りより先に決めて
+   *   おかないと、収まりの計算に倍率を織り込めない。
+   */
+  const accents = charAccents(chars.length, seedOf(trimmed), market);
+  /** 行ごとに切り出す。文字の位置と倍率がずれないように同じ切り方で割る */
+  const accentsFor = (lines: string[]): CharAccent[][] => {
+    let at = 0;
+    return lines.map((l) => {
+      const n = Array.from(l).length;
+      const slice = accents.slice(at, at + n);
+      at += n;
+      return slice;
+    });
+  };
+
   const candidates = japaneseCandidates(chars);
 
   let best = { lines: [trimmed], fontSize: 0, score: -1 };
   for (const c of candidates) {
-    const fontSize = fitFontSize(c.lines, width, bandHeight, cos, sin, market, padEm);
+    const fontSize = fitFontSize(
+      c.lines, width, bandHeight, cos, sin, market, padEm, accentsFor(c.lines),
+    );
     const score = fontSize * c.quality;
     if (score > best.score) best = { lines: c.lines, fontSize, score };
   }
-  return { lines: best.lines, fontSize: best.fontSize };
+
+  /*
+   * ★★2026-09-09、**和文は一列を既定にした**（オーナー指示
+   *   「文字をナナメにしたりサイズを変えて一列にしましょう」）。
+   *
+   *   【何が起きていたか】上の総当たりは「1文字が一番大きくなる割り方」を
+   *     選ぶので、短いフックほど必ず2〜3行になっていた
+   *     （実物: 「ホコリ／舞う」「ゴミ／捨て／0秒」「価格が／バグ」）。
+   *     積むと1文字は大きくなるが、**視線が縦へ折り返す**ぶん読むのに
+   *     時間がかかる。1.4秒しか出さない一撃としては横一列の方が速い。
+   *
+   *   【どう決めたか】まず一列で測り、**それが読める大きさなら一列を採る**。
+   *     読めない大きさまで落ちる時（＝想定より長い文面が来た時）だけ、
+   *     上の総当たりの結果へ戻す。一列を強制して字が潰れる方が害が大きい。
+   *
+   *   ★下限 ONE_LINE_MIN_RATIO の根拠：走る字幕が 108px（画面幅の10.0%）。
+   *     巨大テロップがそれを下回ると「巨大」ではなくなる。10.5%＝113px を
+   *     下限に置いた。台本側の契約（telop_main2 は4〜9文字）なら
+   *     9文字でも 118px 出るので、契約を守った文面は必ず一列になる。
+   */
+  const oneLine = [trimmed];
+  const oneLineSize = fitFontSize(
+    oneLine, width, bandHeight, cos, sin, market, padEm, accentsFor(oneLine),
+  );
+  if (oneLineSize >= width * ONE_LINE_MIN_RATIO) {
+    return { lines: oneLine, fontSize: oneLineSize, accents: accentsFor(oneLine) };
+  }
+
+  return { lines: best.lines, fontSize: best.fontSize, accents: accentsFor(best.lines) };
 };
+
+/**
+ * 1行を、1文字ずつの span で組む。傾きと大きさを文字ごとに変えるため。
+ *
+ * ★縁・発光・塗りの各層が**全く同じもの**を描く必要がある（8方向の複製を
+ *   重ねて輪郭を作っているので、1層でも文字送りが違うと輪郭が二重にぶれる）。
+ *   だから組み立てはここ1箇所に置き、各層はこれを呼ぶだけにする。
+ *
+ * ★letterSpacing を span 側にも書く。**継承だと親の文字サイズで
+ *   px に確定した値が降りてくる**ので、大きい文字ほど詰まって見え、
+ *   収まりの計算（advanceEm × scale）ともずれる。自分の em で解かせる。
+ *
+ * ★rotate はレイアウトに影響しない（CSSのtransformは配置後に掛かる）。
+ *   だから傾きは文字送りを1pxも動かさない。大きさだけが幅に効く。
+ */
+const Row: React.FC<{ line: string; accents: CharAccent[]; fontSize: number }> = ({
+  line,
+  accents,
+  fontSize,
+}) => (
+  <>
+    {Array.from(line).map((ch, i) => {
+      const a = accents[i] ?? FLAT;
+      return (
+        <span
+          key={i}
+          style={{
+            display: "inline-block",
+            fontSize: fontSize * a.scale,
+            lineHeight: 1,
+            letterSpacing: "-0.03em",
+            // ★大小の文字を同じ横軸で揃える。ベースライン揃えだと
+            //   大きい文字だけが沈んで、行がガタつく
+            verticalAlign: "middle",
+            transform: `rotate(${a.tilt}deg)`,
+          }}
+        >
+          {ch}
+        </span>
+      );
+    })}
+  </>
+);
 
 export const HookTelop: React.FC<{
   text: string;
@@ -635,7 +818,7 @@ export const HookTelop: React.FC<{
    *   小ささの方が実害が大きいので、黒縁までを保証対象にした。
    */
   const padEm = style.outlineRatio;
-  const { lines, fontSize } = layoutTelop(
+  const { lines, fontSize, accents } = layoutTelop(
     text, width, bandHeight, style.tiltDeg, market, padEm,
   );
   const blockHeight = lines.length * fontSize * LINE_HEIGHT;
@@ -751,7 +934,7 @@ export const HookTelop: React.FC<{
                       transform: `translate(${dx * outline * 1.9}px, ${dy * outline * 1.9}px)`,
                     }}
                   >
-                    {line}
+                    <Row line={line} accents={accents[i] ?? []} fontSize={fontSize} />
                   </div>
                 ))
               : null}
@@ -767,7 +950,7 @@ export const HookTelop: React.FC<{
                   transform: `translate(${dx * outline}px, ${dy * outline}px)`,
                 }}
               >
-                {line}
+                <Row line={line} accents={accents[i] ?? []} fontSize={fontSize} />
               </div>
             ))}
 
@@ -784,7 +967,7 @@ export const HookTelop: React.FC<{
                   `0 0 ${fontSize * 0.4}px ${color}`,
               }}
             >
-              {line}
+              <Row line={line} accents={accents[i] ?? []} fontSize={fontSize} />
             </div>
 
             {/* 塗り：上が白・下が色。常に出したまま（点滅させない） */}
@@ -797,7 +980,7 @@ export const HookTelop: React.FC<{
                 color: "transparent",
               }}
             >
-              {line}
+              <Row line={line} accents={accents[i] ?? []} fontSize={fontSize} />
             </div>
           </React.Fragment>
         );
