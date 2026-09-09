@@ -6,7 +6,9 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "render": "node scripts/render.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "preview:telop": "node scripts/preview-telop.mjs",
+    "check:telop": "node scripts/check-telop.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.410",

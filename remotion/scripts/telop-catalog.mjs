@@ -28,10 +28,19 @@ try {
 } finally {
   fs.rmSync(tmp, { force: true });
 }
-const { TELOP_STYLES, PALETTE_FOR_TELOP, layoutTelop, advanceEm, seedOf, shuffledBySeed } = mod;
+const { TELOP_STYLES, PALETTE_FOR_TELOP, layoutTelop, advanceEm, seedOf, shuffledBySeed,
+        BAND_TOP_RATIO, BAND_BOTTOM_RATIO } = mod;
 
 const W = 1080, H = 1920;
-const BAND_TOP = H * 0.12, BAND_H = H * 0.58 - BAND_TOP;
+/*
+ * ★★2026-09-09、**実装から読むように直した。**
+ *   ここは 0.12 / 0.58 を数値で持っていた。実装側の帯は既に
+ *   0.16 / 0.62 へ動いており、この一覧だけが**古い帯で計算した
+ *   文字サイズを載せていた**（docs/telop-presets.md が実物と食い違う）。
+ *   同じ取り違えを check-telop.mjs で既に一度やっている。定数は1箇所。
+ */
+const BAND_TOP = H * BAND_TOP_RATIO;
+const BAND_H = H * BAND_BOTTOM_RATIO - BAND_TOP;
 
 const move = (s) => {
   const p = [];
