@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-09T11:31:11+00:00",
+ "generated_at": "2026-09-09T16:46:04+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -49,91 +49,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w5b7mo",
-    "title": "Fishermen off Coronel cut rope and buoys from an orca's tail after it approached their boat",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w5b7mo/fishermen_off_coronel_cut_rope_and_buoys_from_an/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w7ur18",
+    "title": "This street art goes hard.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w7ur18/this_street_art_goes_hard/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7vzys",
-    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w9q96k",
+    "title": "Some advance human positive vibes on reddit",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w9q96k/some_advance_human_positive_vibes_on_reddit/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6t60v",
-    "title": "A person stuck in tunnel after the flash flood getting rescued after 9 days",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w6t60v/a_person_stuck_in_tunnel_after_the_flash_flood/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w86ksv",
+    "title": "Service dogs are real life heroes",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w86ksv/service_dogs_are_real_life_heroes/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7zwc7",
-    "title": "American Airlines passenger duct taped to seat following disruptive behavior onboard the flight",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7zwc7/american_airlines_passenger_duct_taped_to_seat/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wa12qs",
+    "title": "In 1973 Japan planted trees in concentric circles as part of an experiment in forestry spacing. This is what they look like today from above.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wa12qs/in_1973_japan_planted_trees_in_concentric_circles/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w58hzf",
-    "title": "The art of ashtrays crafted from red-hot lava - Mount Etna, Sicily",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w58hzf/the_art_of_ashtrays_crafted_from_redhot_lava/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w6y3b6",
+    "title": "This tree in California is over 4,800 years old. It was already ancient when the Egyptian Pyramids were being built, and its exact location is kept a secret to protect it.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w6y3b6/this_tree_in_california_is_over_4800_years_old_it/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w937rg",
-    "title": "Frothing Hot Coffee w/ NutriBullet",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w937rg/frothing_hot_coffee_w_nutribullet/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wapy6u",
+    "title": "What motivates you to come to work everyday?",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wapy6u/what_motivates_you_to_come_to_work_everyday/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w8581b",
-    "title": "To Assault The Bouncer Without Consequences.",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w8581b/to_assault_the_bouncer_without_consequences/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1w8zp4s",
+    "title": "A kid staring at the camera",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1w8zp4s/a_kid_staring_at_the_camera/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6y1d8",
-    "title": "Driving recklessly on the highway",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w6y1d8/driving_recklessly_on_the_highway/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1w6bs4f",
+    "title": "He saw something spectacular",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1w6bs4f/he_saw_something_spectacular/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wabw4p",
-    "title": "Making Reckless Turn, Then Acting Surprised Upon Winning Stupid Prize",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wabw4p/making_reckless_turn_then_acting_surprised_upon/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1w6zhst",
+    "title": "Father crosses the river with his son inside a sack so that he arrives clean at school.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w6zhst/father_crosses_the_river_with_his_son_inside_a/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w9vqvc",
-    "title": "Why would you flip it like that??",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w9vqvc/why_would_you_flip_it_like_that/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1walqb2",
+    "title": "View flying over the Sahara desert",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1walqb2/view_flying_over_the_sahara_desert/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -150,82 +150,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w7r8qf",
-    "title": "Sekiro: No Defeat Movie Version Full Staff List",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7r8qf/sekiro_no_defeat_movie_version_full_staff_list/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w7asor",
+    "title": "Naruto Director Says He 'Completely Ignored' Overseas Audience Demands While Making The Anime",
+    "url": "https://www.reddit.com/r/anime/comments/1w7asor/naruto_director_says_he_completely_ignored/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7su0t",
-    "title": "Astounding Effects Animation by Hideki Kakita - Karas OVA #4",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7su0t/astounding_effects_animation_by_hideki_kakita/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w6sepk",
+    "title": "\"I'm Dating a Dark Summoner\" New Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1w6sepk/im_dating_a_dark_summoner_new_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w5ezv0",
-    "title": "3D Backgrounds vs 2D in Anime - OtaKing",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w5ezv0/3d_backgrounds_vs_2d_in_anime_otaking/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w9p9hi",
+    "title": "Studio Ghibli producer ignored the “Ghibli-style” AI art trend because he knew people would just get bored of it. “It only takes a little knowledge to spot a fake” - AUTOMATON WEST",
+    "url": "https://www.reddit.com/r/anime/comments/1w9p9hi/studio_ghibli_producer_ignored_the_ghiblistyle_ai/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1waxhe2",
-    "title": "We Are Aliens - Theme Song Trailer",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1waxhe2/we_are_aliens_theme_song_trailer/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wb5b8d",
-    "title": "Simple & Comfortable in Mexico City",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wb5b8d/simple_comfortable_in_mexico_city/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w5st3i",
-    "title": "Quebec City, I am in you 🫵🏼",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w5st3i/quebec_city_i_am_in_you/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w7i19w",
-    "title": "I finally have enough karma to post",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w7i19w/i_finally_have_enough_karma_to_post/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w75s18",
-    "title": "understand understand the concept the concept",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w75s18/understand_understand_the_concept_the_concept/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w6bdtz",
-    "title": "Is the bandana a no? US Open fit yesterday",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w6bdtz/is_the_bandana_a_no_us_open_fit_yesterday/",
-    "subreddit": "streetwear",
+    "id": "t3_1w6z0pt",
+    "title": "My Girlfriend's Friend | Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1w6z0pt/my_girlfriends_friend_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -243,6 +198,15 @@
     "id": "t3_1w6448i",
     "title": "Inazuma if it was released today (Vesna corner because yes)",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w6448i/inazuma_if_it_was_released_today_vesna_corner/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wbctdd",
+    "title": "New Mondstadt overhaul looks great",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wbctdd/new_mondstadt_overhaul_looks_great/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
@@ -267,12 +231,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w73hm5",
-    "title": "This cute lil radish is cutely dressed for the winter, how cute is that 🤗",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w73hm5/this_cute_lil_radish_is_cutely_dressed_for_the/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w8yhtl",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 11 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w8yhtl/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    }
   ]
