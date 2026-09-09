@@ -25,6 +25,11 @@
  *   node scripts/preview-telop.mjs --market=en "STOP SCROLLING"
  *   node scripts/preview-telop.mjs --job=abc123        # 演出の並びを固定する種
  *   node scripts/preview-telop.mjs --out=/tmp/x.png
+ *   node scripts/preview-telop.mjs --bg=assets/shared/xxx.mp4  # 背景を差し替える
+ *
+ * ★--bg は**色や明るさの変更をA/Bする時に要る**。既定の中立な背景は
+ *   暗い単色なので、暗さ・彩度の調整が効いているかどうかが分からない。
+ *   実写に近い素材を置いて、掛ける／掛けないの2枚を測ること（決定#114）。
  *
  * 出す物: 横に並べた1枚のPNG（ffmpegがあれば）と、各フレームのPNG。
  */
@@ -123,7 +128,7 @@ const script = {
     kind: "talk",
     seconds: SCENE_SEC,
     camera: "hold",
-    backgroundUrl: `${base}/assets/shared/neutral-gradient.mp4`,
+    backgroundUrl: `${base}/${flag("bg", "assets/shared/neutral-gradient.mp4")}`,
     headline: "",
   })),
   hookTelops: telops,

@@ -10,6 +10,7 @@ import {
 } from "remotion";
 import type { InSituScene } from "../types";
 import { handheld, layerTransform, useCameraValue } from "../lib/camera";
+import { BACKGROUND_FILTER } from "../lib/look";
 
 /*
  * ============================================================
@@ -95,7 +96,11 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
           src={scene.backgroundUrl}
           muted
           // ★背景の音は使わない。ナレーションとBGMだけで作る
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          style={{
+            width: "100%", height: "100%", objectFit: "cover",
+            // ★色を戻してから暗くする（決定#114）。数値は lib/look.ts に1つだけ置く
+            filter: BACKGROUND_FILTER,
+          }}
         />
       </AbsoluteFill>
 
