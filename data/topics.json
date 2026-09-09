@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-08T21:17:00+00:00",
+ "generated_at": "2026-09-09T04:50:55+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -40,91 +40,100 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w81ms4",
-    "title": "There's certified, and then there's CERTIFIED. This guy is the latter",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w81ms4/theres_certified_and_then_theres_certified_this/",
+    "id": "t3_1wagt31",
+    "title": "This is the moment a supermarket worker dives onto the road to save a child from oncoming traffic in Puebla, Mexico.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wagt31/this_is_the_moment_a_supermarket_worker_dives/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7ur18",
-    "title": "This street art goes hard.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w7ur18/this_street_art_goes_hard/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w937rg",
+    "title": "Frothing Hot Coffee w/ NutriBullet",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w937rg/frothing_hot_coffee_w_nutribullet/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w86ksv",
-    "title": "Service dogs are real life heroes",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w86ksv/service_dogs_are_real_life_heroes/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w8581b",
+    "title": "To Assault The Bouncer Without Consequences.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w8581b/to_assault_the_bouncer_without_consequences/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w9q96k",
-    "title": "Some advance human positive vibes on reddit",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w9q96k/some_advance_human_positive_vibes_on_reddit/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w6y1d8",
+    "title": "Driving recklessly on the highway",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w6y1d8/driving_recklessly_on_the_highway/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wa12qs",
-    "title": "In 1973 Japan planted trees in concentric circles as part of an experiment in forestry spacing. This is what they look like today from above.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wa12qs/in_1973_japan_planted_trees_in_concentric_circles/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wabw4p",
+    "title": "Making Reckless Turn, Then Acting Surprised Upon Winning Stupid Prize",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wabw4p/making_reckless_turn_then_acting_surprised_upon/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6y3b6",
-    "title": "This tree in California is over 4,800 years old. It was already ancient when the Egyptian Pyramids were being built, and its exact location is kept a secret to protect it.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w6y3b6/this_tree_in_california_is_over_4800_years_old_it/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w9vqvc",
+    "title": "Why would you flip it like that??",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w9vqvc/why_would_you_flip_it_like_that/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w77f5n",
-    "title": "It's like starting a car in late December",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w77f5n/its_like_starting_a_car_in_late_december/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1w6zhst",
+    "title": "Father crosses the river with his son inside a sack so that he arrives clean at school.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w6zhst/father_crosses_the_river_with_his_son_inside_a/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w55fgt",
-    "title": "\"As we all know, Susie is a pervert...\" (from 1:56)",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w55fgt/as_we_all_know_susie_is_a_pervert_from_156/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1w7zrcl",
+    "title": "American Airlines passenger duct taped to seat following disruptive behavior onboard the flight",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w7zrcl/american_airlines_passenger_duct_taped_to_seat/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w8wbga",
-    "title": "Playing a game with his father-in-law.",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w8wbga/playing_a_game_with_his_fatherinlaw/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1walqb2",
+    "title": "View flying over the Sahara desert",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1walqb2/view_flying_over_the_sahara_desert/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w70imi",
-    "title": "Not what he was going to say.",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1w70imi/not_what_he_was_going_to_say/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1w990ye",
+    "title": "Burn victim gets facial reconstruction",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w990ye/burn_victim_gets_facial_reconstruction/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w8u8d9",
+    "title": "Imagine being so fed up with unpaid dues that you decide to take over the company’s official X account.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w8u8d9/imagine_being_so_fed_up_with_unpaid_dues_that_you/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -159,42 +168,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w5dorb",
-    "title": "Cosplays from Anime NYC 2026",
-    "url": "https://www.reddit.com/r/cosplay/comments/1w5dorb/cosplays_from_anime_nyc_2026/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w7kav6",
-    "title": "My handmade Princess Mononoke Cosplay!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1w7kav6/my_handmade_princess_mononoke_cosplay/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wab3gf",
-    "title": "Maomao from Apothecary Diaries by me!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wab3gf/maomao_from_apothecary_diaries_by_me/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wa8o7u",
-    "title": "Pure Vessel and Grimm Cosplay - Hollowknight",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wa8o7u/pure_vessel_and_grimm_cosplay_hollowknight/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1w7asor",
     "title": "Naruto Director Says He 'Completely Ignored' Overseas Audience Demands While Making The Anime",
     "url": "https://www.reddit.com/r/anime/comments/1w7asor/naruto_director_says_he_completely_ignored/",
@@ -222,48 +195,21 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w9r2dk",
-    "title": "Wedding can wait, commissions can not",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w9r2dk/wedding_can_wait_commissions_can_not/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w8yhtl",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 11 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w8yhtl/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    },
    {
-    "id": "t3_1w6448i",
-    "title": "Inazuma if it was released today (Vesna corner because yes)",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w6448i/inazuma_if_it_was_released_today_vesna_corner/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1w5ba2y",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 15 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1w5ba2y/rezero_starting_life_in_another_world_season_4/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w7y9f7",
-    "title": "Genshin has more than 250+ unique locations. Crazy for a F2P game.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w7y9f7/genshin_has_more_than_250_unique_locations_crazy/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w9hdpk",
-    "title": "Genshin Impact Version 7.1 Special Program Preview",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w9hdpk/genshin_impact_version_71_special_program_preview/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w73hm5",
-    "title": "This cute lil radish is cutely dressed for the winter, how cute is that 🤗",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w73hm5/this_cute_lil_radish_is_cutely_dressed_for_the/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    }
   ]
