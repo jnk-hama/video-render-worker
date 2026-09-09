@@ -764,11 +764,24 @@ export const layoutTelop = (
  * ★rotate はレイアウトに影響しない（CSSのtransformは配置後に掛かる）。
  *   だから傾きは文字送りを1pxも動かさない。大きさだけが幅に効く。
  */
-const Row: React.FC<{ line: string; accents: CharAccent[]; fontSize: number }> = ({
-  line,
-  accents,
-  fontSize,
-}) => (
+const Row: React.FC<{
+  line: string;
+  accents: CharAccent[];
+  fontSize: number;
+  /**
+   * 塗りの層だけ渡す。**グラデーションは1文字ずつの span 側に掛ける。**
+   *
+   * ★親（行）に掛けても `-webkit-background-clip: text` は inline-block の
+   *   子孫まで効く（Chromiumで実測済み。効かないわけではない）。
+   *   それでも span 側へ移したのは**大きさを文字ごとに変えたから**である。
+   *   親に掛けると1行ぶんの高さで色が決まるので、
+   *     大きい字 … 白から色までひととおり出る
+   *     小さい字 … 縦中央に揃うので**グラデーションの真ん中しか当たらない**
+   *   となり、同じ行で字ごとに色味が変わって見える。
+   *   span 側なら、どの大きさの字も「上が白・下が色」で揃う。
+   */
+  gradient?: string;
+}> = ({ line, accents, fontSize, gradient }) => (
   <>
     {Array.from(line).map((ch, i) => {
       const a = accents[i] ?? FLAT;
@@ -784,6 +797,14 @@ const Row: React.FC<{ line: string; accents: CharAccent[]; fontSize: number }> =
             //   大きい文字だけが沈んで、行がガタつく
             verticalAlign: "middle",
             transform: `rotate(${a.tilt}deg)`,
+            ...(gradient
+              ? {
+                  backgroundImage: gradient,
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }
+              : null),
           }}
         >
           {ch}
@@ -970,17 +991,18 @@ export const HookTelop: React.FC<{
               <Row line={line} accents={accents[i] ?? []} fontSize={fontSize} />
             </div>
 
-            {/* 塗り：上が白・下が色。常に出したまま（点滅させない） */}
-            <div
-              style={{
-                ...base,
-                backgroundImage: `linear-gradient(180deg, #fff 0%, #fff 38%, ${color} 100%)`,
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              <Row line={line} accents={accents[i] ?? []} fontSize={fontSize} />
+            {/*
+              塗り：上が白・下が色。常に出したまま（点滅させない）。
+              ★グラデーションは**1文字ずつの span 側**へ渡す。親に置くと
+                小さい字にグラデーションの真ん中しか当たらない（Row を参照）。
+            */}
+            <div style={base}>
+              <Row
+                line={line}
+                accents={accents[i] ?? []}
+                fontSize={fontSize}
+                gradient={`linear-gradient(180deg, #fff 0%, #fff 38%, ${color} 100%)`}
+              />
             </div>
           </React.Fragment>
         );
