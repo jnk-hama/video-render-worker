@@ -29,6 +29,9 @@ Colab と GitHub Actions では問題にならない（MoneyPrinterTurbo-SETUP.m
 import asyncio
 import os
 import re
+import shutil
+import subprocess
+import tempfile
 
 # 100ナノ秒 → 秒
 TICKS_PER_SECOND = 10_000_000
@@ -38,6 +41,27 @@ DEFAULT_VOICE = 'en-US-AndrewMultilingualNeural'
 
 # 読み上げ速度。ショート動画は少し速い方がテンポに合う
 DEFAULT_RATE = '+12%'
+DEFAULT_PITCH = '+0Hz'
+
+"""
+★★抑揚（2026-09-10・決定#127）。オーナー指示「ナレーションも最大限に抑揚つけて」。
+
+【なぜ文ごとに分けて合成するのか】
+edge-tts は **本文をHTMLエスケープしてから** SSML を組み立てる
+（edge_tts.communicate.mkssml で確認）。つまり `<prosody>` を本文へ
+埋め込む方法は使えない。抑揚を付けられるのは Communicate() の
+引数（rate / volume / pitch）だけで、これは**1回の合成につき1組**しかない。
+
+  → 全文を1回で合成する限り、最初から最後まで必ず一本調子になる。
+  → 文ごとに分けて呼び、文ごとに違う設定を与え、繋ぐしかない。
+
+【設定は文の"役割"で決める。乱数を使わない】
+同じ台本なら毎回同じ音でなければならない（E-017・描き直しは設計された動作）。
+"""
+HOOK_PROSODY = {'rate': '+18%', 'pitch': '+8Hz'}      # 1文目。速く高く入る
+QUESTION_PROSODY = {'rate': '+6%', 'pitch': '+12Hz'}  # 疑問。上げて煮え切らせない
+CLOSING_PROSODY = {'rate': '+4%', 'pitch': '+6Hz'}    # 最終文。落として言い切る
+BODY_PROSODY = {'rate': DEFAULT_RATE, 'pitch': DEFAULT_PITCH}  # 説明。従来のまま
 
 
 class TtsUnavailable(Exception):
@@ -52,7 +76,7 @@ def _require_edge_tts():
         raise TtsUnavailable('edge-tts を読み込めません: %s' % e)
 
 
-async def _synth(text, voice, rate, out_path):
+async def _synth(text, voice, rate, out_path, pitch=DEFAULT_PITCH):
     """
     合成しつつ WordBoundary を集める。
 
@@ -74,7 +98,8 @@ async def _synth(text, voice, rate, out_path):
     開発環境はWebSocketを通さずTTSを試せないため、今まで一度も
     気づけなかった。
     """
-    comm = edge_tts.Communicate(text, voice, rate=rate, boundary='WordBoundary')
+    comm = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch,
+                                boundary='WordBoundary')
 
     words = []
     with open(out_path, 'wb') as f:
@@ -93,12 +118,52 @@ async def _synth(text, voice, rate, out_path):
     return words
 
 
-def synthesize(text, out_path, voice=None, rate=None):
+def split_sentences(text):
+    """本文を文へ分ける。文末記号は文の側へ残す（読点では切らない）。"""
+    body = str(text or '')
+    parts = re.findall(r'[^%s]*[%s]+|[^%s]+$'
+                       % (SENTENCE_END, SENTENCE_END, SENTENCE_END), body)
+    return [p for p in (x.strip() for x in parts) if p]
+
+
+def prosody_for(index, total, sentence):
+    """
+    その文をどう読ませるか。**位置と形だけで決める**（決定#127）。
+
+    ★乱数を使わない。同じ台本なら毎回まったく同じ音でなければならない
+      （E-017。描き直しは設計された動作なので、鳴り方が変わってはいけない）。
+    """
+    if index == 0:
+        return HOOK_PROSODY                       # 掴み。ここで離脱が決まる
+    if sentence.rstrip().endswith(('？', '?')):
+        return QUESTION_PROSODY                   # 問いかけは上げて終わる
+    if index == total - 1:
+        return CLOSING_PROSODY                    # 最後は落として言い切る
+    return BODY_PROSODY
+
+
+def _run(cmd):
+    subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+
+def _audio_seconds(path):
+    """デコード後の実尺（秒）。**時刻の繰り下げはこの値でなければならない。**"""
+    r = subprocess.run(
+        ['ffprobe', '-v', 'error', '-show_entries', 'format=duration',
+         '-of', 'default=nw=1:nk=1', path],
+        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    return float(r.stdout.strip())
+
+
+def synthesize(text, out_path, voice=None, rate=None, prosody=True):
     """
     本文を読み上げた音声ファイルを作り、単語ごとの時刻を返す。
 
     @return {'path': str, 'words': [{'text','start','end'}], 'duration': float}
     @raises TtsUnavailable 使えない場合。呼び出し側は必ず捕まえること
+
+    ★prosody=True なら**文ごとに設定を変えて**合成し、繋いで1本にする
+      （決定#127）。ffmpeg が無い回・1文しかない回は従来どおり1回で合成する。
     """
     body = str(text or '').strip()
     if not body:
@@ -106,16 +171,70 @@ def synthesize(text, out_path, voice=None, rate=None):
 
     _require_edge_tts()
 
-    words = asyncio.run(_synth(body, voice or DEFAULT_VOICE,
-                               rate or DEFAULT_RATE, out_path))
+    sentences = split_sentences(body) if prosody else []
+    can_join = bool(shutil.which('ffmpeg')) and bool(shutil.which('ffprobe'))
+    if len(sentences) > 1 and can_join:
+        words, duration = _synth_by_sentence(sentences, voice, rate, out_path)
+    else:
+        if len(sentences) > 1 and not can_join:
+            # ★黙って一本調子へ落とさない。なぜそうなったかを残す
+            print('ffmpeg が無いので抑揚を付けられません（1回で合成します）', flush=True)
+        words = asyncio.run(_synth(body, voice or DEFAULT_VOICE,
+                                   rate or DEFAULT_RATE, out_path))
+        duration = words[-1]['end'] if words else 0.0
 
     if not os.path.exists(out_path) or os.path.getsize(out_path) < 1024:
         raise TtsUnavailable('音声を生成できませんでした（ファイルが空）。')
 
     # ★WordBoundary が1つも来ないことがある（記号だけの本文など）。
     #   その場合は音声だけ使い、字幕は呼び出し側で均等割りへ降りる。
-    duration = words[-1]['end'] if words else 0.0
     return {'path': out_path, 'words': words, 'duration': duration}
+
+
+def _synth_by_sentence(sentences, voice, rate, out_path):
+    """
+    文ごとに合成して繋ぐ。戻り値は (単語の列, 実尺)。
+
+    ★★**mp3のまま繋がない。** mp3はフレーム単位でエンコーダの詰め物が入るので、
+      文ごとに数十ミリ秒ずつ積もり、後半ほど字幕がずれる。
+      wavへ直して繋ぎ、**最後に1回だけ**mp3へ落とす。
+
+    ★★単語の時刻は文ごとに0秒始まりで返ってくる。
+      **デコード後の実尺**（_audio_seconds）で繰り下げる。
+      ここを間違えると全字幕がずれるので、検査で最終単語と実尺を突き合わせる。
+    """
+    work = tempfile.mkdtemp(prefix='tts_prosody_')
+    try:
+        wavs = []
+        words = []
+        offset = 0.0
+        for i, s in enumerate(sentences):
+            p = prosody_for(i, len(sentences), s)
+            mp3 = os.path.join(work, 'seg%02d.mp3' % i)
+            seg = asyncio.run(_synth(s, voice or DEFAULT_VOICE,
+                                     rate or p['rate'], mp3, p['pitch']))
+            wav = os.path.join(work, 'seg%02d.wav' % i)
+            _run(['ffmpeg', '-v', 'error', '-y', '-i', mp3,
+                  '-ar', '24000', '-ac', '1', wav])
+            dur = _audio_seconds(wav)
+            for w in seg:
+                words.append({'text': w['text'],
+                              'start': round(w['start'] + offset, 3),
+                              'end': round(w['end'] + offset, 3)})
+            print('  文%d: %s rate=%s pitch=%s → %.2f秒'
+                  % (i + 1, s[:18], rate or p['rate'], p['pitch'], dur), flush=True)
+            offset += dur
+            wavs.append(wav)
+
+        lst = os.path.join(work, 'list.txt')
+        with open(lst, 'w', encoding='utf-8') as f:
+            for w in wavs:
+                f.write("file '%s'\n" % w.replace("'", "'\\''"))
+        _run(['ffmpeg', '-v', 'error', '-y', '-f', 'concat', '-safe', '0',
+              '-i', lst, '-c:a', 'libmp3lame', '-q:a', '4', out_path])
+        return words, offset
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
 
 
 # 日本語の1枚あたりの文字数。語ではなく文字で区切る（下の説明）。

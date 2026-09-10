@@ -21,7 +21,9 @@ on:
       - "remotion/scripts/**"
       - "remotion/package.json"
       - "scripts/tts.py"
+      - "scripts/make_narration.py"
       - "scripts/check_group_words.py"
+      - "scripts/check_tts_prosody.py"
       - ".github/workflows/check.yml"
   pull_request:
     paths:
@@ -66,3 +68,11 @@ jobs:
       - name: 字幕のまとめ方（空白・文またぎ）
         working-directory: .
         run: python3 scripts/check_group_words.py
+
+      # ★★2026-09-10 追加（決定#127）。抑揚のため文ごとに合成して繋ぐ。
+      #   繋ぎの計算を間違えると**字幕が全部ずれる**のに、動画は正常に
+      #   出来上がるので見るまで気づかない（E-010と同じ壊れ方）。
+      #   音を作らずに（＝ネットワーク無しで）繋ぎの計算だけを検査する。
+      - name: ナレーションの抑揚（繋いだ後の時刻がずれないこと）
+        working-directory: .
+        run: python3 scripts/check_tts_prosody.py

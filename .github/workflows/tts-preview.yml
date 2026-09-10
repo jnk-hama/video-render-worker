@@ -1,0 +1,121 @@
+# ナレーションだけを作って聴くための口（決定#127）。
+#
+# 【なぜ要るか】
+# 抑揚の調整は「聴いて詰める」作業だが、開発サンドボックスは
+# edge-tts の WebSocket を通さない（403）。つまり**音はActionsでしか作れない**。
+# 描画まで含む render-video は1本およそ5分かかり、Actions は既に
+# 無料枠を超えている。抑揚を1回聴くたびに5分溶かすのは割に合わない。
+#
+# ここは TTS だけを走らせる。Remotion も ffmpeg の重い依存も積まないので
+# 30秒〜1分で終わる。声の一覧もここで出せる。
+#
+# 出す物: narration.mp3 と、文ごとの設定・単語の時刻（Artifact）。
+
+name: tts-preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: '読み上げる本文（空なら見本の台本）'
+        required: false
+        type: string
+      voice:
+        description: '声（空なら ja-JP-NanamiNeural）'
+        required: false
+        type: string
+      list_voices:
+        description: '日本語の声の一覧だけ出す'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # ★mp3を繋ぐのに要る。抑揚は文ごとに合成して繋ぐ方式なので必須
+      - name: FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg
+          ffmpeg -version | head -1
+
+      - name: edge-tts
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check edge-tts
+          python3 -c "import edge_tts; print('edge-tts', edge_tts.__version__)"
+
+      # ★★声の一覧は「私の記憶」ではなく**実物から**出す。
+      #   使える話者名を推測で書かないため（CLAUDE.md「確認できないことは
+      #   確認できませんと答える」）。
+      - name: 日本語の声の一覧
+        if: inputs.list_voices
+        run: |
+          python3 - <<'PY'
+          import asyncio, edge_tts
+          async def main():
+              vs = await edge_tts.list_voices()
+              for v in sorted(vs, key=lambda x: x['ShortName']):
+                  if v['Locale'].startswith('ja-'):
+                      print('%-34s %-7s %s' % (
+                          v['ShortName'], v.get('Gender', ''),
+                          ', '.join(v.get('VoiceTag', {}).get('VoicePersonalities', []) or [])))
+          asyncio.run(main())
+          PY
+
+      - name: 抑揚の検査（音を作らずに繋ぎの計算だけ）
+        if: ${{ !inputs.list_voices }}
+        run: python3 scripts/check_tts_prosody.py
+
+      - name: ナレーションを作る
+        if: ${{ !inputs.list_voices }}
+        env:
+          TTS_TEXT: ${{ inputs.text }}
+          TTS_VOICE: ${{ inputs.voice }}
+        run: |
+          # ★本文はシェルへ展開しない。引用符や改行でコマンドが壊れるため
+          python3 - <<'PY'
+          import json, os, sys
+          sys.path.insert(0, 'scripts')
+          from tts import synthesize, split_sentences, prosody_for
+
+          text = (os.environ.get('TTS_TEXT') or '').strip() or (
+              '夜中にゴミ捨てへ行くの、正直しんどくない？'
+              'これ置くだけでゴミを勝手に吸い上げてくれる。'
+              'この機能でこの価格は安すぎん？'
+              'ペットの毛も毎日ちゃんと消えてく。'
+              '正確な値段はプロフに載せといたよ。')
+          voice = (os.environ.get('TTS_VOICE') or '').strip() or 'ja-JP-NanamiNeural'
+
+          print('声: %s' % voice)
+          sents = split_sentences(text)
+          print('文数: %d' % len(sents))
+          r = synthesize(text, 'narration.mp3', voice=voice)
+          print('尺: %.2f秒 / 単語 %d語' % (r['duration'], len(r['words'])))
+
+          rows = [{'sentence': s, **prosody_for(i, len(sents), s)}
+                  for i, s in enumerate(sents)]
+          json.dump({'text': text, 'voice': voice, 'duration': r['duration'],
+                     'sentences': rows, 'words': r['words']},
+                    open('narration.json', 'w', encoding='utf-8'),
+                    ensure_ascii=False, indent=2)
+          PY
+          ls -lh narration.mp3
+          ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 narration.mp3
+
+      - name: 置き場
+        if: ${{ !inputs.list_voices }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: narration
+          path: |
+            narration.mp3
+            narration.json
+          retention-days: 7
