@@ -83,7 +83,9 @@ def main():
     words = r.get("words") or []
 
     if words:
-        chunks = group_words(words)
+        # ★本文を渡す。TTSは句読点を返さないので、文の切れ目は
+        #   元の本文と突き合わせないと分からない（決定#126）
+        chunks = group_words(words, text=text)
         captions = [{"text": c["text"],
                      "start": round(float(c["start"]), 2),
                      "end": round(float(c["end"]), 2)} for c in chunks]

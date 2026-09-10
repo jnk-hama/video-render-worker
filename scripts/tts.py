@@ -126,7 +126,91 @@ def _is_cjk(text):
     return re.search(r'[\u3040-\u30ff\u3400-\u9fff]', str(text or '')) is not None
 
 
-def group_words(words, per_chunk=3):
+SENTENCE_END = '。！？!?'
+
+
+def sentence_end_after(words, text):
+    """
+    「この語の直後が文の終わりか」を、**元の本文と突き合わせて**返す。
+    戻り値は words と同じ長さの真偽値のリスト。
+
+    ★★なぜ本文と突き合わせるのか（2026-09-10・決定#126）。
+
+      決定#119では `w['text']` の末尾が 。！？ かどうかで判定していた。
+      ところが **edge-tts の WordBoundary は句読点を返さない**。
+      「安すぎん」「ペット」…と、句読点の落ちた語だけが並ぶ。
+      つまりその判定は**一度も真にならず、文またぎは直っていなかった**。
+
+      本番の動画で確認した実害:
+        「…しんどくない？」＋「これ置くだけで」 → 「ないこれ」
+        「…安すぎん？」  ＋「ペットの毛も」   → 「は安すぎん」「ペットの」
+
+      ★検査（check_group_words.py）は句読点を**含む**語を自分で組み立てて
+        渡していたので通っていた。
+        「検査が通った ≠ 検査が本物の入力を読んだ」の形。
+
+    ★TTSが句読点を返す実装もあり得るので**両方**見る。
+      本文が渡らなかった回は従来どおり語の末尾だけで判定する。
+    """
+    flags = [bool(re.search(r'[%s]$' % SENTENCE_END, str(w.get('text') or '')))
+             for w in words]
+    if not text:
+        return flags
+
+    src = str(text)
+    pos = 0
+    for i, w in enumerate(words):
+        t = str(w.get('text') or '')
+        if not t:
+            continue
+        # ★語を本文の中で追う。見つからない回は文字数ぶん進めて先へ行く
+        #   （TTSが読みを正規化することがある。そこで止めない）
+        found = src.find(t, pos)
+        pos = found + len(t) if found >= 0 else min(len(src), pos + len(t))
+        # 直後の空白を飛ばし、文末記号が続いていればそこが文の終わり
+        j = pos
+        while j < len(src) and src[j].isspace():
+            j += 1
+        if j < len(src) and src[j] in SENTENCE_END:
+            flags[i] = True
+            while j < len(src) and src[j] in SENTENCE_END:
+                j += 1   # 「！？」のように続く回もあるのでまとめて飛ばす
+            pos = j
+    return flags
+
+
+def _merge_short_tails(groups, ends, words):
+    """
+    文末で切った結果できた**極端に短い枚**を、前の枚へ戻す（決定#126）。
+
+    ★文末で必ず切ると、「…しんどくない？」の末尾が「ない」だけの枚になる。
+      2文字が0.3秒だけ光って消えるのは読めないし、目障りでもある。
+    ★戻してよいのは**同じ文の中**だけ。文をまたいで繋ぐと、
+      せっかく直した文またぎが復活する。
+    ★繋いだ結果が長くなりすぎないこと。字幕側は16文字まで2行に収める
+      のを保証しているので、その内側に収める。
+    """
+    if len(groups) < 2:
+        return groups
+    limit = JA_CHARS_PER_CHUNK + 3          # 12文字。字幕側の保証(16)の内側
+    min_len = 3                             # これ未満の枚は単独で出さない
+    index = {id(w): i for i, w in enumerate(words)}
+
+    out = [groups[0]]
+    for grp in groups[1:]:
+        n = sum(len(w['text']) for w in grp)
+        prev = out[-1]
+        # ★前の枚の最後の語が文末なら、この枚は**次の文**。繋いではいけない
+        crosses = ends[index[id(prev[-1])]]
+        if (n < min_len and not crosses
+                and sum(len(w['text']) for w in prev) + n <= limit):
+            prev.extend(grp)
+            continue
+        out.append(grp)
+    return out
+
+
+def group_words(words, per_chunk=3, text=None):
     """
     単語を「画面に一度に出す塊」へまとめる。
 
@@ -140,13 +224,17 @@ def group_words(words, per_chunk=3):
       来るので、3語だと1枚に4〜5文字しか載らず、切り替えが速すぎて
       読めない。文字数で JA_CHARS_PER_CHUNK を超えたら次の枚へ送る。
       語の途中では切らない（時刻は語単位でしか取れない）。
+
+    ★text には**元のナレーション本文**を渡す。文の切れ目の判定に使う
+      （決定#126。TTSは句読点を返さないので、語だけでは判定できない）。
     """
     out = []
     groups = []
     cjk = bool(words) and _is_cjk(''.join(w['text'] for w in words))
     if cjk:
+        ends = sentence_end_after(words, text)
         cur = []
-        for w in words:
+        for i, w in enumerate(words):
             # ★句読点だけの語は前の枚に付ける。「！」1文字だけの枚を作らない
             punct = not re.search(r'[0-9A-Za-z\u3040-\u30ff\u3400-\u9fff]', w['text'])
             if (cur and not punct
@@ -160,11 +248,13 @@ def group_words(words, per_chunk=3):
             #     「ステーションに消えてく。」＋「ゴミ捨ての不快感から」
             #       → 「に消えてくゴミ捨て」
             #   のように**文をまたぐ枚**ができる。実際に本番で出た。
-            if re.search(r'[。！？!?]$', str(w['text'])):
+            # ★判定そのものは決定#126で直した（上の sentence_end_after）
+            if ends[i]:
                 groups.append(cur)
                 cur = []
         if cur:
             groups.append(cur)
+        groups = _merge_short_tails(groups, ends, words)
     else:
         n = max(1, int(per_chunk))
         groups = [words[i:i + n] for i in range(0, len(words), n)]
