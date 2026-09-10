@@ -124,6 +124,15 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
    */
   const TELOP_BURST_SEC = 2.2;
 
+  /**
+   * テロップがシーンを覆い尽くさないよう、**字幕のために必ず残す秒数**（決定#128）。
+   *
+   * ★0.9秒 の根拠：字幕は1枚あたり最短でこのくらい出ないと読めない
+   *   （依頼側は9文字で刻む）。これ未満しか残らないなら、
+   *   そもそも字幕を出す価値が無いので、テロップを削ってでもここを空ける。
+   */
+  const TELOP_MIN_CAPTION_SEC = 0.9;
+
   /** 巨大テロップが出ている区間（秒・動画全体の絶対時刻）。字幕はここを避ける */
   const hideCaptionWindows: { start: number; end: number }[] = [];
 
@@ -138,10 +147,26 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
     /*
      * ★シーンがバーストより短い回は、シーンの尺で頭打ちにする。
      *   そうしないと次のシーンへ食い込み、字幕を止める区間もずれる。
+     *
+     * ★★2026-09-10、**字幕のぶんを必ず残す**（決定#128）。
+     *
+     *   テロップを2.2秒へ伸ばした直後、ナレーションの無音を切って尺が
+     *   縮んだ（16.6秒→10.9秒）。1シーンが 10.88/5 ＝ 2.18秒 になり、
+     *   **2.2秒のテロップがシーンを丸ごと覆って、字幕が1枚も出なくなった。**
+     *   実際に1シーン目と5シーン目が字幕ゼロで描き上がった。
+     *   ★とくに5シーン目は「値段はプロフに」＝行動を促す一文である。
+     *     ミュートで見ている人にそれが読めないのは、動画の目的を失う。
+     *
+     *   テロップは「殴る一撃」だが、**字幕を消してよいという意味ではない**。
+     *   シーンが短い回はテロップの方を削る。
      */
-    const burstFrames = Math.min(
-      durationInFrames,
-      Math.max(1, Math.round(TELOP_BURST_SEC * fps)),
+    const tailFrames = Math.round(TELOP_MIN_CAPTION_SEC * fps);
+    const burstFrames = Math.max(
+      1,
+      Math.min(
+        Math.round(TELOP_BURST_SEC * fps),
+        Math.max(1, durationInFrames - tailFrames),
+      ),
     );
 
     if (telop) {
