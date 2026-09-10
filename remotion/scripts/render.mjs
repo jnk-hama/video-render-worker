@@ -64,6 +64,19 @@ const adaptLegacyPayload = (s) => {
    */
   s.jobId = s.jobId || s.job_id || "";
 
+  /*
+   * ★強調語（決定#124）。依頼側は telop_emphasis を highlight_words として
+   *   送ってきているのに、**Remotion側へ一度も渡していなかった**。
+   *   Caption.highlight という型だけが存在して、誰も値を入れていない状態。
+   *   そのため字幕はずっと「全部同じ大きさ・同じ色」で出ていた。
+   */
+  if (Array.isArray(s.highlight_words)) {
+    s.highlightWords = s.highlight_words
+      .map((w) => (typeof w === "string" ? w.trim() : ""))
+      .filter(Boolean);
+    console.log(`強調語 ${s.highlightWords.length}語`);
+  }
+
   if (Array.isArray(s.hook_telops)) {
     s.hookTelops = s.hook_telops.map((t) => (typeof t === "string" && t.trim() ? t.trim() : null));
     const n = s.hookTelops.filter(Boolean).length;

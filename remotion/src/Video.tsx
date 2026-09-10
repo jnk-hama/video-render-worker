@@ -197,6 +197,14 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
         accent={accent}
         hideWindows={hideCaptionWindows}
         market={script.market ?? "ja"}
+        highlightWords={script.highlightWords ?? []}
+        /*
+          ★巨大テロップで出した文言は、字幕で**もう一度出さない**（決定#124）。
+            オーナー指摘：ナレーション「この機能でこの価格は安すぎん？」に対し、
+            テロップ「安すぎん？」と字幕「この機能でこの価格は安すぎん」の
+            両方が出ていた。同じ言葉を2回見せている。
+        */
+        suppressTexts={(script.hookTelops ?? []).filter(Boolean) as string[]}
       />
 
       {/* 広告表記は全編。景表法のステマ規制（決定#065） */}

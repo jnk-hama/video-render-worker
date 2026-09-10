@@ -27,6 +27,18 @@
  *   node scripts/preview-telop.mjs --out=/tmp/x.png
  *   node scripts/preview-telop.mjs --bg=assets/shared/xxx.mp4  # 背景を差し替える
  *
+ * 字幕（走るテロップ）を見る時:
+ *   node scripts/preview-telop.mjs --at=2.4 \
+ *     --captions=この機能でこの価格は安すぎん,置くだけでゴミを勝手に吸い上げてくれる \
+ *     --emphasis=安すぎん,勝手に
+ *
+ * ★--at が要る理由。既定の 0.6秒 は**巨大テロップが出ている区間**で、
+ *   そこでは字幕を出さない決まりになっている（決定#108「2個被らせない」）。
+ *   つまり既定のまま描いても**字幕は1枚も映らない**。
+ *   テロップの出る 1.4秒 より後ろを指す必要がある。
+ * ★--emphasis は台本の telop_emphasis と同じ。その語だけ大きく色を変える
+ *   （決定#124）ので、**幅の見積りが効いているかは絵でしか確かめられない**。
+ *
  * ★--bg は**色や明るさの変更をA/Bする時に要る**。既定の中立な背景は
  *   暗い単色なので、暗さ・彩度の調整が効いているかどうかが分からない。
  *   実写に近い素材を置いて、掛ける／掛けないの2枚を測ること（決定#114）。
@@ -69,6 +81,24 @@ const jobId = flag("job", "preview");
 const outFile = path.resolve(flag("out", "preview-telop.png"));
 const texts = argv.filter((a) => !a.startsWith("--"));
 const telops = texts.length ? texts : SAMPLES[market] ?? SAMPLES.ja;
+
+/*
+ * ★字幕を見るための3つ。既定のままなら今までと同じ絵が出る（既存の使い方を壊さない）。
+ */
+const list = (name) => flag(name, "").split(",").map((s) => s.trim()).filter(Boolean);
+/** 何秒目を描くか。既定 0.6秒 は巨大テロップの区間なので**字幕は映らない** */
+const atSec = Number(flag("at", "0.6"));
+if (!Number.isFinite(atSec) || atSec < 0 || atSec >= SCENE_SEC) {
+  console.error(`★--at は 0以上 ${SCENE_SEC}未満 の秒数です（受け取った値: ${flag("at", "")}）`);
+  process.exit(1);
+}
+const emphasisWords = list("emphasis");
+/** ★実際に来る形（依頼側は9文字ずつに刻む）を既定にする */
+const DEFAULT_CAPTIONS = ["罪悪感ヤバいゴミ箱", "スタンド付きなら", "ペットの毛が毎日", "え、ちょっと待って", "安すぎて二度見"];
+const givenCaptions = list("captions");
+/** テロップの枚数ぶん用意する。足りなければ先頭から繰り返す */
+const source = givenCaptions.length ? givenCaptions : DEFAULT_CAPTIONS;
+const captionTexts = telops.map((_, i) => source[i % source.length]);
 
 if (!FONTS[market]) {
   console.error(`★market は ${Object.keys(FONTS).join(" / ")} のいずれかです（受け取った値: ${market}）`);
@@ -121,14 +151,13 @@ const script = {
   fontDataUri,
   // ★字幕を1本入れておく。巨大テロップと**重なっていないこと**も
   //   同時に見たいため（決定#108。テロップの間は字幕を出さない）
-  captions: [
-    /*
-     * ★★字幕の改行も同時に見たいので、**実際に来る形（9文字ずつ）**を並べる。
-     *   1枚目は巨大テロップの区間なので出ない。2枚目以降で確認できる。
-     */
-    ...["罪悪感ヤバいゴミ箱", "スタンド付きなら", "ペットの毛が毎日", "え、ちょっと待って", "安すぎて二度見"]
-      .map((text, i) => ({ text, start: i * SCENE_SEC, end: (i + 1) * SCENE_SEC, highlight: "" })),
-  ],
+  captions: captionTexts.map((text, i) => ({
+    text,
+    start: i * SCENE_SEC,
+    end: (i + 1) * SCENE_SEC,
+    highlight: "",
+  })),
+  highlightWords: emphasisWords,
   scenes: telops.map(() => ({
     kind: "talk",
     seconds: SCENE_SEC,
@@ -164,7 +193,7 @@ const render = (args) =>
 const frames = [];
 let failed = 0;
 for (const [i, t] of telops.entries()) {
-  const frame = Math.round((i * SCENE_SEC + 0.6) * FPS);
+  const frame = Math.round((i * SCENE_SEC + atSec) * FPS);
   const png = path.join(work, `f${String(i).padStart(2, "0")}.png`);
   const r = await render([
     "remotion", "still", "src/index.ts", "Main", png,

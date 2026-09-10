@@ -168,8 +168,8 @@ const ASCII_ADV_EN = [
   248, 758, 499, 497, 501, 498, 347, 475, 305, 499, 461, 696, 459, 461, 386, 340, 216, 340, 493,
 ];
 
-/** letterSpacing: -0.03em ぶん。1文字ごとに詰まる */
-const TRACKING_EM = 0.03;
+/** letterSpacing: -0.03em ぶん。1文字ごとに詰まる。★字幕はこれを掛けないので外から足す */
+export const TRACKING_EM = 0.03;
 
 /** 1文字の横幅（em）。書体で違うので market で表を選ぶ */
 export const advanceEm = (ch: string, market: string): number => {
@@ -613,11 +613,53 @@ const KANA_RUN_PENALTY = 0.4;
  */
 const OKURIGANA_PENALTY = 0.4;
 
+/**
+ * 位置 i で行を切ることの**良さ**（幅は見ない）。0 は「切ってはいけない」。
+ *
+ * ★禁則（breakQuality）に、日本語の語の内側かどうかの減点を重ねたもの。
+ * ★★**幅の要素を含めない。** ここを1本にしておかないと、
+ *   同じ「切れ目の良さ」を2箇所で別々に書くことになる。
+ *   実際に字幕側で必要になった（決定#124の2行割り）。
+ */
+export const breakScore = (chars: string[], i: number): number => {
+  const q = breakQuality(chars, i);
+  if (q === 0) return 0;
+  const ca = classOf(chars[i - 1]);
+  const cb = classOf(chars[i]);
+  // 仮名どうしの途中はほぼ語の内側。ここで切らせない
+  if (ca === cb && (ca === "kana" || ca === "kata")) return q * KANA_RUN_PENALTY;
+  // 漢字の直後の仮名は送り仮名。語の内側なので下げる
+  if (ca === "kanji" && cb === "kana") return q * OKURIGANA_PENALTY;
+  return q;
+};
+
 export const wrapByWidth = (
   text: string,
   maxWidthPx: number,
   fontSize: number,
   market: string,
+  /*
+   * ★1文字の幅（em）を呼び出し側が上書きできる（決定#124）。
+   *
+   *   字幕は**巨大テロップと条件が違う**：
+   *     ・letterSpacing を掛けていない（advanceEm は -0.03em 済みなので狭すぎる）
+   *     ・強調語だけ 1.34倍で描く
+   *   これを織り込まずに折り返すと、「計算では2行、実際は3行」になる。
+   *   実際に「この機能でこの／価格は安すぎん」の2行目が 828px となり、
+   *   箱(820px)を超えてブラウザが**もう一度折り返していた**。
+   */
+  charEm?: (ch: string, index: number) => number,
+  /*
+   * ★ここでは切らせたくない位置（決定#124）。
+   *
+   *   字幕の強調語が行をまたぐと、`text.split(語)` が当たらなくなり
+   *   **色も大きさも付かないまま**出てしまう。実測で3文字の語の24%、
+   *   4文字の語の39%が行をまたいでいた。目立たせるための機能が
+   *   4回に1回黙って消えるのでは意味が無い。
+   * ★「絶対に切らない」ではなく「他に手が無ければ切る」。
+   *   語が1行に入りきらない時まで守ると、今度は行が箱をはみ出す。
+   */
+  avoidBreakAt?: (index: number) => boolean,
 ): string[] => {
   const chars = Array.from(text);
   if (!chars.length || fontSize <= 0 || maxWidthPx <= 0) return [text];
@@ -626,10 +668,11 @@ export const wrapByWidth = (
   let start = 0;
   while (start < chars.length) {
     // ① 入るところまで詰める
+    const emOf = (i: number) => charEm?.(chars[i], i) ?? advanceEm(chars[i], market);
     let w = 0;
     let end = start;
     while (end < chars.length) {
-      const adv = advanceEm(chars[end], market) * fontSize;
+      const adv = emOf(end) * fontSize;
       if (w + adv > maxWidthPx && end > start) break;
       w += adv;
       end++;
@@ -647,21 +690,14 @@ export const wrapByWidth = (
      *   「これ」「吸い」のような**極端に短い行**ができて行数が増える。
      *   幅の使用率を掛けると、「同じくらい良い切れ目なら長い方」になる。
      */
-    const lineWidth = (from: number, to: number) =>
-      chars.slice(from, to).reduce((w, c) => w + advanceEm(c, market) * fontSize, 0);
-
-    const scoreAt = (i: number): number => {
-      const q = breakQuality(chars, i);
-      if (q === 0) return 0;
-      const ca = classOf(chars[i - 1]);
-      const cb = classOf(chars[i]);
-      let base = q;
-      // 仮名どうしの途中はほぼ語の内側。ここで切らせない
-      if (ca === cb && (ca === "kana" || ca === "kata")) base *= KANA_RUN_PENALTY;
-      // 漢字の直後の仮名は送り仮名。語の内側なので下げる
-      else if (ca === "kanji" && cb === "kana") base *= OKURIGANA_PENALTY;
-      return base * (lineWidth(start, i) / maxWidthPx);
+    const lineWidth = (from: number, to: number) => {
+      let acc = 0;
+      for (let i = from; i < to; i++) acc += emOf(i) * fontSize;
+      return acc;
     };
+
+    const scoreAt = (i: number): number =>
+      avoidBreakAt?.(i) ? 0 : breakScore(chars, i) * (lineWidth(start, i) / maxWidthPx);
 
     let best = end;
     let bestQ = scoreAt(end);
@@ -678,7 +714,7 @@ export const wrapByWidth = (
      */
     if (bestQ === 0) {
       let i = end;
-      while (i < chars.length && breakQuality(chars, i) === 0) i++;
+      while (i < chars.length && (breakQuality(chars, i) === 0 || avoidBreakAt?.(i))) i++;
       best = i;
     }
     lines.push(chars.slice(start, best).join(""));

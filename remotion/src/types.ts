@@ -81,6 +81,11 @@ export type InSituScene = SceneBase & {
 export type Scene = TalkScene | ShotScene | InSituScene;
 
 export type VideoScript = {
+  /**
+   * 強調語（決定#124）。字幕の中でこの語だけ**大きく・色を変えて**出す。
+   * ★依頼側の telop_emphasis がここへ来る。1シーン1語。
+   */
+  highlightWords?: string[];
   jobId: string;
   width: number;
   height: number;
