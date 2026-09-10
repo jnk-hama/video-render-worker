@@ -143,7 +143,8 @@ def group_words(words, per_chunk=3):
     """
     out = []
     groups = []
-    if words and _is_cjk(''.join(w['text'] for w in words)):
+    cjk = bool(words) and _is_cjk(''.join(w['text'] for w in words))
+    if cjk:
         cur = []
         for w in words:
             # ★句読点だけの語は前の枚に付ける。「！」1文字だけの枚を作らない
@@ -153,16 +154,38 @@ def group_words(words, per_chunk=3):
                 groups.append(cur)
                 cur = []
             cur.append(w)
+            # ★★文の終わりで必ず区切る（2026-09-10・決定#119）。
+            #   ここが無いと、依頼側が文ごとに割ってくれた字幕を
+            #   一度つなげてから9文字で刻み直すため、
+            #     「ステーションに消えてく。」＋「ゴミ捨ての不快感から」
+            #       → 「に消えてくゴミ捨て」
+            #   のように**文をまたぐ枚**ができる。実際に本番で出た。
+            if re.search(r'[。！？!?]$', str(w['text'])):
+                groups.append(cur)
+                cur = []
         if cur:
             groups.append(cur)
     else:
         n = max(1, int(per_chunk))
         groups = [words[i:i + n] for i in range(0, len(words), n)]
+    """
+    ★★語のつなぎ方（2026-09-10・決定#119）。
+
+    **日本語は空白で繋がない。** 前の版は言語を問わず ' '.join だったため、
+    edge-tts の WordBoundary（「値段」「は」「安すぎ」…）がそのまま
+      「値段 は 安すぎ ん」
+    と**単語のあいだに空白が入った字幕**になっていた。実際の動画で確認。
+    日本語は分かち書きしないので、これは誤りであるうえ、
+    空白のぶん1枚が約2割広くなり、行が余計に折り返されていた。
+
+    ★英語は空白で繋ぐ（分かち書きするので当然）。
+    """
+    sep = '' if cjk else ' '
     for grp in groups:
         if not grp:
             continue
         out.append({
-            'text': ' '.join(w['text'] for w in grp),
+            'text': sep.join(w['text'] for w in grp),
             'start': grp[0]['start'],
             'end': grp[-1]['end'],
             # 単語ごとの持ち時間（センチ秒）。ASSの \k へそのまま渡せる

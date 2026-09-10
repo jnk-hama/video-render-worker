@@ -20,11 +20,14 @@ on:
       - "remotion/src/**"
       - "remotion/scripts/**"
       - "remotion/package.json"
+      - "scripts/tts.py"
+      - "scripts/check_group_words.py"
       - ".github/workflows/check.yml"
   pull_request:
     paths:
       - "remotion/src/**"
       - "remotion/scripts/**"
+      - "scripts/tts.py"
   workflow_dispatch:
 
 permissions:
@@ -57,3 +60,9 @@ jobs:
 
       - name: 走る字幕（改行が語を割らないこと）
         run: node scripts/check-caption-wrap.mjs
+
+      # ★★2026-09-10 追加（決定#119）。字幕の「1枚のまとめ方」。
+      #   日本語を空白で繋いでいた／文をまたいで刻んでいた、の2つを見張る。
+      - name: 字幕のまとめ方（空白・文またぎ）
+        working-directory: .
+        run: python3 scripts/check_group_words.py
