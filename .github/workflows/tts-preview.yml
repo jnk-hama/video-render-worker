@@ -31,7 +31,7 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write        # Release へ置くため（下記）
 
 jobs:
   tts:
@@ -110,12 +110,42 @@ jobs:
           ls -lh narration.mp3
           ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 narration.mp3
 
-      - name: 置き場
+      # ★★文ごとの設定と時刻を**ログにも出す**。
+      #   Artifact は Azure Blob に置かれるため、取りに行けない環境がある
+      #   （実際にこの開発環境からは 403 で落ちた）。ログなら必ず読める。
+      - name: 結果をログに出す
         if: ${{ !inputs.list_voices }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: narration
-          path: |
-            narration.mp3
-            narration.json
-          retention-days: 7
+        run: |
+          python3 - <<'PY'
+          import json
+          d = json.load(open('narration.json'))
+          print('声: %s / 尺 %.2f秒 / 単語 %d語' % (d['voice'], d['duration'], len(d['words'])))
+          print('--- 文ごとの設定 ---')
+          for i, s in enumerate(d['sentences'], 1):
+              print('  %d rate=%-6s pitch=%-6s %s' % (i, s['rate'], s['pitch'], s['sentence']))
+          print('--- 字幕の刻み（先頭12枚）---')
+          for w in d['words'][:12]:
+              print('  %6.2f-%6.2f %s' % (w['start'], w['end'], w['text']))
+          PY
+
+      # ★★Release へ置く（Artifact ではなく）。
+      #   Artifact は Azure Blob なので届かない環境がある。Release なら
+      #   api.github.com 経由で取れる。render-video と同じ手筋に揃える。
+      - name: Release へ上げる
+        if: ${{ !inputs.list_voices }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TAG="tts-preview"
+          if gh release create "$TAG" narration.mp3 narration.json \
+               --title "$TAG" --notes "ナレーションの試聴用（決定#127）" \
+               --repo "$GH_REPO"; then
+            echo "アップロード完了: $TAG"
+          else
+            # ★毎回同じタグを使う。試聴は最新の1本だけあればよい
+            gh release upload "$TAG" narration.mp3 narration.json \
+              --clobber --repo "$GH_REPO"
+            echo "差し替え完了: $TAG"
+          fi
