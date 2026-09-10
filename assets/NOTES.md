@@ -53,4 +53,32 @@ ffmpeg -y -f lavfi -i "gradients=s=1080x1920:c0=0x0b0b12:c1=0x1b1230:x0=200:y0=2
   -c:v libx264 -preset veryfast -crf 26 assets/shared/neutral-gradient.mp4
 ```
 
+## preview-motion.mp4 の作り方（**確認用。本番では使わない**）
+
+★★2026-09-10 追加。オーナー指摘「背景は真っ暗です」。
+
+`neutral-gradient.mp4` は**逃げ場の映像**で、実測 YAVG 24.7/255 と暗い。
+その上に運鏡（push_in / orbit）が掛かると完成動画は YAVG 6.8〜16.3 まで
+落ちて、ほぼ黒い画面になる。テロップの出方や尺を目で確かめたい時に
+背景が黒いと、**読みやすさの判断ができない**。
+
+そこで確認用に明るい動く背景を1本置く（実測 YAVG 58.5）。
+
+```bash
+ffmpeg -y \
+ -f lavfi -i "gradients=s=540x960:c0=0x14203f:c1=0x2f6f8f:c2=0x7a3f7d:c3=0x1d3557:nb_colors=4:seed=11:duration=12:speed=0.006:rate=30" \
+ -f lavfi -i "gradients=s=540x960:c0=0x000000:c1=0x2a4a6a:c2=0x000000:c3=0x5a3a70:nb_colors=4:seed=29:duration=12:speed=0.012:rate=30" \
+ -filter_complex "[0][1]blend=all_mode=screen:all_opacity=0.5,gblur=sigma=30,eq=saturation=0.9:brightness=0.02,scale=1080:1920,vignette=angle=PI/5,format=yuv420p[v]" \
+ -map "[v]" -t 12 -c:v libx264 -crf 21 assets/shared/preview-motion.mp4
+```
+
+★半分の解像度で作ってから拡大している。ぼかしを掛けるので細部は要らず、
+  この方が速く小さい（1.6MB）。
+★`vignette` は周辺を落とすため。字幕は下寄りに出るので、そこが締まって
+  白文字が読める。
+
+★★**本番の背景はPexelsの実写**（process-job が選んで渡す）。これは
+  実写が用意できない確認の回だけに使う。合成のグラデーションで
+  「本番の見え方」を判断しないこと。
+
 効果音の作り方は `shared/sfx/README.md`。

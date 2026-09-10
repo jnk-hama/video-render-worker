@@ -190,6 +190,57 @@ if (!(totalSeconds > 0)) {
 }
 
 /*
+ * ★★部門の取り違えを止める（決定#082）。**ffmpeg版から移した。**
+ *
+ * 【なぜ移す必要があったか】
+ * assets/NOTES.md には「`ja` の依頼が assets/en/… を指したら描かずに停止」と
+ * 書いてあるが、その検査は scripts/render_video.py の download() の中にしか
+ * 無く、**ffmpeg版の経路だけ**で効いていた。描画方式を Remotion へ移した時に
+ * 一緒に移っておらず、Remotion版は「リポジトリの外を読ませない」しか
+ * 見ていなかった。
+ *
+ * ★実際に素通りした。`target_market: "ja"` の依頼が assets/en/clips/ を
+ *   指したまま最後まで描き上がった（2026-09-10）。決定#082が掲げた
+ *   「注意ではなく構造で分ける」が、**片方の経路にしか無い状態**だった。
+ *
+ * ★使わずに次の素材へ進めるのではなく**止める**。黙って別の映像に
+ *   差し替わる方が危険で、出来上がった動画を見るまで誰も気づかない。
+ */
+const MARKETS = ["ja", "en"];
+{
+  const market = String(script.market || "").trim().toLowerCase();
+  if (!MARKETS.includes(market)) {
+    console.error(
+      `target_market が不正です: ${JSON.stringify(script.market)}（${MARKETS.join(" / ")} のいずれか）`,
+    );
+    process.exit(1);
+  }
+  const other = MARKETS.filter((m) => m !== market);
+  /** 同梱素材（スキームの無いパス）だけが対象。外部URLは部門を持たない */
+  const bundled = (u) => typeof u === "string" && u && !/^(https?:|data:)/i.test(u);
+  const wrongDir = (u) =>
+    bundled(u) && other.some((m) => u.replace(/^\/+/, "").startsWith(`assets/${m}/`));
+
+  const offenders = [];
+  for (const [i, s] of script.scenes.entries()) {
+    for (const key of ["backgroundUrl", "productUrl"]) {
+      if (wrongDir(s[key])) offenders.push(`scenes[${i}].${key} = ${s[key]}`);
+    }
+  }
+  for (const key of ["narrationUrl", "bgmUrl", "fontUrl"]) {
+    if (wrongDir(script[key])) offenders.push(`${key} = ${script[key]}`);
+  }
+  if (offenders.length) {
+    console.error(
+      `部門の取り違えです。依頼は ${market} ラインですが、` +
+        `${other.join("/")} 専用の素材を指しています:\n  ${offenders.join("\n  ")}`,
+    );
+    process.exit(1);
+  }
+  console.log(`部門: ${market} ライン（同梱素材の置き場所を確認しました）`);
+}
+
+/*
  * ★製品画像だけ data URI にして埋め込む（実測して直した）。
  *
  * 【何が起きたか】
@@ -269,11 +320,58 @@ const fileToDataUri = (p, mime) => {
   return `data:${mime};base64,${buf.toString("base64")}`;
 };
 
+/*
+ * ★★BGMを選ぶ（決定#082の bgm:"random"）。**ffmpeg版から移した。**
+ *
+ * 【なぜ移す必要があったか】
+ * 依頼側（process-job）は前から `bgm: "random"` を送っているが、
+ * それを音源へ解決する処理は scripts/render_video.py にしか無かった。
+ * Remotion版は `bgmUrl` しか見ないので、**`bgm` は黙って捨てられ、
+ * 出来上がる動画にBGMが1曲も入っていなかった**（2026-09-10、実物で確認）。
+ * 部門の検査と同じで、描画方式を移した時に一緒に移らなかったもの。
+ *
+ * ★★選び方は**種で固定する**（E-017）。同じジョブを描き直したら
+ *   同じ曲でなければならない。乱数のまま選ぶと、再描画のたびに曲が
+ *   変わり「前と違う動画」が出来てしまう。
+ *   job_id から FNV-1a で種を作る（HookTelop の seedOf と同じ手筋）。
+ */
+const BGM_DIR = path.join("..", "assets", "shared", "bgm");
+const seedOf = (s) => {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+};
+
+if (!script.bgmUrl && String(script.bgm || "").trim().toLowerCase() === "random") {
+  let pool = [];
+  try {
+    pool = fs.readdirSync(BGM_DIR).filter((f) => /\.(mp3|m4a|ogg|wav)$/i.test(f)).sort();
+  } catch {
+    pool = [];
+  }
+  if (pool.length) {
+    const pick = pool[seedOf(String(script.jobId || script.job_id || "job")) % pool.length];
+    script.bgmUrl = path.join(BGM_DIR, pick);
+    console.log(`BGMを選びました: ${pick}（${pool.length}曲から・job_idで固定）`);
+  } else {
+    console.warn("assets/shared/bgm/ に音源がありません。BGM無しで続行します。");
+  }
+} else if (script.bgm && !script.bgmUrl) {
+  // 曲名・パスを直接指定された回。同梱素材として扱う（ffmpeg版と同じ約束）
+  script.bgmUrl = /^(https?:|data:|\/)/i.test(script.bgm)
+    ? script.bgm
+    : path.join("..", script.bgm);
+}
+
 for (const key of ["narrationUrl", "bgmUrl"]) {
   if (script[key]) {
     script[key] = fileToDataUri(script[key], "audio/mpeg");
   }
 }
+console.log(script.bgmUrl ? "BGM: あり" : "BGM: なし");
 
 /*
  * ★効果音を「タグ」から「音源そのもの」へ直す（2026-09-05）。
