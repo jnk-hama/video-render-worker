@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-09T21:03:28+00:00",
+ "generated_at": "2026-09-10T04:51:28+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -49,91 +49,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w7vzys",
-    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w7ur18",
+    "title": "This street art goes hard.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w7ur18/this_street_art_goes_hard/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w6t60v",
-    "title": "A person stuck in tunnel after the flash flood getting rescued after 9 days",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w6t60v/a_person_stuck_in_tunnel_after_the_flash_flood/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1w9q96k",
+    "title": "Some advance human positive vibes on reddit",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w9q96k/some_advance_human_positive_vibes_on_reddit/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7zwc7",
+    "id": "t3_1w86ksv",
+    "title": "Service dogs are real life heroes",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w86ksv/service_dogs_are_real_life_heroes/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wa12qs",
+    "title": "In 1973 Japan planted trees in concentric circles as part of an experiment in forestry spacing. This is what they look like today from above.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wa12qs/in_1973_japan_planted_trees_in_concentric_circles/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w6y3b6",
+    "title": "This tree in California is over 4,800 years old. It was already ancient when the Egyptian Pyramids were being built, and its exact location is kept a secret to protect it.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1w6y3b6/this_tree_in_california_is_over_4800_years_old_it/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w6zhst",
+    "title": "Father crosses the river with his son inside a sack so that he arrives clean at school.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w6zhst/father_crosses_the_river_with_his_son_inside_a/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1walqb2",
+    "title": "View flying over the Sahara desert",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1walqb2/view_flying_over_the_sahara_desert/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1w7zrcl",
     "title": "American Airlines passenger duct taped to seat following disruptive behavior onboard the flight",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7zwc7/american_airlines_passenger_duct_taped_to_seat/",
-    "subreddit": "Damnthatsinteresting",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w7zrcl/american_airlines_passenger_duct_taped_to_seat/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1waxm3e",
-    "title": "University of Waterloo Students Launch Rocket Breaking World Record",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1waxm3e/university_of_waterloo_students_launch_rocket/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wakivi",
+    "title": "A Chinese military attaché handed Philippine Defense Secretary Gilberto Teodoro a note during a security forum in Seoul. He decided to read it aloud.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wakivi/a_chinese_military_attaché_handed_philippine/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wat7av",
-    "title": "Studies, like one done by Vladimir Dinets had show that crocodiles are intelligent enough to engage in play behavior for its own sake. Playing with each other or using natural slides in the wild are some of the activities they partake.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wat7av/studies_like_one_done_by_vladimir_dinets_had_show/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wapy6u",
-    "title": "What motivates you to come to work everyday?",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wapy6u/what_motivates_you_to_come_to_work_everyday/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w8zp4s",
-    "title": "A kid staring at the camera",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w8zp4s/a_kid_staring_at_the_camera/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w6bs4f",
-    "title": "He saw something spectacular",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w6bs4f/he_saw_something_spectacular/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w8v2z4",
-    "title": "It's 450 yrs old tradition (Source Link in Description).",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w8v2z4/its_450_yrs_old_tradition_source_link_in/",
-    "subreddit": "toptalent",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w9wyo1",
-    "title": "This sculpture is actually made from thousands of sheets of paper (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1w9wyo1/this_sculpture_is_actually_made_from_thousands_of/",
-    "subreddit": "toptalent",
+    "id": "t3_1w8u8d9",
+    "title": "Imagine being so fed up with unpaid dues that you decide to take over the company’s official X account.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1w8u8d9/imagine_being_so_fed_up_with_unpaid_dues_that_you/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,64 +141,55 @@
   ],
   "B": [
    {
-    "id": "t3_1w7r8qf",
-    "title": "Sekiro: No Defeat Movie Version Full Staff List",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7r8qf/sekiro_no_defeat_movie_version_full_staff_list/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wansdq",
+    "title": "Another season to Rent A Girlfriend! - Japan",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wansdq/another_season_to_rent_a_girlfriend_japan/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7su0t",
-    "title": "Astounding Effects Animation by Hideki Kakita - Karas OVA #4",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1w7su0t/astounding_effects_animation_by_hideki_kakita/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wb5b8d",
+    "title": "Simple & Comfortable in Mexico City",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wb5b8d/simple_comfortable_in_mexico_city/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1waxhe2",
-    "title": "We Are Aliens - Theme Song Trailer",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1waxhe2/we_are_aliens_theme_song_trailer/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1w7i19w",
+    "title": "I finally have enough karma to post",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w7i19w/i_finally_have_enough_karma_to_post/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wab3gf",
-    "title": "Maomao from Apothecary Diaries by me!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wab3gf/maomao_from_apothecary_diaries_by_me/",
-    "subreddit": "cosplay",
+    "id": "t3_1wbisur",
+    "title": "Sunday days in Barcelona",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wbisur/sunday_days_in_barcelona/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7kav6",
-    "title": "My handmade Princess Mononoke Cosplay!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1w7kav6/my_handmade_princess_mononoke_cosplay/",
-    "subreddit": "cosplay",
+    "id": "t3_1w75s18",
+    "title": "understand understand the concept the concept",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w75s18/understand_understand_the_concept_the_concept/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wa8o7u",
-    "title": "Pure Vessel and Grimm Cosplay - Hollowknight",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wa8o7u/pure_vessel_and_grimm_cosplay_hollowknight/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w7seh2",
-    "title": "A couple of photos of my Kim Possible cosplay from last year!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1w7seh2/a_couple_of_photos_of_my_kim_possible_cosplay/",
-    "subreddit": "cosplay",
+    "id": "t3_1w6bdtz",
+    "title": "Is the bandana a no? US Open fit yesterday",
+    "url": "https://www.reddit.com/r/streetwear/comments/1w6bdtz/is_the_bandana_a_no_us_open_fit_yesterday/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -231,15 +222,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w5v8uk",
-    "title": "[DISC] My Tsundere Girlfriend's Thick Thighs Situation - Chapter 1-2",
-    "url": "https://www.reddit.com/r/manga/comments/1w5v8uk/disc_my_tsundere_girlfriends_thick_thighs/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1waq20w",
     "title": "[DISC] My Neighbor Ms. Kurokawa - Ch. 51 - You Casanova",
     "url": "https://www.reddit.com/r/manga/comments/1waq20w/disc_my_neighbor_ms_kurokawa_ch_51_you_casanova/",
@@ -249,10 +231,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1waspl0",
-    "title": "This anime uses ai for certain scenes",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1waspl0/this_anime_uses_ai_for_certain_scenes/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wbo3oq",
+    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 5",
+    "url": "https://www.reddit.com/r/manga/comments/1wbo3oq/disc_the_story_of_a_girl_who_can_read_minds_ch_5/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": false,
     "source": "rss"
