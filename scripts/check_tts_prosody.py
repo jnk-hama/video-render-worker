@@ -68,6 +68,8 @@ print("\n=== 繋いだ後の単語時刻（最大のリスク）===")
 """
 SEG_SECONDS = [2.0, 3.0, 1.5, 2.5, 2.0]
 WORDS_PER_SEG = 3
+PAD = 0.30          # edge-tts が文の前後に付ける無音を模す
+VOICED = [s - 2 * PAD for s in SEG_SECONDS]   # 切り落とした後に残る長さ
 
 if not (tts.shutil.which("ffmpeg") and tts.shutil.which("ffprobe")):
     print("  … ffmpeg が無いのでこの検査は飛ばします")
@@ -75,19 +77,32 @@ else:
     calls = []
 
     async def fake_synth(text, voice, rate, out_path, pitch=tts.DEFAULT_PITCH):
+        """
+        ★edge-tts と**同じ形**の音を返す：前後に無音が付いた音声。
+          こうしないと「前後の無音を切る」処理が検査されない。
+          （実物の edge-tts は1回の合成ごとに前後へ無音を付ける。
+            それが積もって継ぎ目が約1秒になっていた）
+        """
         i = len(calls)
         calls.append({"text": text, "rate": rate, "pitch": pitch})
         sec = SEG_SECONDS[i]
-        # その長さちょうどの無音を書く（実物と同じ mp3 で作る）
+        voiced = sec - 2 * PAD
+        # 無音 + 音 + 無音。音は聞こえる強さのトーンにする
         subprocess.run(
-            ["ffmpeg", "-v", "error", "-y", "-f", "lavfi",
-             "-i", "anullsrc=r=24000:cl=mono", "-t", "%.3f" % sec,
-             "-c:a", "libmp3lame", "-q:a", "4", out_path],
+            ["ffmpeg", "-v", "error", "-y",
+             "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
+             "-f", "lavfi", "-i", "sine=frequency=220:sample_rate=24000",
+             "-filter_complex",
+             "[0]atrim=0:%.3f[a];[1]atrim=0:%.3f,volume=0.5[b];"
+             "[0]atrim=0:%.3f[c];[a][b][c]concat=n=3:v=0:a=1[out]"
+             % (PAD, voiced, PAD),
+             "-map", "[out]", "-c:a", "libmp3lame", "-q:a", "4", out_path],
             check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        step = sec / WORDS_PER_SEG
+        # ★単語は「音が鳴っている区間」に並ぶ（実物もそう）
+        step = voiced / WORDS_PER_SEG
         return [{"text": "w%d_%d" % (i, k),
-                 "start": round(k * step, 3),
-                 "end": round((k + 1) * step, 3)} for k in range(WORDS_PER_SEG)]
+                 "start": round(PAD + k * step, 3),
+                 "end": round(PAD + (k + 1) * step, 3)} for k in range(WORDS_PER_SEG)]
 
     real = tts._synth
     tts._synth = fake_synth
@@ -107,26 +122,50 @@ else:
     ok(all(words[i]["start"] <= words[i + 1]["start"] for i in range(len(words) - 1)),
        "時刻が単調に増える（繰り下げが効いている）")
 
-    # ★2文目の先頭は、1文目の実尺のぶんだけ後ろにいるはず
-    seg0 = tts._audio_seconds  # 実尺はデコード後で測る（詰め物込み）
     print("   合計 %.3f秒 / 最終単語 end=%.3f秒" % (duration, words[-1]["end"]))
-    ok(abs(words[WORDS_PER_SEG]["start"] - SEG_SECONDS[0]) < 0.06,
-       "2文目の先頭が1文目の実尺ぶん繰り下がっている",
-       "%.3f vs %.3f" % (words[WORDS_PER_SEG]["start"], SEG_SECONDS[0]))
+
+    # ★1文目の先頭の単語は0秒付近。頭の無音ぶん前へずれているはず
+    ok(words[0]["start"] < 0.08,
+       "1文目の先頭が0秒付近（頭の無音ぶん前へずれている）",
+       "%.3f" % words[0]["start"])
+
+    # ★2文目の先頭 ＝ 1文目の実尺（無音を切った後）＋ 間
+    want = VOICED[0] + tts.GAP_SECONDS
+    ok(abs(words[WORDS_PER_SEG]["start"] - want) < 0.08,
+       "2文目の先頭が「1文目の実尺＋間」の位置にある",
+       "%.3f vs %.3f" % (words[WORDS_PER_SEG]["start"], want))
 
     # ★★最終単語が音声の中に収まっている。ここがずれると字幕が全部ずれる
-    ok(words[-1]["end"] <= duration + 0.06,
+    ok(words[-1]["end"] <= duration + 0.08,
        "最終単語が音声の尺を超えない",
        "end=%.3f / 尺=%.3f" % (words[-1]["end"], duration))
-    ok(abs(duration - sum(SEG_SECONDS)) < 0.25,
-       "合計の尺が各文の合計と一致する",
-       "%.3f vs %.3f" % (duration, sum(SEG_SECONDS)))
+
+    want_total = sum(VOICED) + tts.GAP_SECONDS * (len(sents) - 1)
+    ok(abs(duration - want_total) < 0.30,
+       "合計の尺 ＝ 各文の実尺＋間",
+       "%.3f vs %.3f" % (duration, want_total))
 
     # ★出来た音声そのものを測る。計算だけ合っていても意味がない
     actual = tts._audio_seconds(out)
-    ok(abs(actual - duration) < 0.25,
+    ok(abs(actual - duration) < 0.30,
        "**実際に出来た音声**の尺が、報告した尺と一致する",
        "実測 %.3f / 報告 %.3f" % (actual, duration))
+
+    """
+    ★★**継ぎ目の無音が積もっていないこと**（これが今回の直しの本体）。
+      直す前は継ぎ目が 0.94〜1.07秒 あった。15秒の動画で4秒が無音だった。
+    """
+    r = subprocess.run(
+        ["ffmpeg", "-v", "info", "-i", out, "-af",
+         "silencedetect=noise=%s:d=0.10" % tts.SILENCE_DB, "-f", "null", "-"],
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    import re as _re
+    gaps = [float(x) for x in _re.findall(r"silence_duration:\s*([\d.]+)", r.stdout)]
+    longest = max(gaps) if gaps else 0.0
+    print("   継ぎ目の無音: %s" % ([round(g, 2) for g in gaps] or "なし"))
+    ok(longest < tts.GAP_SECONDS + 0.25,
+       "継ぎ目の無音が積もっていない（1秒の空白が復活していない）",
+       "最長 %.2f秒 / 設定 %.2f秒" % (longest, tts.GAP_SECONDS))
 
 print("\n=== 1文だけの回・抑揚を切った回 ===")
 ok(len(tts.split_sentences("これだけ。")) == 1, "1文なら1つ")

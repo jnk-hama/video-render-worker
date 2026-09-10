@@ -155,6 +155,62 @@ def _audio_seconds(path):
     return float(r.stdout.strip())
 
 
+"""
+★★文と文のあいだの間（2026-09-10・決定#127）。
+
+【実測して直した】
+文ごとに合成して繋いだ音を測ったら、**継ぎ目に約1秒の無音**が入っていた。
+
+  0.94秒 / 1.03秒 / 1.00秒 / 1.07秒（silencedetect -40dB）
+
+edge-tts は1回の合成ごとに前後へ無音を付ける。5文を繋ぐとその無音が
+そのまま積もる。15秒の動画で**4秒が無音**になり、尺も 15.21秒 → 16.63秒 に
+伸びていた。テンポを上げるための抑揚なのに、逆に間延びしていた。
+
+→ 各文の前後の無音を**切り落とし**、こちらが決めた長さの間を差し込む。
+★★切った頭のぶんだけ、その文の単語時刻を**前へずらす**。
+  ここを忘れると字幕が音声より遅れて出る。
+"""
+GAP_SECONDS = 0.14          # 文と文のあいだ。息継ぎに聞こえる最小限
+SILENCE_DB = '-40dB'
+
+
+def _speech_bounds(wav):
+    """
+    その音声で「声が鳴っている区間」(開始秒, 終了秒) を返す。
+
+    ★ffmpeg の silencedetect の出力を読む。前後の無音だけが対象で、
+      文の途中の間（読点など）は残す（読み上げの自然さを壊さないため）。
+    """
+    dur = _audio_seconds(wav)
+    r = subprocess.run(
+        ['ffmpeg', '-v', 'info', '-i', wav, '-af',
+         'silencedetect=noise=%s:d=0.05' % SILENCE_DB, '-f', 'null', '-'],
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    spans = []
+    start = None
+    for m in re.finditer(r'silence_(start|end):\s*(-?[\d.]+)', r.stdout):
+        kind, val = m.group(1), float(m.group(2))
+        if kind == 'start':
+            start = val
+        elif start is not None:
+            spans.append((start, val))
+            start = None
+    if start is not None:            # 末尾の無音は end が出ないことがある
+        spans.append((start, dur))
+
+    head = 0.0
+    tail = dur
+    for a, b in spans:
+        if a <= 0.02:                # 先頭から続く無音
+            head = max(head, b)
+        if b >= dur - 0.02:          # 末尾まで続く無音
+            tail = min(tail, a)
+    if tail <= head:                 # 全部無音に見えた回は切らない
+        return 0.0, dur
+    return head, tail
+
+
 def synthesize(text, out_path, voice=None, rate=None, prosody=True):
     """
     本文を読み上げた音声ファイルを作り、単語ごとの時刻を返す。
@@ -213,18 +269,37 @@ def _synth_by_sentence(sentences, voice, rate, out_path):
             mp3 = os.path.join(work, 'seg%02d.mp3' % i)
             seg = asyncio.run(_synth(s, voice or DEFAULT_VOICE,
                                      rate or p['rate'], mp3, p['pitch']))
-            wav = os.path.join(work, 'seg%02d.wav' % i)
+            raw = os.path.join(work, 'raw%02d.wav' % i)
             _run(['ffmpeg', '-v', 'error', '-y', '-i', mp3,
-                  '-ar', '24000', '-ac', '1', wav])
+                  '-ar', '24000', '-ac', '1', raw])
+
+            # ★前後の無音を落とす。積もると継ぎ目が1秒近い空白になる
+            head, tail = _speech_bounds(raw)
+            wav = os.path.join(work, 'seg%02d.wav' % i)
+            _run(['ffmpeg', '-v', 'error', '-y', '-i', raw,
+                  '-ss', '%.3f' % head, '-to', '%.3f' % tail,
+                  '-c:a', 'pcm_s16le', wav])
             dur = _audio_seconds(wav)
+
+            # ★★切った頭のぶん、その文の単語時刻を**前へずらす**。
+            #   忘れると字幕が音声より遅れて出る。
             for w in seg:
                 words.append({'text': w['text'],
-                              'start': round(w['start'] + offset, 3),
-                              'end': round(w['end'] + offset, 3)})
-            print('  文%d: %s rate=%s pitch=%s → %.2f秒'
-                  % (i + 1, s[:18], rate or p['rate'], p['pitch'], dur), flush=True)
+                              'start': round(max(0.0, w['start'] - head) + offset, 3),
+                              'end': round(max(0.0, w['end'] - head) + offset, 3)})
+            print('  文%d: %s rate=%s pitch=%s → %.2f秒（無音を頭%.2f/尻%.2f切除）'
+                  % (i + 1, s[:18], rate or p['rate'], p['pitch'], dur,
+                     head, _audio_seconds(raw) - tail), flush=True)
             offset += dur
             wavs.append(wav)
+            # ★文の切れ目に、こちらが決めた長さの間を入れる（最後の文の後には入れない）
+            if i < len(sentences) - 1:
+                gap = os.path.join(work, 'gap%02d.wav' % i)
+                _run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi',
+                      '-i', 'anullsrc=r=24000:cl=mono',
+                      '-t', '%.3f' % GAP_SECONDS, '-c:a', 'pcm_s16le', gap])
+                wavs.append(gap)
+                offset += GAP_SECONDS
 
         lst = os.path.join(work, 'list.txt')
         with open(lst, 'w', encoding='utf-8') as f:
