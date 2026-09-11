@@ -56,6 +56,30 @@ ok(p[0] == tts.HOOK_PROSODY, "1文目は掴みの設定")
 ok(p[2] == tts.QUESTION_PROSODY, "「安すぎん？」は疑問の設定")
 ok(p[4] == tts.CLOSING_PROSODY, "最終文は締めの設定")
 ok(p[1] == tts.BODY_PROSODY, "説明の文は従来のまま")
+
+"""
+★★**pitch の上げ幅に歯止めをかける**（2026-09-11）。
+
+  「2割を超えると別人に聞こえ始める」とコメントに書いていたのに、
+  その倍（実測 中央比±22%）を出して、オーナーに
+  「突然ナレーター替えないで」と言われた。
+  **コメントに書いた上限は上限ではない。** 機械で止める。
+
+★pitch だけを見張る理由：rate と volume はいくら振っても同じ人のまま
+  聞こえるが、pitch は声の同一性に直結する。
+"""
+def _hz(v):
+    return abs(int(str(v).replace("Hz", "").replace("+", "") or 0))
+
+worst = max(_hz(x["pitch"]) for x in
+            (tts.HOOK_PROSODY, tts.QUESTION_PROSODY,
+             tts.CLOSING_PROSODY, tts.BODY_PROSODY))
+ok(worst <= tts.MAX_PITCH_HZ,
+   "pitch の上げ幅が上限(%dHz)以内" % tts.MAX_PITCH_HZ,
+   "最大 %dHz" % worst)
+# 男性声(約140Hz)での比率。ここが2割を超えたら別人に聞こえる
+ok(worst / 140.0 <= 0.20,
+   "男性声(140Hz)に対して2割以内", "%.0f%%" % (worst / 140.0 * 100))
 # 決定的であること（E-017）
 ok(all(tts.prosody_for(i, len(sents), s) == p[i] for _ in range(20)
        for i, s in enumerate(sents)), "20回とも同じ割り当て")
