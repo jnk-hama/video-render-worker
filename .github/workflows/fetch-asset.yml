@@ -86,7 +86,13 @@ jobs:
               req = urllib.request.Request(api, headers={'User-Agent': UA})
               with urllib.request.urlopen(req, timeout=30) as r:
                   d = json.load(r)
-              for page in (d.get('query', {}).get('pages') or {}).values():
+              # ★何も返らない回があるので、APIの答えをそのまま見せる。
+              #   黙って0件で終わると原因が分からない（実際に1回そうなった）
+              pages = (d.get('query', {}) or {}).get('pages') or {}
+              print('検索: %r → %d件' % (query, len(pages)))
+              if not pages:
+                  print('APIの返り: %s' % json.dumps(d, ensure_ascii=False)[:600])
+              for page in pages.values():
                   ii = (page.get('imageinfo') or [{}])[0]
                   src = ii.get('thumburl') or ii.get('url')
                   if not src:
