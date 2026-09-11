@@ -29,6 +29,10 @@ on:
         description: '直接指定するURL（query より優先）'
         required: false
         type: string
+      pexels:
+        description: 'Pexelsの動画素材を探す語（使用シーンの実写。これを使う時 query/url は無視）'
+        required: false
+        type: string
       limit:
         description: '取り寄せる枚数（検索時）'
         required: false
@@ -45,7 +49,53 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ★★Pexels は Supabase の Edge Function 経由で引く（決定#131）。
+      #   鍵は Supabase にしか無く、ここへ複製しない。呼ぶのに要る
+      #   SUPABASE_URL / SERVICE_ROLE_KEY は既にこのリポジトリのSecretsにある。
+      #   返るのは動画URLと静止画URLだけ（鍵は返らない）。
+      - name: Pexelsの素材を探す
+        if: inputs.pexels != ''
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PQ: ${{ inputs.pexels }}
+          N: ${{ inputs.limit }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          base = (os.environ['SUPABASE_URL'] or '').strip().rstrip('/')
+          if not base.startswith('http'):
+              base = 'https://%s' % base
+          key = (os.environ['SUPABASE_SERVICE_ROLE_KEY'] or '').strip()
+          q = (os.environ.get('PQ') or '').strip()
+          n = int(os.environ.get('N') or 10)
+          api = '%s/functions/v1/pexels-search?q=%s&n=%d' % (base, urllib.parse.quote(q), n)
+          req = urllib.request.Request(api, headers={'Authorization': 'Bearer %s' % key,
+                                                     'apikey': key})
+          with urllib.request.urlopen(req, timeout=40) as r:
+              d = json.load(r)
+          print('Pexels: %r → %d件' % (q, d.get('count', 0)))
+          os.makedirs('assets_out', exist_ok=True)
+          # ★静止画を落として**目で見る**。動画URLはそのまま台本へ渡せる
+          for i, v in enumerate(d.get('videos', [])):
+              line = 'p%02d  id=%-9s %2ds %sx%s' % (i, v['id'], v['duration'], v['w'], v['h'])
+              print(line)
+              print('     video: %s' % v['url'])
+              if v.get('preview'):
+                  try:
+                      rq = urllib.request.Request(v['preview'], headers={'User-Agent': 'jmas'})
+                      with urllib.request.urlopen(rq, timeout=30) as rr:
+                          open('assets_out/p%02d.jpg' % i, 'wb').write(rr.read())
+                  except Exception as e:
+                      print('     ★静止画を取れず: %s' % e)
+          json.dump(d, open('assets_out/pexels.json', 'w'), ensure_ascii=False, indent=2)
+          PY
+          ls -lh assets_out/
+
       - name: 取り寄せる
+        if: inputs.pexels == ''
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
