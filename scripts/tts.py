@@ -42,6 +42,7 @@ DEFAULT_VOICE = 'en-US-AndrewMultilingualNeural'
 # 読み上げ速度。ショート動画は少し速い方がテンポに合う
 DEFAULT_RATE = '+12%'
 DEFAULT_PITCH = '+0Hz'
+DEFAULT_VOLUME = '+0%'
 
 """
 ★★抑揚（2026-09-10・決定#127）。オーナー指示「ナレーションも最大限に抑揚つけて」。
@@ -58,10 +59,24 @@ edge-tts は **本文をHTMLエスケープしてから** SSML を組み立て�
 【設定は文の"役割"で決める。乱数を使わない】
 同じ台本なら毎回同じ音でなければならない（E-017・描き直しは設計された動作）。
 """
-HOOK_PROSODY = {'rate': '+18%', 'pitch': '+8Hz'}      # 1文目。速く高く入る
-QUESTION_PROSODY = {'rate': '+6%', 'pitch': '+12Hz'}  # 疑問。上げて煮え切らせない
-CLOSING_PROSODY = {'rate': '+4%', 'pitch': '+6Hz'}    # 最終文。落として言い切る
-BODY_PROSODY = {'rate': DEFAULT_RATE, 'pitch': DEFAULT_PITCH}  # 説明。従来のまま
+"""
+★★2026-09-11、振れ幅を広げた（オーナー指示「声抑揚もっと」）。
+
+  前:  rate +4〜+18% / pitch +0〜+12Hz  → 実測F0 231.9〜275.9Hz（44Hz幅）
+  後:  rate -8〜+26% / pitch +0〜+26Hz
+
+★**音量も振るようにした。** 前は rate と pitch だけ。抑揚は高さだけでなく
+  「強く言う／引いて言う」でも作られる。edge-tts は volume も受け取れるのに
+  使っていなかった。
+★最終文を **-8%（初めて基準より遅く）** にした。前は +4% で、
+  「落として言い切る」と書きながら実際には基準より速かった。
+★上限の目安：pitch を素の声の2割以上動かすと別人に聞こえ始める。
+  男性(約140Hz)で +26Hz は約19%、女性(約250Hz)で約10%。**男性側が限界に近い。**
+"""
+HOOK_PROSODY = {'rate': '+26%', 'pitch': '+20Hz', 'volume': '+12%'}
+QUESTION_PROSODY = {'rate': '+2%', 'pitch': '+26Hz', 'volume': '+6%'}
+CLOSING_PROSODY = {'rate': '-8%', 'pitch': '+10Hz', 'volume': '+14%'}
+BODY_PROSODY = {'rate': '+14%', 'pitch': '+0Hz', 'volume': '+0%'}
 
 
 class TtsUnavailable(Exception):
@@ -76,7 +91,8 @@ def _require_edge_tts():
         raise TtsUnavailable('edge-tts を読み込めません: %s' % e)
 
 
-async def _synth(text, voice, rate, out_path, pitch=DEFAULT_PITCH):
+async def _synth(text, voice, rate, out_path, pitch=DEFAULT_PITCH,
+                 volume=DEFAULT_VOLUME):
     """
     合成しつつ WordBoundary を集める。
 
@@ -99,7 +115,7 @@ async def _synth(text, voice, rate, out_path, pitch=DEFAULT_PITCH):
     気づけなかった。
     """
     comm = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch,
-                                boundary='WordBoundary')
+                                volume=volume, boundary='WordBoundary')
 
     words = []
     with open(out_path, 'wb') as f:
@@ -268,7 +284,8 @@ def _synth_by_sentence(sentences, voice, rate, out_path):
             p = prosody_for(i, len(sentences), s)
             mp3 = os.path.join(work, 'seg%02d.mp3' % i)
             seg = asyncio.run(_synth(s, voice or DEFAULT_VOICE,
-                                     rate or p['rate'], mp3, p['pitch']))
+                                     rate or p['rate'], mp3, p['pitch'],
+                                     p.get('volume', DEFAULT_VOLUME)))
             raw = os.path.join(work, 'raw%02d.wav' % i)
             _run(['ffmpeg', '-v', 'error', '-y', '-i', mp3,
                   '-ar', '24000', '-ac', '1', raw])
@@ -287,8 +304,9 @@ def _synth_by_sentence(sentences, voice, rate, out_path):
                 words.append({'text': w['text'],
                               'start': round(max(0.0, w['start'] - head) + offset, 3),
                               'end': round(max(0.0, w['end'] - head) + offset, 3)})
-            print('  文%d: %s rate=%s pitch=%s → %.2f秒（無音を頭%.2f/尻%.2f切除）'
-                  % (i + 1, s[:18], rate or p['rate'], p['pitch'], dur,
+            print('  文%d: %s rate=%s pitch=%s vol=%s → %.2f秒（無音を頭%.2f/尻%.2f切除）'
+                  % (i + 1, s[:18], rate or p['rate'], p['pitch'],
+                     p.get('volume', DEFAULT_VOLUME), dur,
                      head, _audio_seconds(raw) - tail), flush=True)
             offset += dur
             wavs.append(wav)

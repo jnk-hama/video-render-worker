@@ -71,12 +71,25 @@ WORDS_PER_SEG = 3
 PAD = 0.30          # edge-tts が文の前後に付ける無音を模す
 VOICED = [s - 2 * PAD for s in SEG_SECONDS]   # 切り落とした後に残る長さ
 
+"""
+★★飛ばしたら**不合格にする**（2026-09-11）。
+
+  以前はここを黙って飛ばして「合格」と出していた。コンテナが作り直されて
+  ffmpeg が消えた回に、**この検査（いちばん大事な繋ぎの計算）が1行も
+  走っていないのに合格と表示された。** 自分で何度も書いている
+  「検査が通った ≠ 検査が対象を読んだ」を、自分の検査でやった。
+
+  CIには ffmpeg があるので本番の守りは効いているが、手元で
+  「合格」と出ること自体が嘘なので、飛ばした回は落とす。
+"""
 if not (tts.shutil.which("ffmpeg") and tts.shutil.which("ffprobe")):
-    print("  … ffmpeg が無いのでこの検査は飛ばします")
+    ok(False, "ffmpeg/ffprobe が無いため繋ぎの検査を実行できませんでした"
+              "（この検査は飛ばさない。入れてから再実行してください）")
 else:
     calls = []
 
-    async def fake_synth(text, voice, rate, out_path, pitch=tts.DEFAULT_PITCH):
+    async def fake_synth(text, voice, rate, out_path, pitch=tts.DEFAULT_PITCH,
+                         volume=tts.DEFAULT_VOLUME):
         """
         ★edge-tts と**同じ形**の音を返す：前後に無音が付いた音声。
           こうしないと「前後の無音を切る」処理が検査されない。
@@ -84,7 +97,8 @@ else:
             それが積もって継ぎ目が約1秒になっていた）
         """
         i = len(calls)
-        calls.append({"text": text, "rate": rate, "pitch": pitch})
+        calls.append({"text": text, "rate": rate, "pitch": pitch,
+                      "volume": volume})
         sec = SEG_SECONDS[i]
         voiced = sec - 2 * PAD
         # 無音 + 音 + 無音。音は聞こえる強さのトーンにする
@@ -117,6 +131,9 @@ else:
        "文ごとに違う pitch で呼んでいる", [c["pitch"] for c in calls])
     ok([c["rate"] for c in calls] == [x["rate"] for x in p],
        "文ごとに違う rate で呼んでいる", [c["rate"] for c in calls])
+    # ★volume は後から足した。渡し忘れても音は出てしまうので必ず見張る
+    ok([c["volume"] for c in calls] == [x.get("volume", tts.DEFAULT_VOLUME) for x in p],
+       "文ごとに違う volume で呼んでいる", [c["volume"] for c in calls])
 
     ok(len(words) == 5 * WORDS_PER_SEG, "単語が全部残る", len(words))
     ok(all(words[i]["start"] <= words[i + 1]["start"] for i in range(len(words) - 1)),
