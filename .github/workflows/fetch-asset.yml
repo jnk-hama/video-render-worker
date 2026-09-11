@@ -65,10 +65,18 @@ jobs:
           python3 -m pip install --quiet --disable-pip-version-check pillow
           python3 - <<'PY'
           import json, os, urllib.parse, urllib.request
-          base = (os.environ['SUPABASE_URL'] or '').strip().rstrip('/')
+          # ★★Secretsに貼る時、改行やゼロ幅スペースが紛れる。実際に紛れていた:
+          #     '//xxx.supabase.co\n\u200b/functions/v1/...' で InvalidURL
+          #   render-video.yml は同じ事故を踏んで tr -cd で対策済みだった。
+          #   **禁止文字を数え上げるのではなく、使える文字だけ残す**（同じ手筋）。
+          import re as _re
+          def clean(v, allowed):
+              return ''.join(c for c in (v or '') if _re.match(allowed, c))
+          base = clean(os.environ.get('SUPABASE_URL'), r'[A-Za-z0-9:/._-]').rstrip('/')
           if not base.startswith('http'):
-              base = 'https://%s' % base
-          key = (os.environ['SUPABASE_SERVICE_ROLE_KEY'] or '').strip()
+              base = 'https://%s' % base.lstrip('/')
+          key = clean(os.environ.get('SUPABASE_SERVICE_ROLE_KEY'), r'[A-Za-z0-9._-]')
+          print('URLの形: %s / 鍵の長さ %d文字' % (base, len(key)))
           q = (os.environ.get('PQ') or '').strip()
           n = int(os.environ.get('N') or 10)
           api = '%s/functions/v1/pexels-search?q=%s&n=%d' % (base, urllib.parse.quote(q), n)
