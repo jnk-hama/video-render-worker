@@ -84,6 +84,9 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+          # ★face_score.py は画像を ffmpeg/ffprobe で読む（OpenCVを足さない設計）。
+          #   この口には ffmpeg が入っていなかった（2026-09-12、実際に落ちた）。
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           mkdir -p faces
           gh release download asset-preview --repo "$GH_REPO" \
             --pattern 'gen*.jpg' --dir faces --clobber
