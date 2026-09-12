@@ -41,6 +41,11 @@ on:
         description: 'リポジトリ内のファイルを Supabase の公開バケットへ上げてURLを出す（例 assets/shared/influencer/anna/front_main.jpg）'
         required: false
         type: string
+      verify_faces:
+        description: 'asset-preview に置いてある gen*.jpg の顔が anna 本人かを機械で判定する'
+        required: false
+        type: boolean
+        default: false
       edge:
         description: '呼ぶEdge Functionの名前（gemini-models / product-scene）。これを使う時ほかは無視'
         required: false
@@ -65,6 +70,47 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ★生成した画の顔が**本人かどうかを機械で判定する**（決定#147）。
+      #
+      # 【なぜ要るか】
+      # 目で見て「同じ人に見える」は検証ではない。face_score.py は
+      # マスター7方向との最大コサイン類似度で判定し、**0.42未満なら別人**と
+      # する（校正済み。本人の最も不利な角度でも0.428出る）。
+      # ★人の目視の前に、まず機械が落とす。C案フェーズ1の選別と同じ考え方。
+      - name: 顔が本人かを判定する
+        if: inputs.verify_faces
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p faces
+          gh release download asset-preview --repo "$GH_REPO" \
+            --pattern 'gen*.jpg' --dir faces --clobber
+          ls -1 faces/
+          # ★onnxruntime は CPU 版だけ。GPUには依存しない（3本の線）
+          python3 -m pip install --quiet --disable-pip-version-check \
+            insightface onnxruntime
+          python3 - <<'PY'
+          import os, sys
+          sys.path.insert(0, 'scripts')
+          import face_score
+          refs = face_score.reference_set()
+          print('マスター %d枚 / 閾値 %.2f' % (len(refs), face_score.PASS_THRESHOLD))
+          ng = 0
+          for f in sorted(os.listdir('faces')):
+              p = os.path.join('faces', f)
+              r = face_score.score(p, refs)
+              if not r:
+                  print('  %-12s 顔が見つからない' % f)
+                  continue
+              mark = 'OK  本人' if r['passed'] else '★NG 別人'
+              print('  %-12s %.3f  %s' % (f, r['best'], mark))
+              if not r['passed']:
+                  ng += 1
+          print('別人判定: %d件' % ng)
+          PY
+
       # ★リポジトリのファイルを Supabase の公開バケットへ上げる口（決定#147）。
       #
       # 【なぜ要るか】
@@ -76,7 +122,7 @@ jobs:
       # ★公開バケットなのでURLを知っていれば誰でも読める。
       #   **人物・商品の素材のような、見られて困らない物だけ**を上げること。
       - name: Supabaseの公開バケットへ上げる
-        if: inputs.upload != ''
+        if: inputs.upload != '' && !inputs.verify_faces
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -125,7 +171,7 @@ jobs:
       #   CLAUDE.md「各SNS・ASPの規約違反・BANリスクを一切含めない
       #   （スクレイピング等）」に触れる。読むのは1URL、1回だけ。
       - name: 公開ページを読む
-        if: inputs.page != '' && inputs.upload == ''
+        if: inputs.page != '' && inputs.upload == '' && !inputs.verify_faces
         env:
           U: ${{ inputs.page }}
         run: |
@@ -187,7 +233,7 @@ jobs:
       # ★返りに base64 の画像（data:image/... または b64 キー）が入っていれば
       #   ファイルに落とす。生成した絵を**使う前に見る**ため（決定#129と同じ理由）。
       - name: Edge Function を呼ぶ
-        if: inputs.edge != '' && inputs.page == '' && inputs.upload == ''
+        if: inputs.edge != '' && inputs.page == '' && inputs.upload == '' && !inputs.verify_faces
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -289,7 +335,7 @@ jobs:
       #   SUPABASE_URL / SERVICE_ROLE_KEY は既にこのリポジトリのSecretsにある。
       #   返るのは動画URLと静止画URLだけ（鍵は返らない）。
       - name: Pexelsの素材を探す
-        if: inputs.pexels != '' && inputs.edge == '' && inputs.page == '' && inputs.upload == ''
+        if: inputs.pexels != '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && !inputs.verify_faces
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -338,7 +384,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == ''
+        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && !inputs.verify_faces
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
@@ -422,7 +468,7 @@ jobs:
       #   「no matches found for assets_out/*」で**成功した処理まで失敗扱い**に
       #   なっていた（2026-09-12）。工程の失敗と成果物の有無は別である。
       - name: Release へ上げる
-        if: hashFiles('assets_out/**') != ''
+        if: hashFiles('assets_out/**') != '' && !inputs.verify_faces
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
