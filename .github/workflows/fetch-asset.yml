@@ -33,6 +33,10 @@ on:
         description: 'Pexelsの動画素材を探す語（使用シーンの実写。これを使う時 query/url は無視）'
         required: false
         type: string
+      page:
+        description: '公開Webページを読んで本文を持ち帰る（サンドボックスから出られないため）'
+        required: false
+        type: string
       edge:
         description: '呼ぶEdge Functionの名前（gemini-models / product-scene）。これを使う時ほかは無視'
         required: false
@@ -57,6 +61,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ★公開ページを読んで持ち帰る口（2026-09-12）。
+      #
+      # 【なぜ要るか】
+      # サンドボックスは外のサイトへ出られない（CONNECT 403）。オーナーから
+      # 「このページ読める?」と参考URLをもらっても、こちらから見に行けない。
+      # ランナーは出られるので、**本文だけ**持ち帰る。
+      #
+      # ★★**取ってよいのは、誰でも見られる普通のページの本文だけ。**
+      #   SNSの動画・音声・画像をまとめて落とす用途に使わない。
+      #   CLAUDE.md「各SNS・ASPの規約違反・BANリスクを一切含めない
+      #   （スクレイピング等）」に触れる。読むのは1URL、1回だけ。
+      - name: 公開ページを読む
+        if: inputs.page != ''
+        env:
+          U: ${{ inputs.page }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import html as _h, os, re, urllib.request
+          url = (os.environ.get('U') or '').strip()
+          if not url.startswith(('http://', 'https://')):
+              raise SystemExit('http(s) のURLを入れてください: %r' % url[:120])
+          req = urllib.request.Request(url, headers={
+              'User-Agent': 'Mozilla/5.0 (compatible; jmas-ai-os page check)',
+              'Accept-Language': 'ja,en;q=0.8',
+          })
+          with urllib.request.urlopen(req, timeout=40) as r:
+              raw = r.read(3 * 1024 * 1024)
+              ctype = r.headers.get('content-type', '')
+              final = r.geturl()
+          print('取得: %s' % final)
+          print('種類: %s / %d バイト' % (ctype, len(raw)))
+          enc = 'utf-8'
+          m = re.search(r'charset=([A-Za-z0-9_-]+)', ctype)
+          if m:
+              enc = m.group(1)
+          text = raw.decode(enc, 'replace')
+          os.makedirs('assets_out', exist_ok=True)
+          open('assets_out/page.html', 'w', encoding='utf-8').write(text)
+          # ★本文だけにする。script/style を落としてタグを剥ぐ
+          body = re.sub(r'(?is)<(script|style|noscript)[^>]*>.*?</\1>', ' ', text)
+          body = re.sub(r'(?s)<[^>]+>', ' ', body)
+          body = _h.unescape(body)
+          body = re.sub(r'[ \t\r\f\v]+', ' ', body)
+          body = re.sub(r'\n\s*\n+', '\n', body).strip()
+          open('assets_out/page.txt', 'w', encoding='utf-8').write(body)
+          print('本文 %d 文字 → assets_out/page.txt' % len(body))
+          print('---- 先頭3000文字 ----')
+          print(body[:3000])
+          PY
+          ls -lh assets_out/
+
       # ★Edge Function を直接叩いて**返りを目で見る**ための口（2026-09-12）。
       #   サンドボックスは *.supabase.co へ出られないので、確認は必ずここを通る。
       #
@@ -65,7 +121,7 @@ jobs:
       # ★返りに base64 の画像（data:image/... または b64 キー）が入っていれば
       #   ファイルに落とす。生成した絵を**使う前に見る**ため（決定#129と同じ理由）。
       - name: Edge Function を呼ぶ
-        if: inputs.edge != ''
+        if: inputs.edge != '' && inputs.page == ''
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -147,7 +203,7 @@ jobs:
       #   SUPABASE_URL / SERVICE_ROLE_KEY は既にこのリポジトリのSecretsにある。
       #   返るのは動画URLと静止画URLだけ（鍵は返らない）。
       - name: Pexelsの素材を探す
-        if: inputs.pexels != '' && inputs.edge == ''
+        if: inputs.pexels != '' && inputs.edge == '' && inputs.page == ''
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -196,7 +252,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == '' && inputs.edge == ''
+        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == ''
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
