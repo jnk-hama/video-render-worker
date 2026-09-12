@@ -243,8 +243,18 @@ jobs:
           if t:
               print('  %-22s %s' % ('title', _h.unescape(t.group(1)).strip()[:300]))
           print('本文 %d 文字 → assets_out/page.txt' % len(body))
-          print('---- 先頭3000文字 ----')
-          print(body[:3000])
+          # ★★3000文字で切っていたが、それでは仕様書が読めない。
+          #   実際にPixabayのAPIドキュメント（13,692文字）を読もうとして、
+          #   肝心の「Search videos」の節が切れて届かなかった。
+          #   assets_out/page.txt に全文はあるが、**privateリポジトリの
+          #   Releaseは未認証で落とせない**（404）ので、ログに出ないものは読めない。
+          LIMIT = 40000
+          if len(body) <= LIMIT:
+              print('---- 全文 ----')
+              print(body)
+          else:
+              print('---- 先頭%d文字（長すぎるので切った。全文はRelease）----' % LIMIT)
+              print(body[:LIMIT])
           PY
           ls -lh assets_out/
 
