@@ -248,7 +248,15 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
       <Disclosure text={script.disclosure} />
 
       {script.narrationUrl ? <Audio src={script.narrationUrl} /> : null}
-      {script.bgmUrl ? <Audio src={script.bgmUrl} volume={0.2} /> : null}
+      {/*
+        ★★2026-09-12、0.2 → 0.30（決定#132・オーナー指摘「テンション上がる曲に」）。
+          曲を勢いのある方へ変えても、0.2 では**ほとんど聞こえない**。
+          ナレーションが主役なので上げすぎないが、0.2は「鳴っているのが
+          分かる」水準にも届いていなかった。
+        ★0.30で止める理由：これ以上はナレーションの子音を食い始める。
+          効果音（0.5前後）とナレーションの間に収める。
+      */}
+      {script.bgmUrl ? <Audio src={script.bgmUrl} volume={0.30} /> : null}
 
       {/*
         効果音（2026-09-05）。

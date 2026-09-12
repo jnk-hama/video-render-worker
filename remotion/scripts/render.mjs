@@ -353,9 +353,39 @@ if (!script.bgmUrl && String(script.bgm || "").trim().toLowerCase() === "random"
     pool = [];
   }
   if (pool.length) {
-    const pick = pool[seedOf(String(script.jobId || script.job_id || "job")) % pool.length];
+    /*
+     * ★★2026-09-12、**ランダムをやめて「勢いのある曲」を選ぶ**（決定#132）。
+     *
+     *   オーナー指摘「BGMももっとテンション上がる曲に変更してください」。
+     *   原因はランダム選択だった。5曲を実測（20秒の平均RMS）すると
+     *     duru-rondo        9506  ← 一番勢いがある
+     *     duru-arcade-vibe  7703
+     *     duru-roomscene-lofi 5768
+     *     hyak-ep4-blackhole  5735
+     *     duru-ai-ep2-music   2691  ← 一番静か
+     *   で **3.5倍の開き**があるのに、job_idの種次第で一番静かな曲が当たる。
+     *   実際に前回の動画は 2691 の曲が鳴っていた。
+     *
+     *   ★アフィリエイトの尺の短い動画は**常に勢いが要る**。曲は「運」で
+     *     決めるものではない。順位を固定で持ち、上から使う。
+     *   ★それでも毎回同じ1曲だと飽きるので、**上位2曲**の中から job_id で
+     *     選ぶ（決定性は保つ = E-017）。
+     */
+    const ENERGY_ORDER = [
+      "duru-rondo.mp3",          // RMS 9506
+      "duru-arcade-vibe.mp3",    // RMS 7703
+      "duru-roomscene-lofi.mp3", // RMS 5768
+      "hyak-ep4-blackhole.mp3",  // RMS 5735
+      "duru-ai-ep2-music.mp3",   // RMS 2691
+    ];
+    const ranked = ENERGY_ORDER.filter((f) => pool.includes(f));
+    // 順位表に載っていない曲（後から足した曲）は末尾へ。取りこぼさない
+    const rest = pool.filter((f) => !ENERGY_ORDER.includes(f));
+    const ordered = [...ranked, ...rest];
+    const top = ordered.slice(0, Math.min(2, ordered.length));
+    const pick = top[seedOf(String(script.jobId || script.job_id || "job")) % top.length];
     script.bgmUrl = path.join(BGM_DIR, pick);
-    console.log(`BGMを選びました: ${pick}（${pool.length}曲から・job_idで固定）`);
+    console.log(`BGMを選びました: ${pick}（勢いの上位${top.length}曲から・job_idで固定）`);
   } else {
     console.warn("assets/shared/bgm/ に音源がありません。BGM無しで続行します。");
   }
