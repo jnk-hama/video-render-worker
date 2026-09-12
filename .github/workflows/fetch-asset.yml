@@ -144,6 +144,26 @@ jobs:
           body = (os.environ.get('BODY') or '').strip()
           hdr = {'Authorization': 'Bearer %s' % key, 'apikey': key,
                  'Content-Type': 'application/json'}
+          # ★★process-job だけは**関数の中でもう一度**合鍵を見る（決定#076）。
+          #   Authorization は入口（Supabaseのゲートウェイ）用で、関数の中は
+          #   専用ヘッダ x-process-job-token を見る。合鍵はDBのRPCが持っている
+          #   ので、ここで引いてヘッダへ入れる。**値はログへ出さない。**
+          if fn == 'process-job':
+              tq = urllib.request.Request(
+                  '%s/rest/v1/rpc/process_job_token' % base,
+                  data=b'{}',
+                  headers={'Authorization': 'Bearer %s' % key, 'apikey': key,
+                           'Content-Type': 'application/json'})
+              try:
+                  with urllib.request.urlopen(tq, timeout=30) as tr:
+                      tok = tr.read().decode().strip().strip('"')
+              except urllib.error.HTTPError as e:
+                  raise SystemExit('合鍵を取得できません（%s）: %s'
+                                   % (e.code, e.read()[:200].decode('utf-8', 'replace')))
+              if not tok:
+                  raise SystemExit('合鍵が空です。process_job_token を確認してください')
+              print('合鍵を取得しました（%d文字）' % len(tok))
+              hdr['x-process-job-token'] = tok
           req = urllib.request.Request('%s/functions/v1/%s' % (base, fn),
                                        data=body.encode() if body else None,
                                        headers=hdr,
