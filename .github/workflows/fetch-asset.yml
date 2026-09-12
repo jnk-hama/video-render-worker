@@ -112,6 +112,21 @@ jobs:
               if not r['passed']:
                   ng += 1
           print('別人判定: %d件' % ng)
+
+          # ★服が変わっていないか（決定#148）。顔だけ見て服を見逃した
+          import outfit_score
+          paths = [os.path.join('faces', f) for f in sorted(os.listdir('faces'))]
+          o = outfit_score.compare(paths)
+          print('')
+          print('服の一致（胴体の色分布・1.0が完全一致）')
+          for a, b, sim in o['pairs']:
+              print('  %-12s %-12s %.3f' % (a, b, sim))
+          if o['skipped']:
+              print('  顔が見つからず飛ばした: %s' % ', '.join(o['skipped']))
+          if o['worst'] is not None:
+              print('  最小 %.3f / 閾値 %.2f → %s'
+                    % (o['worst'], outfit_score.PASS_THRESHOLD,
+                       '服は揃っている' if o['passed'] else '★服が変わっている疑い'))
           PY
 
       # ★リポジトリのファイルを Supabase の公開バケットへ上げる口（決定#147）。
