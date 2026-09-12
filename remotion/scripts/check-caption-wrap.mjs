@@ -31,7 +31,7 @@ const tmp = path.resolve(`.check-caption.${process.pid}.mjs`);
 fs.writeFileSync(
   entry,
   'export * from "./src/components/HookTelop";\n' +
-    'export { isDuplicateOfTelop, pickEmphasis, layoutCaption, captionCharEm } from "./src/components/Captions";\n',
+    'export { isDuplicateOfTelop, pickEmphasis, layoutCaption, captionCharEm, EMPHASIS_SCALE } from "./src/components/Captions";\n',
 );
 let mod;
 try {
@@ -48,7 +48,8 @@ try {
   fs.rmSync(tmp, { force: true });
   fs.rmSync(entry, { force: true });
 }
-const { wrapByWidth, advanceEm, layoutCaption, captionCharEm, isDuplicateOfTelop, pickEmphasis } = mod;
+const { wrapByWidth, advanceEm, layoutCaption, captionCharEm, isDuplicateOfTelop, pickEmphasis,
+        EMPHASIS_SCALE, TRACKING_EM } = mod;
 for (const [n, f] of Object.entries({
   wrapByWidth, advanceEm, layoutCaption, captionCharEm, isDuplicateOfTelop, pickEmphasis,
 })) {
@@ -62,6 +63,14 @@ for (const [n, f] of Object.entries({
  * ★Captions.tsx と同じ値。**コピーだが、下でその一致を検査している。**
  */
 const W = 1080, INSET_L = 60, INSET_R = 200, FONT = 108, MAX_LINES = 2, MIN_FONT = 74;
+// ★数値の定数も実装から取る。写すと、実装を変えた日に検査だけ古い値で測る
+for (const [n, v] of Object.entries({ EMPHASIS_SCALE, TRACKING_EM })) {
+  if (typeof v !== "number") {
+    console.error(`★実装から ${n} を取り出せませんでした。検査になっていません`);
+    process.exit(1);
+  }
+}
+
 const BOX = W - INSET_L - INSET_R;
 
 const capSrc = fs.readFileSync(path.resolve("src/components/Captions.tsx"), "utf8");
@@ -84,18 +93,42 @@ const widthOf = (line) =>
   Array.from(line).reduce((s, c) => s + advanceEm(c, "ja") * FONT, 0);
 
 /**
- * **実際に描かれる幅**。layoutCaption と同じ1文字幅（字間・強調の拡大込み）で測る。
- * ★ここが箱を超えると、ブラウザが計算とは別に折り返す。3行になった原因はこれ。
+ * **実際に描かれる幅**。
+ *
+ * ★★2026-09-12（決定#138）、**captionCharEm を使うのをやめた。**
+ *   以前はここも実装と同じ captionCharEm で測っていた。同じ関数で測る限り、
+ *   その関数自体が間違っていても**必ず一致する**ので、検査が何も見張って
+ *   いないことになる。実際に見逃した:
+ *     captionCharEm は強調語の**最初の1つ**だけを大きく数えていたが、
+ *     描く側（Line）は `split` で**出てくる全部**を大きくする。
+ *     「勝手に出てって勝手に」が2行のはずで**3行に折り返された**。
+ *
+ *   ここは **Line が描く通り**（強調語の全ての出現を EMPHASIS_SCALE 倍）に
+ *   独立して測る。実装と食い違ったらここで落ちる。
  */
-const realWidths = (text, emphasis, lines, fontSize) => {
-  const em = captionCharEm(text, emphasis, "ja");
+const renderWidths = (text, emphasis, lines, fontSize) => {
+  const chars = Array.from(text);
+  const big = new Set();
+  if (emphasis) {
+    const em = Array.from(emphasis);
+    for (let i = 0; i + em.length <= chars.length; i++) {
+      if (em.every((c, k) => chars[i + k] === c)) {
+        for (let k = 0; k < em.length; k++) big.add(i + k);
+        i += em.length - 1;
+      }
+    }
+  }
   let i = 0;
   return lines.map((l) => {
     let acc = 0;
-    for (const ch of Array.from(l)) acc += em(ch, i++) * fontSize;
+    for (const ch of Array.from(l)) {
+      acc += (advanceEm(ch, "ja") + TRACKING_EM) * (big.has(i) ? EMPHASIS_SCALE : 1) * fontSize;
+      i++;
+    }
     return Math.round(acc);
   });
 };
+const realWidths = renderWidths;
 
 /** 実際にナレーションから出てくる形の字幕 */
 const CASES = [
@@ -152,6 +185,16 @@ console.log("\n=== 2行以内に収まるか（決定#124）===");
     ["え、ちょっと待って", "ちょっと"],
     ["夜中にゴミ箱へ", undefined],
     ["短い", undefined],
+    /*
+     * ★★強調語が**2回以上出る**回（決定#138）。ここが抜けていたので
+     *   「勝手に出てって勝手に」の3行折り返しを見逃した。
+     */
+    ["勝手に出てって勝手に", "勝手に"],
+    ["吸って勝手に基地に戻る", "勝手に"],
+    ["毛もホコリも毛だらけ", "毛"],
+    /* ★決定#136で1枚が最長12文字になった。その長さでも2行に収まること */
+    ["コロコロは三周でベタベタ", undefined],
+    ["自分で掃除したっていう", "掃除"],
   ];
   for (const [t, emp] of REAL) {
     const { lines, fontSize } = layoutCaption(t, emp, BOX, "ja");

@@ -63,7 +63,7 @@ const MIN_FONT_SIZE = 74;
  * ★1.34倍で止める理由：これ以上大きいと行の高さが跳ね上がり、
  *   2行に収める前提が崩れる。**強調は「隣より大きい」だけで成立する。**
  */
-const EMPHASIS_SCALE = 1.34;
+export const EMPHASIS_SCALE = 1.34;
 
 /*
  * ★★以下3つは**描画から切り離した純関数**にしてある（決定#124）。
@@ -252,13 +252,37 @@ const splitTwoLines = (
 /** 1文字の実寸（em）。折り返しの計算と描画で同じ値を使うため、ここに1本化する */
 export const captionCharEm =
   (text: string, emphasis: string | undefined, market: string) => {
-    const at = emphasis ? text.indexOf(emphasis) : -1;
-    const head = at >= 0 ? Array.from(text.slice(0, at)).length : -1;
-    const len = at >= 0 ? Array.from(emphasis as string).length : 0;
-    return (ch: string, index: number): number => {
-      const big = head >= 0 && index >= head && index < head + len;
-      return (advanceEm(ch, market) + TRACKING_EM) * (big ? EMPHASIS_SCALE : 1);
-    };
+    /*
+     * ★★2026-09-12、**強調語が2回出る回で測り違えていた**（決定#138）。
+     *
+     *   ここは `text.indexOf(emphasis)` で **最初の1つだけ**を大きい文字として
+     *   数えていた。ところが描く側（下の Line）は `text.split(highlight)` で
+     *   **出てくる全部**を大きくする。つまり測りと描きが食い違っていた。
+     *
+     *   実害（job gen136 の描画で確認）:
+     *     「勝手に出てって勝手に」→ 2行に収めたつもりが、2行目の実幅が
+     *     866px（枠820px）になり、**CSSが折り返して3行になった**。
+     *     オーナー指示「テロップは多くて二列」（決定#124）を破っていた。
+     *
+     *   ★measure と render は**同じ規則で**動かす。片方だけ直すとまたずれる。
+     */
+    const chars = Array.from(text);
+    const big = new Set<number>();
+    if (emphasis) {
+      const em = Array.from(emphasis);
+      for (let i = 0; i + em.length <= chars.length; i++) {
+        let hit = true;
+        for (let k = 0; k < em.length; k++) {
+          if (chars[i + k] !== em[k]) { hit = false; break; }
+        }
+        if (hit) {
+          for (let k = 0; k < em.length; k++) big.add(i + k);
+          i += em.length - 1;   // 重なりを数えない
+        }
+      }
+    }
+    return (ch: string, index: number): number =>
+      (advanceEm(ch, market) + TRACKING_EM) * (big.has(index) ? EMPHASIS_SCALE : 1);
   };
 
 const OUTLINE_DIRS: [number, number][] = [
