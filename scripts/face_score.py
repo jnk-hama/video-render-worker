@@ -30,9 +30,18 @@ import subprocess
 import sys
 
 PASS_THRESHOLD = 0.42
+# ★★2026-09-12（決定#147）、en/ → shared/ へ移した。
+#
+# 【なぜ】オーナー指示「前に生成したAIインフルエンサーを使えばいい」（日本市場）。
+#   ところが決定#082の構造では、ja の依頼が assets/en/... を指すと
+#   **描かずに停止する**。置き場所のせいで使えなかった。
+# ★そもそも彼女は**日本人に見える**。Aライン専用に置いたのが誤りだった。
+#   #082が防ぎたかったのは「水着のモデル映像が日本語の商品紹介に混ざる」
+#   ような**内容の食い違い**であって、日本人の人物像はどちらでも使える。
+#   → shared/ が正しい置き場所。#082の構造自体は変えていない。
 REF_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    'assets', 'en', 'influencer', 'anna')   # ★Aライン専用（決定#082で移動）
+    'assets', 'shared', 'influencer', 'anna')
 
 _app = None
 
