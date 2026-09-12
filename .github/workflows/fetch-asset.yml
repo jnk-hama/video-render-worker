@@ -37,6 +37,10 @@ on:
         description: '公開Webページを読んで本文を持ち帰る（サンドボックスから出られないため）'
         required: false
         type: string
+      upload:
+        description: 'リポジトリ内のファイルを Supabase の公開バケットへ上げてURLを出す（例 assets/shared/influencer/anna/front_main.jpg）'
+        required: false
+        type: string
       edge:
         description: '呼ぶEdge Functionの名前（gemini-models / product-scene）。これを使う時ほかは無視'
         required: false
@@ -61,6 +65,54 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ★リポジトリのファイルを Supabase の公開バケットへ上げる口（決定#147）。
+      #
+      # 【なぜ要るか】
+      # Edge Function（product-scene）は画像を**URLで**受け取る。ところが
+      # このリポジトリは private なので、GitHub上のパスからは取れない。
+      # 素材を渡すには、どこか取りに行ける場所へ置く必要がある。
+      #
+      # ★上げてよいのは**リポジトリの中のファイルだけ**（`..` を弾く）。
+      # ★公開バケットなのでURLを知っていれば誰でも読める。
+      #   **人物・商品の素材のような、見られて困らない物だけ**を上げること。
+      - name: Supabaseの公開バケットへ上げる
+        if: inputs.upload != ''
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          F: ${{ inputs.upload }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import mimetypes, os, re as _re, urllib.request
+          rel = (os.environ.get('F') or '').strip().lstrip('/')
+          if not rel or '..' in rel.split('/'):
+              raise SystemExit('リポジトリの中のパスを入れてください: %r' % rel[:120])
+          if not os.path.isfile(rel):
+              raise SystemExit('ファイルがありません: %s' % rel)
+          def clean(v, allowed):
+              return ''.join(c for c in (v or '') if _re.match(allowed, c))
+          base = clean(os.environ.get('SUPABASE_URL'), r'[A-Za-z0-9:/._-]').rstrip('/')
+          if not base.startswith('http'):
+              base = 'https://%s' % base.lstrip('/')
+          key = clean(os.environ.get('SUPABASE_SERVICE_ROLE_KEY'), r'[A-Za-z0-9._-]')
+          dest = 'assets/' + rel.replace('assets/', '', 1)
+          ctype = mimetypes.guess_type(rel)[0] or 'application/octet-stream'
+          data = open(rel, 'rb').read()
+          url = '%s/storage/v1/object/images/%s' % (base, dest)
+          req = urllib.request.Request(
+              url, data=data, method='POST',
+              headers={'Authorization': 'Bearer %s' % key, 'apikey': key,
+                       'Content-Type': ctype, 'x-upsert': 'true'})
+          try:
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  print('アップロード %s (%d バイト)' % (r.status, len(data)))
+          except urllib.error.HTTPError as e:
+              raise SystemExit('上げられません（%s）: %s'
+                               % (e.code, e.read()[:300].decode('utf-8', 'replace')))
+          print('公開URL: %s/storage/v1/object/public/images/%s' % (base, dest))
+          PY
+
       # ★公開ページを読んで持ち帰る口（2026-09-12）。
       #
       # 【なぜ要るか】
@@ -73,7 +125,7 @@ jobs:
       #   CLAUDE.md「各SNS・ASPの規約違反・BANリスクを一切含めない
       #   （スクレイピング等）」に触れる。読むのは1URL、1回だけ。
       - name: 公開ページを読む
-        if: inputs.page != ''
+        if: inputs.page != '' && inputs.upload == ''
         env:
           U: ${{ inputs.page }}
         run: |
@@ -135,7 +187,7 @@ jobs:
       # ★返りに base64 の画像（data:image/... または b64 キー）が入っていれば
       #   ファイルに落とす。生成した絵を**使う前に見る**ため（決定#129と同じ理由）。
       - name: Edge Function を呼ぶ
-        if: inputs.edge != '' && inputs.page == ''
+        if: inputs.edge != '' && inputs.page == '' && inputs.upload == ''
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -237,7 +289,7 @@ jobs:
       #   SUPABASE_URL / SERVICE_ROLE_KEY は既にこのリポジトリのSecretsにある。
       #   返るのは動画URLと静止画URLだけ（鍵は返らない）。
       - name: Pexelsの素材を探す
-        if: inputs.pexels != '' && inputs.edge == '' && inputs.page == ''
+        if: inputs.pexels != '' && inputs.edge == '' && inputs.page == '' && inputs.upload == ''
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -286,7 +338,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == ''
+        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == ''
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
