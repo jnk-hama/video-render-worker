@@ -92,6 +92,9 @@ jobs:
               ctype = r.headers.get('content-type', '')
               final = r.geturl()
           print('取得: %s' % final)
+          # ★短縮URLは最終URLが本体。og: の抽出前に出しておくと追いやすい
+          if final != url:
+              print('リダイレクト先: %s' % final)
           print('種類: %s / %d バイト' % (ctype, len(raw)))
           enc = 'utf-8'
           m = re.search(r'charset=([A-Za-z0-9_-]+)', ctype)
@@ -107,6 +110,17 @@ jobs:
           body = re.sub(r'[ \t\r\f\v]+', ' ', body)
           body = re.sub(r'\n\s*\n+', '\n', body).strip()
           open('assets_out/page.txt', 'w', encoding='utf-8').write(body)
+          # ★og: と title は本文からタグを剥ぐと消えるので、先に抜いて出す。
+          #   SNSのページは本文がJSで描かれるため、**中身はここにしか無い**
+          for m in re.finditer(
+                  r'<meta[^>]+(?:property|name)=["\'](og:[^"\']+|description|title)["\'][^>]*>', text):
+              tag = m.group(0)
+              c = re.search(r'content=["\'](.*?)["\']', tag, re.S)
+              if c:
+                  print('  %-22s %s' % (m.group(1), _h.unescape(c.group(1))[:400]))
+          t = re.search(r'<title[^>]*>(.*?)</title>', text, re.S)
+          if t:
+              print('  %-22s %s' % ('title', _h.unescape(t.group(1)).strip()[:300]))
           print('本文 %d 文字 → assets_out/page.txt' % len(body))
           print('---- 先頭3000文字 ----')
           print(body[:3000])
