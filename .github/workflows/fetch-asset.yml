@@ -33,6 +33,14 @@ on:
         description: 'Pexelsの動画素材を探す語（使用シーンの実写。これを使う時 query/url は無視）'
         required: false
         type: string
+      edge:
+        description: '呼ぶEdge Functionの名前（gemini-models / product-scene）。これを使う時ほかは無視'
+        required: false
+        type: string
+      edge_body:
+        description: 'Edge Function へ渡すJSON（省略でGET）'
+        required: false
+        type: string
       limit:
         description: '取り寄せる枚数（検索時）'
         required: false
@@ -49,12 +57,97 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ★Edge Function を直接叩いて**返りを目で見る**ための口（2026-09-12）。
+      #   サンドボックスは *.supabase.co へ出られないので、確認は必ずここを通る。
+      #
+      # ★名前は**決め打ちの一覧**からしか選べない。任意の関数を
+      #   service-role で呼べる口を開けると、それ自体が穴になる。
+      # ★返りに base64 の画像（data:image/... または b64 キー）が入っていれば
+      #   ファイルに落とす。生成した絵を**使う前に見る**ため（決定#129と同じ理由）。
+      - name: Edge Function を呼ぶ
+        if: inputs.edge != ''
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FN: ${{ inputs.edge }}
+          BODY: ${{ inputs.edge_body }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, json, os, re as _re, urllib.request
+          ALLOWED = ('gemini-models', 'pexels-search', 'product-scene')
+          fn = (os.environ.get('FN') or '').strip()
+          if fn not in ALLOWED:
+              raise SystemExit('この口から呼べるのは %s だけです（来た値: %r）' % (ALLOWED, fn))
+          def clean(v, allowed):
+              return ''.join(c for c in (v or '') if _re.match(allowed, c))
+          base = clean(os.environ.get('SUPABASE_URL'), r'[A-Za-z0-9:/._-]').rstrip('/')
+          if not base.startswith('http'):
+              base = 'https://%s' % base.lstrip('/')
+          key = clean(os.environ.get('SUPABASE_SERVICE_ROLE_KEY'), r'[A-Za-z0-9._-]')
+          body = (os.environ.get('BODY') or '').strip()
+          hdr = {'Authorization': 'Bearer %s' % key, 'apikey': key,
+                 'Content-Type': 'application/json'}
+          req = urllib.request.Request('%s/functions/v1/%s' % (base, fn),
+                                       data=body.encode() if body else None,
+                                       headers=hdr,
+                                       method='POST' if body else 'GET')
+          os.makedirs('assets_out', exist_ok=True)
+          try:
+              with urllib.request.urlopen(req, timeout=180) as r:
+                  raw = r.read()
+                  code = r.status
+          except urllib.error.HTTPError as e:
+              raw, code = e.read(), e.code
+          print('HTTP %s / %d バイト' % (code, len(raw)))
+          open('assets_out/edge.json', 'wb').write(raw)
+          try:
+              d = json.loads(raw)
+          except Exception:
+              print(raw[:2000].decode('utf-8', 'replace'))
+              raise SystemExit(0 if code == 200 else 1)
+
+          n = [0]
+          def dump(v):
+              """base64の画像を見つけたらファイルへ落とす（見るため）"""
+              if isinstance(v, dict):
+                  for x in v.values():
+                      dump(x)
+              elif isinstance(v, list):
+                  for x in v:
+                      dump(x)
+              elif isinstance(v, str) and len(v) > 2000:
+                  s = v.split(',', 1)[-1] if v.startswith('data:') else v
+                  try:
+                      blob = base64.b64decode(s, validate=True)
+                  except Exception:
+                      return
+                  if blob[:4] in (b'\x89PNG', b'\xff\xd8\xff\xe0', b'\xff\xd8\xff\xe1', b'RIFF'):
+                      ext = '.png' if blob[:4] == b'\x89PNG' else '.jpg'
+                      p = 'assets_out/gen%02d%s' % (n[0], ext)
+                      open(p, 'wb').write(blob)
+                      print('画像を保存: %s (%d バイト)' % (p, len(blob)))
+                      n[0] += 1
+          dump(d)
+          # ★画像を落とした後に本文を出す。base64で流れて読めなくならないよう畳む
+          def fold(v):
+              if isinstance(v, dict):
+                  return {k: fold(x) for k, x in v.items()}
+              if isinstance(v, list):
+                  return [fold(x) for x in v]
+              if isinstance(v, str) and len(v) > 300:
+                  return '<%d文字>' % len(v)
+              return v
+          print(json.dumps(fold(d), ensure_ascii=False, indent=1)[:6000])
+          PY
+          ls -lh assets_out/
+
       # ★★Pexels は Supabase の Edge Function 経由で引く（決定#131）。
       #   鍵は Supabase にしか無く、ここへ複製しない。呼ぶのに要る
       #   SUPABASE_URL / SERVICE_ROLE_KEY は既にこのリポジトリのSecretsにある。
       #   返るのは動画URLと静止画URLだけ（鍵は返らない）。
       - name: Pexelsの素材を探す
-        if: inputs.pexels != ''
+        if: inputs.pexels != '' && inputs.edge == ''
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -103,7 +196,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == ''
+        if: inputs.pexels == '' && inputs.edge == ''
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
