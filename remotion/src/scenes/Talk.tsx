@@ -26,12 +26,25 @@ export const Talk: React.FC<{ scene: TalkScene; accent: string }> = ({ scene, ac
     <AbsoluteFill style={{ backgroundColor: "#07070b" }}>
       {scene.backgroundUrl ? (
         <AbsoluteFill style={{ transform: layerTransform(cam, 0.8) }}>
-          <OffthreadVideo src={scene.backgroundUrl} muted
-            style={{
-              width: "100%", height: "100%", objectFit: "cover",
-              // ★色を戻してから暗くする（決定#114）。数値は lib/look.ts に1つだけ置く
-              filter: BACKGROUND_FILTER,
-            }} />
+          {/*
+            ★2026-09-12、静止画の背景も受ける（決定#135）。
+              OffthreadVideo に静止画を渡すと無言で黒くなる。
+              判定は描画側（render.mjs）が拡張子から1箇所で決める。
+          */}
+          {scene.backgroundIsStill ? (
+            <Img src={scene.backgroundUrl}
+              style={{
+                width: "100%", height: "100%", objectFit: "cover",
+                filter: BACKGROUND_FILTER,
+              }} />
+          ) : (
+            <OffthreadVideo src={scene.backgroundUrl} muted
+              style={{
+                width: "100%", height: "100%", objectFit: "cover",
+                // ★色を戻してから暗くする（決定#114）。数値は lib/look.ts に1つだけ置く
+                filter: BACKGROUND_FILTER,
+              }} />
+          )}
         </AbsoluteFill>
       ) : null}
 

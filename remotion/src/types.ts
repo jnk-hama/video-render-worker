@@ -55,8 +55,10 @@ export type TalkScene = SceneBase & {
   kind: "talk";
   /** 語り手の立ち絵（透過PNG）。無ければ文字だけで成立させる */
   speakerUrl?: string;
-  /** 背景。動画URLでも単色でもよい */
+  /** 背景。動画URLでも静止画でも単色でもよい */
   backgroundUrl?: string;
+  /** 背景が静止画か。描画側（render.mjs）が拡張子から決めて入れる */
+  backgroundIsStill?: boolean;
   headline: string;
   sub?: string;
 };
@@ -71,10 +73,20 @@ export type ShotScene = SceneBase & {
 
 export type InSituScene = SceneBase & {
   kind: "insitu";
-  /** 実環境の背景動画（Pexels等）。ここが「その場にある」感の土台 */
+  /** 実環境の背景（Pexels等の動画、または生成した使用シーンの静止画） */
   backgroundUrl: string;
-  /** 透過済みの製品画像（PNG） */
-  productUrl: string;
+  /**
+   * 背景が静止画か（2026-09-12・決定#135）。
+   * ★描画側（render.mjs）が拡張子から決めて入れる。**依頼側は書かない。**
+   *   ここを推測で分岐すると、拡張子の無いURLで無言のまま黒画面になる。
+   */
+  backgroundIsStill?: boolean;
+  /**
+   * 透過済みの製品画像（PNG）。
+   * ★**省略できる**（2026-09-12）。生成した使用シーンの静止画には
+   *   既に商品が写っているので、その上へ重ねると商品が2つになる。
+   */
+  productUrl?: string;
   /** 画面高に対する製品の高さ。0.42前後が自然 */
   heightRatio?: number;
   /** 製品を置く位置（0=上, 1=下）。地面に接地させるなら 0.55〜0.62 */

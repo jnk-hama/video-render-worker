@@ -118,20 +118,40 @@ const adaptLegacyPayload = (s) => {
     const features = showProduct && Array.isArray(c.features)
       ? c.features.filter((f) => typeof f === "string" && f.trim()).slice(0, 3)
       : [];
-    if (product && showProduct) {
+    /*
+     * ★★2026-09-12、決定#135。背景が**静止画**の回がある。
+     *   生成した「商品を使っている場面」は1枚の絵で返るため。
+     *   ★拡張子で決めるのはここ**1箇所だけ**。描画側で推測させると、
+     *     判定が2つに増えて必ずずれる。
+     */
+    const isStill = !/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(String(c.url || ""));
+    /*
+     * ★★静止画の背景に、透過PNGの商品を**重ねない**。
+     *   生成した使用シーンには既に商品が写っている。重ねると1画面に
+     *   商品が2つ出て、「取ってきた画像の商品そのものを使う」という
+     *   オーナーの前提（決定#132）が崩れる。
+     */
+    const overlayProduct = product && showProduct && !isStill;
+    if (overlayProduct || (isStill && showProduct)) {
       return {
         kind: "insitu",
         seconds,
         camera,
         features,
         backgroundUrl: c.url,
-        productUrl: product,
-        heightRatio: Number(s.foreground.height_ratio) || 0.42,
-        yRatio: Number(s.foreground.y_ratio) || 0.58,
-        ambient: s.foreground.ambient === undefined ? 0.25 : Number(s.foreground.ambient),
+        backgroundIsStill: isStill,
+        ...(overlayProduct
+          ? {
+              productUrl: product,
+              heightRatio: Number(s.foreground.height_ratio) || 0.42,
+              yRatio: Number(s.foreground.y_ratio) || 0.58,
+              ambient:
+                s.foreground.ambient === undefined ? 0.25 : Number(s.foreground.ambient),
+            }
+          : {}),
       };
     }
-    return { kind: "talk", seconds, camera, backgroundUrl: c.url, headline: "" };
+    return { kind: "talk", seconds, camera, features, backgroundUrl: c.url, backgroundIsStill: isStill, headline: "" };
   });
 
   /*

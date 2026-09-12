@@ -56,6 +56,7 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
   const BG_DEPTH = 0.9;
   const FG_DEPTH = 1.18;
 
+  const productUrl = scene.productUrl;
   const heightRatio = scene.heightRatio ?? 0.42;
   const yRatio = scene.yRatio ?? 0.58;
   const ambient = scene.ambient ?? 0.25;
@@ -92,16 +93,33 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
           willChange: "transform",
         }}
       >
-        <OffthreadVideo
-          src={scene.backgroundUrl}
-          muted
-          // ★背景の音は使わない。ナレーションとBGMだけで作る
-          style={{
-            width: "100%", height: "100%", objectFit: "cover",
-            // ★色を戻してから暗くする（決定#114）。数値は lib/look.ts に1つだけ置く
-            filter: BACKGROUND_FILTER,
-          }}
-        />
+        {/*
+          ★★2026-09-12、背景が**静止画**の回を足した（決定#135）。
+            生成した「商品を使っている場面」は1枚の絵で返る。
+            OffthreadVideo に静止画を渡すと無言で黒くなるので、
+            分岐は描画側が拡張子から決めて backgroundIsStill で渡す。
+          ★動きはカメラ（layerTransform）が付ける。1枚でも止まって見えない。
+        */}
+        {scene.backgroundIsStill ? (
+          <Img
+            src={scene.backgroundUrl}
+            style={{
+              width: "100%", height: "100%", objectFit: "cover",
+              filter: BACKGROUND_FILTER,
+            }}
+          />
+        ) : (
+          <OffthreadVideo
+            src={scene.backgroundUrl}
+            muted
+            // ★背景の音は使わない。ナレーションとBGMだけで作る
+            style={{
+              width: "100%", height: "100%", objectFit: "cover",
+              // ★色を戻してから暗くする（決定#114）。数値は lib/look.ts に1つだけ置く
+              filter: BACKGROUND_FILTER,
+            }}
+          />
+        )}
       </AbsoluteFill>
 
       {/*
@@ -117,6 +135,15 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
         }}
       />
 
+      {/*
+        ---------- 製品を重ねる層（productUrl がある時だけ） ----------
+        ★★生成した使用シーン（決定#135）には**既に商品が写っている**。
+          その上へ透過PNGを重ねると、1画面に商品が2つ出る。
+          「取ってきた画像の掃除機そのものを使う」という前提が崩れるので、
+          productUrl の無い回は接地影ごと描かない。
+      */}
+      {productUrl ? (
+        <>
       {/* ---------- 接地影：製品が「床にある」ための手がかり ---------- */}
       <AbsoluteFill
         style={{
@@ -167,7 +194,7 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
           }}
         >
           <Img
-            src={scene.productUrl}
+            src={productUrl}
             style={{ height: "100%", width: "auto", display: "block" }}
           />
           {/*
@@ -185,8 +212,8 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
                 opacity: ambient,
                 mixBlendMode: "overlay",
                 // 製品の形で切り抜く。CSSマスクにPNGのアルファを使う
-                WebkitMaskImage: `url(${scene.productUrl})`,
-                maskImage: `url(${scene.productUrl})`,
+                WebkitMaskImage: `url(${productUrl})`,
+                maskImage: `url(${productUrl})`,
                 WebkitMaskSize: "contain",
                 maskSize: "contain",
                 WebkitMaskRepeat: "no-repeat",
@@ -198,6 +225,8 @@ export const InSitu: React.FC<{ scene: InSituScene; accent: string }> = ({
           ) : null}
         </div>
       </AbsoluteFill>
+        </>
+      ) : null}
 
       {/*
         ★文字はここに出さない（2026-09-05、オーナー指摘）。
