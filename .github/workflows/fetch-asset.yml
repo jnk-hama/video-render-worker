@@ -131,7 +131,7 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import base64, json, os, re as _re, urllib.request
-          ALLOWED = ('gemini-models', 'pexels-search', 'product-scene')
+          ALLOWED = ('gemini-models', 'pexels-search', 'product-scene', 'process-job')
           fn = (os.environ.get('FN') or '').strip()
           if fn not in ALLOWED:
               raise SystemExit('この口から呼べるのは %s だけです（来た値: %r）' % (ALLOWED, fn))
