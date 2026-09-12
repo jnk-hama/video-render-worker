@@ -42,6 +42,13 @@ export type SceneBase = {
   camera?: CameraMove;
   /** 効果音のタグ。ffmpeg版の fx と同じ語彙 */
   fx?: "fire" | "neon" | "pop" | "shock" | "clean";
+  /**
+   * 機能紹介のチップ（2026-09-12・オーナー指示「機能の紹介もしたい」）。
+   * ★**数値と仕様だけ**を入れる（「吸引力 5000Pa」）。
+   *   ナレーションが喋る言葉をここへ書かない（決定#124の二重表示）。
+   * 3つまで。詳しくは components/FeatureChips.tsx
+   */
+  features?: string[];
 };
 
 export type TalkScene = SceneBase & {

@@ -12,6 +12,7 @@ import { InSitu } from "./scenes/InSitu";
 import { Talk } from "./scenes/Talk";
 import { Shot } from "./scenes/Shot";
 import { Captions } from "./components/Captions";
+import { FeatureChips } from "./components/FeatureChips";
 import { Disclosure } from "./components/Disclosure";
 import { FontFace, JP_FONT } from "./lib/fonts";
 import { CameraMotionBlur } from "@remotion/motion-blur";
@@ -201,6 +202,21 @@ export const Video: React.FC<{ script: VideoScript }> = ({ script }) => {
               durationInFrames={burstFrames}
               style={telopStyles[i % telopStyles.length]}
               color={telopColors[i % telopColors.length]}
+              market={script.market ?? "ja"}
+            />
+          </Sequence>
+        ) : null}
+        {/*
+          機能紹介（2026-09-12）。**巨大テロップの後ろから**出す。
+          ★テロップと同時に出さない。オーナーの「テロップが2個被る事は
+            避けて」（決定#108）は、文字の層が増えても同じく守る。
+            telop が無いシーンは burstFrames を待たずに頭から出す。
+        */}
+        {(scene.features ?? []).length > 0 ? (
+          <Sequence from={telop ? burstFrames : 0}>
+            <FeatureChips
+              features={scene.features ?? []}
+              accent={accent}
               market={script.market ?? "ja"}
             />
           </Sequence>

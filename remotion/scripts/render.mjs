@@ -110,11 +110,20 @@ const adaptLegacyPayload = (s) => {
      *     最初と最後に出す従来の形へ落とす。
      */
     const showProduct = clips.length >= 5 ? i >= 2 : (i === 0 || i === clips.length - 1);
+    /*
+     * 機能紹介のチップ（2026-09-12）。clip ごとに `features` で来る。
+     * ★**商品が出ているシーンにしか出さない。** 商品の見えない画面で
+     *   スペックだけ出しても、何の数字か分からない。
+     */
+    const features = showProduct && Array.isArray(c.features)
+      ? c.features.filter((f) => typeof f === "string" && f.trim()).slice(0, 3)
+      : [];
     if (product && showProduct) {
       return {
         kind: "insitu",
         seconds,
         camera,
+        features,
         backgroundUrl: c.url,
         productUrl: product,
         heightRatio: Number(s.foreground.height_ratio) || 0.42,
