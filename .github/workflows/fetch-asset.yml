@@ -418,7 +418,11 @@ jobs:
           PY
           ls -lh assets_out/
 
+      # ★上げる物が無い回（upload だけの回）は飛ばす。
+      #   「no matches found for assets_out/*」で**成功した処理まで失敗扱い**に
+      #   なっていた（2026-09-12）。工程の失敗と成果物の有無は別である。
       - name: Release へ上げる
+        if: hashFiles('assets_out/**') != ''
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
