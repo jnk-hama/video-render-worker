@@ -35,6 +35,10 @@ import sys
 # ★実測で決める。まずは仮の値を置き、--calibrate で測り直す
 PASS_THRESHOLD = 0.55
 
+# ★顔が画面高のこれ未満なら、胴体の帯が小さすぎて判定に使えない。
+#   全身の画や引きの画がこれに当たる。**測れないものは測れないと言う。**
+MIN_FACE_RATIO = 0.10
+
 # 顔の枠から胴体の帯を取る比率
 BAND_TOP = 0.6      # 顔の下端から顔の高さの何倍下から
 BAND_BOTTOM = 2.2   # 何倍下まで
@@ -124,12 +128,37 @@ def similarity(a, b):
     return float(np.minimum(a, b).sum())
 
 
+def band_info(path):
+    """
+    その画で服を判定できるかどうかの材料を返す。
+
+    ★★2026-09-12、**判定できない画を「不一致」と言っていた。**
+      全身が写った画では顔が小さく、胴体の帯も小さくなる。さらに
+      商品を胸の高さで持つと**帯のほとんどが商品**になる。
+      それでも数字は出るので、「服が違う」と報告してしまっていた。
+      → 判定できるかどうかを先に返す。**測れない事と違う事は別。**
+    """
+    box = _face_box(path)
+    if box is None:
+        return {'ok': False, 'why': '顔が見つからない'}
+    x1, y1, x2, y2 = box
+    fw, fh = x2 - x1, y2 - y1
+    w, h, _ = _read_rgb(path)
+    # 顔が画面高の何%か。小さいほど全身寄りで、帯が当てにならない
+    ratio = fh / float(h)
+    if ratio < MIN_FACE_RATIO:
+        return {'ok': False, 'why': '顔が小さすぎる（%.1f%% < %.1f%%）'
+                % (ratio * 100, MIN_FACE_RATIO * 100), 'face_ratio': ratio}
+    return {'ok': True, 'face_ratio': ratio}
+
+
 def compare(paths):
     """
     @return {dict} pairs（総当たりの類似度）と worst（最小値）
     ★**最小値で判断する。** 平均だと、1枚だけ違う服でも埋もれる。
     """
-    hists = [(p, torso_histogram(p)) for p in paths]
+    info = {p: band_info(p) for p in paths}
+    hists = [(p, torso_histogram(p) if info[p]['ok'] else None) for p in paths]
     usable = [(p, h) for p, h in hists if h is not None]
     pairs = []
     for i in range(len(usable)):
@@ -142,7 +171,9 @@ def compare(paths):
         'pairs': pairs,
         'worst': worst,
         'passed': worst is not None and worst >= PASS_THRESHOLD,
-        'skipped': [os.path.basename(p) for p, h in hists if h is None],
+        'skipped': [(os.path.basename(p), info[p].get('why', '不明'))
+                    for p, h in hists if h is None],
+        'judged': len(usable),
     }
 
 
@@ -151,8 +182,8 @@ if __name__ == '__main__':
     r = compare(args)
     for a, b, s in r['pairs']:
         print('  %-12s %-12s %.3f' % (a, b, s))
-    if r['skipped']:
-        print('  顔が見つからず飛ばした: %s' % ', '.join(r['skipped']))
+    for name, why in r['skipped']:
+        print('  %-12s 判定できず（%s）' % (name, why))
     if r['worst'] is None:
         print('比べられる組がありません')
         sys.exit(0)

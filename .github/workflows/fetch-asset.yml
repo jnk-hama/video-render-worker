@@ -121,8 +121,13 @@ jobs:
           print('服の一致（胴体の色分布・1.0が完全一致）')
           for a, b, sim in o['pairs']:
               print('  %-12s %-12s %.3f' % (a, b, sim))
-          if o['skipped']:
-              print('  顔が見つからず飛ばした: %s' % ', '.join(o['skipped']))
+          for name, why in o['skipped']:
+              print('  %-12s 判定できず（%s）' % (name, why))
+          # ★顔の大きさも出す。閾値がどの条件で校正されたかを思い出すため
+          for p in paths:
+              b = outfit_score.band_info(p)
+              if 'face_ratio' in b:
+                  print('  %-12s 顔の高さ %.1f%%' % (os.path.basename(p), b['face_ratio'] * 100))
           if o['worst'] is not None:
               print('  最小 %.3f / 閾値 %.2f → %s'
                     % (o['worst'], outfit_score.PASS_THRESHOLD,
