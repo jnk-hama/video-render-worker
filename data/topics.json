@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-11T08:14:05+00:00",
+ "generated_at": "2026-09-12T08:05:59+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -13,18 +13,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w70oug",
-    "title": "That core strength is lit",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w70oug/that_core_strength_is_lit/",
+    "id": "t3_1w8xbvk",
+    "title": "Dutch racer Loek Hartog stopped his Porsche mid-race, grabbed a fire extinguisher and pulled British driver Ollie Millroy from his burning Ferrari during a China GT race in Shanghai. Millroy survived with five broken ribs, a fractured collarbone and a bruised lung.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w8xbvk/dutch_racer_loek_hartog_stopped_his_porsche/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w8xbvk",
-    "title": "Dutch racer Loek Hartog stopped his Porsche mid-race, grabbed a fire extinguisher and pulled British driver Ollie Millroy from his burning Ferrari during a China GT race in Shanghai. Millroy survived with five broken ribs, a fractured collarbone and a bruised lung.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w8xbvk/dutch_racer_loek_hartog_stopped_his_porsche/",
+    "id": "t3_1wd5hyl",
+    "title": "Milky Way time lapsed",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wd5hyl/milky_way_time_lapsed/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -49,91 +49,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w7ur18",
-    "title": "This street art goes hard.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w7ur18/this_street_art_goes_hard/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w7vzys",
+    "title": "A 60-year-old woman was found alive and rescued by a joint team of Nepal Police and Armed Police Force Nepal after spending 11 days buried beneath a house following flash floods in Betravati, Nuwakot, Nepal.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7vzys/a_60yearold_woman_was_found_alive_and_rescued_by/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w9q96k",
-    "title": "Some advance human positive vibes on reddit",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w9q96k/some_advance_human_positive_vibes_on_reddit/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1w7zwc7",
+    "title": "American Airlines passenger duct taped to seat following disruptive behavior onboard the flight",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1w7zwc7/american_airlines_passenger_duct_taped_to_seat/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w86ksv",
-    "title": "Service dogs are real life heroes",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w86ksv/service_dogs_are_real_life_heroes/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1waxm3e",
+    "title": "University of Waterloo Students Launch Rocket Breaking World Record",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1waxm3e/university_of_waterloo_students_launch_rocket/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wa12qs",
-    "title": "In 1973 Japan planted trees in concentric circles as part of an experiment in forestry spacing. This is what they look like today from above.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wa12qs/in_1973_japan_planted_trees_in_concentric_circles/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wdj8wc",
+    "title": "Every year, National Museum of Korea holds a “Dress Like a Museum Exhibit” costume contest",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wdj8wc/every_year_national_museum_of_korea_holds_a_dress/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wbinlj",
-    "title": "A Chinese military attaché handed Philippine Defense Secretary Gilberto Teodoro a note during a security forum in Seoul. He decided to read it aloud.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wbinlj/a_chinese_military_attaché_handed_philippine/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wat7av",
+    "title": "Studies, like one done by Vladimir Dinets had show that crocodiles are intelligent enough to engage in play behavior for its own sake. Playing with each other or using natural slides in the wild are some of the activities they partake.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wat7av/studies_like_one_done_by_vladimir_dinets_had_show/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wapy6u",
-    "title": "What motivates you to come to work everyday?",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wapy6u/what_motivates_you_to_come_to_work_everyday/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w937rg",
+    "title": "Frothing Hot Coffee w/ NutriBullet",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w937rg/frothing_hot_coffee_w_nutribullet/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w8zp4s",
-    "title": "A kid staring at the camera",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w8zp4s/a_kid_staring_at_the_camera/",
-    "subreddit": "Unexpected",
+    "id": "t3_1w8581b",
+    "title": "To Assault The Bouncer Without Consequences.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w8581b/to_assault_the_bouncer_without_consequences/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7j3u1",
-    "title": "Checking under the hen for eggs",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w7j3u1/checking_under_the_hen_for_eggs/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wabw4p",
+    "title": "Making Reckless Turn, Then Acting Surprised Upon Winning Stupid Prize",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wabw4p/making_reckless_turn_then_acting_surprised_upon/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1walqb2",
-    "title": "View flying over the Sahara desert",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1walqb2/view_flying_over_the_sahara_desert/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1w9vqvc",
+    "title": "Why would you flip it like that??",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1w9vqvc/why_would_you_flip_it_like_that/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wcsvw4",
-    "title": "She saw the police and took her chance",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wcsvw4/she_saw_the_police_and_took_her_chance/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wbz7kc",
+    "title": "\"Is it bleeediin?\" PHAHAHAH😂🤣😂",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wbz7kc/is_it_bleeediin_phahahah/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,28 +141,64 @@
   ],
   "B": [
    {
-    "id": "t3_1wansdq",
-    "title": "Another season to Rent A Girlfriend! - Japan",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wansdq/another_season_to_rent_a_girlfriend_japan/",
-    "subreddit": "Animemes",
+    "id": "t3_1w96t8i",
+    "title": "Twintailed Lucy [Zenless Zone Zero]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w96t8i/twintailed_lucy_zenless_zone_zero/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w7tbzf",
-    "title": "Juicy lobster, buttery steak or something.",
-    "url": "https://www.reddit.com/r/Animemes/comments/1w7tbzf/juicy_lobster_buttery_steak_or_something/",
-    "subreddit": "Animemes",
+    "id": "t3_1wdrggv",
+    "title": "Hoodie Toki [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1wdrggv/hoodie_toki_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wbvs4b",
-    "title": "[Plastic Neesan] We recreated the iconic wall smash",
-    "url": "https://www.reddit.com/r/anime/comments/1wbvs4b/plastic_neesan_we_recreated_the_iconic_wall_smash/",
-    "subreddit": "anime",
+    "id": "t3_1w80d1g",
+    "title": "Kita-chan [Bocchi the Rock]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1w80d1g/kitachan_bocchi_the_rock/",
+    "subreddit": "awwnime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wab3gf",
+    "title": "Maomao from Apothecary Diaries by me!",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wab3gf/maomao_from_apothecary_diaries_by_me/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wa8o7u",
+    "title": "Pure Vessel and Grimm Cosplay - Hollowknight",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wa8o7u/pure_vessel_and_grimm_cosplay_hollowknight/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wdq7aw",
+    "title": "My Gretchen Wieners Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wdq7aw/my_gretchen_wieners_cosplay/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wbs5ro",
+    "title": "Zoey from KPOP Daemon hunters",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wbs5ro/zoey_from_kpop_daemon_hunters/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -177,9 +213,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w7asor",
-    "title": "Naruto Director Says He 'Completely Ignored' Overseas Audience Demands While Making The Anime",
-    "url": "https://www.reddit.com/r/anime/comments/1w7asor/naruto_director_says_he_completely_ignored/",
+    "id": "t3_1wbvs4b",
+    "title": "[Plastic Neesan] We recreated the iconic wall smash",
+    "url": "https://www.reddit.com/r/anime/comments/1wbvs4b/plastic_neesan_we_recreated_the_iconic_wall_smash/",
     "subreddit": "anime",
     "views": 0,
     "has_media": true,
@@ -195,54 +231,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w9r2dk",
-    "title": "Wedding can wait, commissions can not",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w9r2dk/wedding_can_wait_commissions_can_not/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wbctdd",
-    "title": "New Mondstadt overhaul looks great",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wbctdd/new_mondstadt_overhaul_looks_great/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w7y9f7",
-    "title": "Genshin has more than 250+ unique locations. Crazy for a F2P game.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w7y9f7/genshin_has_more_than_250_unique_locations_crazy/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w9hdpk",
-    "title": "Genshin Impact Version 7.1 Special Program Preview",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w9hdpk/genshin_impact_version_71_special_program_preview/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1w73hm5",
-    "title": "This cute lil radish is cutely dressed for the winter, how cute is that 🤗",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w73hm5/this_cute_lil_radish_is_cutely_dressed_for_the/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1w8yhtl",
     "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 11 discussion",
     "url": "https://www.reddit.com/r/anime/comments/1w8yhtl/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wbmgx6",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 16 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1wbmgx6/rezero_starting_life_in_another_world_season_4/",
     "subreddit": "anime",
     "views": 0,
     "has_media": false,
