@@ -18,7 +18,14 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
-from tts import JA_CHARS_PER_CHUNK, group_words  # noqa: E402
+from tts import (  # noqa: E402
+    JA_CHARS_PER_CHUNK,
+    JA_CHUNK_MIN,
+    LEADING_NG,
+    group_words,
+    sentence_end_after,
+    _split_by_score,
+)
 
 fail = 0
 
@@ -88,13 +95,117 @@ ok("".join(texts) == "".join(x["text"] for x in w), "文字が欠けない")
 """
 ★★**この検査が本物であることを、その場で確かめる。**
 
-本文を渡さなければ（＝決定#119のままの判定）文またぎが起きるはず。
-起きなければ、この検査は何も見張っていないことになる。
+以前はここで「本文を渡さなければ文またぎが起きるはず」と、**結果**で
+確かめていた。ところが決定#136で割り方を点数式にしたら、本文が無くても
+たまたま同じ位置で切れるようになり、この canary が鳴らなくなった。
+**たまたま通ることがある検査は、検査ではない。**
+
+→ 結果ではなく**仕組み**を見る。「文の切れ目は本文から来ている」を直接
+  確かめる。edge-tts の語には句読点が無いので、本文が無ければ
+  文の切れ目は**1つも見つからないはず**である。
 """
-g_old = group_words(w)          # 本文を渡さない＝句読点だけで判定する古い挙動
-texts_old = [c["text"] for c in g_old]
-ok(any("ないこれ" in t for t in texts_old),
-   "本文を渡さないと文をまたぐ（＝この検査は本当に効いている）", texts_old)
+ends_with_text = sentence_end_after(w, NARRATION)
+ends_no_text = sentence_end_after(w, None)
+ok(any(ends_with_text), "本文を渡すと文の切れ目が見つかる",
+   [x["text"] for x, e in zip(w, ends_with_text) if e])
+ok(not any(ends_no_text),
+   "本文が無いと文の切れ目は1つも見つからない（＝句読点だけの判定は効かない）")
+
+"""
+★★決定#136。**助詞・語尾の断片から始まる枚を作らない。**
+
+実測（job gen135 の描画）で出ていた形:
+  「これ、床に置いとくだけでいい。」→「これ床に」「置いとく」「だけでいい」
+  「勝手に吸って、勝手に基地に戻る。」→「って勝手」「に吸って」
+声と合っていても、**目では読めない**。
+"""
+print("\n=== 行頭が助詞・語尾の断片にならない（決定#136）===")
+CASES = [
+    ("これ、床に置いとくだけでいい。勝手に出てって、勝手に吸って、勝手に基地に戻る。",
+     ["これ", "床", "に", "置い", "とく", "だけ", "で", "いい",
+      "勝手", "に", "出", "て", "って", "勝手", "に", "吸っ", "て",
+      "勝手", "に", "基地", "に", "戻る"]),
+    ("毛もホコリも、朝起きたら消えてる。自分で掃除したっていう感覚が、もう無いんよ。",
+     ["毛", "も", "ホコリ", "も", "朝", "起き", "たら", "消え", "てる",
+      "自分", "で", "掃除", "し", "た", "って", "いう", "感覚", "が",
+      "もう", "無い", "ん", "よ"]),
+    ("ただ、値段だけはここで言えない。見た瞬間ちょっと固まったから、プロフに置いとくね。",
+     ["ただ", "値段", "だけ", "は", "ここ", "で", "言え", "ない",
+      "見", "た", "瞬間", "ちょっと", "固まっ", "た", "から",
+      "プロフ", "に", "置い", "とく", "ね"]),
+]
+for narration, toks in CASES:
+    t = 0.0
+    ws = []
+    for tok in toks:
+        ws.append({"text": tok, "start": t, "end": t + 0.1 * len(tok)})
+        t += 0.1 * len(tok)
+    g = group_words(ws, text=narration)
+    texts = [c["text"] for c in g]
+    print("   →", " / ".join(texts))
+    """
+    ★行頭の語は、まとめた後の文字列からは分からない（「とくだけ」の
+      先頭が「と」なのか「とく」なのかは、語の列を見ないと決まらない）。
+      なので**割り方を決めている当人**（_split_by_score）に直接聞く。
+    """
+    ends_c = sentence_end_after(ws, narration)
+    heads = []
+    sent = []
+    for x, e in zip(ws, ends_c):
+        sent.append(x)
+        if e:
+            heads += [grp[0]["text"] for grp in _split_by_score(sent)]
+            sent = []
+    if sent:
+        heads += [grp[0]["text"] for grp in _split_by_score(sent)]
+    ok(not any(h in LEADING_NG for h in heads),
+       "行頭が助詞・語尾の断片でない", [h for h in heads if h in LEADING_NG] or heads)
+    ok("".join(texts) == "".join(toks), "文字が欠けない")
+    """
+    ★短すぎる枚も作らない。ただし**1文がそれより短い**回は仕方がない
+      （「はい。」だけの文を無理に他の文と繋いだら文またぎになる）。
+    """
+    ends = sentence_end_after(ws, narration)
+    sent_lens = []
+    n = 0
+    for x, e in zip(ws, ends):
+        n += len(x["text"])
+        if e:
+            sent_lens.append(n)
+            n = 0
+    if n:
+        sent_lens.append(n)
+    shortest_sentence = min(sent_lens)
+    short = [x for x in texts if len(x) < JA_CHUNK_MIN]
+    ok(not short or shortest_sentence < JA_CHUNK_MIN,
+       f"{JA_CHUNK_MIN}文字未満の枚を作らない", short)
+
+"""
+★★この検査も、その場で本物か確かめる。
+  点数から「行頭が助詞」の罰を外したら、上の検査は落ちるはずである。
+"""
+import tts as _tts  # noqa: E402
+_saved = _tts.LEADING_NG
+_tts.LEADING_NG = ()
+narration, toks = CASES[0]
+t = 0.0
+ws = []
+for tok in toks:
+    ws.append({"text": tok, "start": t, "end": t + 0.1 * len(tok)})
+    t += 0.1 * len(tok)
+ends_off = sentence_end_after(ws, narration)
+heads_off = []
+sent = []
+for x, e in zip(ws, ends_off):
+    sent.append(x)
+    if e:
+        heads_off += [grp[0]["text"] for grp in _tts._split_by_score(sent)]
+        sent = []
+if sent:
+    heads_off += [grp[0]["text"] for grp in _tts._split_by_score(sent)]
+_tts.LEADING_NG = _saved
+ok(any(h in LEADING_NG for h in heads_off),
+   "罰を外すと行頭に助詞が出る（＝この検査は本当に効いている）", heads_off)
 
 print("\n=== 英語は空白で繋ぐ ===")
 w = words(("STOP", 0.0, 0.4), ("SCROLLING", 0.4, 1.0), ("NOW", 1.0, 1.3))

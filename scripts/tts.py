@@ -396,6 +396,17 @@ def _synth_by_sentence(sentences, voice, rate, out_path):
 # 日本語の1枚あたりの文字数。語ではなく文字で区切る（下の説明）。
 JA_CHARS_PER_CHUNK = 9
 
+"""
+★★字幕1枚の長さ（2026-09-12・決定#136）。**点数で決めるための3つの値**。
+
+以前は JA_CHARS_PER_CHUNK=9 を「超えたら次の枚へ」と貪欲に使っていた。
+今は目標・下限・上限の3つを持ち、この幅の中で一番読みやすい割り方を選ぶ。
+JA_CHARS_PER_CHUNK は「9文字前後」という元の意図として残す（=目標）。
+"""
+JA_CHUNK_TARGET = JA_CHARS_PER_CHUNK   # 狙う長さ
+JA_CHUNK_MIN = 4                       # これ未満は「光って消える」だけで読めない
+JA_CHUNK_MAX = 12                      # 字幕側の保証(16文字2行)の内側
+
 
 def _is_cjk(text):
     return re.search(r'[\u3040-\u30ff\u3400-\u9fff]', str(text or '')) is not None
@@ -485,6 +496,100 @@ def _merge_short_tails(groups, ends, words):
     return out
 
 
+"""
+★★字幕の**行頭に置かない語**（2026-09-12・決定#136）。
+
+【何が起きていたか（実測・job gen135 の描画で確認）】
+9文字で刻むだけなので、塊の先頭が助詞になる枚ができていた。
+  「これ、床に置いとくだけでいい。」
+    → 「これ床に」「置いとく」「**だけでいい**」
+  「勝手に出てって、勝手に吸って、勝手に基地に戻る。」
+    → 「勝手に出て」「って勝手」「**に吸って**」「勝手に基地」
+**「に吸って」から始まる字幕**は、声と合っていても目では読めない。
+オーナー指摘「ナレーションとテロップが言ってることがずれてる」の一部は、
+文言のずれではなく**この切れ方**だった。
+
+【なぜ形態素解析を入れないか】
+文節で割れば正しく切れるが、辞書と解析器が要り、出力が環境で揺れる。
+「確率で出力が揺れる処理を構成に持ち込まない」（CLAUDE.md）に反する。
+**行頭に来たら前の枚へ戻す**という決定論的な後処理で足りる。
+"""
+LEADING_NG = (
+    # 助詞
+    'は', 'が', 'を', 'に', 'へ', 'で', 'と', 'も', 'や', 'の', 'か', 'ね', 'よ', 'さ',
+    'から', 'まで', 'より', 'など', 'だけ', 'ほど', 'ばかり', 'しか', 'でも', 'ので',
+    'のに', 'けど', 'って', 'とか', 'なら', 'たら', 'ても', 'ながら',
+    # 語尾・活用の断片（前の語に付くべきもの）
+    'て', 'た', 'だ', 'な', 'ず', 'ば', 'る', 'ん', 'く', 'し',
+    'とく', 'てる', 'てた', 'てき', 'ちゃ', 'じゃ', 'られ', 'れる', 'せる',
+    'ます', 'ましょ', 'たい', 'なく', 'なっ', 'いう', 'いい', 'ある', 'いる',
+)
+
+
+
+
+def _chunk_cost(chunk):
+    """
+    この1枚の「読みにくさ」。小さいほど良い。
+
+    ★★点数で決める（2026-09-12・決定#136）。
+      以前は「9文字を超えたら次の枚へ」と**貪欲に**割っていた。
+      貪欲だと、割った後で困っても戻せない。実際に出ていた形:
+        「これ、床に置いとくだけでいい。」→「これ床に」「置いとく」「だけでいい」
+        「勝手に吸って、勝手に基地に戻る。」→「って勝手」「に吸って」
+      **「に吸って」から始まる字幕**は、声と合っていても目では読めない。
+      助詞を前へ戻す後処理も試したが、今度は「いい」「ない」のような
+      2文字の枚が残った。**片方を直すと他方が壊れる**＝貪欲が原因。
+
+    ★巨大テロップの行割り（HookTelop の breakScore）と同じ考え方にする。
+      候補に点数を付け、**全体で一番良い割り方**を選ぶ。
+    """
+    n = sum(len(w['text']) for w in chunk)
+    # 目標の長さから離れるほど悪い
+    cost = (n - JA_CHUNK_TARGET) ** 2
+    # ★行頭が助詞・語尾の断片なのが**一番読みにくい**。ここを最も重くする
+    if chunk[0]['text'] in LEADING_NG:
+        cost += 400
+    # ★短すぎる枚は、光って消えるだけで読めない（決定#126で潰した形）
+    if n < JA_CHUNK_MIN:
+        cost += 250
+    return cost
+
+
+def _split_by_score(ws):
+    """
+    1文ぶんの語の列を、**全体で一番読みやすい割り方**へ分ける。
+
+    候補が指数的に増えないよう、後ろから累積の最小費用を求める（動的計画法）。
+    語数は1文あたり数十なので、計算量は無視できる。
+    """
+    n = len(ws)
+    if n == 0:
+        return []
+    # best[i] = ws[i:] を割った時の最小費用 / cut[i] = そこでの最初の切れ目
+    best = [0.0] * (n + 1)
+    cut = [n] * (n + 1)
+    for i in range(n - 1, -1, -1):
+        best[i] = float('inf')
+        length = 0
+        for j in range(i + 1, n + 1):
+            length += len(ws[j - 1]['text'])
+            # ★長すぎる枚は作らない。字幕側が2行に収められる範囲を超える
+            if length > JA_CHUNK_MAX and j > i + 1:
+                break
+            c = _chunk_cost(ws[i:j]) + best[j]
+            if c < best[i]:
+                best[i] = c
+                cut[i] = j
+    out = []
+    i = 0
+    while i < n:
+        j = cut[i]
+        out.append(ws[i:j])
+        i = j
+    return out
+
+
 def group_words(words, per_chunk=3, text=None):
     """
     単語を「画面に一度に出す塊」へまとめる。
@@ -508,28 +613,26 @@ def group_words(words, per_chunk=3, text=None):
     cjk = bool(words) and _is_cjk(''.join(w['text'] for w in words))
     if cjk:
         ends = sentence_end_after(words, text)
+        # ★★まず**文で切る**（2026-09-10・決定#119 / #126）。
+        #   ここが無いと、依頼側が文ごとに割ってくれた字幕を一度つなげて
+        #   から刻み直すため、
+        #     「ステーションに消えてく。」＋「ゴミ捨ての不快感から」
+        #       → 「に消えてくゴミ捨て」
+        #   のように**文をまたぐ枚**ができる。実際に本番で出た。
+        sentences = []
         cur = []
         for i, w in enumerate(words):
-            # ★句読点だけの語は前の枚に付ける。「！」1文字だけの枚を作らない
-            punct = not re.search(r'[0-9A-Za-z\u3040-\u30ff\u3400-\u9fff]', w['text'])
-            if (cur and not punct
-                    and sum(len(x['text']) for x in cur) + len(w['text']) > JA_CHARS_PER_CHUNK):
-                groups.append(cur)
-                cur = []
             cur.append(w)
-            # ★★文の終わりで必ず区切る（2026-09-10・決定#119）。
-            #   ここが無いと、依頼側が文ごとに割ってくれた字幕を
-            #   一度つなげてから9文字で刻み直すため、
-            #     「ステーションに消えてく。」＋「ゴミ捨ての不快感から」
-            #       → 「に消えてくゴミ捨て」
-            #   のように**文をまたぐ枚**ができる。実際に本番で出た。
-            # ★判定そのものは決定#126で直した（上の sentence_end_after）
             if ends[i]:
-                groups.append(cur)
+                sentences.append(cur)
                 cur = []
         if cur:
-            groups.append(cur)
-        groups = _merge_short_tails(groups, ends, words)
+            sentences.append(cur)
+        # ★★文の中は**点数で**割る（決定#136）。貪欲に9文字で刻むと、
+        #   助詞から始まる枚や2文字だけの枚ができ、片方を直すと
+        #   他方が壊れた。詳しくは _chunk_cost。
+        for sent in sentences:
+            groups.extend(_split_by_score(sent))
     else:
         n = max(1, int(per_chunk))
         groups = [words[i:i + n] for i in range(0, len(words), n)]
