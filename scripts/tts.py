@@ -113,6 +113,9 @@ HOOK_PROSODY = {'rate': '+34%', 'pitch': '+6Hz', 'volume': '+22%'}
 QUESTION_PROSODY = {'rate': '-12%', 'pitch': '+10Hz', 'volume': '+10%'}
 CLOSING_PROSODY = {'rate': '-18%', 'pitch': '+2Hz', 'volume': '+26%'}
 BODY_PROSODY = {'rate': '+16%', 'pitch': '+0Hz', 'volume': '-6%'}
+#: 間の文のもう一方。BODY と交互に使い、同じ読み方を2回続けない（決定#134）
+#: ★pitch は動かさない（声の同一性）。速さと強さだけで差を付ける
+BODY_ALT_PROSODY = {'rate': '+2%', 'pitch': '+4Hz', 'volume': '+12%'}
 
 #: pitch の上限（Hz）。これを超える設定を置かないための歯止め
 MAX_PITCH_HZ = 10
@@ -187,6 +190,26 @@ def prosody_for(index, total, sentence):
 
     ★乱数を使わない。同じ台本なら毎回まったく同じ音でなければならない
       （E-017。描き直しは設計された動作なので、鳴り方が変わってはいけない）。
+
+    ★★2026-09-12、**間の文が全部同じ設定になっていた**（決定#134）。
+
+      実測して分かった。5シーンの台本でも**文は9つ**あった
+      （1シーンに2文入るため）。この関数は「文の番号」で役を決めるので、
+
+        文1        → 掴み
+        文2〜文8   → **全部 BODY（+16% / -6%）で同一**
+        文9        → 締め
+
+      つまり **9文中7文が完全に同じ読み方**。しかも今回の台本には
+      「？」で終わる文が1つも無く、QUESTION は一度も発動しなかった。
+      抑揚を広げたのに平坦に聞こえていたのは、**振れ幅ではなく
+      「同じ設定が7回続くこと」が原因**だった。
+
+      ★自分で「同じ速さの文を隣り合わせない」とコメントに書いておきながら、
+        実装は真逆だった。docs/hook-prompt-v3.md にも
+        「5シーンの語尾を揃えない／AI臭は揃うことから出る」と書いてある。
+
+      → 間の文は2種類を**交互に**使う。これで同じ読み方が2回続かない。
     """
     if index == 0:
         return HOOK_PROSODY                       # 掴み。ここで離脱が決まる
@@ -194,7 +217,8 @@ def prosody_for(index, total, sentence):
         return QUESTION_PROSODY                   # 問いかけは上げて終わる
     if index == total - 1:
         return CLOSING_PROSODY                    # 最後は落として言い切る
-    return BODY_PROSODY
+    # ★交互。隣り合う文が同じ読み方にならないことだけを保証する
+    return BODY_PROSODY if index % 2 == 1 else BODY_ALT_PROSODY
 
 
 def _run(cmd):
