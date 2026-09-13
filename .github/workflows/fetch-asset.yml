@@ -201,60 +201,84 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import html as _h, os, re, urllib.request
-          url = (os.environ.get('U') or '').strip()
-          if not url.startswith(('http://', 'https://')):
-              raise SystemExit('http(s) のURLを入れてください: %r' % url[:120])
-          req = urllib.request.Request(url, headers={
-              'User-Agent': 'Mozilla/5.0 (compatible; jmas-ai-os page check)',
-              'Accept-Language': 'ja,en;q=0.8',
-          })
-          with urllib.request.urlopen(req, timeout=40) as r:
-              raw = r.read(3 * 1024 * 1024)
-              ctype = r.headers.get('content-type', '')
-              final = r.geturl()
-          print('取得: %s' % final)
-          # ★短縮URLは最終URLが本体。og: の抽出前に出しておくと追いやすい
-          if final != url:
-              print('リダイレクト先: %s' % final)
-          print('種類: %s / %d バイト' % (ctype, len(raw)))
-          enc = 'utf-8'
-          m = re.search(r'charset=([A-Za-z0-9_-]+)', ctype)
-          if m:
-              enc = m.group(1)
-          text = raw.decode(enc, 'replace')
+
+          # ★★2026-09-13、**空白・改行で区切って複数URLを渡せるようにした。**
+          #   Actionsの無料枠が実測で100%（1,999分/月）に達しているのに、
+          #   1ページ読むたびに1分課金されるのは割に合わない。
+          #   READMEを5本読むのに5回起動していた所を1回で済ませる。
+          urls = [u for u in re.split(r'\s+', (os.environ.get('U') or '').strip()) if u]
+          if not urls:
+              raise SystemExit('URLがありません')
+          for u in urls:
+              if not u.startswith(('http://', 'https://')):
+                  raise SystemExit('http(s) のURLを入れてください: %r' % u[:120])
+
+          # ★1本ずつの上限。全部で4万文字の枠を分け合う
+          per = 40000 if len(urls) == 1 else max(4000, 38000 // len(urls))
           os.makedirs('assets_out', exist_ok=True)
-          open('assets_out/page.html', 'w', encoding='utf-8').write(text)
-          # ★本文だけにする。script/style を落としてタグを剥ぐ
-          body = re.sub(r'(?is)<(script|style|noscript)[^>]*>.*?</\1>', ' ', text)
-          body = re.sub(r'(?s)<[^>]+>', ' ', body)
-          body = _h.unescape(body)
-          body = re.sub(r'[ \t\r\f\v]+', ' ', body)
-          body = re.sub(r'\n\s*\n+', '\n', body).strip()
-          open('assets_out/page.txt', 'w', encoding='utf-8').write(body)
-          # ★og: と title は本文からタグを剥ぐと消えるので、先に抜いて出す。
-          #   SNSのページは本文がJSで描かれるため、**中身はここにしか無い**
-          for m in re.finditer(
-                  r'<meta[^>]+(?:property|name)=["\'](og:[^"\']+|description|title)["\'][^>]*>', text):
-              tag = m.group(0)
-              c = re.search(r'content=["\'](.*?)["\']', tag, re.S)
-              if c:
-                  print('  %-22s %s' % (m.group(1), _h.unescape(c.group(1))[:400]))
-          t = re.search(r'<title[^>]*>(.*?)</title>', text, re.S)
-          if t:
-              print('  %-22s %s' % ('title', _h.unescape(t.group(1)).strip()[:300]))
-          print('本文 %d 文字 → assets_out/page.txt' % len(body))
-          # ★★3000文字で切っていたが、それでは仕様書が読めない。
-          #   実際にPixabayのAPIドキュメント（13,692文字）を読もうとして、
-          #   肝心の「Search videos」の節が切れて届かなかった。
-          #   assets_out/page.txt に全文はあるが、**privateリポジトリの
-          #   Releaseは未認証で落とせない**（404）ので、ログに出ないものは読めない。
-          LIMIT = 40000
-          if len(body) <= LIMIT:
-              print('---- 全文 ----')
-              print(body)
-          else:
-              print('---- 先頭%d文字（長すぎるので切った。全文はRelease）----' % LIMIT)
-              print(body[:LIMIT])
+
+          def read_one(url):
+              req = urllib.request.Request(url, headers={
+                  'User-Agent': 'Mozilla/5.0 (compatible; jmas-ai-os page check)',
+                  'Accept-Language': 'ja,en;q=0.8',
+              })
+              with urllib.request.urlopen(req, timeout=40) as r:
+                  raw = r.read(3 * 1024 * 1024)
+                  return raw, r.headers.get('content-type', ''), r.geturl()
+
+          for i, url in enumerate(urls, 1):
+              print('\n' + '=' * 70)
+              try:
+                  raw, ctype, final = read_one(url)
+              except Exception as e:
+                  # ★1本で落ちても残りを読む。全部やり直すと1分また溶ける
+                  print('[%d/%d] 取得失敗: %s\n  %s' % (i, len(urls), url, e))
+                  continue
+              print('[%d/%d] 取得: %s' % (i, len(urls), final))
+              if final != url:
+                  print('  リダイレクト先: %s' % final)
+              print('  種類: %s / %d バイト' % (ctype, len(raw)))
+
+              enc = 'utf-8'
+              m = re.search(r'charset=([A-Za-z0-9_-]+)', ctype)
+              if m:
+                  enc = m.group(1)
+              text = raw.decode(enc, 'replace')
+
+              # ★本文だけにする。script/style を落としてタグを剥ぐ
+              body = re.sub(r'(?is)<(script|style|noscript)[^>]*>.*?</\1>', ' ', text)
+              body = re.sub(r'(?s)<[^>]+>', ' ', body)
+              body = _h.unescape(body)
+              body = re.sub(r'[ \t\r\f\v]+', ' ', body)
+              body = re.sub(r'\n\s*\n+', '\n', body).strip()
+
+              # ★複数の時はファイル名を分ける。1本の時は今までと同じ名前を保つ
+              #   （page.txt を前提にしている手順を壊さないため）
+              stem = 'page' if len(urls) == 1 else 'page%02d' % i
+              open('assets_out/%s.html' % stem, 'w', encoding='utf-8').write(text)
+              open('assets_out/%s.txt' % stem, 'w', encoding='utf-8').write(body)
+
+              # ★og: と title は本文からタグを剥ぐと消えるので、先に抜いて出す。
+              #   SNSのページは本文がJSで描かれるため、**中身はここにしか無い**
+              for mm in re.finditer(
+                      r'<meta[^>]+(?:property|name)=["\'](og:[^"\']+|description|title)["\'][^>]*>', text):
+                  c = re.search(r'content=["\'](.*?)["\']', mm.group(0), re.S)
+                  if c:
+                      print('  %-22s %s' % (mm.group(1), _h.unescape(c.group(1))[:400]))
+              t = re.search(r'<title[^>]*>(.*?)</title>', text, re.S)
+              if t:
+                  print('  %-22s %s' % ('title', _h.unescape(t.group(1)).strip()[:300]))
+
+              # ★★3000文字で切っていたら仕様書が読めなかった（Pixabay 13,692文字で
+              #   肝心の節が届かなかった）。privateのReleaseは未認証で落とせない（404）ので、
+              #   **ログに出ないものは読めない**。
+              print('  本文 %d 文字 → assets_out/%s.txt' % (len(body), stem))
+              if len(body) <= per:
+                  print('---- 全文 ----')
+                  print(body)
+              else:
+                  print('---- 先頭%d文字（長すぎるので切った。全文はRelease）----' % per)
+                  print(body[:per])
           PY
           ls -lh assets_out/
 
