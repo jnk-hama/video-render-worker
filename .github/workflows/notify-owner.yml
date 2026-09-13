@@ -1,0 +1,77 @@
+# オーナーへの通知をIssueとして立てる。
+#
+# ★★2026-09-13 追加（オーナー承認済み）。
+#
+# 【なぜ要るか】
+# Supabase側の `LINE_CHANNEL_ACCESS_TOKEN` が未設定で、手動投稿の依頼が
+# **14日で88件のうち1通も届いていなかった**。鍵が入るまで通知が全滅、
+# という状態を無くす。LINEが通ればLINEで終わり、ここは使われない。
+#
+# 【なぜIssueを process-job から直接立てないか】
+# 実測: GITHUB_DISPATCH_TOKEN でIssue APIを叩くと403だった。原文:
+#   403 {"message":"Resource not accessible by personal access token"}
+# 描画依頼用に絞ったfine-grained PATなのでIssueの権限が無い。
+# 一方 repository_dispatch は通る（描画で実証済み）。
+# → ここまで dispatch で来てもらい、**このワークフロー自身の
+#   GITHUB_TOKEN** でIssueを立てる。権限の変更も新しい秘密も要らない。
+name: notify-owner
+
+on:
+  repository_dispatch:
+    types: [notify-owner]
+  # 手で試せる口も残す
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Issueの題名'
+        required: false
+        type: string
+      body:
+        description: 'Issueの本文'
+        required: false
+        type: string
+
+# ★このワークフローに要るのはIssueを書く権限だけ。それ以外は与えない
+permissions:
+  issues: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Issueを立てる（開いている分が多ければ立てない）
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: ${{ github.event.client_payload.title || inputs.title }}
+          BODY: ${{ github.event.client_payload.body || inputs.body }}
+        run: |
+          set -euo pipefail
+
+          # ★★Issueが溢れないようにする。今は全ジョブが同じ理由で落ちるので、
+          #   放っておくと同内容のIssueが1日6件立つ。
+          PREFIX="手動投稿リクエスト: "
+          MAX_OPEN=5
+
+          if [ -z "${TITLE:-}" ]; then
+            echo "::error::題名が空です（client_payload.title / inputs.title）"
+            exit 1
+          fi
+
+          OPEN=$(gh issue list --repo "$GH_REPO" --state open --limit 100 \
+                   --json title --jq "[.[] | select(.title | startswith(\"$PREFIX\"))] | length")
+          echo "未処理の通知Issue: ${OPEN}件（上限 ${MAX_OPEN}）"
+
+          if [ "$OPEN" -ge "$MAX_OPEN" ]; then
+            # ★ここで失敗にしない。溢れさせないのは正常な動作であって異常ではない
+            echo "::notice::未処理が${OPEN}件あるため、今回はIssueを立てませんでした"
+            exit 0
+          fi
+
+          # ★本文はファイル経由で渡す。シェルへ展開すると引用符や改行で壊れる
+          printf '%s' "${BODY:-（本文なし）}" > body.md
+          URL=$(gh issue create --repo "$GH_REPO" \
+                  --title "$TITLE" --body-file body.md)
+          echo "立てました: $URL"
