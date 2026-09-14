@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-13T08:30:02+00:00",
+ "generated_at": "2026-09-14T09:08:07+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -22,15 +22,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w8xbvk",
-    "title": "Dutch racer Loek Hartog stopped his Porsche mid-race, grabbed a fire extinguisher and pulled British driver Ollie Millroy from his burning Ferrari during a China GT race in Shanghai. Millroy survived with five broken ribs, a fractured collarbone and a bruised lung.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1w8xbvk/dutch_racer_loek_hartog_stopped_his_porsche/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wagt31",
     "title": "This is the moment a supermarket worker dives onto the road to save a child from oncoming traffic in Puebla, Mexico.",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wagt31/this_is_the_moment_a_supermarket_worker_dives/",
@@ -43,6 +34,15 @@
     "id": "t3_1wcadba",
     "title": "The President of Mongolia, 100 kg, bench presses 20 reps—this is just too badass",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wcadba/the_president_of_mongolia_100_kg_bench_presses_20/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1we9cru",
+    "title": "Younger brother at work providing romantic support",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1we9cru/younger_brother_at_work_providing_romantic_support/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -85,9 +85,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w9dpwx",
-    "title": "The day Robin Williams made Koko the gorilla laugh, after she had been grieving the loss of her companion, Michael, for six months.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w9dpwx/the_day_robin_williams_made_koko_the_gorilla/",
+    "id": "t3_1we3gio",
+    "title": "Kids in the hospital paint little stones for penguins to gift their mates",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1we3gio/kids_in_the_hospital_paint_little_stones_for/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -103,18 +103,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w8zp4s",
-    "title": "A kid staring at the camera",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1w8zp4s/a_kid_staring_at_the_camera/",
+    "id": "t3_1walv1y",
+    "title": "Hooman tells doggo to “Go!”",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1walv1y/hooman_tells_doggo_to_go/",
     "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1walv1y",
-    "title": "Hooman tells doggo to “Go!”",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1walv1y/hooman_tells_doggo_to_go/",
+    "id": "t3_1wef15x",
+    "title": "This one's a head banger",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wef15x/this_ones_a_head_banger/",
     "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
@@ -130,9 +130,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1walqb2",
-    "title": "View flying over the Sahara desert",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1walqb2/view_flying_over_the_sahara_desert/",
+    "id": "t3_1wfb35p",
+    "title": "This was Akku Yadav, an alleged gangster in Nagpur, accused of raping around 40 women. In 2004, around 200 women stormed a courtroom, reportedly stabbing him 70+ times and forcing chili powder into his throat.He allegedly bribed police to escape,until his victims took matters into their own hands",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wfb35p/this_was_akku_yadav_an_alleged_gangster_in_nagpur/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -150,6 +150,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wf0gyt",
+    "title": "No fun if it would kill me... (Neon Genesis Evangelion)",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wf0gyt/no_fun_if_it_would_kill_me_neon_genesis_evangelion/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wdeofn",
     "title": "When your teacher calls you to the board — And you just stand there",
     "url": "https://www.reddit.com/r/animegifs/comments/1wdeofn/when_your_teacher_calls_you_to_the_board_and_you/",
@@ -159,37 +168,28 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wb5b8d",
-    "title": "Simple & Comfortable in Mexico City",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wb5b8d/simple_comfortable_in_mexico_city/",
-    "subreddit": "streetwear",
+    "id": "t3_1wclwy7",
+    "title": "The Big 3 reunite with the father of shonen (Animation by me)",
+    "url": "https://www.reddit.com/r/anime/comments/1wclwy7/the_big_3_reunite_with_the_father_of_shonen/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wbisur",
-    "title": "Sunday days in Barcelona",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wbisur/sunday_days_in_barcelona/",
-    "subreddit": "streetwear",
+    "id": "t3_1wbvs4b",
+    "title": "[Plastic Neesan] We recreated the iconic wall smash",
+    "url": "https://www.reddit.com/r/anime/comments/1wbvs4b/plastic_neesan_we_recreated_the_iconic_wall_smash/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w9za1c",
-    "title": "Fun fit at the shop today",
-    "url": "https://www.reddit.com/r/streetwear/comments/1w9za1c/fun_fit_at_the_shop_today/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wecb73",
-    "title": "🄸🄽 🄰 🅂🅃🄰🅃🄴 🄾🄵 🄵🄻🅄🅇 [WDYWT]",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wecb73/wdywt/",
-    "subreddit": "streetwear",
+    "id": "t3_1w9p9hi",
+    "title": "Studio Ghibli producer ignored the “Ghibli-style” AI art trend because he knew people would just get bored of it. “It only takes a little knowledge to spot a fake” - AUTOMATON WEST",
+    "url": "https://www.reddit.com/r/anime/comments/1w9p9hi/studio_ghibli_producer_ignored_the_ghiblistyle_ai/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -213,9 +213,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w9hdpk",
-    "title": "Genshin Impact Version 7.1 Special Program Preview",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w9hdpk/genshin_impact_version_71_special_program_preview/",
+    "id": "t3_1wesutn",
+    "title": "Hoyo officially recognizes \"Jahoda's Witnesses\" as Jahoda's fandom name",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wesutn/hoyo_officially_recognizes_jahodas_witnesses_as/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
@@ -231,12 +231,21 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wd1y7t",
-    "title": "A romantic photo like none taken before",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wd1y7t/a_romantic_photo_like_none_taken_before/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wfa192",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 12 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1wfa192/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wbmgx6",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 16 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1wbmgx6/rezero_starting_life_in_another_world_season_4/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
