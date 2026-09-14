@@ -4,3 +4,13 @@ payload.json
 out.mp4
 releases.json
 stale.txt
+
+# ★★このリポジトリは公開である。うっかり置いた鍵がそのまま世界へ出る。
+#   「気をつける」ではなく、置いても入らない状態にしておく。
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.clasprc.json
+service-account*.json

@@ -567,8 +567,53 @@ jobs:
       #   描画が成功して**アップロードだけ**落ちた回にも「描画に失敗」と
       #   出ていた。実際にそれで一度誤読しかけた。どの段階で落ちたかは
       #   上のステップの一覧を見るのが正しい。
+      #
+      # ★★2026-09-14、**中身を出すのをやめた**。
+      #
+      # 【なぜ】このリポジトリを公開にした。ログは誰でも読める。
+      #   ここは以前 payload.json の先頭2000文字をそのまま出していたが、
+      #   その中身は**台本の本文と、どの商品を選んだか**である。
+      #   失敗するたびに、それが全世界へ出ることになる。
+      #   認証情報は入っていない（鍵はSecretsが自動でマスクする）が、
+      #   出す必要が無いものを出さない。
+      #
+      # 【何を残したか】障害調査に要るのは「どの値が欠けていたか・形が
+      #   違ったか」であって本文ではない。だから**形だけ**出す。
+      #   文字列は長さ、配列は件数、辞書はキー名。
+      #   renderer / target_market のような**内容を持たない短い札**だけは
+      #   値ごと出す（これが読めないと部門の取り違えを追えない。決定#082）。
       - name: 失敗時のログ
         if: failure()
         run: |
-          echo "どこかの段階で失敗しました（どのステップかは上の一覧を参照）。payload は以下:"
-          head -c 2000 payload.json || true
+          echo "どこかの段階で失敗しました（どのステップかは上の一覧を参照）。"
+          echo "payload の形（本文は出さない）:"
+          python3 - <<'PY' || true
+          import json
+
+          # 内容を持たない短い札。これだけは値ごと出す
+          PLAIN = {'renderer', 'target_market', 'safe_area', 'platform',
+                   'video_type', 'id', 'job_id', 'lang', 'aspect'}
+
+          try:
+              p = json.load(open('payload.json'))
+          except Exception as e:
+              print('  payload.json を読めません: %s' % type(e).__name__)
+              raise SystemExit(0)
+
+          job = p.get('job', p)
+          if not isinstance(job, dict):
+              print('  job が辞書ではありません: %s' % type(job).__name__)
+              raise SystemExit(0)
+
+          def shape(k, v):
+              if k in PLAIN and isinstance(v, (str, int, float, bool)):
+                  return repr(v)
+              if isinstance(v, str):   return 'str(%d文字)' % len(v)
+              if isinstance(v, list):  return 'list(%d件)' % len(v)
+              if isinstance(v, dict):  return 'dict{%s}' % ', '.join(sorted(v))
+              if v is None:            return 'null'
+              return '%s=%r' % (type(v).__name__, v)
+
+          for k in sorted(job):
+              print('  %-18s %s' % (k, shape(k, job[k])))
+          PY
