@@ -43,6 +43,27 @@ on:
         description: 'リポジトリ内のファイルを Supabase の公開バケットへ上げてURLを出す（例 assets/shared/influencer/anna/front_main.jpg）'
         required: false
         type: string
+      # ★★2026-09-15 追加。**リポジトリに置かずに**画像を公開バケットへ上げる口。
+      #
+      # 【なぜ要るか】
+      # ASPの商品写真をオーナーから受け取っても、置き場所が無かった。
+      # 楽天の商品ページは Akamai にデータセンターIPを弾かれて読めず
+      # （実測: 43バイトの "Reference #..." しか返らない）、
+      # 画像URLを機械で取る手段が無い。
+      #
+      # ★**このリポジトリは公開である。他社の商品写真をコミットしてはいけない。**
+      #   git履歴に入ると消せず、公開と同時に再配布したことになる。
+      #   だから「リポジトリを経由せず」に上げられる口を別に用意する。
+      # ★上限は workflow_dispatch の入力（約65,535文字）。
+      #   base64は元の約1.34倍なので、およそ48KBまでの画像が通る。
+      image_b64:
+        description: '画像そのものをbase64で渡して公開バケットへ上げる（リポジトリに残さない）'
+        required: false
+        type: string
+      image_name:
+        description: 'image_b64 で上げる時のファイル名（例 product/redial-850019.jpg）'
+        required: false
+        type: string
       verify_faces:
         description: 'asset-preview に置いてある gen*.jpg の顔が anna 本人かを機械で判定する'
         required: false
@@ -147,29 +168,51 @@ jobs:
       # ★公開バケットなのでURLを知っていれば誰でも読める。
       #   **人物・商品の素材のような、見られて困らない物だけ**を上げること。
       - name: Supabaseの公開バケットへ上げる
-        if: inputs.upload != '' && !inputs.verify_faces
+        if: (inputs.upload != '' || inputs.image_b64 != '') && !inputs.verify_faces
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           F: ${{ inputs.upload }}
+          B64: ${{ inputs.image_b64 }}
+          BNAME: ${{ inputs.image_name }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import mimetypes, os, re as _re, urllib.request
+          import base64, mimetypes, os, re as _re, urllib.request
+          b64 = (os.environ.get('B64') or '').strip()
           rel = (os.environ.get('F') or '').strip().lstrip('/')
-          if not rel or '..' in rel.split('/'):
-              raise SystemExit('リポジトリの中のパスを入れてください: %r' % rel[:120])
-          if not os.path.isfile(rel):
-              raise SystemExit('ファイルがありません: %s' % rel)
           def clean(v, allowed):
               return ''.join(c for c in (v or '') if _re.match(allowed, c))
           base = clean(os.environ.get('SUPABASE_URL'), r'[A-Za-z0-9:/._-]').rstrip('/')
           if not base.startswith('http'):
               base = 'https://%s' % base.lstrip('/')
           key = clean(os.environ.get('SUPABASE_SERVICE_ROLE_KEY'), r'[A-Za-z0-9._-]')
-          dest = 'assets/' + rel.replace('assets/', '', 1)
-          ctype = mimetypes.guess_type(rel)[0] or 'application/octet-stream'
-          data = open(rel, 'rb').read()
+
+          # ★バイト列の出所は2つあるが、**上げる処理は1つしか持たない**
+          #   （同じ処理を2箇所に書くと必ずずれる）。
+          if b64:
+              # base64で直接渡された回。リポジトリには何も残らない
+              name = (os.environ.get('BNAME') or '').strip().lstrip('/')
+              if not name or '..' in name.split('/'):
+                  raise SystemExit('image_name を入れてください（例 product/foo.jpg）: %r' % name[:120])
+              if not _re.fullmatch(r'[A-Za-z0-9/._-]{1,120}', name):
+                  raise SystemExit('image_name に使える文字は英数字と / . _ - だけです: %r' % name[:120])
+              try:
+                  data = base64.b64decode(b64, validate=True)
+              except Exception as e:
+                  raise SystemExit('base64を復号できません: %s' % e)
+              if not data:
+                  raise SystemExit('復号したら空でした')
+              dest = 'uploads/' + name
+              ctype = mimetypes.guess_type(name)[0] or 'application/octet-stream'
+          else:
+              if not rel or '..' in rel.split('/'):
+                  raise SystemExit('リポジトリの中のパスを入れてください: %r' % rel[:120])
+              if not os.path.isfile(rel):
+                  raise SystemExit('ファイルがありません: %s' % rel)
+              dest = 'assets/' + rel.replace('assets/', '', 1)
+              ctype = mimetypes.guess_type(rel)[0] or 'application/octet-stream'
+              data = open(rel, 'rb').read()
           url = '%s/storage/v1/object/images/%s' % (base, dest)
           req = urllib.request.Request(
               url, data=data, method='POST',
