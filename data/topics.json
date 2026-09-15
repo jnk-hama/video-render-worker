@@ -1,30 +1,12 @@
 {
- "generated_at": "2026-09-14T09:08:07+00:00",
+ "generated_at": "2026-09-15T08:52:01+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1wa23nz",
-    "title": "Despite suffering from Cerebral Palsy, he never gave up on his dream..🫂❤️",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wa23nz/despite_suffering_from_cerebral_palsy_he_never/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wd5hyl",
     "title": "Milky Way time lapsed",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wd5hyl/milky_way_time_lapsed/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wagt31",
-    "title": "This is the moment a supermarket worker dives onto the road to save a child from oncoming traffic in Puebla, Mexico.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wagt31/this_is_the_moment_a_supermarket_worker_dives/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,6 +22,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wf6w7b",
+    "title": "Mount Fuji, seen from an airplane",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wf6w7b/mount_fuji_seen_from_an_airplane/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1we9cru",
     "title": "Younger brother at work providing romantic support",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1we9cru/younger_brother_at_work_providing_romantic_support/",
@@ -49,10 +40,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1w9q96k",
-    "title": "Some advance human positive vibes on reddit",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1w9q96k/some_advance_human_positive_vibes_on_reddit/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wemjyh",
+    "title": "A waterslide that goes into a sharktank",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wemjyh/a_waterslide_that_goes_into_a_sharktank/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -61,15 +52,6 @@
     "id": "t3_1wcrkzd",
     "title": "A wonderful tribute to the victims of 9/11 by Sky Element Drones, 2,977 Lights over New York Harbor. One light for every life lost. Filmed on the 9th of September.",
     "url": "https://www.reddit.com/r/BeAmazed/comments/1wcrkzd/a_wonderful_tribute_to_the_victims_of_911_by_sky/",
-    "subreddit": "BeAmazed",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wa12qs",
-    "title": "In 1973 Japan planted trees in concentric circles as part of an experiment in forestry spacing. This is what they look like today from above.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wa12qs/in_1973_japan_planted_trees_in_concentric_circles/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -94,18 +76,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wapy6u",
-    "title": "What motivates you to come to work everyday?",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wapy6u/what_motivates_you_to_come_to_work_everyday/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wek5e5",
+    "title": "Milky Way is traveling through space at 600 kilometers per second, oscillating slightly, as if it were flapping its wings through the cosmos.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wek5e5/milky_way_is_traveling_through_space_at_600/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1walv1y",
-    "title": "Hooman tells doggo to “Go!”",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1walv1y/hooman_tells_doggo_to_go/",
+    "id": "t3_1wbncm0",
+    "title": "mole disappears in soil in seconds",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wbncm0/mole_disappears_in_soil_in_seconds/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wapy6u",
+    "title": "What motivates you to come to work everyday?",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wapy6u/what_motivates_you_to_come_to_work_everyday/",
     "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
@@ -121,10 +112,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wcsvw4",
-    "title": "She saw the police and took her chance",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wcsvw4/she_saw_the_police_and_took_her_chance/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1walv1y",
+    "title": "Hooman tells doggo to “Go!”",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1walv1y/hooman_tells_doggo_to_go/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -133,6 +124,15 @@
     "id": "t3_1wfb35p",
     "title": "This was Akku Yadav, an alleged gangster in Nagpur, accused of raping around 40 women. In 2004, around 200 women stormed a courtroom, reportedly stabbing him 70+ times and forcing chili powder into his throat.He allegedly bribed police to escape,until his victims took matters into their own hands",
     "url": "https://www.reddit.com/r/interestingasfuck/comments/1wfb35p/this_was_akku_yadav_an_alleged_gangster_in_nagpur/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wcsvw4",
+    "title": "She saw the police and took her chance",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wcsvw4/she_saw_the_police_and_took_her_chance/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -159,6 +159,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wedsj3",
+    "title": "Keep wondering... (Black Lagoon)",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wedsj3/keep_wondering_black_lagoon/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wdeofn",
     "title": "When your teacher calls you to the board — And you just stand there",
     "url": "https://www.reddit.com/r/animegifs/comments/1wdeofn/when_your_teacher_calls_you_to_the_board_and_you/",
@@ -168,37 +177,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wclwy7",
-    "title": "The Big 3 reunite with the father of shonen (Animation by me)",
-    "url": "https://www.reddit.com/r/anime/comments/1wclwy7/the_big_3_reunite_with_the_father_of_shonen/",
-    "subreddit": "anime",
+    "id": "t3_1wb5b8d",
+    "title": "Simple & Comfortable in Mexico City",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wb5b8d/simple_comfortable_in_mexico_city/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wbvs4b",
-    "title": "[Plastic Neesan] We recreated the iconic wall smash",
-    "url": "https://www.reddit.com/r/anime/comments/1wbvs4b/plastic_neesan_we_recreated_the_iconic_wall_smash/",
-    "subreddit": "anime",
+    "id": "t3_1wbisur",
+    "title": "Sunday days in Barcelona",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wbisur/sunday_days_in_barcelona/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w9p9hi",
-    "title": "Studio Ghibli producer ignored the “Ghibli-style” AI art trend because he knew people would just get bored of it. “It only takes a little knowledge to spot a fake” - AUTOMATON WEST",
-    "url": "https://www.reddit.com/r/anime/comments/1w9p9hi/studio_ghibli_producer_ignored_the_ghiblistyle_ai/",
-    "subreddit": "anime",
+    "id": "t3_1wecb73",
+    "title": "🄸🄽 🄰 🅂🅃🄰🅃🄴 🄾🄵 🄵🄻🅄🅇 [WDYWT]",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wecb73/wdywt/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1w9r2dk",
-    "title": "Wedding can wait, commissions can not",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1w9r2dk/wedding_can_wait_commissions_can_not/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wez11m",
+    "title": "Today’s fit at Alfargo’s",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wez11m/todays_fit_at_alfargos/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -222,6 +231,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wfosfn",
+    "title": "Google Classroom is now being raided with POSITIVE reviews of the 7.1 anniversary",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wfosfn/google_classroom_is_now_being_raided_with/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1weenac",
     "title": "HAVE YOU EVER FOUGHT OVER 1 MORA WITH YOUR LIFE ON THE LINE?!!",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1weenac/have_you_ever_fought_over_1_mora_with_your_life/",
@@ -231,21 +249,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wfa192",
-    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 12 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1wfa192/mushoku_tensei_jobless_reincarnation_season_3/",
-    "subreddit": "anime",
+    "id": "t3_1wg1tgf",
+    "title": "The Mentor and His Mentee",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wg1tgf/the_mentor_and_his_mentee/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wbmgx6",
-    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 16 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1wbmgx6/rezero_starting_life_in_another_world_season_4/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
+    "has_media": true,
     "source": "rss"
    }
   ]
