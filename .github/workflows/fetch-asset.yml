@@ -197,10 +197,39 @@ jobs:
                   raise SystemExit('image_name を入れてください（例 product/foo.jpg）: %r' % name[:120])
               if not _re.fullmatch(r'[A-Za-z0-9/._-]{1,120}', name):
                   raise SystemExit('image_name に使える文字は英数字と / . _ - だけです: %r' % name[:120])
+              # ★★2026-09-15、実際に失敗して足した。
+              #   転記の途中で改行や空白が混ざる／末尾の = が落ちることがある。
+              #   **中身が壊れているのか、体裁だけの問題なのかを切り分ける。**
+              #   体裁は直せるので直す。中身が壊れていれば下で必ず落ちる。
+              b64 = _re.sub(r'\s+', '', b64)
+              if len(b64) % 4:
+                  b64 += '=' * (4 - len(b64) % 4)
               try:
                   data = base64.b64decode(b64, validate=True)
               except Exception as e:
-                  raise SystemExit('base64を復号できません: %s' % e)
+                  raise SystemExit(
+                      'base64を復号できません: %s / 長さ%d・末尾20文字=%r'
+                      % (e, len(b64), b64[-20:]))
+              # ★JPEG/PNG の先頭を見て、本当に画像かを確かめる。
+              #   壊れたbase64でも復号だけは通ることがあり、
+              #   そのまま上げると「成功したのに中身が壊れた画像」が残る。
+              # ★★先頭だけでは足りない。**途中で切れた画像は先頭が無傷**なので
+              #   「成功したのに中身が壊れた画像」がそのまま残る（実測して足した）。
+              #   終端マーカーまで見て、切れていないことを確かめる。
+              if data[:2] == b'\xff\xd8':
+                  if data[-2:] != b'\xff\xd9':
+                      raise SystemExit(
+                          'JPEGの終端がありません（末尾=%r）。転記が途中で切れています'
+                          % data[-8:])
+              elif data[:8] == b'\x89PNG\r\n\x1a\n':
+                  if data[-8:] != b'\x00\x00\x00\x00IEND\xae\x42\x60\x82'[-8:]:
+                      raise SystemExit(
+                          'PNGの終端(IEND)がありません（末尾=%r）。転記が途中で切れています'
+                          % data[-8:])
+              else:
+                  raise SystemExit(
+                      '画像に見えません（先頭=%r）。転記が途中で壊れていないか確認してください'
+                      % data[:8])
               if not data:
                   raise SystemExit('復号したら空でした')
               dest = 'uploads/' + name
