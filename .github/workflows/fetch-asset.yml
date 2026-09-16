@@ -39,6 +39,13 @@ on:
         description: '公開Webページを読んで本文を持ち帰る（サンドボックスから出られないため）'
         required: false
         type: string
+      # ★★2026-09-16 追加。長いページの「途中」を読むための口。
+      #   Geminiの料金表は84,000文字あり、先頭を切って出すだけでは
+      #   肝心の節へ届かなかった（実測）。語を指定して周辺だけ出す。
+      page_grep:
+        description: 'page の本文からこの語を探し、周辺だけを出す（長いページ用）'
+        required: false
+        type: string
       upload:
         description: 'リポジトリ内のファイルを Supabase の公開バケットへ上げてURLを出す（例 assets/shared/influencer/anna/front_main.jpg）'
         required: false
@@ -271,6 +278,7 @@ jobs:
         if: inputs.page != '' && inputs.upload == '' && !inputs.verify_faces
         env:
           U: ${{ inputs.page }}
+          G: ${{ inputs.page_grep }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -280,6 +288,7 @@ jobs:
           #   Actionsの無料枠が実測で100%（1,999分/月）に達しているのに、
           #   1ページ読むたびに1分課金されるのは割に合わない。
           #   READMEを5本読むのに5回起動していた所を1回で済ませる。
+          grep = (os.environ.get('G') or '').strip()
           urls = [u for u in re.split(r'\s+', (os.environ.get('U') or '').strip()) if u]
           if not urls:
               raise SystemExit('URLがありません')
@@ -347,7 +356,33 @@ jobs:
               #   肝心の節が届かなかった）。privateのReleaseは未認証で落とせない（404）ので、
               #   **ログに出ないものは読めない**。
               print('  本文 %d 文字 → assets_out/%s.txt' % (len(body), stem))
-              if len(body) <= per:
+              # ★★2026-09-16 追加。**長いページの「途中」が読めなかった。**
+              #   Geminiの料金表は84,000文字あり、先頭38,000文字で切ると
+              #   肝心のVeoの節へ届かない。privateのReleaseは未認証で
+              #   落とせない（404）ので、**ログに出ないものは読めない**。
+              #   → 語を指定したら、その周辺だけを出す。
+              #   ★「先頭を出す」に落とさない。**探した語が無いなら無いと言う。**
+              #     無言で先頭を出すと「載っていない」と誤読する。
+              if grep:
+                  low, hits, shown = body.lower(), 0, 0
+                  i = 0
+                  while shown < per:
+                      j = low.find(grep.lower(), i)
+                      if j < 0:
+                          break
+                      hits += 1
+                      a, b = max(0, j - 400), min(len(body), j + 1200)
+                      chunk = body[a:b]
+                      print('---- %r の %d件目（%d文字目付近）----' % (grep, hits, j))
+                      print(chunk)
+                      shown += len(chunk)
+                      i = b
+                  if hits == 0:
+                      print('★ %r はこのページの本文に **1件もありません**（本文 %d 文字を全部見た）'
+                            % (grep, len(body)))
+                  else:
+                      print('---- %r は %d件（上限%d文字まで表示）----' % (grep, hits, per))
+              elif len(body) <= per:
                   print('---- 全文 ----')
                   print(body)
               else:
