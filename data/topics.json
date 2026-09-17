@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-16T08:47:01+00:00",
+ "generated_at": "2026-09-17T08:50:04+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -16,15 +16,6 @@
     "id": "t3_1wf6w7b",
     "title": "Mount Fuji, seen from an airplane",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wf6w7b/mount_fuji_seen_from_an_airplane/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wcadba",
-    "title": "The President of Mongolia, 100 kg, bench presses 20 reps—this is just too badass",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wcadba/the_president_of_mongolia_100_kg_bench_presses_20/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -49,9 +40,27 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wfrqqr",
+    "title": "Joe Gibbs Racing pit crew completing a flawless sub-10 second pit stop up close",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wfrqqr/joe_gibbs_racing_pit_crew_completing_a_flawless/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wfjgs7",
     "title": "a spider built web around a wasp nest trapping them in,and the ants are eating the larvae, stockpilin for winter",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjgs7/a_spider_built_web_around_a_wasp_nest_trapping/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wh983v",
+    "title": "China unveils autonomous robotic fish for underwater surveillance.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wh983v/china_unveils_autonomous_robotic_fish_for/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -76,15 +85,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wh983v",
-    "title": "China unveils autonomous robotic fish for underwater surveillance.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wh983v/china_unveils_autonomous_robotic_fish_for/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wfjepu",
     "title": "My dad took these photos of a crazy-looking repeating rainbow in the clouds over Palm Coast, FL.",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjepu/my_dad_took_these_photos_of_a_crazylooking/",
@@ -94,46 +94,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wem0gk",
-    "title": "Don’t pretend to punch people",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wem0gk/dont_pretend_to_punch_people/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wgs6ua",
+    "title": "Dad had no idea what was under the bucket 😱💀",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wgs6ua/dad_had_no_idea_what_was_under_the_bucket/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfhqql",
-    "title": "Guys try to recreate jackass",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wfhqql/guys_try_to_recreate_jackass/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wef15x",
+    "title": "This one's a head banger",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wef15x/this_ones_a_head_banger/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh1p94",
-    "title": "Cop sneaks up and tackles motorcycle rider who was taunting officers to chase him",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wh1p94/cop_sneaks_up_and_tackles_motorcycle_rider_who/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wfb35p",
+    "title": "This was Akku Yadav, an alleged gangster in Nagpur, accused of raping around 40 women. In 2004, around 200 women stormed a courtroom, reportedly stabbing him 70+ times and forcing chili powder into his throat.He allegedly bribed police to escape,until his victims took matters into their own hands",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wfb35p/this_was_akku_yadav_an_alleged_gangster_in_nagpur/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfeton",
-    "title": "HMB while i jump over this wall",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1wfeton/hmb_while_i_jump_over_this_wall/",
-    "subreddit": "holdmybeer",
+    "id": "t3_1wcsvw4",
+    "title": "She saw the police and took her chance",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wcsvw4/she_saw_the_police_and_took_her_chance/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wencp8",
-    "title": "HMB while i do my show",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1wencp8/hmb_while_i_do_my_show/",
-    "subreddit": "holdmybeer",
+    "id": "t3_1wclqjh",
+    "title": "Diver scores a perfect 0.00 score during 2015 Asian Games",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wclqjh/diver_scores_a_perfect_000_score_during_2015/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,73 +141,37 @@
   ],
   "B": [
    {
-    "id": "t3_1wdrggv",
-    "title": "Hoodie Toki [Blue Archive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wdrggv/hoodie_toki_blue_archive/",
-    "subreddit": "awwnime",
+    "id": "t3_1wh459v",
+    "title": "I wonder if this is true",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wh459v/i_wonder_if_this_is_true/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfctzd",
-    "title": "Lindverne [Zenless Zone Zero]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wfctzd/lindverne_zenless_zone_zero/",
-    "subreddit": "awwnime",
+    "id": "t3_1wggi4m",
+    "title": "A must have for every weeb.",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wggi4m/a_must_have_for_every_weeb/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wcc29s",
-    "title": "Citlali [Genshin Impact]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wcc29s/citlali_genshin_impact/",
-    "subreddit": "awwnime",
+    "id": "t3_1wf0gyt",
+    "title": "No fun if it would kill me... (Neon Genesis Evangelion)",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wf0gyt/no_fun_if_it_would_kill_me_neon_genesis_evangelion/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wdq7aw",
-    "title": "My Gretchen Wieners Cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wdq7aw/my_gretchen_wieners_cosplay/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wemoo5",
-    "title": "Lara Croft Tomb Raider Reboot 2013",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wemoo5/lara_croft_tomb_raider_reboot_2013/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wgfcyy",
-    "title": "My Sid cosplay from Toy Story",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wgfcyy/my_sid_cosplay_from_toy_story/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wbs5ro",
-    "title": "Zoey from KPOP Daemon hunters",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wbs5ro/zoey_from_kpop_daemon_hunters/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wcrx8y",
-    "title": "Camie Utsushimi, My Hero Academia",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wcrx8y/camie_utsushimi_my_hero_academia/",
-    "subreddit": "cosplay",
+    "id": "t3_1wdeofn",
+    "title": "When your teacher calls you to the board — And you just stand there",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wdeofn/when_your_teacher_calls_you_to_the_board_and_you/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -216,15 +180,6 @@
     "id": "t3_1wclwy7",
     "title": "The Big 3 reunite with the father of shonen (Animation by me)",
     "url": "https://www.reddit.com/r/anime/comments/1wclwy7/the_big_3_reunite_with_the_father_of_shonen/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wbvs4b",
-    "title": "[Plastic Neesan] We recreated the iconic wall smash",
-    "url": "https://www.reddit.com/r/anime/comments/1wbvs4b/plastic_neesan_we_recreated_the_iconic_wall_smash/",
     "subreddit": "anime",
     "views": 0,
     "has_media": true,
@@ -240,9 +195,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wesutn",
-    "title": "Hoyo officially recognizes \"Jahoda's Witnesses\" as Jahoda's fandom name",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wesutn/hoyo_officially_recognizes_jahodas_witnesses_as/",
+    "id": "t3_1wde8s9",
+    "title": "Madhouse fight scenes were wild back in the day [Needless]",
+    "url": "https://www.reddit.com/r/anime/comments/1wde8s9/madhouse_fight_scenes_were_wild_back_in_the_day/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1whu9n1",
+    "title": "Just uploading an HD version of the Citlali GIF...",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1whu9n1/just_uploading_an_hd_version_of_the_citlali_gif/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
@@ -252,6 +216,15 @@
     "id": "t3_1wgyofn",
     "title": "Single and ready to mingle?",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wgyofn/single_and_ready_to_mingle/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wesutn",
+    "title": "Hoyo officially recognizes \"Jahoda's Witnesses\" as Jahoda's fandom name",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wesutn/hoyo_officially_recognizes_jahodas_witnesses_as/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
@@ -273,6 +246,24 @@
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wfa192",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 12 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1wfa192/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1why3wc",
+    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 17 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1why3wc/rezero_starting_life_in_another_world_season_4/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
