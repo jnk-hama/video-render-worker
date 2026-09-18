@@ -1,17 +1,8 @@
 {
- "generated_at": "2026-09-17T08:50:04+00:00",
+ "generated_at": "2026-09-18T08:26:28+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
-   {
-    "id": "t3_1wd5hyl",
-    "title": "Milky Way time lapsed",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wd5hyl/milky_way_time_lapsed/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1wf6w7b",
     "title": "Mount Fuji, seen from an airplane",
@@ -40,6 +31,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wio1fv",
+    "title": "Very creative with stage setup",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wio1fv/very_creative_with_stage_setup/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wfrqqr",
     "title": "Joe Gibbs Racing pit crew completing a flawless sub-10 second pit stop up close",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wfrqqr/joe_gibbs_racing_pit_crew_completing_a_flawless/",
@@ -49,46 +49,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wfjgs7",
-    "title": "a spider built web around a wasp nest trapping them in,and the ants are eating the larvae, stockpilin for winter",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjgs7/a_spider_built_web_around_a_wasp_nest_trapping/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1we3gio",
+    "title": "Kids in the hospital paint little stones for penguins to gift their mates",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1we3gio/kids_in_the_hospital_paint_little_stones_for/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh983v",
-    "title": "China unveils autonomous robotic fish for underwater surveillance.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wh983v/china_unveils_autonomous_robotic_fish_for/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wi1lxx",
+    "title": "This New Jersey man flies drones every night to find lost pets for free. He’s already reunited over 122 families",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wi1lxx/this_new_jersey_man_flies_drones_every_night_to/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wf56rj",
-    "title": "The Romanian Football Federation has introduced a new black card, which can be used to permanently cancel a match, to help prevent abusive behaviour from parents at youth-team matches",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wf56rj/the_romanian_football_federation_has_introduced_a/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wih75q",
+    "title": "This elderly Syrian hid his banned library behind a brick wall in Damascus in 2011 before fleeing to Kuwait to escape Assad's prisons. Today, he returned and tore down the wall, finally recovering the priceless books the regime outlawed.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wih75q/this_elderly_syrian_hid_his_banned_library_behind/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1we7oaq",
-    "title": "PlayStation 5 with HDMI 2.1 to a 1949 black-and-white television",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1we7oaq/playstation_5_with_hdmi_21_to_a_1949/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wek5e5",
+    "title": "Milky Way is traveling through space at 600 kilometers per second, oscillating slightly, as if it were flapping its wings through the cosmos.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wek5e5/milky_way_is_traveling_through_space_at_600/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfjepu",
-    "title": "My dad took these photos of a crazy-looking repeating rainbow in the clouds over Palm Coast, FL.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjepu/my_dad_took_these_photos_of_a_crazylooking/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wezxkv",
+    "title": "catamount saved from drowning",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wezxkv/catamount_saved_from_drowning/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wj41p7",
+    "title": "The things that only happen in Australia",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wj41p7/the_things_that_only_happen_in_australia/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -112,27 +121,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wfb35p",
-    "title": "This was Akku Yadav, an alleged gangster in Nagpur, accused of raping around 40 women. In 2004, around 200 women stormed a courtroom, reportedly stabbing him 70+ times and forcing chili powder into his throat.He allegedly bribed police to escape,until his victims took matters into their own hands",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wfb35p/this_was_akku_yadav_an_alleged_gangster_in_nagpur/",
+    "id": "t3_1wirw6s",
+    "title": "In 1991, a Nigerian prophet by name Daniel Abodunrin felt inspired by the story of Daniel in the bible and decided to recreate the story. He went into a cage in a zoo where Lions were kept with the belief that God would shut their mouths. As soon as he entered, he was completely devoured by the lion",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wirw6s/in_1991_a_nigerian_prophet_by_name_daniel/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wcsvw4",
-    "title": "She saw the police and took her chance",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wcsvw4/she_saw_the_police_and_took_her_chance/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wclqjh",
-    "title": "Diver scores a perfect 0.00 score during 2015 Asian Games",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wclqjh/diver_scores_a_perfect_000_score_during_2015/",
+    "id": "t3_1wg5s0w",
+    "title": "On April 14, 1994, the seven largest tobacco companies in the USA swore that nicotine is not addictive.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wg5s0w/on_april_14_1994_the_seven_largest_tobacco/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -168,6 +168,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1whzsmh",
+    "title": "Two consenting adults",
+    "url": "https://www.reddit.com/r/Animemes/comments/1whzsmh/two_consenting_adults/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wdeofn",
     "title": "When your teacher calls you to the board — And you just stand there",
     "url": "https://www.reddit.com/r/animegifs/comments/1wdeofn/when_your_teacher_calls_you_to_the_board_and_you/",
@@ -177,93 +186,75 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wclwy7",
-    "title": "The Big 3 reunite with the father of shonen (Animation by me)",
-    "url": "https://www.reddit.com/r/anime/comments/1wclwy7/the_big_3_reunite_with_the_father_of_shonen/",
-    "subreddit": "anime",
+    "id": "t3_1wecb73",
+    "title": "🄸🄽 🄰 🅂🅃🄰🅃🄴 🄾🄵 🄵🄻🅄🅇 [WDYWT]",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wecb73/wdywt/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1we9217",
-    "title": "The Guy She Was Interested in Wasn't a Guy at All | Mitsuki Koga & Aya Osawa Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1we9217/the_guy_she_was_interested_in_wasnt_a_guy_at_all/",
-    "subreddit": "anime",
+    "id": "t3_1wez11m",
+    "title": "Today’s fit at Alfargo’s",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wez11m/todays_fit_at_alfargos/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wde8s9",
-    "title": "Madhouse fight scenes were wild back in the day [Needless]",
-    "url": "https://www.reddit.com/r/anime/comments/1wde8s9/madhouse_fight_scenes_were_wild_back_in_the_day/",
-    "subreddit": "anime",
+    "id": "t3_1wh4qv9",
+    "title": "styled a collection from JCREW x Eckhaus Latta",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wh4qv9/styled_a_collection_from_jcrew_x_eckhaus_latta/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1whu9n1",
-    "title": "Just uploading an HD version of the Citlali GIF...",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1whu9n1/just_uploading_an_hd_version_of_the_citlali_gif/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wg46ic",
+    "title": "[DISC] Mom × Magical Girl - Oneshot by @kou88450",
+    "url": "https://www.reddit.com/r/manga/comments/1wg46ic/disc_mom_magical_girl_oneshot_by_kou88450/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wgyofn",
-    "title": "Single and ready to mingle?",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wgyofn/single_and_ready_to_mingle/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wims88",
+    "title": "What manga is this from?",
+    "url": "https://www.reddit.com/r/manga/comments/1wims88/what_manga_is_this_from/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wesutn",
-    "title": "Hoyo officially recognizes \"Jahoda's Witnesses\" as Jahoda's fandom name",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wesutn/hoyo_officially_recognizes_jahodas_witnesses_as/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wdj2f2",
+    "title": "[DISC] Against One's Will (Oneshot by Holiday Yasumi)",
+    "url": "https://www.reddit.com/r/manga/comments/1wdj2f2/disc_against_ones_will_oneshot_by_holiday_yasumi/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfosfn",
-    "title": "Google Classroom is now being raided with POSITIVE reviews of the 7.1 anniversary",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wfosfn/google_classroom_is_now_being_raided_with/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wdfhu0",
+    "title": "[DISC] - Confessing to an athletic girl. - Oneshot by @kou88450",
+    "url": "https://www.reddit.com/r/manga/comments/1wdfhu0/disc_confessing_to_an_athletic_girl_oneshot_by/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wg1tgf",
-    "title": "The Mentor and His Mentee",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wg1tgf/the_mentor_and_his_mentee/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1weciit",
+    "title": "[ART] Mother press experiment - Mikoto-chan Doesn’t Want to Be Hated!",
+    "url": "https://www.reddit.com/r/manga/comments/1weciit/art_mother_press_experiment_mikotochan_doesnt/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wfa192",
-    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 12 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1wfa192/mushoku_tensei_jobless_reincarnation_season_3/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1why3wc",
-    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 17 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1why3wc/rezero_starting_life_in_another_world_season_4/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
     "source": "rss"
    }
   ]
