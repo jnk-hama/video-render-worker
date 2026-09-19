@@ -77,7 +77,7 @@ on:
         type: boolean
         default: false
       edge:
-        description: '呼ぶEdge Functionの名前（gemini-models / product-scene）。これを使う時ほかは無視'
+        description: '呼ぶEdge Functionの名前（gemini-models / product-scene / video-scene）。これを使う時ほかは無視'
         required: false
         type: string
       edge_body:
@@ -409,7 +409,7 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import base64, json, os, re as _re, urllib.request
-          ALLOWED = ('gemini-models', 'pexels-search', 'product-scene', 'process-job')
+          ALLOWED = ('gemini-models', 'pexels-search', 'product-scene', 'process-job', 'video-scene')
           fn = (os.environ.get('FN') or '').strip()
           if fn not in ALLOWED:
               raise SystemExit('この口から呼べるのは %s だけです（来た値: %r）' % (ALLOWED, fn))
