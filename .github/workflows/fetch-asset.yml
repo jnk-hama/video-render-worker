@@ -484,13 +484,28 @@ jobs:
                       n[0] += 1
           dump(d)
           # ★画像を落とした後に本文を出す。base64で流れて読めなくならないよう畳む
+          # ★★2026-09-19、**エラー本文まで畳んでいて読めなかった。**
+          #   Edge Function が返した 400 の理由が `<531文字>` になり、
+          #   **何が悪いのか分からないまま止まった。**
+          #   畳みたいのは base64（読んでも意味が無く、ログを流す）だけである。
+          #   → 中身を見て、**base64らしい時だけ**畳む。散文は畳まない。
+          def _looks_b64(t):
+              if len(t) < 300:
+                  return False
+              head = t[:200].replace('\n', '')
+              # data URI か、英数字+/= だけで出来ている長い塊
+              return t.startswith('data:') or _re.fullmatch(r'[A-Za-z0-9+/=]{200}', head) is not None
+
           def fold(v):
               if isinstance(v, dict):
                   return {k: fold(x) for k, x in v.items()}
               if isinstance(v, list):
                   return [fold(x) for x in v]
-              if isinstance(v, str) and len(v) > 300:
-                  return '<%d文字>' % len(v)
+              if isinstance(v, str) and _looks_b64(v):
+                  return '<%d文字のbase64>' % len(v)
+              # ★散文は畳まないが、青天井にもしない（ログが流れる）
+              if isinstance(v, str) and len(v) > 4000:
+                  return v[:4000] + ('…<全%d文字>' % len(v))
               return v
           # ★★2026-09-19、**6,000文字では足りなかった。** gemini-models の
           #   ListModels は約6.1KBで、**末尾（veo の行）がちょうど切れていた。**
