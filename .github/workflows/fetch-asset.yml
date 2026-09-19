@@ -492,7 +492,19 @@ jobs:
               if isinstance(v, str) and len(v) > 300:
                   return '<%d文字>' % len(v)
               return v
-          print(json.dumps(fold(d), ensure_ascii=False, indent=1)[:6000])
+          # ★★2026-09-19、**6,000文字では足りなかった。** gemini-models の
+          #   ListModels は約6.1KBで、**末尾（veo の行）がちょうど切れていた。**
+          #   private の Release は未認証で落とせないので「ログに出ないものは読めない」。
+          #   → 上限を上げ、それでも超える回は**末尾も必ず出す**。
+          #     先頭だけ出して「載っていない」と誤読するのが一番まずい（page_grep と同じ理由）。
+          _t = json.dumps(fold(d), ensure_ascii=False, indent=1)
+          _LIM = 30000
+          if len(_t) <= _LIM:
+              print(_t)
+          else:
+              print(_t[: _LIM // 2])
+              print('\n---- 中略（全 %d 文字。ここから末尾）----\n' % len(_t))
+              print(_t[-(_LIM // 2):])
           PY
           ls -lh assets_out/
 
