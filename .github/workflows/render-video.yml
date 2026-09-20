@@ -385,6 +385,38 @@ jobs:
             echo "ナレーションを作っていない回なので、音声の検査はしません。"
           fi
 
+      # ★★2026-09-20 追加。**出来上がった絵を見る**ための口。
+      #
+      # 【なぜ要るか】
+      # ffprobe が保証するのは「壊れていないこと」までである。
+      # 字幕が画面外に出ていないか／前景が商品を隠していないか／
+      # 背景が内容と噛み合っているかは、**絵を見ないと分からない**。
+      # 実装者のサンドボックスは Supabase にも Release にも出られず、
+      # 通るのは git だけなので preview ブランチへ置く。
+      #
+      # ★等間隔に6コマ。先頭と末尾だけでは、途中で崩れた回を見逃す。
+      # ★ここで失敗しても動画は出来ている。確認の失敗で成果物を捨てない。
+      - name: 仕上がりのコマを並べて置く
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check pillow
+          dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 out.mp4)
+          mkdir -p frames
+          python3 - "$dur" <<'PY'
+          import subprocess, sys
+          dur = float(sys.argv[1])
+          n = 6
+          for i in range(n):
+              t = dur * (i + 0.5) / n
+              subprocess.run(['ffmpeg', '-y', '-v', 'error', '-ss', '%.3f' % t,
+                              '-i', 'out.mp4', '-frames:v', '1',
+                              'frames/f%02d.jpg' % i], check=True)
+          print('尺 %.2f秒 から %d コマ抜きました' % (dur, n))
+          PY
+          python3 scripts/preview_b64.py frames/f*.jpg --max 200 --cols 3
+          bash scripts/push_preview.sh preview.jpg "render ${{ steps.payload.outputs.job_id }}"
+
       # ★★2026-09-02、日本市場の部署（jmas-ai-os）向け。
       #   TikTok / Instagram の投稿APIは「公開URLから動画を取りに来る」方式で、
       #   このリポジトリは private なので Release アセットは取りに来られない。

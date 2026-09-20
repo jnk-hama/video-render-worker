@@ -33,18 +33,26 @@ if [ ! -s "$SRC" ]; then
   exit 1
 fi
 
-cp "$SRC" /tmp/_preview_upload.jpg
+# ★★**呼び出し元の作業ツリーを触らない。**
+#   最初は `git checkout --orphan` で書いていたが、それは今いる
+#   チェックアウトのブランチを変えてしまう。描画ワークフローでは
+#   このあとに Release 作成などが続くので、足元を変えてはいけない。
+#
+#   別ディレクトリに使い捨てリポジトリを作る案も駄目だった。
+#   **認証はチェックアウト先のローカル設定に入っている**ので、
+#   新しいリポジトリからは push できない（鍵を写す＝ログへ出す危険）。
+#
+#   → 配管コマンドでオブジェクトだけ作り、そのコミットを直接 push する。
+#     HEAD も作業ツリーも index も動かない。認証は今のリポジトリのまま。
+export GIT_AUTHOR_NAME="github-actions[bot]"
+export GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
+export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 
-git config user.name  "github-actions[bot]"
-git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-# 孤児ブランチ。作業ツリーは残るので、追跡対象から全部外してから1枚だけ足す
-git checkout -q --orphan preview-tmp
-git rm -rq --cached . >/dev/null 2>&1 || true
-cp /tmp/_preview_upload.jpg preview.jpg
-git add -f preview.jpg
-git commit -q -m "chore(preview): ${NOTE}"
-git push -q -f origin HEAD:preview
+blob=$(git hash-object -w "$SRC")
+tree=$(printf '100644 blob %s\tpreview.jpg\n' "$blob" | git mktree)
+commit=$(git commit-tree "$tree" -m "chore(preview): ${NOTE}")
+git push -q -f origin "${commit}:refs/heads/preview"
 
 echo "preview ブランチへ置きました: ${NOTE}"
 echo "  git fetch origin preview && git show origin/preview:preview.jpg > /tmp/preview.jpg"
