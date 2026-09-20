@@ -706,7 +706,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && !inputs.verify_faces
+        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && inputs.garment_from == '' && !inputs.verify_faces
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
