@@ -288,6 +288,22 @@ jobs:
           with urllib.request.urlopen(req, timeout=60) as r:
               print('アップロード %s' % r.status)
           print('公開URL: %s/storage/v1/object/public/images/%s' % (base, dest))
+          # ★★結果をログに縮小base64で出す。
+          #   顔0件は機械で見たが、**衣類が残っているか**は絵を見ないと分からない。
+          #   私（実装者）はSupabaseの公開URLへ出られないので、
+          #   ログ経由でしか結果を確認できない。**確認できないまま次へ渡さない。**
+          #   ・360px幅・品質55に落とす（ログを流さないため）
+          #   ・元画像ではなく**切り出し後だけ**を出す（他社モデルの顔を残さない）
+          import base64, io
+          prev = im.crop((0, top, W, H))
+          prev.thumbnail((360, 360))
+          buf = io.BytesIO()
+          prev.save(buf, format='JPEG', quality=55)
+          b = base64.b64encode(buf.getvalue()).decode()
+          print('PREVIEW_B64_BEGIN %dx%d %dB' % (prev.width, prev.height, len(b)))
+          for k in range(0, len(b), 200):
+              print(b[k:k + 200])
+          print('PREVIEW_B64_END')
           print('')
           print('★顔は0件になっていますが、**衣類がちゃんと写っているか**は')
           print('  人が見て確かめてください。機械で見たのは「顔が無いこと」だけです。')
