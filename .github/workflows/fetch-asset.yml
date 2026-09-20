@@ -294,16 +294,20 @@ jobs:
           #   ログ経由でしか結果を確認できない。**確認できないまま次へ渡さない。**
           #   ・360px幅・品質55に落とす（ログを流さないため）
           #   ・元画像ではなく**切り出し後だけ**を出す（他社モデルの顔を残さない）
-          import base64, io
+          #   ・**1行で出す。** 複数行に割ると読み手側で継ぎ目がずれる
+          #     （実際に11,840文字が11,619文字になって壊れた）
+          #   ・**sha256を併記する。** 転記できたかを長さと指紋で確かめられる
+          #   ・200px幅・品質50まで落とす（転記量を減らすため）
+          import base64, hashlib, io
           prev = im.crop((0, top, W, H))
-          prev.thumbnail((360, 360))
+          prev.thumbnail((200, 200))
           buf = io.BytesIO()
-          prev.save(buf, format='JPEG', quality=55)
-          b = base64.b64encode(buf.getvalue()).decode()
-          print('PREVIEW_B64_BEGIN %dx%d %dB' % (prev.width, prev.height, len(b)))
-          for k in range(0, len(b), 200):
-              print(b[k:k + 200])
-          print('PREVIEW_B64_END')
+          prev.save(buf, format='JPEG', quality=50)
+          raw_prev = buf.getvalue()
+          b = base64.b64encode(raw_prev).decode()
+          print('PREVIEW_B64 %dx%d chars=%d sha256=%s'
+                % (prev.width, prev.height, len(b), hashlib.sha256(raw_prev).hexdigest()))
+          print(b)
           print('')
           print('★顔は0件になっていますが、**衣類がちゃんと写っているか**は')
           print('  人が見て確かめてください。機械で見たのは「顔が無いこと」だけです。')
