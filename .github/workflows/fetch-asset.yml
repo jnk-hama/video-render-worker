@@ -288,30 +288,14 @@ jobs:
           with urllib.request.urlopen(req, timeout=60) as r:
               print('アップロード %s' % r.status)
           print('公開URL: %s/storage/v1/object/public/images/%s' % (base, dest))
-          # ★★結果をログに縮小base64で出す。
-          #   顔0件は機械で見たが、**衣類が残っているか**は絵を見ないと分からない。
-          #   私（実装者）はSupabaseの公開URLへ出られないので、
-          #   ログ経由でしか結果を確認できない。**確認できないまま次へ渡さない。**
-          #   ・360px幅・品質55に落とす（ログを流さないため）
-          #   ・元画像ではなく**切り出し後だけ**を出す（他社モデルの顔を残さない）
-          #   ・**1行で出す。** 複数行に割ると読み手側で継ぎ目がずれる
-          #     （実際に11,840文字が11,619文字になって壊れた）
-          #   ・**sha256を併記する。** 転記できたかを長さと指紋で確かめられる
-          #   ・200px幅・品質50まで落とす（転記量を減らすため）
-          import base64, hashlib, io
-          prev = im.crop((0, top, W, H))
-          prev.thumbnail((200, 200))
-          buf = io.BytesIO()
-          prev.save(buf, format='JPEG', quality=50)
-          raw_prev = buf.getvalue()
-          b = base64.b64encode(raw_prev).decode()
-          print('PREVIEW_B64 %dx%d chars=%d sha256=%s'
-                % (prev.width, prev.height, len(b), hashlib.sha256(raw_prev).hexdigest()))
-          print(b)
           print('')
           print('★顔は0件になっていますが、**衣類がちゃんと写っているか**は')
           print('  人が見て確かめてください。機械で見たのは「顔が無いこと」だけです。')
           PY
+          # ★結果を目で確かめる。出し方は scripts/preview_b64.py に1本化した
+          #   （同じ縮小・同じ指紋の付け方を2箇所に書かない）
+          python3 scripts/preview_b64.py garment.jpg
+
 
       # ★リポジトリのファイルを Supabase の公開バケットへ上げる口（決定#147）。
       #
@@ -809,6 +793,31 @@ jobs:
       # ★上げる物が無い回（upload だけの回）は飛ばす。
       #   「no matches found for assets_out/*」で**成功した処理まで失敗扱い**に
       #   なっていた（2026-09-12）。工程の失敗と成果物の有無は別である。
+      # ★★取り寄せた素材を**使う前に見る**ための口（2026-09-20）。
+      #
+      # 【なぜ要るか】
+      # サンドボックスは画像サイトへ出られず、private リポジトリの
+      # Release 資産も認証なしでは取れない。つまり取り寄せた素材を
+      # 実装者が一度も見ないまま動画へ入れることになっていた。
+      # **見ていない素材を使って実際に失敗している**（assets/NOTES.md の
+      # b-*.mp4 の件）。見る手段が無いなら、見る手段を作る方が先である。
+      #
+      # ★Pexels でも 取り寄せる でも、assets_out に落ちた画像を全部並べる。
+      #   ★このステップは Pexels / 取り寄せる より**後**に置くこと。
+      #     前に置くと assets_out がまだ空で、黙って何も出ない。
+      - name: 取り寄せた画像を並べて見せる
+        if: hashFiles('assets_out/**') != ''
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check pillow
+          shopt -s nullglob
+          imgs=(assets_out/*.jpg assets_out/*.jpeg assets_out/*.png assets_out/*.webp)
+          if [ ${#imgs[@]} -eq 0 ]; then
+            echo "assets_out に画像がありません（動画だけの回）。並べる物がありません"
+            exit 0
+          fi
+          python3 scripts/preview_b64.py "${imgs[@]}" --max 160 --cols 4
+
       - name: Release へ上げる
         if: hashFiles('assets_out/**') != '' && !inputs.verify_faces
         env:
