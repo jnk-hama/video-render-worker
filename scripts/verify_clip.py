@@ -48,6 +48,7 @@ def verify(video, work=None):
 
     face_hits, face_seen, scores = 0, 0, []
     hand_ok, hand_seen = 0, 0
+    hand_error = None
     for p in frames:
         f = face_score.score(p, refs)
         if f:
@@ -55,11 +56,26 @@ def verify(video, work=None):
             scores.append(f['best'])
             if f['passed']:
                 face_hits += 1
-        h = hand_score.check_hand(p)
-        if h and h['hands'] >= 1:
-            hand_seen += 1
-            if h['fingers_ok']:
-                hand_ok += 1
+        """
+        ★★手の判定で落ちても、顔の判定まで道連れにしない（2026-09-20）。
+
+        実測: mediapipe が libGLESv2.so.2 を dlopen できず OSError で落ち、
+        **顔の結果まで一緒に消えた**。顔の同一性がこの採点の本体であり、
+        手が測れないことより顔が測れないことの方が痛い。
+
+        ★ただし**黙って続けない。** 失敗を hand_error に残して出力に出す。
+          「0%」と「測れなかった」は別物である（0件を成功にしないのと同じ）。
+        """
+        if hand_error is None:
+            try:
+                h = hand_score.check_hand(p)
+            except Exception as e:
+                hand_error = '%s: %s' % (type(e).__name__, str(e)[:120])
+                h = None
+            if h and h['hands'] >= 1:
+                hand_seen += 1
+                if h['fingers_ok']:
+                    hand_ok += 1
 
     for p in frames:
         os.remove(p)
@@ -69,6 +85,7 @@ def verify(video, work=None):
         return {'frames': len(frames), 'face_rate': 0.0,
                 'face_mean': 0.0, 'face_min': 0.0, 'face_swing': 0.0,
                 'hand_rate': (hand_ok / hand_seen) if hand_seen else 0.0,
+                'hand_error': hand_error,
                 'note': '顔を1フレームも検出できず'}
 
     mean = sum(scores) / len(scores)
@@ -82,6 +99,7 @@ def verify(video, work=None):
         'face_swing': max(scores) - min(scores),
         'hand_detected': hand_seen,
         'hand_rate': (hand_ok / hand_seen) if hand_seen else None,
+        'hand_error': hand_error,
     }
 
 
@@ -94,9 +112,14 @@ if __name__ == '__main__':
             print('%-30s 読めず' % os.path.basename(v))
             continue
         hr = '―' if r.get('hand_rate') is None else '%.0f%%' % (r['hand_rate'] * 100)
+        if r.get('hand_error'):
+            hr = '測れず'
         print('%-30s %-7d %-8s %-8.3f %-8.3f %s'
               % (os.path.basename(v), r['frames'],
                  '%.0f%%' % (r['face_rate'] * 100),
                  r['face_mean'], r['face_swing'], hr))
         if r['face_swing'] > 0.25:
             print('%-30s   ★揺れが大きい。途中で顔が変わっている可能性' % '')
+        # ★測れなかったことを黙らせない
+        if r.get('hand_error'):
+            print('%-30s   ★手の判定が動きませんでした: %s' % ('', r['hand_error']))
