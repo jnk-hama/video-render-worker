@@ -84,6 +84,27 @@ on:
         description: 'Edge Function へ渡すJSON（省略でGET）'
         required: false
         type: string
+      # ★★2026-09-20 追加（決定#158）。**他社モデルを入力から外すための口。**
+      #
+      # 【なぜ要るか】
+      # ASPの商品写真には、その店が撮影したモデルが写っていることがある。
+      # それを生成の入力に渡すと、**その人の肖像を我々の生成物として使う**
+      # ことになる。#068 の優良誤認とは別の、肖像権の問題である。
+      #
+      # ★★**「写っている人は無視しろ」という指示では防げない。**
+      #   実際、プロンプトで商品を禁じたのに生成パーカーが出たばかりである。
+      #   指示ではなく**入力から消す**。
+      #
+      # ★切ったら終わりにしない。**切った後に顔検出をやり直し、
+      #   0件になったことを確かめてから**上げる。
+      garment_from:
+        description: '商品写真から人物を外した「衣類だけ」の画像を作る（元画像のURL）'
+        required: false
+        type: string
+      garment_name:
+        description: 'garment_from で作った画像の置き先（例 product/redial-850019-garment.jpg）'
+        required: false
+        type: string
       limit:
         description: '取り寄せる枚数（検索時）'
         required: false
@@ -162,6 +183,114 @@ jobs:
               print('  最小 %.3f / 閾値 %.2f → %s'
                     % (o['worst'], outfit_score.PASS_THRESHOLD,
                        '服は揃っている' if o['passed'] else '★服が変わっている疑い'))
+          PY
+
+      # ★他社モデルを外した「衣類だけ」の画像を作る（決定#158）。
+      #   顔検出で人物の位置を機械的に特定し、その下だけを残す。
+      #   ★**切った後に顔検出をやり直して0件を確認するまで上げない。**
+      - name: 商品写真から人物を外す
+        if: inputs.garment_from != ''
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SRC: ${{ inputs.garment_from }}
+          DEST: ${{ inputs.garment_name }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --disable-pip-version-check \
+            insightface onnxruntime pillow
+          python3 - <<'PY'
+          import os, re, subprocess, sys, urllib.request
+          sys.path.insert(0, 'scripts')
+          import numpy as np
+          from PIL import Image
+          import face_score
+
+          src = (os.environ.get('SRC') or '').strip()
+          dest = (os.environ.get('DEST') or '').strip().lstrip('/')
+          if not src.startswith('https://'):
+              raise SystemExit('garment_from は https:// のURLにしてください')
+          if not dest or '..' in dest.split('/') or not re.fullmatch(r'[A-Za-z0-9/._-]{1,120}', dest):
+              raise SystemExit('garment_name を入れてください（例 product/foo-garment.jpg）: %r' % dest[:120])
+
+          urllib.request.urlretrieve(src, 'src.jpg')
+          im = Image.open('src.jpg').convert('RGB')
+          W, H = im.size
+          print('元画像: %dx%d' % (W, H))
+
+          def faces(path):
+              dim = subprocess.run(
+                  ['ffprobe', '-v', 'error', '-select_streams', 'v:0',
+                   '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', path],
+                  capture_output=True, text=True).stdout.strip().split('x')
+              w, h = int(dim[0]), int(dim[1])
+              raw = subprocess.run(
+                  ['ffmpeg', '-v', 'error', '-i', path, '-pix_fmt', 'bgr24',
+                   '-f', 'rawvideo', '-'], capture_output=True).stdout
+              if len(raw) < w * h * 3:
+                  return []
+              img = np.frombuffer(raw, dtype=np.uint8).reshape(h, w, 3).copy()
+              return face_score._analyzer().get(img)
+
+          found = faces('src.jpg')
+          print('元画像の顔: %d件' % len(found))
+          for f in found:
+              print('  bbox %s' % [int(v) for v in f.bbox])
+
+          # ★★0件を成功にしない。
+          #   「人が写っていない」のか「検出できなかった」のかを、
+          #   0件という結果だけからは区別できない。**通さずに止める。**
+          if not found:
+              raise SystemExit(
+                  '顔が1件も検出されませんでした。\n'
+                  '  人物が写っていないのか、検出に失敗したのかを区別できません。\n'
+                  '  元画像を人が見て、人物が写っていないなら upload/image_b64 で\n'
+                  '  そのまま上げてください（この口は「人物を外す」ためのものです）。')
+
+          # 一番下にある顔の下端より下を残す（頭を落とす）
+          bottom = max(int(f.bbox[3]) for f in found)
+          margin = int(H * 0.02)
+          top = min(H - 1, bottom + margin)
+          keep = H - top
+          print('切り取り: 上から %dpx を捨て、下 %dpx を残す' % (top, keep))
+
+          # ★小さくなりすぎたら止める。衣類が残っていない可能性が高い
+          if keep < 256 or keep < H * 0.35:
+              raise SystemExit(
+                  '残る領域が小さすぎます（%dpx / 元 %dpx）。\n'
+                  '  衣類が写っていない切り方になります。別の写真を使ってください。' % (keep, H))
+
+          im.crop((0, top, W, H)).save('garment.jpg', quality=92)
+          print('切り出し後: %dx%d / %d バイト'
+                % (W, keep, os.path.getsize('garment.jpg')))
+
+          # ★★切った後にやり直す。ここが要。
+          after = faces('garment.jpg')
+          print('切り出し後の顔: %d件' % len(after))
+          if after:
+              for f in after:
+                  print('  残っている bbox %s' % [int(v) for v in f.bbox])
+              raise SystemExit('顔が残っています。上げません。')
+
+          # 上げる
+          def clean(v, allowed):
+              return ''.join(c for c in (v or '') if re.match(allowed, c))
+          base = clean(os.environ.get('SUPABASE_URL'), r'[A-Za-z0-9:/._-]').rstrip('/')
+          if not base.startswith('http'):
+              base = 'https://%s' % base.lstrip('/')
+          key = clean(os.environ.get('SUPABASE_SERVICE_ROLE_KEY'), r'[A-Za-z0-9._-]')
+          data = open('garment.jpg', 'rb').read()
+          req = urllib.request.Request(
+              '%s/storage/v1/object/images/%s' % (base, dest), data=data, method='POST',
+              headers={'Authorization': 'Bearer %s' % key, 'apikey': key,
+                       'Content-Type': 'image/jpeg', 'x-upsert': 'true'})
+          with urllib.request.urlopen(req, timeout=60) as r:
+              print('アップロード %s' % r.status)
+          print('公開URL: %s/storage/v1/object/public/images/%s' % (base, dest))
+          print('')
+          print('★顔は0件になっていますが、**衣類がちゃんと写っているか**は')
+          print('  人が見て確かめてください。機械で見たのは「顔が無いこと」だけです。')
           PY
 
       # ★リポジトリのファイルを Supabase の公開バケットへ上げる口（決定#147）。
