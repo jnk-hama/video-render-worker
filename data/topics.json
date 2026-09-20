@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-19T08:14:05+00:00",
+ "generated_at": "2026-09-20T08:46:11+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,6 +7,15 @@
     "id": "t3_1wf6w7b",
     "title": "Mount Fuji, seen from an airplane",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wf6w7b/mount_fuji_seen_from_an_airplane/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wjebwl",
+    "title": "Fuego Volcano erupts with volcanic lightning over Antigua, Guatemala",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wjebwl/fuego_volcano_erupts_with_volcanic_lightning_over/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -31,109 +40,100 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wjebwl",
-    "title": "Fuego Volcano erupts with volcanic lightning over Antigua, Guatemala",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wjebwl/fuego_volcano_erupts_with_volcanic_lightning_over/",
+    "id": "t3_1wg3baq",
+    "title": "Seven-year-old chess prodigy Lucie Pichard casually checkmates her opponent.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wg3baq/sevenyearold_chess_prodigy_lucie_pichard_casually/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1we9cru",
-    "title": "Younger brother at work providing romantic support",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1we9cru/younger_brother_at_work_providing_romantic_support/",
-    "subreddit": "nextfuckinglevel",
+    "id": "t3_1wfjgs7",
+    "title": "a spider built web around a wasp nest trapping them in,and the ants are eating the larvae, stockpilin for winter",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjgs7/a_spider_built_web_around_a_wasp_nest_trapping/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wi1lxx",
-    "title": "This New Jersey man flies drones every night to find lost pets for free. He’s already reunited over 122 families",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wi1lxx/this_new_jersey_man_flies_drones_every_night_to/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wh983v",
+    "title": "China unveils autonomous robotic fish for underwater surveillance.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wh983v/china_unveils_autonomous_robotic_fish_for/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wih75q",
-    "title": "This elderly Syrian hid his banned library behind a brick wall in Damascus in 2011 before fleeing to Kuwait to escape Assad's prisons. Today, he returned and tore down the wall, finally recovering the priceless books the regime outlawed.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wih75q/this_elderly_syrian_hid_his_banned_library_behind/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wf56rj",
+    "title": "The Romanian Football Federation has introduced a new black card, which can be used to permanently cancel a match, to help prevent abusive behaviour from parents at youth-team matches",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wf56rj/the_romanian_football_federation_has_introduced_a/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wek5e5",
-    "title": "Milky Way is traveling through space at 600 kilometers per second, oscillating slightly, as if it were flapping its wings through the cosmos.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wek5e5/milky_way_is_traveling_through_space_at_600/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1whjrpd",
+    "title": "The U.S. Geological Survey shows what visitors leave behind in Yellowstone National Park",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1whjrpd/the_us_geological_survey_shows_what_visitors/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wezxkv",
-    "title": "catamount saved from drowning",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wezxkv/catamount_saved_from_drowning/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wfjepu",
+    "title": "My dad took these photos of a crazy-looking repeating rainbow in the clouds over Palm Coast, FL.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjepu/my_dad_took_these_photos_of_a_crazylooking/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh2eeh",
-    "title": "Sometimes humans amaze me. Thank you to these two for saving a life",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wh2eeh/sometimes_humans_amaze_me_thank_you_to_these_two/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wh1p94",
+    "title": "Cop sneaks up and tackles motorcycle rider who was taunting officers to chase him",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wh1p94/cop_sneaks_up_and_tackles_motorcycle_rider_who/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wj41p7",
-    "title": "The things that only happen in Australia",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wj41p7/the_things_that_only_happen_in_australia/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wh5qbx",
+    "title": "Carjacking gone wrong",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wh5qbx/carjacking_gone_wrong/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wgs6ua",
-    "title": "Dad had no idea what was under the bucket 😱💀",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wgs6ua/dad_had_no_idea_what_was_under_the_bucket/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wfhqql",
+    "title": "Guys try to recreate jackass",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wfhqql/guys_try_to_recreate_jackass/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wk2uwa",
-    "title": "Food chain: Instructions unclear",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wk2uwa/food_chain_instructions_unclear/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wj320m",
+    "title": "Let me show off my money",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wj320m/let_me_show_off_my_money/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wef15x",
-    "title": "This one's a head banger",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wef15x/this_ones_a_head_banger/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wirw6s",
-    "title": "In 1991, a Nigerian prophet by name Daniel Abodunrin felt inspired by the story of Daniel in the bible and decided to recreate the story. He went into a cage in a zoo where Lions were kept with the belief that God would shut their mouths. As soon as he entered, he was completely devoured by the lion",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wirw6s/in_1991_a_nigerian_prophet_by_name_daniel/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wh19r1",
+    "title": "Have you seen anything like this before (Source Link in Description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wh19r1/have_you_seen_anything_like_this_before_source/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -159,15 +159,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wf0gyt",
-    "title": "No fun if it would kill me... (Neon Genesis Evangelion)",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wf0gyt/no_fun_if_it_would_kill_me_neon_genesis_evangelion/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1whzsmh",
     "title": "Two consenting adults",
     "url": "https://www.reddit.com/r/Animemes/comments/1whzsmh/two_consenting_adults/",
@@ -177,37 +168,82 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wiub70",
-    "title": "Nice to be welcomed back — Could’ve made it less weird though",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wiub70/nice_to_be_welcomed_back_couldve_made_it_less/",
-    "subreddit": "animegifs",
+    "id": "t3_1wkioy4",
+    "title": "But the salary not enough.",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wkioy4/but_the_salary_not_enough/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1we9217",
-    "title": "The Guy She Was Interested in Wasn't a Guy at All | Mitsuki Koga & Aya Osawa Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1we9217/the_guy_she_was_interested_in_wasnt_a_guy_at_all/",
-    "subreddit": "anime",
+    "id": "t3_1wid88g",
+    "title": "Vincent Chansards sequence on Re:Zero Season 4 Episode 17",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wid88g/vincent_chansards_sequence_on_rezero_season_4/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1whrs2j",
-    "title": "Shangri-La Frontier Season 3 Key Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1whrs2j/shangrila_frontier_season_3_key_visual/",
-    "subreddit": "anime",
+    "id": "t3_1wh7tyo",
+    "title": "Veteran Animator EVAKOI Launches BLINK BLINK Animation Label with Producer Noa",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wh7tyo/veteran_animator_evakoi_launches_blink_blink/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wihplg",
-    "title": "1 HP and a Dream. Mio's amazing Game 3 Clutch at EVO Japan [Young Ladies Don't Play Fighting Games]",
-    "url": "https://www.reddit.com/r/anime/comments/1wihplg/1_hp_and_a_dream_mios_amazing_game_3_clutch_at/",
-    "subreddit": "anime",
+    "id": "t3_1wfpv3e",
+    "title": "Franky Radical Beam! - One Piece #1178",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wfpv3e/franky_radical_beam_one_piece_1178/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wjxh6q",
+    "title": "Bleach TYBW #48, Key animation: Akira Iwamoto (岩本陽) (Presumed)",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wjxh6q/bleach_tybw_48_key_animation_akira_iwamoto_岩本陽/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wkmihs",
+    "title": "A Sociology of the Webgen",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wkmihs/a_sociology_of_the_webgen/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wktskm",
+    "title": "🅱🅸🆁🆃🅷🅳🅰🆈 🅿🅰🆁🆃🆈 🅻🅾🅾🅺🆂 [WDYWT]",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wktskm/wdywt/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wh4qv9",
+    "title": "styled a collection from JCREW x Eckhaus Latta",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wh4qv9/styled_a_collection_from_jcrew_x_eckhaus_latta/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wfkd70",
+    "title": "Today’s fit for work",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wfkd70/todays_fit_for_work/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -231,48 +267,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wesutn",
-    "title": "Hoyo officially recognizes \"Jahoda's Witnesses\" as Jahoda's fandom name",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wesutn/hoyo_officially_recognizes_jahodas_witnesses_as/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wfosfn",
     "title": "Google Classroom is now being raided with POSITIVE reviews of the 7.1 anniversary",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wfosfn/google_classroom_is_now_being_raided_with/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wg1tgf",
-    "title": "The Mentor and His Mentee",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wg1tgf/the_mentor_and_his_mentee/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wfa192",
-    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 12 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1wfa192/mushoku_tensei_jobless_reincarnation_season_3/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1why3wc",
-    "title": "Re:Zero Starting Life in Another World Season 4 • Re:Zero kara Hajimeru Isekai Seikatsu Season 4 - Episode 17 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1why3wc/rezero_starting_life_in_another_world_season_4/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
     "source": "rss"
    }
   ]
