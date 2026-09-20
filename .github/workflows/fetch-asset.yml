@@ -125,6 +125,13 @@ on:
         description: 'crop_from で作った画像の置き先（例 product/redial-850019-only.jpg）'
         required: false
         type: string
+      # ★★2026-09-20 追加（決定#159）。**verify_clip.py も未配線だった。**
+      #   生成クリップがアンナ本人かを数字で見る手段が、書いてあるのに
+      #   どこからも呼ばれていなかった。人の目視の前に、まず機械が落とす。
+      verify_clip:
+        description: '生成クリップのURL。顔がアンナ本人か・手が壊れていないかを機械判定する'
+        required: false
+        type: string
       limit:
         description: '取り寄せる枚数（検索時）'
         required: false
@@ -204,6 +211,43 @@ jobs:
                     % (o['worst'], outfit_score.PASS_THRESHOLD,
                        '服は揃っている' if o['passed'] else '★服が変わっている疑い'))
           PY
+
+      # ★★生成クリップを数字で採点する（決定#159）。
+      #   verify_clip.py は書いてあったのに**どこからも呼ばれていなかった**。
+      #   「アンナ本人に見える」は検証ではない。マスター7方向との
+      #   最大コサイン類似度 0.42 で機械が落とす。
+      #   ★あわせてコマを preview ブランチへ置く（絵も見る）。
+      - name: 生成クリップを判定する
+        if: inputs.verify_clip != ''
+        env:
+          CLIP: ${{ inputs.verify_clip }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1
+          python3 -m pip install --quiet --disable-pip-version-check \
+            insightface onnxruntime mediapipe pillow
+          python3 - <<'PY'
+          import os, urllib.request
+          url = (os.environ.get('CLIP') or '').strip()
+          if not url.startswith('https://'):
+              raise SystemExit('verify_clip は https:// のURLにしてください')
+          urllib.request.urlretrieve(url, 'clip.mp4')
+          print('取得: %d バイト' % os.path.getsize('clip.mp4'))
+          PY
+          python3 scripts/verify_clip.py clip.mp4
+          # ★数字だけで判断しない。コマも見る
+          dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 clip.mp4)
+          mkdir -p cframes
+          python3 - "$dur" <<'PY'
+          import subprocess, sys
+          dur = float(sys.argv[1]); n = 6
+          for i in range(n):
+              subprocess.run(['ffmpeg','-y','-v','error','-ss','%.3f' % (dur*(i+0.5)/n),
+                              '-i','clip.mp4','-frames:v','1','cframes/f%02d.jpg' % i], check=True)
+          print('尺 %.2f秒 から %d コマ' % (dur, n))
+          PY
+          python3 scripts/preview_b64.py cframes/f*.jpg --max 200 --cols 3
+          bash scripts/push_preview.sh preview.jpg "verify_clip $(date -u +%H:%MZ)"
 
       # ★他社モデルを外した「衣類だけ」の画像を作る（決定#158）。
       #   顔検出で人物の位置を機械的に特定し、その下だけを残す。
@@ -793,7 +837,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && inputs.garment_from == '' && inputs.crop_from == '' && !inputs.verify_faces
+        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && inputs.garment_from == '' && inputs.crop_from == '' && inputs.verify_clip == '' && !inputs.verify_faces
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
