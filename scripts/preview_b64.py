@@ -65,6 +65,8 @@ def main():
     ap.add_argument('--max', type=int, default=DEFAULT_MAX)
     ap.add_argument('--cols', type=int, default=DEFAULT_COLS)
     ap.add_argument('--quality', type=int, default=DEFAULT_QUALITY)
+    ap.add_argument('--out', default='preview.jpg',
+                    help='この名前でも保存する（scripts/push_preview.sh が拾う）')
     a = ap.parse_args()
 
     sheet = build_sheet(a.paths, a.max, a.cols)
@@ -72,6 +74,12 @@ def main():
     sheet.save(buf, format='JPEG', quality=a.quality)
     raw = buf.getvalue()
     b = base64.b64encode(raw).decode()
+
+    # ★ファイルにも残す。**base64の転記は枚数が増えると破綻する**
+    #   （8枚を並べたら14,852文字になり、写し取れなかった）。
+    #   ログのbase64は1〜2枚の時の手段で、本命は push_preview.sh。
+    if a.out:
+        open(a.out, 'wb').write(raw)
 
     print('PREVIEW_B64 %dx%d n=%d chars=%d sha256=%s'
           % (sheet.width, sheet.height, len(a.paths), len(b),

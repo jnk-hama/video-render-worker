@@ -817,6 +817,9 @@ jobs:
             exit 0
           fi
           python3 scripts/preview_b64.py "${imgs[@]}" --max 160 --cols 4
+          # ★ログのbase64は枚数が増えると転記で壊れる（8枚=14,852文字は無理だった）。
+          #   壊れない経路として preview ブランチにも置く。
+          bash scripts/push_preview.sh preview.jpg "pexels/fetch $(date -u +%H:%MZ)"
 
       - name: Release へ上げる
         if: hashFiles('assets_out/**') != '' && !inputs.verify_faces
