@@ -105,6 +105,26 @@ on:
         description: 'garment_from で作った画像の置き先（例 product/redial-850019-garment.jpg）'
         required: false
         type: string
+      # ★★2026-09-20 追加（決定#159）。**顔を外すだけでは足りなかった。**
+      #
+      # garment_from は顔の下で切るので、胴体・腕・脚・髪がそのまま残る。
+      # 実際にそうなった。「他社のモデルを使わない」に対して、
+      # **顔を消しただけでは他社のモデルは消えていない。**
+      #
+      # → 衣類の部分だけを座標で切り出す。人が数値を見て決める。
+      #   ★機械には「どこが衣類か」を確定的に判定できない。だから人が指定する。
+      crop_from:
+        description: '画像の一部を切り出して上げる（元画像のURL）'
+        required: false
+        type: string
+      crop_box:
+        description: 'crop_from の切り出し範囲。左,上,右,下 を0〜1の割合で（例 0.10,0.06,0.94,0.70）'
+        required: false
+        type: string
+      crop_name:
+        description: 'crop_from で作った画像の置き先（例 product/redial-850019-only.jpg）'
+        required: false
+        type: string
       limit:
         description: '取り寄せる枚数（検索時）'
         required: false
@@ -295,6 +315,69 @@ jobs:
           # ★結果を目で確かめる。出し方は scripts/preview_b64.py に1本化した
           #   （同じ縮小・同じ指紋の付け方を2箇所に書かない）
           python3 scripts/preview_b64.py garment.jpg
+
+      # ★★指定した範囲だけを切り出す（決定#159）。
+      #   顔の下で切るだけでは胴体も腕も脚も残る。衣類だけを残すには
+      #   座標で切るしかなく、**どこが衣類かは人が見て決める**。
+      #   機械に判定させると、外した時に気づけない。
+      - name: 画像の一部を切り出す
+        if: inputs.crop_from != ''
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SRC: ${{ inputs.crop_from }}
+          BOX: ${{ inputs.crop_box }}
+          DEST: ${{ inputs.crop_name }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 - <<'PY'
+          import os, re, urllib.request
+          from PIL import Image
+
+          src = (os.environ.get('SRC') or '').strip()
+          dest = (os.environ.get('DEST') or '').strip().lstrip('/')
+          box = (os.environ.get('BOX') or '').strip()
+          if not src.startswith('https://'):
+              raise SystemExit('crop_from は https:// のURLにしてください')
+          if not dest or '..' in dest.split('/') or not re.fullmatch(r'[A-Za-z0-9/._-]{1,120}', dest):
+              raise SystemExit('crop_name を入れてください: %r' % dest[:120])
+
+          try:
+              l, t, r, b = [float(x) for x in box.split(',')]
+          except Exception:
+              raise SystemExit('crop_box は 左,上,右,下 の4つを0〜1で: %r' % box[:80])
+          # ★範囲を検査する。逆さや外れた値を黙って通すと、空の画像が出来る
+          if not (0 <= l < r <= 1 and 0 <= t < b <= 1):
+              raise SystemExit('crop_box の値が不正です（0〜1で 左<右 / 上<下）: %s' % box)
+
+          urllib.request.urlretrieve(src, 'crop_src.jpg')
+          im = Image.open('crop_src.jpg').convert('RGB')
+          W, H = im.size
+          px = (int(l * W), int(t * H), int(r * W), int(b * H))
+          out = im.crop(px)
+          print('元画像 %dx%d → 切り出し %dx%d  範囲%s' % (W, H, out.width, out.height, px))
+          # ★小さすぎたら止める。商品が写っていない切り方になる
+          if out.width < 200 or out.height < 200:
+              raise SystemExit('切り出しが小さすぎます（%dx%d）' % (out.width, out.height))
+          out.save('crop.jpg', quality=92)
+
+          def clean(v, allowed):
+              return ''.join(c for c in (v or '') if re.match(allowed, c))
+          base = clean(os.environ.get('SUPABASE_URL'), r'[A-Za-z0-9:/._-]').rstrip('/')
+          if not base.startswith('http'):
+              base = 'https://%s' % base.lstrip('/')
+          key = clean(os.environ.get('SUPABASE_SERVICE_ROLE_KEY'), r'[A-Za-z0-9._-]')
+          req = urllib.request.Request(
+              '%s/storage/v1/object/images/%s' % (base, dest),
+              data=open('crop.jpg', 'rb').read(), method='POST',
+              headers={'Authorization': 'Bearer %s' % key, 'apikey': key,
+                       'Content-Type': 'image/jpeg', 'x-upsert': 'true'})
+          with urllib.request.urlopen(req, timeout=60) as rr:
+              print('アップロード %s' % rr.status)
+          print('公開URL: %s/storage/v1/object/public/images/%s' % (base, dest))
+          PY
+          python3 scripts/preview_b64.py crop.jpg
 
 
       # ★リポジトリのファイルを Supabase の公開バケットへ上げる口（決定#147）。
@@ -710,7 +793,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && inputs.garment_from == '' && !inputs.verify_faces
+        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && inputs.garment_from == '' && inputs.crop_from == '' && !inputs.verify_faces
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
