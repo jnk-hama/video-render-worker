@@ -421,7 +421,9 @@ jobs:
               print('アップロード %s' % rr.status)
           print('公開URL: %s/storage/v1/object/public/images/%s' % (base, dest))
           PY
-          python3 scripts/preview_b64.py crop.jpg
+          python3 scripts/preview_b64.py crop.jpg --max 480
+          # ★大きい画像はログのbase64だと転記で壊れる。preview ブランチにも置く
+          bash scripts/push_preview.sh preview.jpg "crop $(date -u +%H:%MZ)"
 
 
       # ★リポジトリのファイルを Supabase の公開バケットへ上げる口（決定#147）。
