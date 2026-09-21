@@ -1,30 +1,12 @@
 {
- "generated_at": "2026-09-20T08:46:11+00:00",
+ "generated_at": "2026-09-21T09:09:06+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1wf6w7b",
-    "title": "Mount Fuji, seen from an airplane",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wf6w7b/mount_fuji_seen_from_an_airplane/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wjebwl",
     "title": "Fuego Volcano erupts with volcanic lightning over Antigua, Guatemala",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wjebwl/fuego_volcano_erupts_with_volcanic_lightning_over/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wio1fv",
-    "title": "Very creative with stage setup",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wio1fv/very_creative_with_stage_setup/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,19 +22,28 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wg3baq",
-    "title": "Seven-year-old chess prodigy Lucie Pichard casually checkmates her opponent.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wg3baq/sevenyearold_chess_prodigy_lucie_pichard_casually/",
+    "id": "t3_1wio1fv",
+    "title": "Very creative with stage setup",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wio1fv/very_creative_with_stage_setup/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfjgs7",
-    "title": "a spider built web around a wasp nest trapping them in,and the ants are eating the larvae, stockpilin for winter",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjgs7/a_spider_built_web_around_a_wasp_nest_trapping/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wkje9j",
+    "title": "Wrestler wins match then carries injured opponent to locker room",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wkje9j/wrestler_wins_match_then_carries_injured_opponent/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wkn561",
+    "title": "Largest wildlife overpass in North America reduced wildlife collision by 91%",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wkn561/largest_wildlife_overpass_in_north_america/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -61,15 +52,6 @@
     "id": "t3_1wh983v",
     "title": "China unveils autonomous robotic fish for underwater surveillance.",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wh983v/china_unveils_autonomous_robotic_fish_for/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wf56rj",
-    "title": "The Romanian Football Federation has introduced a new black card, which can be used to permanently cancel a match, to help prevent abusive behaviour from parents at youth-team matches",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wf56rj/the_romanian_football_federation_has_introduced_a/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -85,55 +67,73 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wfjepu",
-    "title": "My dad took these photos of a crazy-looking repeating rainbow in the clouds over Palm Coast, FL.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wfjepu/my_dad_took_these_photos_of_a_crazylooking/",
+    "id": "t3_1wix6mb",
+    "title": "First new wild cat species identified in over 100 years, in Bolivia: the Tilcayo Cat",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wix6mb/first_new_wild_cat_species_identified_in_over_100/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh1p94",
-    "title": "Cop sneaks up and tackles motorcycle rider who was taunting officers to chase him",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wh1p94/cop_sneaks_up_and_tackles_motorcycle_rider_who/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wkosqi",
+    "title": "90-year-old Kanazawa Toshisuke wins Japan's over-85 bodybuilding title, one day after his birthday",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wkosqi/90yearold_kanazawa_toshisuke_wins_japans_over85/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh5qbx",
-    "title": "Carjacking gone wrong",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wh5qbx/carjacking_gone_wrong/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wgfe0c",
+    "title": "Sasha DiGiulian was the first female to ever ascend El Cap platinum wall (she was also stuck for 10 days)",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wgfe0c/sasha_digiulian_was_the_first_female_to_ever/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfhqql",
-    "title": "Guys try to recreate jackass",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wfhqql/guys_try_to_recreate_jackass/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wj41p7",
+    "title": "The things that only happen in Australia",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wj41p7/the_things_that_only_happen_in_australia/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wj320m",
-    "title": "Let me show off my money",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wj320m/let_me_show_off_my_money/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wkn58k",
+    "title": "Spotting a person doing squat",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wkn58k/spotting_a_person_doing_squat/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh19r1",
-    "title": "Have you seen anything like this before (Source Link in Description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1wh19r1/have_you_seen_anything_like_this_before_source/",
-    "subreddit": "toptalent",
+    "id": "t3_1wk2uwa",
+    "title": "Food chain: Instructions unclear",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wk2uwa/food_chain_instructions_unclear/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wgs6ua",
+    "title": "Dad had no idea what was under the bucket 😱💀",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wgs6ua/dad_had_no_idea_what_was_under_the_bucket/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wis1e4",
+    "title": "In 2014, a father dressed as Spider-Man and jumped from the roof of his home to surprise his terminally ill 5-year-old son, giving him a moment he would never forget.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wis1e4/in_2014_a_father_dressed_as_spiderman_and_jumped/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -159,15 +159,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1whzsmh",
-    "title": "Two consenting adults",
-    "url": "https://www.reddit.com/r/Animemes/comments/1whzsmh/two_consenting_adults/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wkioy4",
     "title": "But the salary not enough.",
     "url": "https://www.reddit.com/r/Animemes/comments/1wkioy4/but_the_salary_not_enough/",
@@ -177,73 +168,64 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wid88g",
-    "title": "Vincent Chansards sequence on Re:Zero Season 4 Episode 17",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wid88g/vincent_chansards_sequence_on_rezero_season_4/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1whzsmh",
+    "title": "Two consenting adults",
+    "url": "https://www.reddit.com/r/Animemes/comments/1whzsmh/two_consenting_adults/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh7tyo",
-    "title": "Veteran Animator EVAKOI Launches BLINK BLINK Animation Label with Producer Noa",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wh7tyo/veteran_animator_evakoi_launches_blink_blink/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wjww51",
+    "title": "When 'one more round' turned into 'playing till morning'",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wjww51/when_one_more_round_turned_into_playing_till/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wfpv3e",
-    "title": "Franky Radical Beam! - One Piece #1178",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wfpv3e/franky_radical_beam_one_piece_1178/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wiub70",
+    "title": "Nice to be welcomed back — Could’ve made it less weird though",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wiub70/nice_to_be_welcomed_back_couldve_made_it_less/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wjxh6q",
-    "title": "Bleach TYBW #48, Key animation: Akira Iwamoto (岩本陽) (Presumed)",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wjxh6q/bleach_tybw_48_key_animation_akira_iwamoto_岩本陽/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wgevqe",
+    "title": "Those sleepless nights...",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wgevqe/those_sleepless_nights/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wkmihs",
-    "title": "A Sociology of the Webgen",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wkmihs/a_sociology_of_the_webgen/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wl2q4r",
+    "title": "Apothecary Diaries - \"It's to prevent getting dragged into a back alley.\"",
+    "url": "https://www.reddit.com/r/anime/comments/1wl2q4r/apothecary_diaries_its_to_prevent_getting_dragged/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wktskm",
-    "title": "🅱🅸🆁🆃🅷🅳🅰🆈 🅿🅰🆁🆃🆈 🅻🅾🅾🅺🆂 [WDYWT]",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wktskm/wdywt/",
-    "subreddit": "streetwear",
+    "id": "t3_1whrs2j",
+    "title": "Shangri-La Frontier Season 3 Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1whrs2j/shangrila_frontier_season_3_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wh4qv9",
-    "title": "styled a collection from JCREW x Eckhaus Latta",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wh4qv9/styled_a_collection_from_jcrew_x_eckhaus_latta/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wfkd70",
-    "title": "Today’s fit for work",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wfkd70/todays_fit_for_work/",
-    "subreddit": "streetwear",
+    "id": "t3_1wjoue9",
+    "title": "Nothing left for me to do but dance [Food for the Soul]",
+    "url": "https://www.reddit.com/r/anime/comments/1wjoue9/nothing_left_for_me_to_do_but_dance_food_for_the/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -267,9 +249,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wfosfn",
-    "title": "Google Classroom is now being raided with POSITIVE reviews of the 7.1 anniversary",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wfosfn/google_classroom_is_now_being_raided_with/",
+    "id": "t3_1wg1tgf",
+    "title": "The Mentor and His Mentee",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wg1tgf/the_mentor_and_his_mentee/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wkpxhk",
+    "title": "Handmade primogems to give out at the next convention [OC]",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wkpxhk/handmade_primogems_to_give_out_at_the_next/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wirtgj",
+    "title": "catching strays in 2026 😭",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wirtgj/catching_strays_in_2026/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
