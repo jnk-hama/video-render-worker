@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-21T09:09:06+00:00",
+ "generated_at": "2026-09-22T08:44:01+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -49,46 +49,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wh983v",
-    "title": "China unveils autonomous robotic fish for underwater surveillance.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wh983v/china_unveils_autonomous_robotic_fish_for/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wi1lxx",
+    "title": "This New Jersey man flies drones every night to find lost pets for free. He’s already reunited over 122 families",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wi1lxx/this_new_jersey_man_flies_drones_every_night_to/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1whjrpd",
-    "title": "The U.S. Geological Survey shows what visitors leave behind in Yellowstone National Park",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1whjrpd/the_us_geological_survey_shows_what_visitors/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wih75q",
+    "title": "This elderly Syrian hid his banned library behind a brick wall in Damascus in 2011 before fleeing to Kuwait to escape Assad's prisons. Today, he returned and tore down the wall, finally recovering the priceless books the regime outlawed.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wih75q/this_elderly_syrian_hid_his_banned_library_behind/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wix6mb",
-    "title": "First new wild cat species identified in over 100 years, in Bolivia: the Tilcayo Cat",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wix6mb/first_new_wild_cat_species_identified_in_over_100/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wh2eeh",
+    "title": "Sometimes humans amaze me. Thank you to these two for saving a life",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wh2eeh/sometimes_humans_amaze_me_thank_you_to_these_two/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wkosqi",
-    "title": "90-year-old Kanazawa Toshisuke wins Japan's over-85 bodybuilding title, one day after his birthday",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wkosqi/90yearold_kanazawa_toshisuke_wins_japans_over85/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wk4efw",
+    "title": "Look at a Black Monitor Lizard Eat Three Whole Eggs in seconds",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wk4efw/look_at_a_black_monitor_lizard_eat_three_whole/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wgfe0c",
-    "title": "Sasha DiGiulian was the first female to ever ascend El Cap platinum wall (she was also stuck for 10 days)",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wgfe0c/sasha_digiulian_was_the_first_female_to_ever/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wm9tmu",
+    "title": "They took care of each other!",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wm9tmu/they_took_care_of_each_other/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -121,18 +121,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wgs6ua",
-    "title": "Dad had no idea what was under the bucket 😱💀",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wgs6ua/dad_had_no_idea_what_was_under_the_bucket/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wis1e4",
+    "title": "In 2014, a father dressed as Spider-Man and jumped from the roof of his home to surprise his terminally ill 5-year-old son, giving him a moment he would never forget.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wis1e4/in_2014_a_father_dressed_as_spiderman_and_jumped/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wis1e4",
-    "title": "In 2014, a father dressed as Spider-Man and jumped from the roof of his home to surprise his terminally ill 5-year-old son, giving him a moment he would never forget.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wis1e4/in_2014_a_father_dressed_as_spiderman_and_jumped/",
+    "id": "t3_1wlb5ct",
+    "title": "NASA has released these new photos from the surface of Mars 🔭",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wlb5ct/nasa_has_released_these_new_photos_from_the/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -144,15 +144,6 @@
     "id": "t3_1wh459v",
     "title": "I wonder if this is true",
     "url": "https://www.reddit.com/r/Animemes/comments/1wh459v/i_wonder_if_this_is_true/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wggi4m",
-    "title": "A must have for every weeb.",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wggi4m/a_must_have_for_every_weeb/",
     "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
@@ -177,6 +168,24 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wlb7g5",
+    "title": "A beastfolk imposter among us",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wlb7g5/a_beastfolk_imposter_among_us/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wm1o32",
+    "title": "New Day — Fresh Vibes ☀️",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wm1o32/new_day_fresh_vibes/",
+    "subreddit": "animegifs",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wjww51",
     "title": "When 'one more round' turned into 'playing till morning'",
     "url": "https://www.reddit.com/r/animegifs/comments/1wjww51/when_one_more_round_turned_into_playing_till/",
@@ -195,37 +204,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wgevqe",
-    "title": "Those sleepless nights...",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wgevqe/those_sleepless_nights/",
+    "id": "t3_1wj4ceq",
+    "title": "Mwah — Consider That Your Goodnight Kiss ❤️",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wj4ceq/mwah_consider_that_your_goodnight_kiss/",
     "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wl2q4r",
-    "title": "Apothecary Diaries - \"It's to prevent getting dragged into a back alley.\"",
-    "url": "https://www.reddit.com/r/anime/comments/1wl2q4r/apothecary_diaries_its_to_prevent_getting_dragged/",
-    "subreddit": "anime",
+    "id": "t3_1wlkez5",
+    "title": "Feels like I’m in a Yakuza game",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wlkez5/feels_like_im_in_a_yakuza_game/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1whrs2j",
-    "title": "Shangri-La Frontier Season 3 Key Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1whrs2j/shangrila_frontier_season_3_key_visual/",
-    "subreddit": "anime",
+    "id": "t3_1wh4qv9",
+    "title": "styled a collection from JCREW x Eckhaus Latta",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wh4qv9/styled_a_collection_from_jcrew_x_eckhaus_latta/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wjoue9",
-    "title": "Nothing left for me to do but dance [Food for the Soul]",
-    "url": "https://www.reddit.com/r/anime/comments/1wjoue9/nothing_left_for_me_to_do_but_dance_food_for_the/",
-    "subreddit": "anime",
+    "id": "t3_1wmnr38",
+    "title": "Day 23123 of praying for cooler weather",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wmnr38/day_23123_of_praying_for_cooler_weather/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -243,15 +252,6 @@
     "id": "t3_1wgyofn",
     "title": "Single and ready to mingle?",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wgyofn/single_and_ready_to_mingle/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wg1tgf",
-    "title": "The Mentor and His Mentee",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wg1tgf/the_mentor_and_his_mentee/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
