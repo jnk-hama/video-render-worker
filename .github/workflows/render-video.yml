@@ -415,7 +415,11 @@ jobs:
           print('尺 %.2f秒 から %d コマ抜きました' % (dur, n))
           PY
           python3 scripts/preview_b64.py frames/f*.jpg --max 200 --cols 3
-          bash scripts/push_preview.sh preview.jpg "render ${{ steps.payload.outputs.job_id }}"
+          # ★★出来上がった動画そのものも置く（2026-09-22）。
+          #   コマを6枚見ても、間・テンポ・音は分からない。実装者の
+          #   サンドボックスは Supabase 403 / private Release 404 なので、
+          #   **再生して確かめる手段が git しかない**。
+          bash scripts/push_preview.sh preview.jpg "render ${{ steps.payload.outputs.job_id }}" out.mp4
 
       # ★★2026-09-02、日本市場の部署（jmas-ai-os）向け。
       #   TikTok / Instagram の投稿APIは「公開URLから動画を取りに来る」方式で、

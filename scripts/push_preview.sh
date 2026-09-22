@@ -49,10 +49,32 @@ export GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
 export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 
-blob=$(git hash-object -w "$SRC")
-tree=$(printf '100644 blob %s\tpreview.jpg\n' "$blob" | git mktree)
+# ★★2026-09-22、**3つ目以降の引数で追加のファイルも置けるようにした。**
+#
+# 【なぜ】ここまで置けたのは静止画の一覧だけで、**出来上がった動画そのものを
+#   実装者が一度も見られていなかった**。コマを6枚見るのと、実際に再生して
+#   間・テンポ・音を確かめるのは別のことである。
+#   Supabase は 403、private の Release も未認証では 404 なので、
+#   **通るのは git だけ**という事情は動画でも同じ。
+#
+# ★置いてよい物の線は変えない（下の注意書きのとおり）。動画は
+#   「自分たちが描画した結果」なので置いてよい。
+{
+  printf '100644 blob %s\tpreview.jpg\n' "$(git hash-object -w "$SRC")"
+  for extra in "${@:3}"; do
+    if [ ! -s "$extra" ]; then
+      echo "★$extra がありません（飛ばします）" >&2
+      continue
+    fi
+    printf '100644 blob %s\t%s\n' "$(git hash-object -w "$extra")" "$(basename "$extra")"
+  done
+} > /tmp/pp_tree.$$
+
+tree=$(git mktree < /tmp/pp_tree.$$)
+rm -f /tmp/pp_tree.$$
 commit=$(git commit-tree "$tree" -m "chore(preview): ${NOTE}")
 git push -q -f origin "${commit}:refs/heads/preview"
 
 echo "preview ブランチへ置きました: ${NOTE}"
+git ls-tree --name-only "$tree" | sed 's/^/  - /'
 echo "  git fetch origin preview && git show origin/preview:preview.jpg > /tmp/preview.jpg"
