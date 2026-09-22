@@ -2192,7 +2192,61 @@ def main():
 
     cmd += ['-shortest']
 
-    # --- 映像フィルタ（字幕）---
+    # --- 映像フィルタ（カラーグレード → 字幕 の順）---
+    vf_parts = []
+
+    """
+    ★★カラーグレード（2026-09-22・決定#164）。参考動画から測った .cube を当てる。
+
+    【なぜ要るか】
+    生成したままの映像は**色が揃っていない**。参考にした実物は
+    中間調にアンバーが乗っており、並べると明らかに質感が違って見えた。
+
+    【なぜ字幕より"前"に置くか】フィルタは左から順に掛かる。
+      lut3d,ass  … 映像だけ色が変わる（正しい）
+      ass,lut3d  … **焼いたテロップまで色が変わる**
+
+    ★★実測（2026-09-22）。**危ないのは白ではなくアクセント色の方だった。**
+      このLUTの特徴は「中間調にアンバー、両端はニュートラル」なので、
+      純白のテロップは逆順でも96%が保たれる（＝白で検証すると差が見えない）。
+      ところが**中間調にある赤 #ff3b5c は大きくずれる**：
+
+        狙いの赤            (239, 60, 94)
+        lut3d,ass（正）     (248, 58, 90)   ズレ 15
+        ass,lut3d（誤）     (235, 77, 70)   ズレ 45 ← 3倍。青が落ちて煉瓦色へ
+
+      白だけ見て「順番は関係ない」と結論しないこと。
+
+    ★★**format=yuv420p を必ず後ろに付ける。** lut3d は画素形式を
+      yuv444p へ格上げすることがあり、そのまま H.264 にすると
+      profile が High 4:4:4 Predictive になる。
+      **スマホのハードウェアデコーダはこれを再生できない**
+      （2026-09-22、実際にオーナーの端末で「このファイル形式を再生できません」
+        になった。最終段の -pix_fmt でも直るが、ここで閉じておく）。
+
+    ★強さは .cube を焼く時に決める（mint.py --strength）。実測では
+      既定の 1.0 は**彩度が目標の2倍以上**になり、0.15 がほぼ一致だった。
+    """
+    lut_src = str(job.get('lut') or '').strip()
+    if lut_src:
+        lut_path = lut_src
+        if lut_src.startswith(('http://', 'https://')):
+            lut_path = os.path.join(work, 'look.cube')
+            if not download(lut_src, lut_path, market=market):
+                raise SystemExit('LUTを取得できません: %s' % lut_src[:120])
+        if not os.path.isfile(lut_path):
+            raise SystemExit('LUTが見つかりません: %s' % lut_path)
+        # ★中身も見る。拡張子だけ合っている別物を黙って通さない
+        with open(lut_path, 'r', encoding='utf-8', errors='replace') as f:
+            head = f.read(4096)
+        if 'LUT_3D_SIZE' not in head:
+            raise SystemExit(
+                'LUTの中身が .cube に見えません（LUT_3D_SIZE が無い）: %s' % lut_path)
+        esc = lut_path.replace('\\', '/').replace(':', r'\:')
+        vf_parts.append('lut3d=file=%s' % esc)
+        vf_parts.append('format=yuv420p')
+        log('カラーグレードを当てます: %s' % os.path.basename(lut_path))
+
     # ★モードTは字幕そのものが本体。ここを 'A' で決め打ちにすると
     #   背景だけの真っ黒な動画が出る（実際に一度そうなった）
     if mode in ('A', 'T') and captions:
@@ -2216,7 +2270,13 @@ def main():
         assarg = 'ass=' + assfile.replace('\\', '/').replace(':', r'\:')
         if font_dir:
             assarg += ':fontsdir=' + font_dir.replace('\\', '/').replace(':', r'\:')
-        cmd += ['-vf', assarg]
+        vf_parts.append(assarg)
+
+    # ★★グレードだけの回（字幕なし）でも -vf を出す。
+    #   以前はここが字幕の if の中にあったので、LUTを渡しても
+    #   字幕が無ければ**黙って無視**されていたはずの形。
+    if vf_parts:
+        cmd += ['-vf', ','.join(vf_parts)]
 
     """
     ★音声フィルタ。BGMがある回だけ、2本を混ぜて1本にする。
