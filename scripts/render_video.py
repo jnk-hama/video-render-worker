@@ -1957,19 +1957,66 @@ def main():
     log('使えたクリップ: %d 本（目標 %d）' % (len(parts), target))
 
     # --- 連結 ---
-    # ★concat デマルチプレクサは、リスト内の相対パスを
-    #   「リストファイルのある場所」から解決する。
-    #   相対のまま書くと ./work/./work/part_00.mp4 を探して落ちる（実測）。
-    listfile = os.path.join(work, 'concat.txt')
-    with open(listfile, 'w', encoding='utf-8') as f:
-        for p in parts:
-            ap_ = os.path.abspath(p)
-            f.write("file '%s'\n" % ap_.replace("'", "'\\''"))
+    """
+    ★★2026-09-22、**繋ぎ目を重ねられるようにした**（transition_seconds）。
 
+    【なぜ】オーナー指摘「カットが次に行くのが早い。ブツブツ感が気になる」。
+      原因は**尺ではなく繋ぎ方**だった。クリップは1本ずつ別に生成した
+      もので、同じ人物が同じ部屋のまま**別のポーズへ瞬間移動する**。
+      これが「ブツブツ」の正体である。
+
+    ★★ここを読み違えて「1カット1.2秒へ刻む」と提案していた。**逆だった。**
+      参考にしたTikTokが1.2秒でも保つのは、**実写で動きが連続している**から。
+      こちらは静止画から起こした短いクリップなので、刻むほど破綻する。
+
+    ★既定は 0（従来どおりのハードカット）。渡さない限り出力は変わらない。
+    """
+    trans = float(job.get('transition_seconds') or 0)
     joined = os.path.join(work, 'joined.mp4')
-    run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
-         '-f', 'concat', '-safe', '0', '-i', listfile,
-         '-c', 'copy', joined])
+
+    if trans > 0 and len(parts) >= 2:
+        durs = [probe_duration(p) or 0.0 for p in parts]
+        # ★重なりは一番短いクリップの半分まで。超えるとそのカットが
+        #   「出た瞬間に消える」ことになる
+        trans = min(trans, min(durs) / 2.0)
+        cmd = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error']
+        for p in parts:
+            cmd += ['-i', p]
+        """
+        ★xfade は「前の映像の“出来上がり”の時間軸」で offset を数える。
+          k本目の重なりの位置 = (先頭からk本の合計) - k*重なり
+          ここを素の累計にすると、重ねたぶんだけ後ろへずれていく。
+        """
+        chain = []
+        prev = '0:v'
+        acc = 0.0
+        for i in range(1, len(parts)):
+            acc += durs[i - 1]
+            offset = max(0.0, acc - i * trans)
+            out = 'vx%d' % i
+            chain.append(
+                '[%s][%d:v]xfade=transition=fade:duration=%.3f:offset=%.3f[%s]'
+                % (prev, i, trans, offset, out))
+            prev = out
+        cmd += ['-filter_complex', ';'.join(chain), '-map', '[%s]' % prev,
+                '-an', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
+                joined]
+        run(cmd)
+        log('繋ぎ目を %.2f秒 重ねました（%d本・%.2f秒)'
+            % (trans, len(parts), sum(durs) - (len(parts) - 1) * trans))
+    else:
+        # ★concat デマルチプレクサは、リスト内の相対パスを
+        #   「リストファイルのある場所」から解決する。
+        #   相対のまま書くと ./work/./work/part_00.mp4 を探して落ちる（実測）。
+        listfile = os.path.join(work, 'concat.txt')
+        with open(listfile, 'w', encoding='utf-8') as f:
+            for p in parts:
+                ap_ = os.path.abspath(p)
+                f.write("file '%s'\n" % ap_.replace("'", "'\\''"))
+
+        run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+             '-f', 'concat', '-safe', '0', '-i', listfile,
+             '-c', 'copy', joined])
 
     """
     ★★2026-08-28。映像が音声より短い回に、最後の絵を伸ばして埋める。
