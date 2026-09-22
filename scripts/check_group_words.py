@@ -14,6 +14,7 @@
 
 使い方: python3 scripts/check_group_words.py
 """
+import re
 import os
 import sys
 
@@ -232,6 +233,36 @@ print("\n=== 異常系 ===")
 ok(group_words([]) == [], "語が0件でも落ちない")
 g = group_words(words(("。", 0.0, 0.1)))
 ok(len(g) == 1 and g[0]["text"] == "。", "句読点1つだけでも落ちない", g)
+
+"""
+★★2026-09-22 追加。**呼び出し側が text= を渡しているか**を見る（決定#126）。
+
+【なぜ要るか】
+ここまでの検査は group_words そのものを見ており、全部通っていた。
+それでも**本番の動画では文またぎが出続けていた**。原因は関数ではなく
+配線で、render_video.py が `group_words(r['words'])` と
+**本文を渡さずに**呼んでいた。
+
+  単体が通っている ≠ 本番経路でその通り使われている（E-021と同じ形）。
+
+関数だけを見ている限り、この誤りは永久に見つからない。
+**呼び出し側を読んで、text= が付いていることを確かめる。**
+"""
+print("\n=== 呼び出し側の配線 ===")
+_caller = os.path.join(os.path.dirname(os.path.abspath(__file__)), "render_video.py")
+try:
+    _src = open(_caller, encoding="utf-8").read()
+except OSError as e:
+    ok(False, "render_video.py を読めた", e)
+    _src = ""
+
+# ★コメント・説明文の中の group_words( に反応しないよう、実際の呼び出しだけ拾う
+_calls = re.findall(r"^[^#\n]*?\btts_mod\.group_words\(([^)]*)\)", _src, re.M)
+ok(len(_calls) > 0, "render_video.py の group_words 呼び出しを見つけた",
+   f"{len(_calls)}件")
+# ★0件を成功にしない。見つからないのは「正しい」ではなく「読めていない」
+for _i, _args in enumerate(_calls):
+    ok("text=" in _args, f"呼び出し{_i + 1}に text= が付いている", _args.strip())
 
 print("\n合格" if fail == 0 else f"\n★不合格 {fail}件")
 sys.exit(0 if fail == 0 else 1)

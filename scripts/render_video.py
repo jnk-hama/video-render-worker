@@ -1630,7 +1630,24 @@ def build_captions_from_tts(narration, work, voice):
         log('音声を作れませんでした（無音で続行）: %s' % e)
         return None, [], 0.0
 
-    chunks = tts_mod.group_words(r['words'])
+    """
+    ★★2026-09-22、**text= を渡していなかった**（決定#126の配線漏れ）。
+
+    group_words は文の切れ目を「元の本文と突き合わせて」判定する。
+    ところがここが `group_words(r['words'])` で、**本文を渡していなかった**。
+    渡さないと語の末尾の 。！？ で判定する側へ落ちるが、
+    **edge-tts の WordBoundary は句読点を返さない**ので、
+    文の切れ目が1つも見つからず、**字幕が文をまたぎ続けていた**。
+
+    実際に出ていた形（job anna-redial-telop-v2 のコマで確認）:
+      「サイズ豊富で体型を」「選ばないすっぽり」「小顔見え手の甲まで」
+      → 「選ばない。」で終わる文と「すっぽりフード…」が1枚に同居していた。
+
+    ★tts.py 側の実装も check_group_words.py も正しかった。
+      **直っていなかったのは呼び出し側だけ**である。
+      単体が通っていることと、本番経路で使われていることは別（E-021と同じ形）。
+    """
+    chunks = tts_mod.group_words(r['words'], text=narration)
     if not chunks:
         log('単語の時刻が取れませんでした。音声だけ使い、字幕は均等割りにします。')
     return r['path'], chunks, float(r['duration'] or 0)
