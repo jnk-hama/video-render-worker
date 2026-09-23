@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-22T08:44:01+00:00",
+ "generated_at": "2026-09-23T08:46:10+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -67,9 +67,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wh2eeh",
-    "title": "Sometimes humans amaze me. Thank you to these two for saving a life",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wh2eeh/sometimes_humans_amaze_me_thank_you_to_these_two/",
+    "id": "t3_1wm9tmu",
+    "title": "They took care of each other!",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wm9tmu/they_took_care_of_each_other/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wmwnab",
+    "title": "Mother whale teaches baby to see the sunrise",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wmwnab/mother_whale_teaches_baby_to_see_the_sunrise/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -79,15 +88,6 @@
     "id": "t3_1wk4efw",
     "title": "Look at a Black Monitor Lizard Eat Three Whole Eggs in seconds",
     "url": "https://www.reddit.com/r/BeAmazed/comments/1wk4efw/look_at_a_black_monitor_lizard_eat_three_whole/",
-    "subreddit": "BeAmazed",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wm9tmu",
-    "title": "They took care of each other!",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wm9tmu/they_took_care_of_each_other/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -121,34 +121,25 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wis1e4",
-    "title": "In 2014, a father dressed as Spider-Man and jumped from the roof of his home to surprise his terminally ill 5-year-old son, giving him a moment he would never forget.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wis1e4/in_2014_a_father_dressed_as_spiderman_and_jumped/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wmokq8",
+    "title": "Security measures for this VIP",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wmokq8/security_measures_for_this_vip/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wlb5ct",
-    "title": "NASA has released these new photos from the surface of Mars 🔭",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wlb5ct/nasa_has_released_these_new_photos_from_the/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1whwqtj",
+    "title": "The ending is incredible - (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1whwqtj/the_ending_is_incredible_source_link_in/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1wh459v",
-    "title": "I wonder if this is true",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wh459v/i_wonder_if_this_is_true/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1wkioy4",
     "title": "But the salary not enough.",
@@ -177,55 +168,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wm1o32",
-    "title": "New Day — Fresh Vibes ☀️",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wm1o32/new_day_fresh_vibes/",
-    "subreddit": "animegifs",
+    "id": "t3_1wkt5td",
+    "title": "And the Oscar goes to...",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wkt5td/and_the_oscar_goes_to/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wjww51",
-    "title": "When 'one more round' turned into 'playing till morning'",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wjww51/when_one_more_round_turned_into_playing_till/",
-    "subreddit": "animegifs",
+    "id": "t3_1wid88g",
+    "title": "Vincent Chansards sequence on Re:Zero Season 4 Episode 17",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wid88g/vincent_chansards_sequence_on_rezero_season_4/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wiub70",
-    "title": "Nice to be welcomed back — Could’ve made it less weird though",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wiub70/nice_to_be_welcomed_back_couldve_made_it_less/",
-    "subreddit": "animegifs",
+    "id": "t3_1wjxh6q",
+    "title": "Bleach TYBW #48, Key animation: Akira Iwamoto (岩本陽) (Presumed)",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wjxh6q/bleach_tybw_48_key_animation_akira_iwamoto_岩本陽/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wj4ceq",
-    "title": "Mwah — Consider That Your Goodnight Kiss ❤️",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wj4ceq/mwah_consider_that_your_goodnight_kiss/",
-    "subreddit": "animegifs",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wlkez5",
-    "title": "Feels like I’m in a Yakuza game",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wlkez5/feels_like_im_in_a_yakuza_game/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wh4qv9",
-    "title": "styled a collection from JCREW x Eckhaus Latta",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wh4qv9/styled_a_collection_from_jcrew_x_eckhaus_latta/",
-    "subreddit": "streetwear",
+    "id": "t3_1wmr64s",
+    "title": "The World Is Dancing #13 KA: Rui (Presumed)",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wmr64s/the_world_is_dancing_13_ka_rui_presumed/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -240,18 +213,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1whu9n1",
-    "title": "Just uploading an HD version of the Citlali GIF...",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1whu9n1/just_uploading_an_hd_version_of_the_citlali_gif/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wlkez5",
+    "title": "Feels like I’m in a Yakuza game",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wlkez5/feels_like_im_in_a_yakuza_game/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wgyofn",
-    "title": "Single and ready to mingle?",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wgyofn/single_and_ready_to_mingle/",
+    "id": "t3_1wncrii",
+    "title": "finally flannel szn again🙏🏾",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wncrii/finally_flannel_szn_again/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1whu9n1",
+    "title": "Just uploading an HD version of the Citlali GIF...",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1whu9n1/just_uploading_an_hd_version_of_the_citlali_gif/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
@@ -273,6 +255,24 @@
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wnbrzd",
+    "title": "FYI pyroculi spin opposite to the other occuli",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wnbrzd/fyi_pyroculi_spin_opposite_to_the_other_occuli/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wmi1ue",
+    "title": "I just saw We Are Aliens and I literally loved every second of it.",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wmi1ue/i_just_saw_we_are_aliens_and_i_literally_loved/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
