@@ -563,6 +563,31 @@ def resolution_is_acceptable(path):
     return rw >= MIN_MATERIAL_DIMENSION and rh >= MIN_MATERIAL_DIMENSION
 
 
+def extract_part_audio(src, dest, start, duration):
+    """
+    1パートぶんの音声を、映像と**同じ区間・同じ長さ**で切り出す（決定#166）。
+
+    ★音声の無い素材（静止画・無音の動画）は、同じ長さの無音で埋める。
+      埋めないと後ろのパートが前へ詰まり、**口と声がずれる**。
+    ★apad で足りない分を無音で伸ばしてから -t で切る。素材が指定より
+      短い回も、長さは必ず duration になる。
+    """
+    probe_a = subprocess.run(
+        ['ffprobe', '-v', 'error', '-select_streams', 'a',
+         '-show_entries', 'stream=index', '-of', 'csv=p=0', src],
+        capture_output=True, text=True).stdout.strip()
+    common = ['-ar', '44100', '-ac', '2', '-c:a', 'pcm_s16le', dest]
+    if probe_a:
+        run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+             '-ss', str(start), '-t', str(duration), '-i', src,
+             '-vn', '-af', 'apad', '-t', str(duration)] + common)
+    else:
+        run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+             '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
+             '-t', str(duration)] + common)
+    return dest
+
+
 def normalize(src, dest, start, duration, w, h, fps, dim=False):
     """
     1クリップを「指定秒数・9:16・同一規格」に揃える。
@@ -1754,7 +1779,28 @@ def main():
     captions = []
     target_seconds = 0.0
 
-    if mode in ('A', 'T'):
+    """
+    ★★clip_audio（2026-09-23・決定#166）。**クリップ自身の音声をそのまま使う回。**
+
+    Veo 3.1 は口の動きに合わせた声まで生成する。ところが従来は
+    normalize() が `-an` で全クリップの音声を捨て、TTS のナレーションに
+    差し替えていた。**喋らせても声が消えて別の声になる**。
+
+    この回は TTS を回さない。字幕は job.captions で明示的に渡す
+    （オーナー方針「アンナが喋るならナレーションは本当に伝えたいフックのみ」）。
+    尺はクリップの長さの合計で決まる（target_seconds を 0 のままにし、
+    各クリップを並びどおり1回ずつ使う）。
+    """
+    clip_audio = bool(job.get('clip_audio'))
+    if clip_audio and mode != 'A':
+        raise SystemExit('clip_audio はモードAでだけ使えます（mode=%s）' % mode)
+    part_audio = []   # clip_audio の回だけ使う。parts と同じ並び
+
+    if mode in ('A', 'T') and clip_audio:
+        captions = job.get('captions') or []
+        log('clip_audio: クリップ自身の音声を使います（TTSは回しません・字幕 %d 枚）'
+            % len(captions))
+    elif mode in ('A', 'T'):
         audio_path, captions, target_seconds = build_captions_from_tts(
             job.get('narration'), work, job.get('voice'))
 
@@ -1765,7 +1811,7 @@ def main():
         if not target_seconds:
             target_seconds = max((float(c.get('end') or 0) for c in captions),
                                  default=0.0)
-    else:
+    if mode not in ('A', 'T'):
         # ★モードBは音声解析も字幕も一切行わない（オーナー指示）
         log('モードB: 音声解析と字幕付与は行いません。')
 
@@ -1928,7 +1974,14 @@ def main():
               each = float(c.get('duration') or rng.uniform(1.0, 3.0))
               st, each = pick_cut_window(src, each, rng)
           else:
-              st = float(c.get('start') or 0.5)
+              """
+              ★★2026-09-23、**start:0 が 0.5 として扱われていた**（決定#166）。
+                `c.get('start') or 0.5` は、0 が偽なので**明示した 0 を捨てる**。
+                依頼側は「頭から」のつもりで 0 を渡しているのに、全部の回で
+                クリップの頭0.5秒が切られていた。喋るカットだと**セリフの
+                出だしが消える**。既定の 0.5 は「指定が無い時」だけに効かせる。
+              """
+              st = float(c['start']) if c.get('start') is not None else 0.5
               each = float(c.get('duration') or want_each)
 
           try:
@@ -1942,6 +1995,14 @@ def main():
               ok = False
           if ok:
               parts.append(dst)
+              if clip_audio:
+                  # ★音声は「指定した尺」ではなく**出来た映像パートの実尺**で切る。
+                  #   素材が短いと映像は指定より短くなり、指定尺で切ると
+                  #   その差だけ後ろのパートの口と声がずれる（テストで検出）
+                  real = probe_duration(dst) or each
+                  part_audio.append(extract_part_audio(
+                      src, os.path.join(work, 'pa_%02d.wav' % i),
+                      0 if looks_like_image(url, src) else st, real))
           try:
               os.remove(src)
           except OSError:
@@ -2017,6 +2078,41 @@ def main():
         run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
              '-f', 'concat', '-safe', '0', '-i', listfile,
              '-c', 'copy', joined])
+
+    """
+    ★★clip_audio の回は、各パートの音声を映像と**同じ形で**繋ぐ（決定#166）。
+
+      映像を xfade で重ねたなら、音声も**同じ長さ**の acrossfade で重ねる。
+      片方だけ重ねると、2本目以降が重ねた秒数ずつ**ずれて、口と声が合わなくなる**。
+    ★尺はこの音声の長さで決まる（下の「映像が短い回に伸ばす」処理も、
+      ここで決めた target_seconds を基準に動く）。
+    """
+    if clip_audio:
+        if len(part_audio) != len(parts):
+            raise SystemExit('音声と映像のパート数が合いません（映像%d / 音声%d）'
+                             % (len(parts), len(part_audio)))
+        audio_path = os.path.join(work, 'clip_audio.wav')
+        acmd = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error']
+        for a in part_audio:
+            acmd += ['-i', a]
+        if trans > 0 and len(part_audio) >= 2:
+            chain = []
+            prev = '0:a'
+            for i in range(1, len(part_audio)):
+                out = 'ax%d' % i
+                chain.append('[%s][%d:a]acrossfade=d=%.3f:c1=tri:c2=tri[%s]'
+                             % (prev, i, trans, out))
+                prev = out
+            acmd += ['-filter_complex', ';'.join(chain), '-map', '[%s]' % prev]
+        else:
+            ins = ''.join('[%d:a]' % i for i in range(len(part_audio)))
+            acmd += ['-filter_complex',
+                     '%sconcat=n=%d:v=0:a=1[aout]' % (ins, len(part_audio)),
+                     '-map', '[aout]']
+        acmd += ['-c:a', 'pcm_s16le', audio_path]
+        run(acmd)
+        target_seconds = probe_duration(audio_path) or 0.0
+        log('clip_audio: %d本の音声を繋ぎました（%.2f秒）' % (len(part_audio), target_seconds))
 
     """
     ★★2026-08-28。映像が音声より短い回に、最後の絵を伸ばして埋める。
