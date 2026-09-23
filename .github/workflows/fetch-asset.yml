@@ -321,34 +321,6 @@ jobs:
           PY
           python3 scripts/preview_b64.py cframes/f*.jpg --max 200 --cols 3
           bash scripts/push_preview.sh preview.jpg "verify_clip $(date -u +%H:%MZ)"
-          # ★★Veo が勝手に焼いた字幕を探す（決定#171）。2026-09-23、指示で禁じていたのに
-          #   6本中1本で画面下に意味不明の文字（「み筊に澮…」）が出た。オーナーが見つけた。
-          #   この段階のクリップにはまだテロップを焼いていないので、**写った文字は全部Veo製**。
-          #   ★商品の番号プリント（88 等）を拾わないよう、数字と記号だけの語は数えない。
-          #   ★OCR は誤検知もするので止めない。コマの時刻つきで知らせ、人が見る。
-          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-jpn >/dev/null
-          mkdir -p ocr && ffmpeg -v error -i clip.mp4 -vf fps=2 ocr/o%03d.png
-          python3 - <<'PYOCR'
-          import glob, re, subprocess
-          hits = []
-          for i, f in enumerate(sorted(glob.glob('ocr/o*.png'))):
-              out = subprocess.run(['tesseract', f, 'stdout', '-l', 'jpn+eng', '--psm', '11', 'tsv'],
-                                   capture_output=True, text=True).stdout
-              for line in out.splitlines()[1:]:
-                  c = line.split('\t')
-                  if len(c) < 12:
-                      continue
-                  word, conf = c[11].strip(), float(c[10] or -1)
-                  if conf < 60 or len(word) < 2 or re.fullmatch(r'[\d\W_]+', word):
-                      continue
-                  hits.append((i * 0.5, word, conf))
-          if hits:
-              print('★Veo製の文字の疑い %d 件（時刻・語・確からしさ）:' % len(hits))
-              for t, w, c in hits[:30]:
-                  print('   %4.1fs  %s  (%.0f)' % (t, w, c))
-          else:
-              print('Veo製の文字: 見つかりません（%d コマを検査）' % len(glob.glob('ocr/o*.png')))
-          PYOCR
           # ★文字起こし（transcribe:true の回だけ）。モデルはランナーで落とす
           #   （実装者のサンドボックスは huggingface へ出られない）
           if [ "${{ inputs.transcribe }}" = "true" ]; then
