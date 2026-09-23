@@ -128,6 +128,14 @@ on:
       # ★★2026-09-20 追加（決定#159）。**verify_clip.py も未配線だった。**
       #   生成クリップがアンナ本人かを数字で見る手段が、書いてあるのに
       #   どこからも呼ばれていなかった。人の目視の前に、まず機械が落とす。
+      # ★★2026-09-23 追加。**生成した静止画を、人が見る前に機械で落とす口。**
+      #   verify_faces は Release の gen*.jpg しか見ず、並行して2回生成すると
+      #   片方が上書きされて判定できなかった（実際に起きた）。
+      #   URLを直接渡せば、どの回の画でも確実に判定できる。
+      verify_urls:
+        description: '判定する静止画のURL（空白区切りで複数可）。顔がアンナ本人か・服が揃っているかを見る'
+        required: false
+        type: string
       verify_clip:
         description: '生成クリップのURL。顔がアンナ本人か・手が壊れていないかを機械判定する'
         required: false
@@ -211,6 +219,63 @@ jobs:
                     % (o['worst'], outfit_score.PASS_THRESHOLD,
                        '服は揃っている' if o['passed'] else '★服が変わっている疑い'))
           PY
+
+      # ★★静止画を URL で直接判定する（2026-09-23）。
+      #   #068「生成画は人が目視してから使う」の前段。**まず機械が落とす。**
+      #   ★数字だけで判断しない。大きめのコマも preview ブランチへ置く。
+      - name: 静止画をURLで判定する
+        if: inputs.verify_urls != ''
+        env:
+          URLS: ${{ inputs.verify_urls }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --disable-pip-version-check \
+            insightface onnxruntime pillow
+          mkdir -p faces
+          python3 - <<'PY2'
+          import os, re, sys, urllib.request
+          urls = [u for u in re.split(r'\s+', (os.environ.get('URLS') or '').strip()) if u]
+          if not urls:
+              raise SystemExit('verify_urls が空です')
+          if len(urls) > 12:
+              raise SystemExit('一度に判定できるのは12枚までです（%d枚）' % len(urls))
+          for i, u in enumerate(urls):
+              if not u.startswith('https://'):
+                  raise SystemExit('https:// のURLにしてください: %r' % u[:120])
+              dest = 'faces/s%02d.jpg' % i
+              urllib.request.urlretrieve(u, dest)
+              print('取得 s%02d  %7d バイト  %s' % (i, os.path.getsize(dest), u.rsplit('/', 1)[-1]))
+          PY2
+          python3 - <<'PY2'
+          import os, sys
+          sys.path.insert(0, 'scripts')
+          import face_score, outfit_score
+          refs = face_score.reference_set()
+          print('\n顔（マスター %d枚との最大類似度 / 閾値 %.2f）' % (len(refs), face_score.PASS_THRESHOLD))
+          files = sorted(os.listdir('faces'))
+          ng = 0
+          for f in files:
+              r = face_score.score(os.path.join('faces', f), refs)
+              if not r:
+                  print('  %-8s 顔が見つからない（寄りの画なら正常）' % f)
+                  continue
+              mark = 'OK  本人' if r['passed'] else '★NG 別人'
+              ng += 0 if r['passed'] else 1
+              print('  %-8s %.3f  %s' % (f, r['best'], mark))
+          o = outfit_score.compare([os.path.join('faces', f) for f in files])
+          print('\n服の一致（胴体の色分布・1.0が完全一致）')
+          for a, b, sim in o['pairs']:
+              print('  %-8s %-8s %.3f' % (a, b, sim))
+          for name, why in o['skipped']:
+              print('  %-8s 判定できず（%s）' % (name, why))
+          if o['worst'] is not None:
+              print('  最小 %.3f / 閾値 %.2f → %s' % (o['worst'], outfit_score.PASS_THRESHOLD,
+                    '服は揃っている' if o['passed'] else '★服が変わっている疑い'))
+          print('\n別人判定: %d件' % ng)
+          PY2
+          python3 scripts/preview_b64.py faces/*.jpg --max 360 --cols 5
+          bash scripts/push_preview.sh preview.jpg "verify_urls $(date -u +%H:%MZ)"
 
       # ★★生成クリップを数字で採点する（決定#159）。
       #   verify_clip.py は書いてあったのに**どこからも呼ばれていなかった**。
@@ -839,7 +904,7 @@ jobs:
           ls -lh assets_out/
 
       - name: 取り寄せる
-        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && inputs.garment_from == '' && inputs.crop_from == '' && inputs.verify_clip == '' && !inputs.verify_faces
+        if: inputs.pexels == '' && inputs.edge == '' && inputs.page == '' && inputs.upload == '' && inputs.garment_from == '' && inputs.crop_from == '' && inputs.verify_clip == '' && inputs.verify_urls == '' && !inputs.verify_faces
         env:
           Q: ${{ inputs.query }}
           U: ${{ inputs.url }}
