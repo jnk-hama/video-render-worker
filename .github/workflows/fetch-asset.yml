@@ -136,6 +136,14 @@ on:
         description: '判定する静止画のURL（空白区切りで複数可）。顔がアンナ本人か・服が揃っているかを見る'
         required: false
         type: string
+      # ★★2026-09-23 追加。**喋らせたクリップが台本どおりに喋ったか**を文字で見る。
+      #   Veo の日本語は言い間違えうる。商品の訴求を言い間違えたまま出すと
+      #   景表法の問題になるので、人が聞く前に機械で文字起こしして突き合わせる。
+      transcribe:
+        description: 'verify_clip と一緒に使う。クリップの音声を日本語で文字起こしする'
+        required: false
+        type: boolean
+        default: false
       verify_clip:
         description: '生成クリップのURL。顔がアンナ本人か・手が壊れていないかを機械判定する'
         required: false
@@ -313,6 +321,30 @@ jobs:
           PY
           python3 scripts/preview_b64.py cframes/f*.jpg --max 200 --cols 3
           bash scripts/push_preview.sh preview.jpg "verify_clip $(date -u +%H:%MZ)"
+          # ★文字起こし（transcribe:true の回だけ）。モデルはランナーで落とす
+          #   （実装者のサンドボックスは huggingface へ出られない）
+          if [ "${{ inputs.transcribe }}" = "true" ]; then
+            python3 -m pip install --quiet --disable-pip-version-check faster-whisper
+            python3 - <<'PY2'
+          import subprocess
+          has = subprocess.run(['ffprobe','-v','error','-select_streams','a',
+                                '-show_entries','stream=index','-of','csv=p=0','clip.mp4'],
+                               capture_output=True, text=True).stdout.strip()
+          if not has:
+              print('文字起こし: 音声トラックがありません')
+              raise SystemExit(0)
+          from faster_whisper import WhisperModel
+          # ★CPU・int8。GPUに依存しない（3本の線）
+          m = WhisperModel('small', device='cpu', compute_type='int8')
+          segs, info = m.transcribe('clip.mp4', language='ja', vad_filter=True)
+          segs = list(segs)
+          print('文字起こし（言語 %s / 確からしさ %.2f）:' % (info.language, info.language_probability))
+          if not segs:
+              print('  （発話なし）')
+          for sg in segs:
+              print('  %5.2f-%5.2f  %s' % (sg.start, sg.end, sg.text.strip()))
+          PY2
+          fi
 
       # ★他社モデルを外した「衣類だけ」の画像を作る（決定#158）。
       #   顔検出で人物の位置を機械的に特定し、その下だけを残す。
