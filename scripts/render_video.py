@@ -588,7 +588,32 @@ def extract_part_audio(src, dest, start, duration):
     return dest
 
 
-def normalize(src, dest, start, duration, w, h, fps, dim=False):
+def inset_filter(inset):
+    """
+    素材の上下左右を割合で切り落とす crop（決定#171）。
+
+    ★★2026-09-23、Veo の出力に**上下の帯が焼き込まれていた**（3:4 の静止画から
+      作ると、9:16 に合わせるため Veo 自身が余白を足す）。帯は素材の中にあるので、
+      下の scale=increase → crop では消えない。**先に帯を切ってから**揃える。
+    ★0〜0.4 に制限する。書き損じで画面の大半を捨てないため。
+    """
+    if not isinstance(inset, dict):
+        return ''
+    f = {}
+    for k in ('top', 'bottom', 'left', 'right'):
+        try:
+            v = float(inset.get(k) or 0)
+        except (TypeError, ValueError):
+            v = 0.0
+        f[k] = max(0.0, min(0.4, v))
+    if not any(f.values()):
+        return ''
+    return ('crop=trunc(iw*{kw}/2)*2:trunc(ih*{kh}/2)*2:trunc(iw*{l}):trunc(ih*{t}),'
+            .format(kw=1 - f['left'] - f['right'], kh=1 - f['top'] - f['bottom'],
+                    l=f['left'], t=f['top']))
+
+
+def normalize(src, dest, start, duration, w, h, fps, dim=False, inset=None):
     """
     1クリップを「指定秒数・9:16・同一規格」に揃える。
 
@@ -598,9 +623,9 @@ def normalize(src, dest, start, duration, w, h, fps, dim=False):
     scale=increase → crop で、横長素材を縦型に切り出す（余白を作らない）。
     """
     vf = (
-        'scale={w}:{h}:force_original_aspect_ratio=increase,'
+        '{inset}scale={w}:{h}:force_original_aspect_ratio=increase,'
         'crop={w}:{h},{dim}setsar=1,fps={fps},format=yuv420p'
-    ).format(w=w, h=h, fps=fps, dim=dim_filter(dim))
+    ).format(w=w, h=h, fps=fps, dim=dim_filter(dim), inset=inset_filter(inset))
 
     run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
          '-ss', str(start), '-t', str(duration), '-i', src,
@@ -1989,7 +2014,8 @@ def main():
                   # ★静止画は動かしてから連結する（Ken Burns）
                   ok = still_to_clip(src, dst, each, w, h, fps, rng, dim)
               else:
-                  ok = normalize(src, dst, st, each, w, h, fps, dim)
+                  ok = normalize(src, dst, st, each, w, h, fps, dim,
+                                 inset=c.get('inset'))
           except Exception as e:
               log('  変換に失敗（次のクリップへ）: %s' % e)
               ok = False
