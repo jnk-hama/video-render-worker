@@ -336,13 +336,29 @@ jobs:
           from faster_whisper import WhisperModel
           # ★CPU・int8。GPUに依存しない（3本の線）
           m = WhisperModel('small', device='cpu', compute_type='int8')
-          segs, info = m.transcribe('clip.mp4', language='ja', vad_filter=True)
+          # ★語ごとの時刻も出す。Whisper は日本語の文末に「ください」等を
+          #   足して聞き取ることがある（2026-09-23、別々に生成した2本で同じ
+          #   「見てねください」が出た）。本当に喋っているなら、その語の位置で
+          #   クリップを切れるように時刻が要る
+          segs, info = m.transcribe('clip.mp4', language='ja', vad_filter=True,
+                                    word_timestamps=True,
+                                    condition_on_previous_text=False)
           segs = list(segs)
           print('文字起こし（言語 %s / 確からしさ %.2f）:' % (info.language, info.language_probability))
           if not segs:
               print('  （発話なし）')
           for sg in segs:
               print('  %5.2f-%5.2f  %s' % (sg.start, sg.end, sg.text.strip()))
+              for w in (sg.words or []):
+                  print('      %5.2f-%5.2f  %s  (p=%.2f)' % (w.start, w.end, w.word.strip(), w.probability))
+          # ★Whisper とは独立に、音が実際に止まる位置を出す（無音検出は推論なし）
+          r = subprocess.run(['ffmpeg','-hide_banner','-nostats','-i','clip.mp4','-af',
+                              'silencedetect=noise=-35dB:d=0.25','-f','null','-'],
+                             capture_output=True, text=True)
+          sil = [l.split('] ')[-1] for l in r.stderr.splitlines() if 'silence_' in l]
+          print('無音区間（-35dB / 0.25秒以上）:')
+          for l in sil or ['（無音区間なし）']:
+              print('   ', l)
           PY2
           fi
 
