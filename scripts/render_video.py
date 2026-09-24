@@ -378,6 +378,45 @@ def foreground_filter(w, h, fps, seconds, spec):
     return ';'.join(chains)
 
 
+# 商品パネル（product_panel）の置き場所。画面高に対する比。
+# 字幕（caption_y 0.74）より上、顔（上 1/3）より下に収める
+PANEL_TOP = 0.42
+PANEL_BOTTOM = 0.70
+PANEL_FADE = 0.15
+
+
+def panel_filter(w, h, n, start, end, sizes):
+    """
+    商品パネルの filter_complex を作る。入力 0 が本編、1..n が透過PNG。
+
+    ★★2026-09-24 オーナー「別枠ってこういうこと」（参考: 色違いの実物を
+      切り抜いて横に並べ、大見出しを乗せたTikTok）。文字の箱ではなく、
+      **ASPの実画像そのものを大きく並べる**のが別枠。
+    ★描くのは実画像だけ（#068）。色違いを生成で作らない＝画像が無い色は出さない。
+    ★ sizes は各PNGの (幅, 高さ)。横に等分した枠へ、縦横比を保って収める。
+    """
+    margin = int(w * 0.04)
+    gap = int(w * 0.03)
+    box_w = (w - 2 * margin - gap * (n - 1)) // n
+    box_h = int(h * (PANEL_BOTTOM - PANEL_TOP))
+    chains, prev = [], '0:v'
+    for i, (iw, ih) in enumerate(sizes):
+        k = min(box_w / float(iw), box_h / float(ih))
+        sw, sh = max(2, int(iw * k) // 2 * 2), max(2, int(ih * k) // 2 * 2)
+        x = margin + i * (box_w + gap) + (box_w - sw) // 2
+        y = int(h * PANEL_TOP) + (box_h - sh) // 2
+        chains.append('[%d:v]scale=%d:%d,format=rgba,'
+                      'fade=t=in:st=%.3f:d=%.2f:alpha=1,'
+                      'fade=t=out:st=%.3f:d=%.2f:alpha=1[p%d]'
+                      % (i + 1, sw, sh, start, PANEL_FADE,
+                         max(start, end - PANEL_FADE), PANEL_FADE, i))
+        out = 'v%d' % i
+        chains.append("[%s][p%d]overlay=x=%d:y=%d:enable='between(t,%.3f,%.3f)'[%s]"
+                      % (prev, i, x, y, start, end, out))
+        prev = out
+    return ';'.join(chains), prev
+
+
 def log(msg):
     print(msg, flush=True)
 
@@ -1438,7 +1477,7 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
 
 def build_ass(captions, w, h, font_size, center=False,
               font_name='DejaVu Sans', ratio=None, font_dir=None,
-              theme=None, disclosure=None, safe=None, cards=None):
+              theme=None, disclosure=None, safe=None, cards=None, panel=None):
     """
     単語ごとに色が変わる字幕（karaoke）を作る。
 
@@ -1512,6 +1551,28 @@ def build_ass(captions, w, h, font_size, center=False,
         cy = int(h * (0.50 if center else min(0.92, safe['caption_y'] + CARD_BELOW_CAPTION)))
         lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)}%s'
                      % (ass_time(start), ass_time(end), center_x, cy, text))
+    """
+    ★商品パネルの見出しとラベル。見出しはパネルの上に大きく（参考の「全色OK」）、
+      ラベルは各画像の下に Card の箱で。画像そのものは panel_filter が重ねる。
+    """
+    if panel and panel.get('images'):
+        ps, pe = float(panel.get('start', 0)), float(panel.get('end', 0))
+        if panel.get('title') and pe > ps:
+            lines.append('Dialogue: 2,%s,%s,Pop,,0,0,0,,{\\pos(%d,%d)\\fs%d\\fad(120,120)}%s'
+                         % (ass_time(ps), ass_time(pe), w // 2,
+                            int(h * (PANEL_TOP - 0.05)), int(font_size * 1.6),
+                            ass_escape(str(panel['title']))))
+        labels = panel.get('labels') or []
+        n = min(len(panel['images']), 4)
+        margin, gap = int(w * 0.04), int(w * 0.03)
+        box_w = (w - 2 * margin - gap * (n - 1)) // max(1, n)
+        for i, lb in enumerate(labels[:n]):
+            if not lb:
+                continue
+            cx = margin + i * (box_w + gap) + box_w // 2
+            lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)}%s'
+                         % (ass_time(ps), ass_time(pe), cx,
+                            int(h * (PANEL_BOTTOM - 0.015)), ass_escape(str(lb))))
     for c in captions:
         text = ass_escape(c.get('text', ''))
         if not text:
@@ -2277,6 +2338,41 @@ def main():
         except Exception as e:
             log('  前景の合成を飛ばします（動画は出します）: %s' % str(e)[:160])
 
+    """
+    ★商品パネル（product_panel）。指定区間だけ、実画像を横に並べて重ねる。
+      1枚も用意できなければパネルごと飛ばして動画は出す（前景と同じ方針）。
+    """
+    panel = job.get('product_panel') or None
+    if panel and panel.get('images'):
+        try:
+            pngs = []
+            for k, u in enumerate(panel['images'][:4]):
+                raw = os.path.join(work, 'panel_raw_%d' % k)
+                png = os.path.join(work, 'panel_%d.png' % k)
+                if download(str(u), raw, market=job.get('target_market')) \
+                        and prepare_foreground(raw, png):
+                    pngs.append(png)
+                else:
+                    log('  パネルの画像を用意できませんでした（この1枚は出しません）: %s' % str(u)[:100])
+            if pngs:
+                ps, pe = float(panel.get('start', 0)), float(panel.get('end', 0))
+                fc, last = panel_filter(w, h, len(pngs), ps, pe,
+                                        [probe_size(pp) for pp in pngs])
+                paneled = os.path.join(work, 'paneled.mp4')
+                pcmd = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-i', joined]
+                for pp in pngs:
+                    pcmd += ['-loop', '1', '-i', pp]
+                pcmd += ['-filter_complex', fc, '-map', '[%s]' % last, '-an',
+                         '-t', '%.3f' % float(target_seconds or probe_duration(joined) or 0),
+                         '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
+                         '-pix_fmt', 'yuv420p', paneled]
+                run(pcmd)
+                if os.path.exists(paneled) and os.path.getsize(paneled) > 1024:
+                    joined = paneled
+                    log('  商品パネルを重ねました（%d枚 / %.1f〜%.1f秒）' % (len(pngs), ps, pe))
+        except Exception as e:
+            log('  商品パネルを飛ばします（動画は出します）: %s' % str(e)[:160])
+
     # ------------------------------------------------------------------
     # 仕上げ
     # ------------------------------------------------------------------
@@ -2457,6 +2553,7 @@ def main():
                                                 job.get('highlight_words')),
                               disclosure=job.get('disclosure'),
                               cards=job.get('info_cards'),
+                              panel=job.get('product_panel'),
                               safe=SAFE_AREAS.get(
                                   str(job.get('safe_area') or 'none').lower(),
                                   SAFE_AREAS['none'])))
