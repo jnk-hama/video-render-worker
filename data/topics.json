@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-23T08:46:10+00:00",
+ "generated_at": "2026-09-24T08:39:06+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,24 +7,6 @@
     "id": "t3_1wjebwl",
     "title": "Fuego Volcano erupts with volcanic lightning over Antigua, Guatemala",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wjebwl/fuego_volcano_erupts_with_volcanic_lightning_over/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wimln0",
-    "title": "A mother asked her kids to reenact how the three of them ended up on top of the wardrobe.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wimln0/a_mother_asked_her_kids_to_reenact_how_the_three/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wio1fv",
-    "title": "Very creative with stage setup",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wio1fv/very_creative_with_stage_setup/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -49,19 +31,19 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wi1lxx",
-    "title": "This New Jersey man flies drones every night to find lost pets for free. He’s already reunited over 122 families",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wi1lxx/this_new_jersey_man_flies_drones_every_night_to/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wo2h74",
+    "title": "that last jump was something out of Spider-Man",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wo2h74/that_last_jump_was_something_out_of_spiderman/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wih75q",
-    "title": "This elderly Syrian hid his banned library behind a brick wall in Damascus in 2011 before fleeing to Kuwait to escape Assad's prisons. Today, he returned and tore down the wall, finally recovering the priceless books the regime outlawed.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wih75q/this_elderly_syrian_hid_his_banned_library_behind/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wnu2vg",
+    "title": "Comedian Karl Porter’s slow-mo goal celebration",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wnu2vg/comedian_karl_porters_slowmo_goal_celebration/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -88,6 +70,24 @@
     "id": "t3_1wk4efw",
     "title": "Look at a Black Monitor Lizard Eat Three Whole Eggs in seconds",
     "url": "https://www.reddit.com/r/BeAmazed/comments/1wk4efw/look_at_a_black_monitor_lizard_eat_three_whole/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wiyirx",
+    "title": "17-Year-Old With a Heart of Gold.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wiyirx/17yearold_with_a_heart_of_gold/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wiu2ji",
+    "title": "I love how the little hand stretches out for the deer to come in",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wiu2ji/i_love_how_the_little_hand_stretches_out_for_the/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -130,10 +130,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1whwqtj",
-    "title": "The ending is incredible - (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1whwqtj/the_ending_is_incredible_source_link_in/",
-    "subreddit": "toptalent",
+    "id": "t3_1wlb5ct",
+    "title": "NASA has released these new photos from the surface of Mars 🔭",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wlb5ct/nasa_has_released_these_new_photos_from_the/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,100 +141,82 @@
   ],
   "B": [
    {
-    "id": "t3_1wkioy4",
-    "title": "But the salary not enough.",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wkioy4/but_the_salary_not_enough/",
-    "subreddit": "Animemes",
+    "id": "t3_1wma2xa",
+    "title": "Fuzzy [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1wma2xa/fuzzy_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1whzsmh",
-    "title": "Two consenting adults",
-    "url": "https://www.reddit.com/r/Animemes/comments/1whzsmh/two_consenting_adults/",
-    "subreddit": "Animemes",
+    "id": "t3_1wjfnia",
+    "title": "Houshou Marine [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1wjfnia/houshou_marine_hololive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wlb7g5",
-    "title": "A beastfolk imposter among us",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wlb7g5/a_beastfolk_imposter_among_us/",
-    "subreddit": "Animemes",
+    "id": "t3_1wjtc5e",
+    "title": "Ryo [Bocchi The Rock!]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1wjtc5e/ryo_bocchi_the_rock/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wkt5td",
-    "title": "And the Oscar goes to...",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wkt5td/and_the_oscar_goes_to/",
-    "subreddit": "Animemes",
+    "id": "t3_1wm1o32",
+    "title": "New Day — Fresh Vibes ☀️",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wm1o32/new_day_fresh_vibes/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wid88g",
-    "title": "Vincent Chansards sequence on Re:Zero Season 4 Episode 17",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wid88g/vincent_chansards_sequence_on_rezero_season_4/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wjww51",
+    "title": "When 'one more round' turned into 'playing till morning'",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wjww51/when_one_more_round_turned_into_playing_till/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wjxh6q",
-    "title": "Bleach TYBW #48, Key animation: Akira Iwamoto (岩本陽) (Presumed)",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wjxh6q/bleach_tybw_48_key_animation_akira_iwamoto_岩本陽/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wiub70",
+    "title": "Nice to be welcomed back — Could’ve made it less weird though",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wiub70/nice_to_be_welcomed_back_couldve_made_it_less/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wmr64s",
-    "title": "The World Is Dancing #13 KA: Rui (Presumed)",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wmr64s/the_world_is_dancing_13_ka_rui_presumed/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wl2q4r",
+    "title": "Apothecary Diaries - \"It's to prevent getting dragged into a back alley.\"",
+    "url": "https://www.reddit.com/r/anime/comments/1wl2q4r/apothecary_diaries_its_to_prevent_getting_dragged/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wmnr38",
-    "title": "Day 23123 of praying for cooler weather",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wmnr38/day_23123_of_praying_for_cooler_weather/",
-    "subreddit": "streetwear",
+    "id": "t3_1wjoue9",
+    "title": "Nothing left for me to do but dance [Food for the Soul]",
+    "url": "https://www.reddit.com/r/anime/comments/1wjoue9/nothing_left_for_me_to_do_but_dance_food_for_the/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wlkez5",
-    "title": "Feels like I’m in a Yakuza game",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wlkez5/feels_like_im_in_a_yakuza_game/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wncrii",
-    "title": "finally flannel szn again🙏🏾",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wncrii/finally_flannel_szn_again/",
-    "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1whu9n1",
-    "title": "Just uploading an HD version of the Citlali GIF...",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1whu9n1/just_uploading_an_hd_version_of_the_citlali_gif/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wlmja3",
+    "title": "Fall 2026 release calendar",
+    "url": "https://www.reddit.com/r/anime/comments/1wlmja3/fall_2026_release_calendar/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -243,15 +225,6 @@
     "id": "t3_1wkpxhk",
     "title": "Handmade primogems to give out at the next convention [OC]",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wkpxhk/handmade_primogems_to_give_out_at_the_next/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wirtgj",
-    "title": "catching strays in 2026 😭",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wirtgj/catching_strays_in_2026/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
@@ -267,10 +240,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wmi1ue",
-    "title": "I just saw We Are Aliens and I literally loved every second of it.",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wmi1ue/i_just_saw_we_are_aliens_and_i_literally_loved/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1wirtgj",
+    "title": "catching strays in 2026 😭",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wirtgj/catching_strays_in_2026/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wn54dm",
+    "title": "Meeting Sandrone in Snezhnaya",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wn54dm/meeting_sandrone_in_snezhnaya/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wnhek3",
+    "title": "Would swapping Ronova for Rhiendottir will be better for team DPS?",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wnhek3/would_swapping_ronova_for_rhiendottir_will_be/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wljcy8",
+    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 13 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1wljcy8/mushoku_tensei_jobless_reincarnation_season_3/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": false,
     "source": "rss"
