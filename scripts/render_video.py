@@ -2349,8 +2349,19 @@ def main():
             for k, u in enumerate(panel['images'][:4]):
                 raw = os.path.join(work, 'panel_raw_%d' % k)
                 png = os.path.join(work, 'panel_%d.png' % k)
-                if download(str(u), raw, market=job.get('target_market')) \
-                        and prepare_foreground(raw, png):
+                if not download(str(u), raw, market=job.get('target_market')):
+                    ok = False
+                elif panel.get('cutout') is False:
+                    # ★切り抜かず、写真のまま白い縁の「カード」にする。ASPの画像が
+                    #   モデル着用写真しか無い回は、切り抜くと髪や肌が残って汚い
+                    #   （2026-09-24 実測）。写真ごと見せる方が正直で見栄えも良い
+                    run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-i', raw,
+                         '-vf', 'pad=iw+iw/25*2:ih+iw/25*2:iw/25:iw/25:white',
+                         '-frames:v', '1', png])
+                    ok = os.path.exists(png)
+                else:
+                    ok = prepare_foreground(raw, png)
+                if ok:
                     pngs.append(png)
                 else:
                     log('  パネルの画像を用意できませんでした（この1枚は出しません）: %s' % str(u)[:100])
