@@ -26,6 +26,12 @@ import subprocess
 import sys
 from collections import deque
 
+
+def log(msg):
+    # ★rembg が無い回の「自前の方式へ降ります」を書く所で log が未定義だった。
+    #   降りる経路そのものが NameError で落ち、自前の方式へ一度も降りられなかった
+    print(msg, file=sys.stderr, flush=True)
+
 # 隣の画素との差の許容量（0-255）。これ以下なら同じ背景とみなす
 """
 ★★2026-09-01、rembg のモデルを **必ず明示する**。既定に任せない。
