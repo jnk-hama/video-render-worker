@@ -864,6 +864,11 @@ SAFE_AREAS = {
 #   0.26 → 字高16px（読めない）
 #   0.65 → 字高38px（字幕120pxの約1/3。読めて邪魔にならない）
 NOTE_SIZE_RATIO = 0.65
+# 情報カードの大きさ（字幕の基準サイズに対する比）。字幕より一段小さく、
+# 広告表記よりは大きい。主役の字幕と競合させない
+CARD_SIZE_RATIO = 0.6
+# 情報カードを字幕の**下**に置く距離（画面高に対する比）。上に置くと服を隠す
+CARD_BELOW_CAPTION = 0.08
 
 """
 ★★2026-08-31、背景を沈める加工。既定では掛けない（送られた回だけ）。
@@ -1418,6 +1423,13 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
         ('Style: Note,%s,%d,&H20FFFFFF,&H20FFFFFF,&H00000000,'
          '&H80000000,0,0,0,0,100,100,0,0,1,3,0,8,40,40,40,1'
          % (font_name, max(28, int(font_size * NOTE_SIZE_RATIO)))),
+        # ★情報カード（サイズ・機能）。**喋るテロップとは別枠**に見せる
+        #   （2026-09-24 オーナー「サイズや機能性は別枠で分かりやすく」）。
+        #   BorderStyle 3 = 文字の後ろに不透明の箱。箱の色は OutlineColour
+        #   （libass の仕様。BackColour は影の色）。Outline が箱の余白になる
+        ('Style: Card,%s,%d,&H00FFFFFF,&H00FFFFFF,&H33000000,'
+         '&H00000000,0,0,0,0,100,100,0,0,3,18,0,5,40,40,40,1'
+         % (font_name, max(28, int(font_size * CARD_SIZE_RATIO)))),
         '',
         '[Events]',
         'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
@@ -1426,7 +1438,7 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
 
 def build_ass(captions, w, h, font_size, center=False,
               font_name='DejaVu Sans', ratio=None, font_dir=None,
-              theme=None, disclosure=None, safe=None):
+              theme=None, disclosure=None, safe=None, cards=None):
     """
     単語ごとに色が変わる字幕（karaoke）を作る。
 
@@ -1485,6 +1497,21 @@ def build_ass(captions, w, h, font_size, center=False,
             'Dialogue: 0,0:00:00.00,9:59:59.99,Note,,0,0,0,,'
             '{\\pos(%d,%d)}%s' % (center_x, int(h * safe['note_y']),
                                  ass_escape(str(disclosure))))
+    """
+    ★情報カード（info_cards）。サイズ・色展開・機能など「読ませる情報」を、
+      喋りに合わせたテロップとは別の箱で出す。塗り（\\k）もポップも掛けない。
+    ★文中の \\n で改行できる。行ごとに ass_escape してから \\N で繋ぐ
+      （escape は改行を空白へ潰すので、先に割っておく）。
+    """
+    for cd in (cards or []):
+        text = '\\N'.join(ass_escape(t) for t in str(cd.get('text') or '').split('\n') if t.strip())
+        start = float(cd.get('start', 0))
+        end = float(cd.get('end', start + 2.0))
+        if not text or end <= start:
+            continue
+        cy = int(h * (0.50 if center else min(0.92, safe['caption_y'] + CARD_BELOW_CAPTION)))
+        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)}%s'
+                     % (ass_time(start), ass_time(end), center_x, cy, text))
     for c in captions:
         text = ass_escape(c.get('text', ''))
         if not text:
@@ -2026,9 +2053,23 @@ def main():
                   #   素材が短いと映像は指定より短くなり、指定尺で切ると
                   #   その差だけ後ろのパートの口と声がずれる（テストで検出）
                   real = probe_duration(dst) or each
+                  """
+                  ★★audio_url（2026-09-24）。**声だけ別のクリップから持ってくる。**
+                    喋らせると生成が落ちるカット（フードを被る）は声なしの映像しか
+                    無い。同じアンナの声で別に作ったクリップの音声を当てる
+                    （アフレコ。口は合わなくてよい、とオーナー確認済み）。
+                    取れなければ黙って代えず、映像自身の音声へ戻したとログに出す。
+                  """
+                  a_src, a_st = src, (0 if looks_like_image(url, src) else st)
+                  if c.get('audio_url'):
+                      alt = os.path.join(work, 'asrc_%02d.mp4' % i)
+                      if download(c['audio_url'], alt, market=market):
+                          a_src, a_st = alt, float(c.get('audio_start') or 0)
+                          log('  声は別クリップから当てます: %s' % str(c['audio_url'])[:110])
+                      else:
+                          log('  audio_url が取れないので映像自身の音声を使います')
                   part_audio.append(extract_part_audio(
-                      src, os.path.join(work, 'pa_%02d.wav' % i),
-                      0 if looks_like_image(url, src) else st, real))
+                      a_src, os.path.join(work, 'pa_%02d.wav' % i), a_st, real))
           try:
               os.remove(src)
           except OSError:
@@ -2415,6 +2456,7 @@ def main():
                               theme=build_theme(job.get('design_tokens'),
                                                 job.get('highlight_words')),
                               disclosure=job.get('disclosure'),
+                              cards=job.get('info_cards'),
                               safe=SAFE_AREAS.get(
                                   str(job.get('safe_area') or 'none').lower(),
                                   SAFE_AREAS['none'])))
