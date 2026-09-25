@@ -46,6 +46,14 @@ REF_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     'assets', 'shared', 'influencer', 'anna')
 
+# ★★2026-09-25（決定#173）、インフルエンサーをアンナから「マリー」へ替えた。
+#   マスターは生成画（自前の画像）だが、描画のたびに使う物ではないので
+#   リポジトリには置かず URL で持つ。**ここが唯一の置き場所**（1つに集約する）。
+#   空にすると従来どおり REF_DIR（アンナ）を読む。
+MASTER_URLS = [
+    'https://xtbpgpegmbkizuwumvxt.supabase.co/storage/v1/object/public/images/scene/persona/1790304052972-d05df9e8.jpg',
+]
+
 _app = None
 
 
@@ -82,8 +90,21 @@ def embeddings(path):
 
 
 def reference_set():
-    """マスターの7方向を読み込む。1枚ではなく全部使う（上の説明を参照）。"""
+    """マスターを読み込む。MASTER_URLS があればそれ、無ければ REF_DIR の全方向。"""
     out = []
+    if MASTER_URLS:
+        import tempfile
+        import urllib.request
+        d = tempfile.mkdtemp(prefix='face_ref_')
+        for i, u in enumerate(MASTER_URLS):
+            dest = os.path.join(d, 'master_%02d.jpg' % i)
+            urllib.request.urlretrieve(u, dest)
+            for e in embeddings(dest):
+                out.append((os.path.basename(u), e))
+        # ★1件も読めないまま「全員不合格」や「判定なし」を返さない（E-021 の形）
+        if not out:
+            raise SystemExit('マスターから顔を1つも読めませんでした: %s' % MASTER_URLS)
+        return out
     for fn in sorted(os.listdir(REF_DIR)):
         if fn.startswith('_') or not fn.lower().endswith(('.jpg', '.png')):
             continue
