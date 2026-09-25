@@ -144,6 +144,11 @@ on:
         required: false
         type: boolean
         default: false
+      transcribe_lang:
+        description: '文字起こしの言語（ja / en）。英語で喋らせたクリップは en（決定#174）'
+        required: false
+        type: string
+        default: 'ja'
       verify_clip:
         description: '生成クリップのURL。顔がアンナ本人か・手が壊れていないかを機械判定する'
         required: false
@@ -325,8 +330,11 @@ jobs:
           #   （実装者のサンドボックスは huggingface へ出られない）
           if [ "${{ inputs.transcribe }}" = "true" ]; then
             python3 -m pip install --quiet --disable-pip-version-check faster-whisper
-            python3 - <<'PY2'
-          import subprocess
+            TLANG="${{ inputs.transcribe_lang }}" python3 - <<'PY2'
+          import os, subprocess
+          lang = os.environ.get('TLANG') or 'ja'
+          if lang not in ('ja', 'en'):
+              raise SystemExit('transcribe_lang は ja か en です: %s' % lang)
           has = subprocess.run(['ffprobe','-v','error','-select_streams','a',
                                 '-show_entries','stream=index','-of','csv=p=0','clip.mp4'],
                                capture_output=True, text=True).stdout.strip()
@@ -344,7 +352,7 @@ jobs:
               #   足して聞き取ることがある（2026-09-23、別々に生成した2本で同じ
               #   「見てねください」が出た）。本当に喋っているなら、その語の位置で
               #   クリップを切れるように時刻が要る
-              segs, info = m.transcribe('clip.mp4', language='ja', vad_filter=True,
+              segs, info = m.transcribe('clip.mp4', language=lang, vad_filter=True,
                                         word_timestamps=True,
                                         condition_on_previous_text=False)
               segs = list(segs)
