@@ -80,6 +80,8 @@ def verify_cut(base, key, video_url, must_show):
                      {'action': 'verify', 'video_url': video_url, 'must_show': must_show})
     if code != 200 or (res or {}).get('match') not in (0, 1):
         raise SystemExit('絵の照合を呼べません（%s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:300]))
+    # ★判定は毎回ログへ残す（朝の報告と、判定の当たり外れの記録に使う・#185）
+    print('  照合 %s: %s（%s）' % ('OK' if res['match'] else 'NG', must_show[:60], str(res.get('seen') or '')[:120]))
     return res['match'], str(res.get('seen') or '')
 
 
