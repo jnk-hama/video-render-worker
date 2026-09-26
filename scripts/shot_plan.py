@@ -25,6 +25,7 @@ CUT_SECONDS = 4       # 機能のカット。セリフは JA_CHARS_4S 文字ま�
 JA_CHARS_4S = 18      # 自然な喋りの実測 約4.5文字/秒 × 4秒（marie-redial-ja-v3 の実測）
 MAX_FEATURE_CUTS = 4  # フック・CTA を除く。20秒前後に収める
 SPEECH_SPEED = 1.15   # 喋りの速さ（オーナー「もう少し早く」#183）。render_video の上限は 1.3
+CARD_SFX = 'pop'      # カードが出る時の効果音（assets/shared/sfx/ にある物・#189）
 
 """
 ★規則表。上から順に当てる（先に当たった規則が勝つ）。
@@ -205,6 +206,7 @@ def render_job(product, plan_, clip_urls, upload_path):
         'product_key': product['product_key'],
         'clip_audio': True, 'captions_from_speech': True, 'transition_seconds': 0,
         'speech_speed': SPEECH_SPEED,
+        'auto_trim_polite': True,  # ★Veo が足す言い終わりの「です」を描画側で切る（#189）
         'quality_gate': product.get('quality_gate') or 'block',
         'bgm': product.get('bgm') or 'assets/shared/bgm/duru-roomscene-lofi.mp3',
         'design_tokens': {'text_color_hex': '#ffffff', 'accent_color_hex': '#ff3b5c'},
@@ -214,6 +216,8 @@ def render_job(product, plan_, clip_urls, upload_path):
     }
     if plan_.get('panel'):
         job['product_panel'] = plan_['panel']
+    # ★カードが出る瞬間に短い効果音（決定#189）。目を文字へ向けさせる。秒は描画側がカット番号から解く
+    job['sfx'] = [{'tag': CARD_SFX, 'cut_index': c['cut_index']} for c in cards]
     return {'job': job}
 
 

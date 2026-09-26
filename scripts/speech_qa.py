@@ -95,6 +95,42 @@ def speech_window(words, clip_start, clip_len, lead=None, tail=None):
     return clip_start + a, b - a
 
 
+# 言い終わりの丁寧語を切った時、最後の語の後ろに残す秒（TRIM_TAIL だと「で」の頭が残る）
+POLITE_TAIL = 0.04
+
+
+def strip_polite_end(words, lang):
+    """
+    言い終わりの丁寧語（FORBID_END_DEFAULT）を語の時刻から外す（決定#189）。
+    ★Veo はタメ口のセリフの後ろに「です」を足す（4回目）。このままだと品質ゲートが
+      動画ごと止め、Veo の費用が無駄になる。セリフの計画に丁寧語は無いので、外せば計画どおりに戻る。
+    ★「楽です」のように1語へ繋がった時は、文字数の割合で切る位置を決める（決まった規則）。
+    ★全部が丁寧語（喋りが「です」だけ）なら外さない（カットが消える）。
+    @return (外した後の語, 外したか)。時刻は受け取った words と同じ時間軸
+    """
+    ends = sorted(FORBID_END_DEFAULT.get(lang, []), key=len, reverse=True)
+    if not words or not ends:
+        return words, False
+    whole = _norm(part_text(words, lang), lang)
+    hit = next((e for e in ends if whole.endswith(_norm(e, lang)) and len(whole) > len(_norm(e, lang))), None)
+    if not hit:
+        return words, False
+    left = len(_norm(hit, lang))
+    out = [dict(w) for w in words]
+    while out and left > 0:
+        w = out[-1]
+        n = len(_norm(w['text'], lang))
+        if n <= left:
+            out.pop()
+            left -= n
+            continue
+        keep = n - left
+        w['end'] = w['start'] + (w['end'] - w['start']) * keep / n
+        w['text'] = _norm(w['text'], lang)[:keep]
+        left = 0
+    return (out, True) if out else (words, False)
+
+
 def transcribe(audio_path, lang):
     """
     @return [{'text','start','end'}] 語ごと。区間の時刻は audio_path の時間軸。

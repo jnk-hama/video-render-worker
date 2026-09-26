@@ -270,6 +270,24 @@ en_caps = speech_qa.captions_from_words([EN4], 'en', group_words)
 expect(' '.join(c['text'] for c in en_caps) == 'This vintage wash gives it so much care.',
        '英語の字幕は空白で繋ぐ')
 
+print('=== 言い終わりの丁寧語を切る（#189）===')
+W = lambda *xs: [{'text': t, 'start': a, 'end': b} for t, a, b in xs]  # noqa: E731
+w2, cut = speech_qa.strip_polite_end(W(('座っても', 0.0, 0.8), ('楽', 0.8, 1.0), ('です', 1.0, 1.4)), 'ja')
+expect(cut and speech_qa.part_text(w2, 'ja') == '座っても楽' and w2[-1]['end'] == 1.0, '別の語の「です」は語ごと外す')
+w2, cut = speech_qa.strip_polite_end(W(('座っても', 0.0, 0.8), ('楽です。', 0.8, 1.4)), 'ja')
+expect(cut and speech_qa.part_text(w2, 'ja') == '座っても楽' and abs(w2[-1]['end'] - 1.0) < 1e-9,
+       '繋がった「楽です」は文字数の割合で切る（1/3）')
+w2, cut = speech_qa.strip_polite_end(W(('かわいい', 0.0, 0.6), ('ですね', 0.6, 1.0)), 'ja')
+expect(cut and speech_qa.part_text(w2, 'ja') == 'かわいい', '「ですね」も外す（長い方から当てる）')
+w2, cut = speech_qa.strip_polite_end(W(('フード', 0.0, 0.5), ('大きい', 0.5, 1.0)), 'ja')
+expect(not cut and len(w2) == 2, '丁寧語が無ければ何もしない')
+w2, cut = speech_qa.strip_polite_end(W(('です', 0.0, 0.4)), 'ja')
+expect(not cut, '喋りが丁寧語だけなら外さない（カットを消さない）')
+w2, cut = speech_qa.strip_polite_end(W(('頭まですっぽり', 0.0, 1.0)), 'ja')
+expect(not cut, '文中の「です」は切らない')
+expect(not speech_qa.check_speech([speech_qa.strip_polite_end(W(('座っても', 0, .8), ('楽です', .8, 1.4)), 'ja')[0]],
+                                  [{}], 'ja'), '切った後は喋りの検査を通る')
+
 print()
 if fails:
     print('不合格 %d 件' % len(fails))

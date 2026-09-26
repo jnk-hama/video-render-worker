@@ -78,7 +78,16 @@ expect([c['cut_index'] for c in job['info_cards']] == [i for i, c in enumerate(p
        'カードはカット番号で指定（秒は描画側で解く）')
 expect(job['quality_gate'] == 'block', '自動の回は検査で止める（warn にしない）')
 expect(job['speech_speed'] == shot_plan.SPEECH_SPEED > 1.0, '喋りは少し速く（#183）')
+expect(job.get('auto_trim_polite') is True, 'Veo が足す言い終わりの「です」は描画側で切る（#189）')
 expect(not any('すっぽり' in r['line'] for r in shot_plan.RULES), '崩れて読まれた語（すっぽり）を規則表に置かない')
+expect([x['cut_index'] for x in job['sfx']] == [c['cut_index'] for c in job['info_cards']],
+       'カードが出るカットごとに効果音を1つ（#189）')
+import render_video  # noqa: E402
+expect(shot_plan.CARD_SFX in render_video.SFX_TAGS and
+       os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'shared', 'sfx',
+                                   shot_plan.CARD_SFX + '.mp3')), 'カードの効果音は描画側が鳴らせる物')
+tsfx = speech_qa.timed_by_cut([{'tag': 'pop', 'cut_index': 1}], speech_qa.part_windows([5.63, 3.55], 0.0))
+expect(abs(tsfx[0]['start'] - 5.78) < 1e-6, '効果音もカット番号から秒へ直る（カードと同じ秒）')
 
 print('=== 画と台詞の照合（#185）===')
 import marie_video  # noqa: E402

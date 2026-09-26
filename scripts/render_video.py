@@ -2179,7 +2179,15 @@ def main():
                   probe_wav = os.path.join(work, 'trim_%02d.wav' % i)
                   extract_part_audio(src, probe_wav, st, each)
                   ws = speech_qa.transcribe(probe_wav, market)
-                  st2, each2 = speech_qa.speech_window(ws, st, each)
+                  tail = None
+                  # ★言い終わりに Veo が足した丁寧語を切る（決定#189）。切れなければ下の検査が止める
+                  if job.get('auto_trim_polite'):
+                      ws2, cut = speech_qa.strip_polite_end(ws, market)
+                      if cut:
+                          log('  言い終わりの丁寧語を切ります: 「%s」→「%s」' % (
+                              speech_qa.part_text(ws, market), speech_qa.part_text(ws2, market)))
+                          ws, tail = ws2, speech_qa.POLITE_TAIL
+                  st2, each2 = speech_qa.speech_window(ws, st, each, tail=tail)
                   if (st2, each2) != (st, each):
                       log('  無音を詰めます: %.2f〜%.2f秒 → %.2f〜%.2f秒'
                           % (st, st + each, st2, st2 + each2))
@@ -2479,7 +2487,7 @@ def main():
             log('  前景の合成を飛ばします（動画は出します）: %s' % str(e)[:160])
 
     # ★カード・パネルをカット番号（cut_index）で指定した回は、ここで実際の秒へ直す（決定#182）
-    if (any('cut_index' in (c or {}) for c in (job.get('info_cards') or []))
+    if (any('cut_index' in (c or {}) for c in (job.get('info_cards') or []) + (job.get('sfx') or []))
             or 'cut_index' in (job.get('product_panel') or {})):
         import speech_qa
         eff = trans if (trans > 0 and len(parts) >= 2) else 0.0
@@ -2487,6 +2495,10 @@ def main():
         job['info_cards'] = speech_qa.timed_by_cut(job.get('info_cards') or [], wins)
         if job.get('product_panel'):
             job['product_panel'] = (speech_qa.timed_by_cut([job['product_panel']], wins) or [None])[0]
+        # ★効果音もカット番号で受ける（カードが出る瞬間に鳴らすため・決定#189）。鳴らす秒＝カードの出る秒
+        if job.get('sfx'):
+            job['sfx'] = [dict(c, at=c['start']) if 'start' in c and 'at' not in c else c
+                          for c in speech_qa.timed_by_cut(job['sfx'], wins)]
         log('  カード・パネルをカット番号から秒へ直しました（%d枚）' % len(job['info_cards']))
 
     """
