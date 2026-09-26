@@ -35,19 +35,57 @@ permissions:
   contents: write        # Release を作るため
 
 jobs:
+  # ★★2026-09-26、フック差し替え工場（決定#177）。
+  #   依頼に hook_variants があれば「フック違いの N 本」へ展開し、下の render を
+  #   1本ずつ並べて回す。無い依頼は1本のまま素通り（従来の依頼は何も変わらない）。
+  #   展開の規則は scripts/expand_hooks.py（検査: check_expand_hooks.py）。
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      items: ${{ steps.expand.outputs.items }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: フック違いへ展開する
+        id: expand
+        env:
+          # ★シェルへ直接展開しない。JSONに引用符が含まれるとコマンドが壊れる
+          DISPATCH_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+          MANUAL_PAYLOAD: ${{ inputs.payload_json }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            printf '%s' "$DISPATCH_PAYLOAD" > payload.json
+          else
+            printf '%s' "$MANUAL_PAYLOAD" > payload.json
+          fi
+          python3 scripts/expand_hooks.py payload.json > expand.out
+          cat expand.out >> "$GITHUB_OUTPUT"
+          # ★本文は出さない（公開リポジトリ）。本数だけ
+          grep '^count=' expand.out
+
   render:
+    needs: plan
+    # ★名前は id だけにする。既定だと matrix の値（＝依頼の本文）が名前に出る
+    name: render (${{ matrix.item.id }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        item: ${{ fromJSON(needs.plan.outputs.items) }}
 
     # ★★2026-09-03、同じジョブを二重に描かないための鍵。
     #   依頼側は「25分待っても動画が来なければ再依頼」する作りなので、
     #   混雑で遅れた回は**古い実行と新しい実行が並ぶ**。両方が同じ
     #   Storageのパスへ上げると、後から終わった方（＝古い依頼の結果）が
     #   上書きしてしまう。job_id ごとに1本だけ走らせ、新しい方を優先する。
-    #   ★ job_id は client_payload をそのまま参照する（この時点では
-    #     まだ検証前なので、鍵として使うだけで、シェルへは渡さない）。
+    #   ★ 鍵は plan が出した id（＝job_id、展開した回は -hN 付き）。この時点では
+    #     まだ検証前なので、鍵として使うだけで、シェルへは渡さない。
     concurrency:
-      group: render-${{ github.event.client_payload.job.job_id || github.event.client_payload.job_id || github.run_id }}
+      # ★展開した1本ごと（-hN）に鍵を分ける。同じ鍵だと兄弟を取り消し合う
+      group: render-${{ matrix.item.id || github.run_id }}
       cancel-in-progress: true
 
     steps:
@@ -85,15 +123,11 @@ jobs:
         id: payload
         env:
           # ★シェルへ直接展開しない。JSONに引用符が含まれるとコマンドが壊れる
-          DISPATCH_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
-          MANUAL_PAYLOAD: ${{ inputs.payload_json }}
+          # ★依頼は plan が展開した1本（hook_variants が無ければ元の依頼そのもの）
+          ITEM_PAYLOAD: ${{ matrix.item.payload }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            printf '%s' "$DISPATCH_PAYLOAD" > payload.json
-          else
-            printf '%s' "$MANUAL_PAYLOAD" > payload.json
-          fi
+          printf '%s' "$ITEM_PAYLOAD" > payload.json
           # ★client_payload は最上位10プロパティまで（GitHub APIの制限）。
           #   GAS は {"job": {...}} と1個に畳んで送る。旧い平置きも読む。
           #
@@ -123,6 +157,27 @@ jobs:
                 'clips:', len(d.get('clips') or []),
                 'captions:', len(d.get('captions') or []))
           PY
+
+      # ★★2026-09-26、喋りの検査の依存（決定#177）。clip_audio の回（Veo の喋る
+      #   カット）だけ入れる。文字起こし（faster-whisper）と画面の文字の検出（RapidOCR）。
+      #   通常の描画（TTS の回）には積まない。無料枠の分数をそのまま本数の上限にしないため。
+      - name: 喋りの検査の依存
+        run: |
+          set -euo pipefail
+          if python3 - <<'PY'
+          import json, sys
+          d = json.load(open('payload.json'))
+          if isinstance(d.get('job'), dict):
+              d = d['job']
+          sys.exit(0 if d.get('clip_audio') else 1)
+          PY
+          then
+            python3 -m pip install --quiet --disable-pip-version-check \
+              faster-whisper rapidocr_onnxruntime pillow numpy
+            python3 -c "import faster_whisper, rapidocr_onnxruntime; print('faster-whisper', faster_whisper.__version__)"
+          else
+            echo "clip_audio ではないので、喋りの検査の依存は入れません。"
+          fi
 
       # ★★2026-09-03、条件付きにした。**無料枠の使い方の問題**。
       #   rembg / onnxruntime / mediapipe の導入と姿勢推定モデルの取得で

@@ -24,6 +24,10 @@ on:
       - "scripts/make_narration.py"
       - "scripts/check_group_words.py"
       - "scripts/check_tts_prosody.py"
+      - "scripts/speech_qa.py"
+      - "scripts/check_speech_qa.py"
+      - "scripts/expand_hooks.py"
+      - "scripts/check_expand_hooks.py"
       - ".github/workflows/check.yml"
   pull_request:
     paths:
@@ -74,6 +78,16 @@ jobs:
       - name: 字幕のまとめ方（空白・文またぎ）
         working-directory: .
         run: python3 scripts/check_group_words.py
+
+      # ★★2026-09-26 追加（決定#177）。喋った内容からの字幕と喋りの検査。
+      #   入力は完成品から取った本物の文字起こし（E-033）。重い依存は要らない。
+      - name: 喋りの字幕と検査（のです／言えていない語／カットまたぎ）
+        working-directory: .
+        run: python3 scripts/check_speech_qa.py
+
+      - name: フック差し替えの展開
+        working-directory: .
+        run: python3 scripts/check_expand_hooks.py
 
       # ★★2026-09-10 追加（決定#127）。抑揚のため文ごとに合成して繋ぐ。
       #   繋ぎの計算を間違えると**字幕が全部ずれる**のに、動画は正常に
