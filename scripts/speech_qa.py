@@ -46,6 +46,11 @@ FORBID_END_DEFAULT = {'ja': ['です', 'ます', 'ですね', 'ますね'], 'en'
 OCR_BANDS = ((0.80, 1.00), (0.00, 0.12))
 OCR_MIN_SCORE = 0.5
 OCR_FRAMES_PER_PART = 3
+# カット前後の無音を詰める（決定#179）。喋り始めの何秒前・喋り終わりの何秒後まで残すか。
+# ★後ろを長めに残すのは、言い終わりの余韻（息・表情）を切ると不自然になるため
+TRIM_LEAD = 0.10
+TRIM_TAIL = 0.25
+TRIM_MIN = 1.0
 # 語をカットへ振り分ける時、カットの開始より何秒手前から「そのカットの語」とみなすか
 WORD_START_SLACK = 0.15
 # 日本語の字幕1枚の上限。手で書いていた字幕は最長14文字（「それ彼氏の？ってよく聞かれる」）
@@ -58,12 +63,43 @@ def _norm(text, lang):
     return t.lower() if lang == 'en' else t
 
 
+_MODEL = None
+
+
+def _model():
+    """★1回の描画で何度も呼ぶ（カットごとの無音詰め＋全体の字幕）。読み込みは1回だけ"""
+    global _MODEL
+    if _MODEL is None:
+        from faster_whisper import WhisperModel
+        _MODEL = WhisperModel(WHISPER_MODEL, device='cpu', compute_type='int8')
+    return _MODEL
+
+
+def speech_window(words, clip_start, clip_len, lead=None, tail=None):
+    """
+    無音を詰めた切り出し範囲 (start, duration) を返す（決定#179・video-use の考え方）。
+
+    ★喋り始めの TRIM_LEAD 秒前から、喋り終わりの TRIM_TAIL 秒後まで。
+      語が取れない（喋っていない）カットは元の範囲のまま（映像だけのカットを消さない）。
+    ★元の範囲の外へは出ない。短くなりすぎる時（TRIM_MIN 未満）も元のまま。
+    @param words 切り出し範囲の頭を 0 とした語の時刻
+    """
+    lead = TRIM_LEAD if lead is None else lead
+    tail = TRIM_TAIL if tail is None else tail
+    if not words:
+        return clip_start, clip_len
+    a = max(0.0, words[0]['start'] - lead)
+    b = min(clip_len, words[-1]['end'] + tail)
+    if b - a < TRIM_MIN:
+        return clip_start, clip_len
+    return clip_start + a, b - a
+
+
 def transcribe(audio_path, lang):
     """
     @return [{'text','start','end'}] 語ごと。区間の時刻は audio_path の時間軸。
     """
-    from faster_whisper import WhisperModel
-    model = WhisperModel(WHISPER_MODEL, device='cpu', compute_type='int8')
+    model = _model()
     segs, _info = model.transcribe(
         audio_path, language=lang, word_timestamps=True,
         beam_size=WHISPER_BEAM, temperature=0.0, vad_filter=False,

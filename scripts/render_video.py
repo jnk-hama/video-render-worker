@@ -90,6 +90,9 @@ MIN_MATERIAL_DIMENSION = 480
 # ★0.2 より上げるとナレーションが聞き取りにくくなる。
 BGM_VOLUME = 0.2
 
+# ジャンプカットの継ぎ目で音を絞る長さ（秒）。video-use の既定と同じ30ms（決定#179）
+CUT_FADE_SEC = 0.03
+
 # 終わりのBGMフェードアウト（秒）。ぶつ切りで終わると素人臭くなる。
 BGM_FADEOUT_SEC = 3.0
 
@@ -1901,6 +1904,11 @@ def main():
             raise SystemExit('captions_from_speech の回は target_market（%s）が必須です'
                              % ' / '.join(MARKETS))
         sample_text = '日本語' if tm == 'ja' else 'English'
+    # ★無音詰め（決定#179）。喋った内容から字幕を作る回（新しい作り方）では既定でオン。
+    #   従来の依頼（TTS の回・手書き字幕の回）は変えない。trim_silence:false で切れる
+    trim_silence = bool(job.get('trim_silence', captions_from_speech))
+    if trim_silence and not job.get('clip_audio'):
+        raise SystemExit('trim_silence は clip_audio の回だけ使えます')
 
     # ★どちらの部門の依頼か。素材の取り違えはここで止める（決定#082）
     market = resolve_market(job, sample_text)
@@ -2124,6 +2132,24 @@ def main():
               """
               st = float(c['start']) if c.get('start') is not None else 0.5
               each = float(c.get('duration') or want_each)
+              """
+              ★★カット前後の無音を詰める（決定#179・video-use の考え方を決まった規則で）。
+                喋るカットの頭と尻の「誰も喋っていない時間」は、日本版v2で18.3秒中
+                約2.5秒あった。語の時刻で喋り始め0.1秒前〜喋り終わり0.25秒後に詰める。
+                ★声を別クリップから当てる回（audio_url）は、映像側の喋りと声が
+                  一致しないので詰めない。
+              """
+              if (trim_silence and not c.get('audio_url')
+                      and not looks_like_image(url, src)):
+                  import speech_qa
+                  probe_wav = os.path.join(work, 'trim_%02d.wav' % i)
+                  extract_part_audio(src, probe_wav, st, each)
+                  ws = speech_qa.transcribe(probe_wav, market)
+                  st2, each2 = speech_qa.speech_window(ws, st, each)
+                  if (st2, each2) != (st, each):
+                      log('  無音を詰めます: %.2f〜%.2f秒 → %.2f〜%.2f秒'
+                          % (st, st + each, st2, st2 + each2))
+                  st, each = st2, each2
 
           try:
               if looks_like_image(url, src):
@@ -2268,9 +2294,20 @@ def main():
                 prev = out
             acmd += ['-filter_complex', ';'.join(chain), '-map', '[%s]' % prev]
         else:
-            ins = ''.join('[%d:a]' % i for i in range(len(part_audio)))
+            """
+            ★★ジャンプカットの継ぎ目に 30ms の音のフェード（決定#179・video-use の考え方）。
+              波形の途中でぶつ切りにすると「プツッ」と鳴る。映像は切り替えたまま、
+              音だけ継ぎ目の前後30msを絞る。尺は変わらない（口と声はずれない）。
+            """
+            chains = []
+            for k, a in enumerate(part_audio):
+                d = probe_duration(a) or 0.0
+                f = CUT_FADE_SEC if d > CUT_FADE_SEC * 4 else 0.0
+                chains.append('[%d:a]afade=t=in:d=%.3f,afade=t=out:st=%.3f:d=%.3f[f%d]'
+                              % (k, f, max(0.0, d - f), f, k) if f else '[%d:a]anull[f%d]' % (k, k))
+            ins = ''.join('[f%d]' % k for k in range(len(part_audio)))
             acmd += ['-filter_complex',
-                     '%sconcat=n=%d:v=0:a=1[aout]' % (ins, len(part_audio)),
+                     ';'.join(chains) + ';%sconcat=n=%d:v=0:a=1[aout]' % (ins, len(part_audio)),
                      '-map', '[aout]']
         acmd += ['-c:a', 'pcm_s16le', audio_path]
         run(acmd)

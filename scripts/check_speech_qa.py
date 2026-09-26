@@ -194,6 +194,16 @@ expect(any('言い終わり' in s for s in speech_qa.check_speech(one('これサ
 expect(speech_qa.check_speech(one('頭まですっぽり入る大きさ'), [{}], 'ja') == [],
        '文中の「です」（頭まですっぽり）は止めない')
 
+print('=== 無音を詰める範囲（決定#179）===')
+# marie-ja-v2 の袖のカット: 喋りは 0.04〜2.52秒（クリップ頭基準）、クリップは 2.9秒
+sw = speech_qa.speech_window([{'text': '萌', 'start': 0.04, 'end': 0.2}, {'text': 'です', 'start': 2.3, 'end': 2.52}], 0.0, 2.9)
+expect(abs(sw[0] - 0.0) < 1e-6 and abs(sw[1] - 2.77) < 1e-6, '喋り始めの0.1秒前（頭は0で止まる）〜喋り終わり0.25秒後')
+sw2 = speech_qa.speech_window([{'text': 'a', 'start': 1.0, 'end': 1.5}, {'text': 'b', 'start': 3.0, 'end': 3.4}], 0.5, 6.0)
+expect(abs(sw2[0] - 1.4) < 1e-6 and abs(sw2[1] - 2.75) < 1e-6, '頭の無音も詰める（元の開始 0.5秒からの相対で数える）')
+expect(speech_qa.speech_window([], 0.0, 6.0) == (0.0, 6.0), '喋っていないカットは詰めない（映像だけのカットを消さない）')
+expect(speech_qa.speech_window([{'text': 'a', 'start': 2.0, 'end': 2.3}], 0.0, 6.0) == (0.0, 6.0),
+       '短くなりすぎる時（1秒未満）は詰めない')
+
 print('=== 喋った内容からの字幕 ===')
 caps = speech_qa.captions_from_words(parts, 'ja', group_words)
 for c in caps:
