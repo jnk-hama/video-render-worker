@@ -185,6 +185,15 @@ ok_hooks = ['見てこの色落ちヴィンテージっぽくていい感じじ�
 expect(all(speech_qa.check_speech([[{'text': t, 'start': 0, 'end': 1}]], [{}], 'ja') == [] for t in ok_hooks),
        '言い回しで回避したフックは通す')
 
+print('=== 言い終わりの丁寧語（本番 run 36218880881 の実際の喋り）===')
+one = lambda t: [[{'text': t, 'start': 0, 'end': 1}]]
+expect(any('言い終わり' in s for s in speech_qa.check_speech(one('袖長めでね指先までちゃんと隠れる感じで可愛くないです'), [{}], 'ja')),
+       '「可愛くないです」（問いかけが否定に変わる）を止める')
+expect(any('言い終わり' in s for s in speech_qa.check_speech(one('これサイズ大きめだからさ、彼氏の借りたみたいにゆるっと着れるやつです。'), [{}], 'ja')),
+       '「着れるやつです。」を止める')
+expect(speech_qa.check_speech(one('頭まですっぽり入る大きさ'), [{}], 'ja') == [],
+       '文中の「です」（頭まですっぽり）は止めない')
+
 print('=== 喋った内容からの字幕 ===')
 caps = speech_qa.captions_from_words(parts, 'ja', group_words)
 for c in caps:

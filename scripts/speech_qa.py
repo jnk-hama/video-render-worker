@@ -35,6 +35,12 @@ FORBID_DEFAULT = {
     'en': ['keeps asking', 'keep asking', 'people ask me', 'everyone asks',
            "i've been wearing", "i've been using", 'i bought', 'compliments'],
 }
+# ★★カットの**言い終わり**で止める語（決定#178・2026-09-26）。
+#   Veo は口語のセリフの後ろに「です」を足す。「のです」（9/25）に続き、自然な喋り（#176）でも
+#   「着れるやつです」「かわいくないです」が出た。後者は**問いかけが否定に変わる**（意味が逆）。
+#   文中の「です」（「頭まですっぽり」）は正しいので、**言い終わりだけ**を見る。
+#   マリーの口調はタメ口なので、言い終わりの丁寧語は必ず誤り。
+FORBID_END_DEFAULT = {'ja': ['です', 'ます', 'ですね', 'ますね'], 'en': []}
 # OCR を掛ける帯（画面の高さに対する割合）。Veo の焼き込み字幕は下に出た（E-033）。
 # ★胸のプリント（商品の柄）は中央付近なので帯から外れる
 OCR_BANDS = ((0.80, 1.00), (0.00, 0.12))
@@ -197,6 +203,11 @@ def check_speech(parts, clips, lang, forbid=None):
             if _norm(f, lang) and _norm(f, lang) in n:
                 issues.append('カット%d: 言ってはいけない「%s」を言っている → 「%s」'
                               % (i + 1, f, said))
+        for e in FORBID_END_DEFAULT.get(lang, []):
+            if n and n.endswith(_norm(e, lang)):
+                issues.append('カット%d: 言い終わりが丁寧語「%s」（タメ口のはず・意味が変わりうる） → 「%s」'
+                              % (i + 1, e, said))
+                break
         spec = clips[i] if i < len(clips) else {}
         for must in (spec.get('must_say') or []):
             alts = must if isinstance(must, list) else [must]
