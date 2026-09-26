@@ -166,6 +166,25 @@ expect(len(en_issues) == 1 and 'care' in en_issues[0], '英語: character が ca
 expect(speech_qa.check_speech([EN4], [{'must_say': [['character', 'vintage wash']]}], 'en') == [],
        '英語: 言い換えの候補のどれかが言えていれば通す')
 
+print('=== 架空の体験談（決定#178）も口から出たら止める ===')
+hook_issues = speech_qa.check_speech([parts[0]], [{}], 'ja')
+expect(any('よく聞かれ' in s for s in hook_issues), '「それ彼氏のってそうよく聞かれるやつね」を止める')
+en_hook = W("""
+0.30 0.84 Okay,
+0.92 1.22 everyone
+1.22 1.50 keeps
+1.50 1.92 asking
+1.92 2.32 where
+2.32 2.46 I
+2.46 2.66 got
+2.66 2.90 this
+2.90 3.20 hoodie.
+""")
+expect(len(speech_qa.check_speech([en_hook], [{}], 'en')) == 1, '英語「Everyone keeps asking where I got this hoodie」を止める')
+ok_hooks = ['見てこの色落ちヴィンテージっぽくていい感じじゃない', 'これサイズ大きめだから彼氏の借りたみたいにゆるっと着れるやつ']
+expect(all(speech_qa.check_speech([[{'text': t, 'start': 0, 'end': 1}]], [{}], 'ja') == [] for t in ok_hooks),
+       '言い回しで回避したフックは通す')
+
 print('=== 喋った内容からの字幕 ===')
 caps = speech_qa.captions_from_words(parts, 'ja', group_words)
 for c in caps:
