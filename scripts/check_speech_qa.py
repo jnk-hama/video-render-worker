@@ -99,8 +99,10 @@ JA = W("""
 16.80 17.08 て
 17.08 17.66 ください
 """)
-# 同じ動画のパート尺（3.1/3.6/2.9/3.6/3.5/2.9）と重なり 0.3
+# 依頼の尺（3.1/3.6/…）と、実際に出来たパートの尺（1コマ長い）。重なり 0.3
+# ★文字起こしは実際のパートで組んだ動画から取ったので、振り分けは実尺で見る
 JA_DURS = [3.1, 3.6, 2.9, 3.6, 3.5, 2.9]
+REAL_DURS = [3.133333, 3.633333, 2.933333, 3.633333, 3.5, 2.933333]
 
 # marie-redial-en-v1 の4カット目（run 36209134894 / large-v3）
 EN4 = W("""
@@ -129,7 +131,8 @@ expect(abs(win[1][0] - 2.8) < 1e-6 and abs(win[5][0] - 15.2) < 1e-6,
        '2本目は2.8秒・6本目は15.2秒から（先頭k本の合計 - k*0.3）')
 
 print('=== 語の振り分け ===')
-parts = speech_qa.words_by_part(JA, win)
+real_win = speech_qa.part_windows(REAL_DURS, 0.3)
+parts = speech_qa.words_by_part(JA, real_win)
 texts = [speech_qa.part_text(p, 'ja') for p in parts]
 for i, t in enumerate(texts):
     print('     カット%d: %s' % (i + 1, t))
@@ -137,6 +140,15 @@ expect(texts[0].startswith('それ彼氏の') and texts[0].endswith('やつね')
 expect(texts[4].startswith('色打ち加工'), 'カット5＝色落ちのカット（崩れた発音のまま）')
 expect(texts[5] == 'リンクから見てみてください', 'カット6＝CTA')
 expect(sum(len(p) for p in parts) == len(JA), '語を1つも捨てていない')
+
+print('=== 本番の実尺（run 36211844791）でも境目の語が前のカットへ落ちない ===')
+# ★本番のパートは 3.133/3.633/… と指定より1コマ長い。すると次のカットの開始が
+#   6.167 / 15.333 になり、Whisper が20〜30ms早めに置いた「萌」(6.14)「リ」(15.32) が
+#   前のカットに入って「リンクが聞き取れない」と誤って止めた（実際に起きた）
+rp = speech_qa.words_by_part(JA, real_win)
+rt = [speech_qa.part_text(p, 'ja') for p in rp]
+expect(rt[2].startswith('萌え袖') and not rt[1].endswith('萌'), '「萌」は3カット目')
+expect(rt[5] == 'リンクから見てみてください', '「リ」は6カット目')
 
 print('=== 喋りの検査（本物の不具合を拾えるか）===')
 clips = [{}, {}, {}, {}, {'must_say': ['色落ち加工']}, {'must_say': ['リンク']}]
@@ -159,7 +171,7 @@ caps = speech_qa.captions_from_words(parts, 'ja', group_words)
 for c in caps:
     print('     %.2f-%.2f %s' % (c['start'], c['end'], c['text']))
 expect(all(' ' not in c['text'] for c in caps), '日本語の字幕に空白が入らない')
-bounds = [w[0] for w in win[1:]]
+bounds = [w[0] for w in real_win[1:]]
 cross = [c for c in caps for b in bounds if c['start'] < b - 0.15 < c['end'] - 0.3]
 expect(not cross, 'カットをまたぐ字幕が無い')
 expect(''.join(c['text'] for c in caps) == ''.join(texts), '字幕の文字＝喋った文字（足しも引きもしない）')

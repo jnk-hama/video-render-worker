@@ -32,6 +32,8 @@ FORBID_DEFAULT = {'ja': ['のです'], 'en': []}
 OCR_BANDS = ((0.80, 1.00), (0.00, 0.12))
 OCR_MIN_SCORE = 0.5
 OCR_FRAMES_PER_PART = 3
+# 語をカットへ振り分ける時、カットの開始より何秒手前から「そのカットの語」とみなすか
+WORD_START_SLACK = 0.15
 # 日本語の字幕1枚の上限。手で書いていた字幕は最長14文字（「それ彼氏の？ってよく聞かれる」）
 JA_MAX_CHARS = 16
 
@@ -83,13 +85,17 @@ def words_by_part(words, windows):
       1語目が前のカットに入った（実データ: 「萌」が「大きさなのです」側へ。
       check_speech_qa.py で検出）。**開始時刻がそのカットの開始以降なら
       そのカット**、とする。前のカットの語尾は重なりの前に言い始めているので混ざらない。
+    ★★さらに WORD_START_SLACK だけ手前から数える。Whisper は語の開始を20〜30ms
+      早めに置くことがあり、本番（run 36211844791）で「萌」「リ」が前のカットへ落ち、
+      「リンクが聞き取れない」と**誤って止めた**。カットは喋り終わり＋0.3秒で切るので、
+      次のカットの直前 0.15秒に前のカットの語が始まることは無い。
     """
     starts = [w0 for w0, _ in windows]
     parts = [[] for _ in windows]
     for w in words:
         k = 0
         for i, st in enumerate(starts):
-            if w['start'] >= st:
+            if w['start'] >= st - WORD_START_SLACK:
                 k = i
         parts[k].append(w)
     return parts

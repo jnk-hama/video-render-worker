@@ -22,7 +22,9 @@ import subprocess
 
 VOICE_LUFS = -16.0
 FINAL_LUFS = -14.0
-FINAL_TP = -1.5
+# ★★-1.5 にしたら仕上がりは -0.8〜-0.9 dBTP だった（本番 run 36211844791 と手元で実測）。
+#   loudnorm の後の AAC 符号化でピークが約 +0.6dB 上がる。-2.0 で仕上がり -1.4。
+FINAL_TP = -2.0
 FINAL_LRA = 11.0
 # これより静かなパートは「喋っていない」とみなして持ち上げない（無音を増幅しない）
 SILENT_BELOW_LUFS = -50.0
