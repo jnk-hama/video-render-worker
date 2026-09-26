@@ -1,0 +1,59 @@
+# 商品1つから、マリーの動画を最後まで作る（決定#182）。
+#   カット計画（scripts/shot_plan.py・決まった規則）→ Veo（video-scene）→ 回収 → render-video へ依頼
+# ★product_json の例:
+#   {"product_key":"redial-850019","genre":"apparel","library_genre":"hoodie",
+#    "features":["大きめフード","長め袖","ダブルジップ","ヴィンテージ洗い加工","2色","M〜3L"],
+#    "image_url":"https://…/product/redial-850019.jpg",
+#    "stills":{"selfie":"…","mirror":"…","free_hands":"…","hood":"…"}}
+# ★dry_run: true なら計画と見積りだけ出して、Veo は起動しない（0円）
+name: marie-video
+
+on:
+  workflow_dispatch:
+    inputs:
+      product_json:
+        description: '商品（product_key / genre / features / image_url / stills）'
+        required: true
+        type: string
+      dry_run:
+        description: '計画と見積りだけ（Veo を起動しない）'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: write   # render-video を起動するため
+
+concurrency:
+  group: marie-video
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: 計画 → Veo → 回収
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PRODUCT_JSON: ${{ inputs.product_json }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$PRODUCT_JSON" > product.json
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python3 scripts/marie_video.py product.json job.json --dry-run
+          else
+            python3 scripts/marie_video.py product.json job.json
+          fi
+      - name: 描画を依頼する
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run render-video.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" \
+            -f payload_json="$(cat job.json)"
+          echo "render-video を起動しました"

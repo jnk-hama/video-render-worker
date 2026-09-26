@@ -130,6 +130,30 @@ def transcribe_parts(part_audio, windows, lang, transcribe_fn=None):
     return out
 
 
+CUT_PAD = 0.15   # カット番号で指定したカード・パネルを、切れ目から少し内側へ置く
+
+
+def timed_by_cut(items, windows, pad=CUT_PAD):
+    """
+    cut_index（clips の添字）で指定したカード・パネルへ、実際の秒を入れて返す（決定#182）。
+
+    ★無音を詰める（#179）と各カットの長さは描画するまで分からない。秒で書かせると
+      依頼側が2回描画して測る羽目になった（v3b→v3c）。カット番号なら描画側で解ける。
+    ★cut_index の無い物は秒指定のまま通す。範囲外の番号は捨てる（別のカットに出さない）。
+    """
+    out = []
+    for it in items or []:
+        if 'cut_index' not in it:
+            out.append(it)
+            continue
+        k = int(it['cut_index'])
+        if not 0 <= k < len(windows):
+            continue
+        st, en = windows[k]
+        out.append(dict(it, start=round(st + pad, 3), end=round(max(st + pad, en - pad), 3)))
+    return out
+
+
 def part_windows(durations, trans):
     """
     各パートが完成品のどこに来るか [(start, end)]。

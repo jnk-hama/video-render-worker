@@ -2443,6 +2443,17 @@ def main():
         except Exception as e:
             log('  前景の合成を飛ばします（動画は出します）: %s' % str(e)[:160])
 
+    # ★カード・パネルをカット番号（cut_index）で指定した回は、ここで実際の秒へ直す（決定#182）
+    if (any('cut_index' in (c or {}) for c in (job.get('info_cards') or []))
+            or 'cut_index' in (job.get('product_panel') or {})):
+        import speech_qa
+        eff = trans if (trans > 0 and len(parts) >= 2) else 0.0
+        wins = speech_qa.part_windows([probe_duration(p) or 0.0 for p in parts], eff)
+        job['info_cards'] = speech_qa.timed_by_cut(job.get('info_cards') or [], wins)
+        if job.get('product_panel'):
+            job['product_panel'] = (speech_qa.timed_by_cut([job['product_panel']], wins) or [None])[0]
+        log('  カード・パネルをカット番号から秒へ直しました（%d枚）' % len(job['info_cards']))
+
     """
     ★商品パネル（product_panel）。指定区間だけ、実画像を横に並べて重ねる。
       1枚も用意できなければパネルごと飛ばして動画は出す（前景と同じ方針）。

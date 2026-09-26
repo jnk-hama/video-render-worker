@@ -28,6 +28,8 @@ on:
       - "scripts/check_speech_qa.py"
       - "scripts/expand_hooks.py"
       - "scripts/check_expand_hooks.py"
+      - "scripts/shot_plan.py"
+      - "scripts/check_shot_plan.py"
       - ".github/workflows/check.yml"
   pull_request:
     paths:
@@ -88,6 +90,10 @@ jobs:
       - name: フック差し替えの展開
         working-directory: .
         run: python3 scripts/check_expand_hooks.py
+
+      - name: 商品ごとのカット選び（決定#182）
+        working-directory: .
+        run: python3 scripts/check_shot_plan.py
 
       # ★★2026-09-10 追加（決定#127）。抑揚のため文ごとに合成して繋ぐ。
       #   繋ぎの計算を間違えると**字幕が全部ずれる**のに、動画は正常に
