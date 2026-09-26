@@ -256,6 +256,13 @@ h3_text = ''.join(c['text'] for c in h3_caps)
 print('     ' + ' | '.join(c['text'] for c in h3_caps))
 expect('盛れる' in h3_text and '漏れる' not in h3_text, '字幕は「ガチで盛れる」（語が「漏｜れる」に割れていても直る）')
 expect(speech_qa.part_text(H3, 'ja').endswith('漏れる'), '検査が見る文字起こしは直さない（音の誤りを隠さない）')
+pc = speech_qa.captions_from_words([W("""
+0.0 0.5 サイズ大きめでね、
+0.5 1.2 シルエットかわいい。
+""")], 'ja', group_words)
+print('     ' + ' | '.join(c['text'] for c in pc))
+expect(all('。' not in c['text'] and not c['text'].endswith('、') for c in pc),
+       '字幕に句点を出さず、末尾の読点も落とす（run 36227979886）')
 expect(speech_qa.captions_from_words([[{'text': '漏れる', 'start': 0, 'end': 1}]], 'en', group_words)[0]['text'] == '漏れる',
        '英語の回には掛けない')
 

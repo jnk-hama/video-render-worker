@@ -237,6 +237,9 @@ def fix_caption_text(caps, lang):
     for c in caps:
         for wrong, right in JA_CAPTION_FIX.items():
             c['text'] = c['text'].replace(wrong, right)
+        # ★カットごとに起こすと Whisper が「。」「、」を付ける（run 36227979886）。
+        #   縦型の字幕に句点は置かず、末尾の読点も落とす（文中の読点は区切りとして残す）
+        c['text'] = c['text'].replace('。', '').rstrip('、')
     return caps
 
 
