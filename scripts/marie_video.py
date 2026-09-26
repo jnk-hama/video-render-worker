@@ -4,7 +4,9 @@
   計画（shot_plan）→ カットごとに Veo を起動（video-scene）→ 回収 → 描画の依頼（render_job.json）
 
 ★Veo は有料（$0.05/秒・月$50の蓋は video-scene 側 #155）。ここは決まった本数しか起動しない。
-  作り直しは「音声フィルタで止まった回（Google は課金しない）」だけ、1回まで。
+  作り直しは1カットにつき1回まで。対象は「音声フィルタで止まった回（Google は課金しない）」と、
+  「セリフが言っている絵（must_show）が映っていないと判定された回」（#185）。
+  それでも映っていなければ描画の前で止める（嘘の絵を描かない）。判定は承認ではない（#068）。
 ★鍵は環境変数から読み、ログへ出さない。依頼の中身（セリフ・URL）も公開ログへ全文は出さない。
 
 使い方（Actions）: python3 scripts/marie_video.py product.json render_job.json [--dry-run]
@@ -23,7 +25,7 @@ import shot_plan  # noqa: E402
 START_GAP_SEC = 25     # 起動の間隔。まとめて叩くと 429（E-031）
 POLL_SEC = 30
 POLL_TIMEOUT_SEC = 900
-RETRY_FILTERED = 1     # 音声フィルタ（課金されない）で止まった回の作り直し回数
+RETRY_PER_CUT = 1      # 1カットの作り直し回数（音声フィルタ・絵のずれを合わせて）
 
 
 def _base_and_key():
@@ -70,6 +72,29 @@ def rows(base, key, ids):
     return {r['id']: r for r in (res or [])}
 
 
+def verify_cut(base, key, video_url, must_show):
+    """must_show が映っているか（1/0）。呼べない・読めない時は止める（未設定なら閉じる・#185）"""
+    code, res = _req('%s/functions/v1/video-scene' % base, key,
+                     {'action': 'verify', 'video_url': video_url, 'must_show': must_show})
+    if code != 200 or (res or {}).get('match') not in (0, 1):
+        raise SystemExit('絵の照合を呼べません（%s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:300]))
+    return res['match'], str(res.get('seen') or '')
+
+
+def redo_targets(cuts, got, ids, verify):
+    """作り直すカット番号と理由。動画が無い＝フィルタ、must_show が映っていない＝絵のずれ"""
+    out = {}
+    for k, i in enumerate(ids):
+        url = got[i].get('video_url')
+        if not url:
+            out[k] = 'フィルタ等で動画なし'
+        elif cuts[k].get('must_show'):
+            match, seen = verify(url, cuts[k]['must_show'])
+            if not match:
+                out[k] = '絵がセリフと合わない（映っていた物: %s）' % seen[:120]
+    return out
+
+
 def wait_all(base, key, ids):
     t0 = time.time()
     while True:
@@ -105,21 +130,30 @@ def main():
             time.sleep(START_GAP_SEC)
         ids.append(start_cut(base, key, product, c))
     got = wait_all(base, key, ids)
-    for attempt in range(RETRY_FILTERED):
-        # ★音声フィルタで止まった回は Google が課金しない（返答に明記）。1回だけ作り直す
-        bad = [k for k, i in enumerate(ids) if not got[i].get('video_url')]
+    seen_before = {}  # ★同じ動画を2度判定しない（判定も有料）
+
+    def verify(url, must_show):
+        if url not in seen_before:
+            seen_before[url] = verify_cut(base, key, url, must_show)
+        return seen_before[url]
+
+    for attempt in range(RETRY_PER_CUT):
+        bad = redo_targets(plan['cuts'], got, ids, verify)
         if not bad:
             break
-        print('音声フィルタ等で止まったカット %s を作り直します' % [k + 1 for k in bad])
+        for k, why in bad.items():
+            print('カット %d を作り直します: %s' % (k + 1, why))
         for n, k in enumerate(bad):
             if n:
                 time.sleep(START_GAP_SEC)
             ids[k] = start_cut(base, key, product, plan['cuts'][k])
         got.update(wait_all(base, key, [ids[k] for k in bad]))
-    missing = [k + 1 for k, i in enumerate(ids) if not got[i].get('video_url')]
-    if missing:
-        raise SystemExit('作れなかったカット: %s（%s）' % (
-            missing, [str(got[ids[k - 1]].get('reviewed_note') or '')[:120] for k in missing]))
+    # ★作り直した後も、動画が無い・絵が合わないカットがあれば描かずに止める
+    still_bad = redo_targets(plan['cuts'], got, ids, verify)
+    if still_bad:
+        raise SystemExit('描画の前で止めました: %s' % '; '.join(
+            'カット%d %s %s' % (k + 1, why, str(got[ids[k]].get('reviewed_note') or '')[:120])
+            for k, why in still_bad.items()))
     path = 'preview/marie-%s-auto.mp4' % re.sub(r'[^a-z0-9-]', '-', product['product_key'].lower())
     job = shot_plan.render_job(product, plan, [got[i]['video_url'] for i in ids], path)
     json.dump(job, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False)

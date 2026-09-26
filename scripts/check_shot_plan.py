@@ -80,6 +80,36 @@ expect(job['quality_gate'] == 'block', '自動の回は検査で止める（warn
 expect(job['speech_speed'] == shot_plan.SPEECH_SPEED > 1.0, '喋りは少し速く（#183）')
 expect(not any('すっぽり' in r['line'] for r in shot_plan.RULES), '崩れて読まれた語（すっぽり）を規則表に置かない')
 
+print('=== 画と台詞の照合（#185）===')
+import marie_video  # noqa: E402
+for rule in shot_plan.RULES:
+    if 'must_show' in rule:
+        ok = 0 < len(rule['must_show']) <= 200 and not any(ch in rule['must_show'] for ch in '"「」\n')
+        expect(ok, 'must_show「%s」は1文・記号なし（video-scene が弾かない形）' % rule['must_show'][:40])
+for feat in ('大きめフード', '長め袖', 'ダブルジップ'):
+    c = next(c for c in p['cuts'] if c['feature'] == feat)
+    expect(bool(c.get('must_show')), '%s のカットは映っているべき物を持つ' % feat)
+cuts = p['cuts']
+ids = list(range(len(cuts)))
+sleeve = next(k for k, c in enumerate(cuts) if c['feature'] == '長め袖')
+calls = []
+
+
+def fake_verify(url, must_show):
+    calls.append(url)
+    return (0, 'bare fingers') if url == 'v%d' % sleeve else (1, 'ok')
+
+
+got = {i: {'video_url': 'v%d' % i} for i in ids}
+got[0] = {'video_url': None}
+bad = marie_video.redo_targets(cuts, got, ids, fake_verify)
+expect(set(bad) == {0, sleeve}, '動画なし（フィルタ）と絵のずれ（袖）の両方を作り直しに回す')
+expect('bare fingers' in bad[sleeve], '作り直しの理由に「実際に映っていた物」を残す')
+expect(sorted(calls) == sorted('v%d' % k for k in ids if k and cuts[k].get('must_show')),
+       'must_show の無いカット（フック・CTA）は判定しない（判定も有料）')
+expect(marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
+                                lambda u, m: (1, 'ok')) == {}, '全部映っていれば作り直さない')
+
 print('=== カット番号 → 秒 ===')
 wins = speech_qa.part_windows([5.63, 3.55, 4.25], 0.0)
 tc = speech_qa.timed_by_cut([{'text': 'a', 'cut_index': 1}, {'text': 'b', 'start': 1, 'end': 2},

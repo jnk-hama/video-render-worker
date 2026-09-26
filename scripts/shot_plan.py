@@ -30,6 +30,7 @@ SPEECH_SPEED = 1.15   # 喋りの速さ（オーナー「もう少し早く」#1
 ★規則表。上から順に当てる（先に当たった規則が勝つ）。
   still は優先順（左が第一候補）。action は静止画ごとに書く（同じ機能でも絵によって出来る動作が違う）。
   line は 18文字以下・タメ口・です/ます・？ 無し（video-scene が ？ を弾く）。
+  must_show は「セリフが言っている絵」を英語1文で（#185）。見せる主張のある規則だけに付け、動作全体ではなく1点に絞る。
   実地で通った物（2026-09-26 の本番）を元にしている。
 """
 RULES = [
@@ -45,31 +46,37 @@ RULES = [
                        "gently tugs it forward so it frames her face, then smiles and talks to the viewer like a friend.",
                'free_hands': "Waist-up. She pulls the big hood up over her head with both hands so it frames her "
                              "face, then smiles and talks to the viewer like a friend."},
-     'line': 'フードが大きいから、頭まで隠れる', 'must_say': 'フード'},
+     'line': 'フードが大きいから、頭まで隠れる', 'must_say': 'フード',
+     'must_show': 'The hood is up and covers the top of her head.'},
     # ★「すっぽり」は Veo が「おっぽり」と崩して読んだ（9/26・オーナー指摘）。崩れやすい語は規則表に置かない
     {'genres': ('apparel', 'hoodie'), 'match': r'袖',
      'still': {'selfie': "She is filming herself at arm's length. With her free hand she pulls the long sleeve down "
                          "over her hand until the cuff covers her fingers, holds that hand up next to her cheek and "
                          "talks casually like she is telling a friend. That hand stays inside the sleeve; no peace sign."},
-     'line': '袖長めで、指先まで隠れるの盛れる', 'must_say': '指先'},
+     'line': '袖長めで、指先まで隠れるの盛れる', 'must_say': '指先',
+     'must_show': 'A sleeve cuff covers her fingers so the fingertips are hidden.'},
     {'genres': ('apparel', 'hoodie'), 'match': r'ジップ|ファスナー',
      'still': {'free_hands': "Waist-up. She looks down, takes the second zipper pull at the bottom hem with both "
                              "hands and slides it up a little so the hem opens, then looks up and talks to the viewer "
                              "like a friend."},
-     'line': '下からも開くから、抜け感出せる'},
+     'line': '下からも開くから、抜け感出せる',
+     'must_show': 'She moves a zipper pull at the bottom hem of the garment.'},
     {'genres': ('apparel', 'hoodie'), 'match': r'サイズ|大きめ|オーバー|ゆったり|ビッグ|[MSL]〜',
      'still': {'mirror': "Mirror selfie, full body. She turns slightly left and right in front of the mirror to show "
                          "the loose, roomy silhouette, then smiles and talks to the mirror like a friend."},
-     'line': 'サイズ大きめで、シルエットかわいい'},
+     'line': 'サイズ大きめで、シルエットかわいい',
+     'must_show': 'Her full body is visible in a mirror, showing a loose silhouette.'},
     {'genres': ('apparel', 'hoodie'), 'match': r'ポケット',
      'still': {'free_hands': "Waist-up. She slides both hands into the front pockets, shows how deep they are, then "
                              "smiles and talks to the viewer like a friend."},
-     'line': 'ポケット深めで、手ぶらでいける'},
+     'line': 'ポケット深めで、手ぶらでいける',
+     'must_show': 'Her hands go into the front pockets of the garment.'},
     # ---- ガジェット（商品を持った絵 holding が要る） ----
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
      'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
                           "camera and talks like she is telling a friend."},
-     'line': 'コードないから、サッと使える'},
+     'line': 'コードないから、サッと使える',
+     'must_show': 'She holds the product and no cable is attached to it.'},
     {'genres': ('gadget',), 'match': r'静音|静か|dB',
      'still': {'holding': "The product is running next to her; she leans in to listen, smiles because it is quiet, "
                           "and talks softly to the camera like a friend."},
@@ -77,11 +84,13 @@ RULES = [
     {'genres': ('gadget',), 'match': r'軽量|軽い|[0-9.]+ ?(g|kg)',
      'still': {'holding': "She holds the product up easily with one hand and bounces it slightly to show how light "
                           "it is, then talks to the camera like a friend."},
-     'line': '片手で持てる軽さ、ガチで楽'},
+     'line': '片手で持てる軽さ、ガチで楽',
+     'must_show': 'She holds the product up with one hand.'},
     {'genres': ('gadget',), 'match': r'自動|ステーション|オート',
      'still': {'holding': "She sets the product on its station and steps back, pointing at it with a relaxed smile "
                           "while talking to the camera like a friend."},
-     'line': '置くだけで、あとは勝手にやってくれる'},
+     'line': '置くだけで、あとは勝手にやってくれる',
+     'must_show': 'The product sits on its station or base.'},
 ]
 
 # フックに使える機能が無い時・CTA。どちらも自撮り（顔が大きく映る方が止まる）
@@ -111,6 +120,8 @@ def _cut(role, rule, stills, feature, seconds):
            'action': action, 'line': rule['line'], 'seconds': seconds, 'card': feature}
     if rule.get('must_say'):
         cut['must_say'] = rule['must_say']
+    if rule.get('must_show'):
+        cut['must_show'] = rule['must_show']  # 映っているべき物。出来た動画を video-scene の verify で照合する（#185）
     return cut
 
 
