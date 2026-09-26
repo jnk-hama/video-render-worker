@@ -474,7 +474,14 @@ jobs:
           #   コマを6枚見ても、間・テンポ・音は分からない。実装者の
           #   サンドボックスは Supabase 403 / private Release 404 なので、
           #   **再生して確かめる手段が git しかない**。
-          bash scripts/push_preview.sh preview.jpg "render ${{ steps.payload.outputs.job_id }}" out.mp4
+          # ★★他社の商品写真（ASPの実画像）を重ねた回は公開の preview へ置かない（2026-09-26）。
+          #   リポジトリは公開。product_panel / foreground の画像は楽天等の写真そのもので、
+          #   marie-redial-ja-v3c が自動で置かれ、手で消した。確認は Storage の URL で行う。
+          if python3 -c "import json,sys; j=json.load(open('payload.json')).get('job') or {}; sys.exit(0 if ((j.get('product_panel') or {}).get('images') or j.get('foreground')) else 1)"; then
+            echo "商品写真を含む回なので preview へは置きません（Storage の URL で確認）"
+          else
+            bash scripts/push_preview.sh preview.jpg "render ${{ steps.payload.outputs.job_id }}" out.mp4
+          fi
 
       # ★★2026-09-02、日本市場の部署（jmas-ai-os）向け。
       #   TikTok / Instagram の投稿APIは「公開URLから動画を取りに来る」方式で、
