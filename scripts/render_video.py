@@ -1877,6 +1877,22 @@ def main():
         job.get('narration') or '',
         ' '.join(str(c.get('text') or '') for c in (job.get('captions') or [])))
 
+    """
+    ★★captions_from_speech（決定#177）。字幕は喋った内容から後で作るので、
+      ここではまだ本文が無い。部門の判定とフォント選びは本文の文字種で
+      決まるため、**target_market を必須にして**、その言語の見本を渡す。
+      未指定のまま推定させると、日本語の喋りに英語のフォントが当たる。
+    """
+    captions_from_speech = bool(job.get('captions_from_speech'))
+    if captions_from_speech:
+        if not job.get('clip_audio'):
+            raise SystemExit('captions_from_speech は clip_audio の回だけ使えます')
+        tm = str(job.get('target_market') or '').strip().lower()
+        if tm not in MARKETS:
+            raise SystemExit('captions_from_speech の回は target_market（%s）が必須です'
+                             % ' / '.join(MARKETS))
+        sample_text = '日本語' if tm == 'ja' else 'English'
+
     # ★どちらの部門の依頼か。素材の取り違えはここで止める（決定#082）
     market = resolve_market(job, sample_text)
     log('部門: %s ライン' % market)
@@ -2251,6 +2267,40 @@ def main():
         run(acmd)
         target_seconds = probe_duration(audio_path) or 0.0
         log('clip_audio: %d本の音声を繋ぎました（%.2f秒）' % (len(part_audio), target_seconds))
+
+        """
+        ★★喋りの検査と、喋った内容からの字幕（決定#177）。
+          clip_audio の回＝Veo が作った喋るカットなので、ここで必ず見る。
+          ・画面の上下に文字が焼き込まれていないか（OCR）
+          ・言ってはいけない言い回し／言うべき語（captions_from_speech の回）
+          quality_gate: "block"（既定）なら描かずに止める。"warn" は記録だけ。
+        """
+        import speech_qa
+        gate = str(job.get('quality_gate') or 'block').lower()
+        issues = []
+        for n, t, txt, sc in speech_qa.find_burned_text(parts):
+            issues.append('カット%d: 画面に文字が焼き込まれている（%.1f秒・「%s」%.2f）'
+                          ' → そのカットに inset を掛けるか作り直す' % (n, t, txt, sc))
+        if captions_from_speech:
+            import tts as tts_mod
+            eff_trans = trans if (trans > 0 and len(parts) >= 2) else 0.0
+            windows = speech_qa.part_windows(
+                [probe_duration(p) or 0.0 for p in parts], eff_trans)
+            words = speech_qa.transcribe(audio_path, market)
+            by_part = speech_qa.words_by_part(words, windows)
+            for i, ws in enumerate(by_part):
+                log('  カット%d の喋り: %s' % (i + 1, speech_qa.part_text(ws, market) or '（無音）'))
+            captions = speech_qa.captions_from_words(by_part, market, tts_mod.group_words)
+            log('喋った内容から字幕を %d 枚作りました（%s）' % (len(captions), speech_qa.WHISPER_MODEL))
+            issues += speech_qa.check_speech(by_part, job.get('clips') or [], market,
+                                             forbid=job.get('forbid_phrases'))
+        for s in issues:
+            log('★検査: ' + s)
+        if issues and gate != 'warn':
+            raise SystemExit('喋り・絵の検査で %d 件の問題（描画を中止）。\n  %s'
+                             % (len(issues), '\n  '.join(issues)))
+        if not issues:
+            log('喋り・絵の検査: 問題なし')
 
     """
     ★★2026-08-28。映像が音声より短い回に、最後の絵を伸ばして埋める。
