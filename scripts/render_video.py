@@ -63,6 +63,9 @@ import subprocess
 import sys
 import tempfile
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import loudness  # noqa: E402  音量をそろえる（決定#177）
+
 # 1本のクリップの上限。極端に長いものを拾うと転送で時間を食う
 MAX_DOWNLOAD_BYTES = 80 * 1024 * 1024
 DOWNLOAD_TIMEOUT_SEC = 60
@@ -2129,8 +2132,15 @@ def main():
                           log('  声は別クリップから当てます: %s' % str(c['audio_url'])[:110])
                       else:
                           log('  audio_url が取れないので映像自身の音声を使います')
-                  part_audio.append(extract_part_audio(
-                      a_src, os.path.join(work, 'pa_%02d.wav' % i), a_st, real))
+                  raw = extract_part_audio(
+                      a_src, os.path.join(work, 'pa_raw_%02d.wav' % i), a_st, real)
+                  # ★カットごとに同じ大きさへ（決定#177）。Veo は1本ずつ音量が違い、
+                  #   そのまま繋ぐとカットが替わるたびに音量が跳ねる（E-033）
+                  pa = os.path.join(work, 'pa_%02d.wav' % i)
+                  lufs, gain = loudness.level_part(raw, pa)
+                  log('  音量: %s LUFS → %+.1f dB' % (
+                      '測れず' if lufs is None else '%.1f' % lufs, gain))
+                  part_audio.append(pa)
           try:
               os.remove(src)
           except OSError:
@@ -2669,6 +2679,25 @@ def main():
     dur = probe_duration(args.out)
     if dur < 1.0:
         raise SystemExit('出力が短すぎます（%.2f秒）。' % dur)
+
+    """
+    ★仕上げの音量（決定#177）。全モード共通。音声が無い回は何もしない。
+      映像はコピーで、音声は音量を掛けるだけなので、尺も同期も変わらない。
+    """
+    if loudness.has_audio(args.out):
+        tmp = args.out + '.ln.mp4'
+        m = loudness.finalize(args.out, tmp)
+        if m:
+            os.replace(tmp, args.out)
+            after = loudness.measure_lufs(args.out)
+            log('音量を仕上げました: %.1f LUFS / TP %.1f dB → %s LUFS（目標 %.1f / TP %.1f）'
+                % (m['input_i'], m['input_tp'],
+                   '測れず' if after is None else '%.1f' % after,
+                   loudness.FINAL_LUFS, loudness.FINAL_TP))
+            size = os.path.getsize(args.out)
+            dur = probe_duration(args.out)
+        else:
+            log('音声を測れないので、仕上げの音量は掛けません')
 
     log('完成: %s (%.1f MB / %.1f秒 / モード%s / 字幕%d枚)'
         % (args.out, size / 1024 / 1024, dur, mode, len(captions)))
