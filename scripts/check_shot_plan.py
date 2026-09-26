@@ -41,8 +41,8 @@ size = next((c for c in p['cuts'] if c['feature'] == 'M〜3L'), None)
 expect(size is not None and size['still'] == 'mirror', 'サイズは鏡越しの全身で見せる（パネルの見出しにも使う）')
 zipc = next(c for c in p['cuts'] if c['feature'] == 'ダブルジップ')
 expect(zipc['still'] == 'free_hands', 'ジップは両手が空いた絵から')
-expect(p['panel'] and p['panel']['title'] == '2色・M〜3L' and p['panel']['cut_index'] == len(p['cuts']) - 1,
-       '色・サイズ展開は動画にせず最後の実画像パネルの見出しへ')
+expect(p['panel'] and p['panel']['title'] == '2色' and p['panel']['cut_index'] == len(p['cuts']) - 1,
+       '色展開は最後の実画像パネルの見出しへ。前のカードで出したサイズは繰り返さない（#184）')
 expect(all(len(c['line']) <= shot_plan.JA_CHARS_4S * c['seconds'] // 4 for c in p['cuts']), 'セリフは尺に入る長さ')
 
 print('=== 静止画が足りない時は作らない ===')

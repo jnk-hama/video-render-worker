@@ -169,7 +169,10 @@ def plan(product):
             raise SystemExit('規則表のセリフが不正: %r（%d文字・上限%d）' % (c['line'], len(c['line']), lim))
     panel = None
     if product.get('image_url') and cuts and cuts[-1]['role'] == 'cta':
-        panel = {'cut_index': len(cuts) - 1, 'title': '・'.join(panel_bits[:2]) or '',
+        # ★前のカードで出した情報は最後の見出しに繰り返さない（オーナー「M〜は前のシーンで書いてるからいらない」#184）
+        shown = {c['card'] for c in cuts if c.get('card')}
+        rest = [b for b in panel_bits if b not in shown]
+        panel = {'cut_index': len(cuts) - 1, 'title': '・'.join(rest[:2]),
                  'images': [product['image_url']], 'cutout': False}
     return {'cuts': cuts, 'cards_only': cards_only, 'panel': panel}
 
