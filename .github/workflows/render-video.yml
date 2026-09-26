@@ -45,7 +45,7 @@ jobs:
     outputs:
       items: ${{ steps.expand.outputs.items }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
       - name: フック違いへ展開する
         id: expand
         env:
@@ -89,7 +89,7 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
 
       # ★バージョンを固定せずランナー同梱に任せると、描画結果が黙って変わる。
       #   apt の ffmpeg を明示的に入れ、実際のバージョンをログへ残す。
@@ -107,7 +107,7 @@ jobs:
       #   事情もある。
       - name: TTS
         run: |
-          python3 -m pip install --quiet --disable-pip-version-check edge-tts
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt edge-tts
           python3 -c "import edge_tts; print('edge-tts ready')"
 
       # ★★2026-09-01、切り抜きと合成のための依存。**すべてCPUで動く。**
@@ -172,7 +172,7 @@ jobs:
           sys.exit(0 if d.get('clip_audio') else 1)
           PY
           then
-            python3 -m pip install --quiet --disable-pip-version-check \
+            python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
               faster-whisper rapidocr_onnxruntime pillow numpy
             python3 -c "import faster_whisper, rapidocr_onnxruntime; print('faster-whisper', faster_whisper.__version__)"
           else
@@ -226,7 +226,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get install -y -qq --no-install-recommends libegl1 libgl1
-          python3 -m pip install --quiet --disable-pip-version-check \
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
             rembg onnxruntime mediapipe
           python3 - <<'PY'
           import onnxruntime
@@ -329,7 +329,7 @@ jobs:
       # ------------------------------------------------------------------
       - name: Node
         if: steps.renderer.outputs.engine == 'remotion'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
         with:
           node-version: '22'
           cache: npm
@@ -355,7 +355,7 @@ jobs:
       #   node_modules の中なので、npm ci の**後**に戻さないと消える。
       - name: Chrome Headless Shell をキャッシュから戻す
         if: steps.renderer.outputs.engine == 'remotion'
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4.3.0
         with:
           path: remotion/node_modules/.remotion
           key: remotion-chrome-${{ runner.os }}
@@ -455,7 +455,7 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt pillow
           dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 out.mp4)
           mkdir -p frames
           python3 - "$dur" <<'PY'

@@ -30,7 +30,9 @@ on:
       - "scripts/check_expand_hooks.py"
       - "scripts/shot_plan.py"
       - "scripts/check_shot_plan.py"
-      - ".github/workflows/check.yml"
+      - "scripts/check_pins.py"
+      - "constraints.txt"
+      - ".github/workflows/*.yml"
   pull_request:
     paths:
       - "remotion/src/**"
@@ -49,9 +51,9 @@ jobs:
       run:
         working-directory: remotion
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
         with:
           node-version: 20
           cache: npm
@@ -94,6 +96,10 @@ jobs:
       - name: 商品ごとのカット選び（決定#182）
         working-directory: .
         run: python3 scripts/check_shot_plan.py
+
+      - name: pip の版固定（決定#188）
+        working-directory: .
+        run: python3 scripts/check_pins.py
 
       # ★★2026-09-10 追加（決定#127）。抑揚のため文ごとに合成して繋ぐ。
       #   繋ぎの計算を間違えると**字幕が全部ずれる**のに、動画は正常に

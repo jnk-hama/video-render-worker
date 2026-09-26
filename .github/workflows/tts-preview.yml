@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
 
       # ★mp3を繋ぐのに要る。抑揚は文ごとに合成して繋ぐ方式なので必須
       - name: FFmpeg
@@ -49,7 +49,7 @@ jobs:
 
       - name: edge-tts
         run: |
-          python3 -m pip install --quiet --disable-pip-version-check edge-tts
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt edge-tts
           python3 -c "import edge_tts; print('edge-tts', edge_tts.__version__)"
 
       # ★★声の一覧は「私の記憶」ではなく**実物から**出す。

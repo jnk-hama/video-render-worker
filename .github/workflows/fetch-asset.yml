@@ -167,7 +167,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
 
       # ★生成した画の顔が**本人かどうかを機械で判定する**（決定#147）。
       #
@@ -191,7 +191,7 @@ jobs:
             --pattern 'gen*.jpg' --dir faces --clobber
           ls -1 faces/
           # ★onnxruntime は CPU 版だけ。GPUには依存しない（3本の線）
-          python3 -m pip install --quiet --disable-pip-version-check \
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
             insightface onnxruntime
           python3 - <<'PY'
           import os, sys
@@ -243,7 +243,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          python3 -m pip install --quiet --disable-pip-version-check \
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
             insightface onnxruntime pillow
           mkdir -p faces
           python3 - <<'PY2'
@@ -302,7 +302,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1 libgles2
-          python3 -m pip install --quiet --disable-pip-version-check \
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
             insightface onnxruntime mediapipe pillow
           python3 - <<'PY'
           import os, urllib.request
@@ -329,7 +329,7 @@ jobs:
           # ★文字起こし（transcribe:true の回だけ）。モデルはランナーで落とす
           #   （実装者のサンドボックスは huggingface へ出られない）
           if [ "${{ inputs.transcribe }}" = "true" ]; then
-            python3 -m pip install --quiet --disable-pip-version-check faster-whisper
+            python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt faster-whisper
             TLANG="${{ inputs.transcribe_lang }}" python3 - <<'PY2'
           import os, subprocess
           lang = os.environ.get('TLANG') or 'ja'
@@ -387,7 +387,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          python3 -m pip install --quiet --disable-pip-version-check \
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
             insightface onnxruntime pillow
           python3 - <<'PY'
           import os, re, subprocess, sys, urllib.request
@@ -499,7 +499,7 @@ jobs:
           DEST: ${{ inputs.crop_name }}
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt pillow
           python3 - <<'PY'
           import os, re, urllib.request
           from PIL import Image
@@ -923,7 +923,7 @@ jobs:
           N: ${{ inputs.limit }}
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt pillow
           python3 - <<'PY'
           import json, os, urllib.parse, urllib.request
           # ★★Secretsに貼る時、改行やゼロ幅スペースが紛れる。実際に紛れていた:
@@ -970,7 +970,7 @@ jobs:
           U: ${{ inputs.url }}
           N: ${{ inputs.limit }}
         run: |
-          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt pillow
           # ★URL・検索語はシェルへ展開しない（引用符や & でコマンドが壊れる）
           python3 - <<'PY'
           import json, os, re, urllib.parse, urllib.request
@@ -1063,7 +1063,7 @@ jobs:
         if: hashFiles('assets_out/**') != ''
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt pillow
           shopt -s nullglob
           imgs=(assets_out/*.jpg assets_out/*.jpeg assets_out/*.png assets_out/*.webp)
           if [ ${#imgs[@]} -eq 0 ]; then
