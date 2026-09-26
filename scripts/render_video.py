@@ -905,7 +905,14 @@ SAFE_AREAS = {
 # 広告表記の大きさ（字幕の基準サイズに対する比）。実測して決めた値。
 #   0.26 → 字高16px（読めない）
 #   0.65 → 字高38px（字幕120pxの約1/3。読めて邪魔にならない）
-NOTE_SIZE_RATIO = 0.65
+#   ★★2026-09-26（決定#178）、オーナー「PR表記はなるべく小さく透過して」。
+#   文言を「PR」の2文字にし（消費者庁の運用基準が例に挙げる表記）、左上の隅へ寄せた。
+#   0.45 で字高 約26px。0.26（16px・読めない）までは下げない。
+NOTE_SIZE_RATIO = 0.45
+# 広告表記の透明度（ASS のアルファ。00=不透明・FF=透明）。0x70 ≒ 44% 透過
+NOTE_ALPHA = 0x70
+# 依頼が表記を指定しなかった時の既定。**付け忘れで無表示にしない**（決定#178）
+DEFAULT_DISCLOSURE = {'ja': 'PR', 'en': '#ad'}
 # 情報カードの大きさ（字幕の基準サイズに対する比）。字幕より一段小さく、
 # 広告表記よりは大きい。主役の字幕と競合させない
 CARD_SIZE_RATIO = 0.6
@@ -1462,9 +1469,11 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
         #
         #   0.65 で字高38px（画面幅の25%）。字幕本体の字高は120px前後なので
         #   約1/3。読めるが、主役の字幕とは競合しない大きさ。
-        ('Style: Note,%s,%d,&H20FFFFFF,&H20FFFFFF,&H00000000,'
-         '&H80000000,0,0,0,0,100,100,0,0,1,3,0,8,40,40,40,1'
-         % (font_name, max(28, int(font_size * NOTE_SIZE_RATIO)))),
+        #   ★2026-09-26（#178）: 小さく・透過・左上（Alignment 7）。縁も同じだけ透かす
+        ('Style: Note,%s,%d,&H%02XFFFFFF,&H%02XFFFFFF,&H%02X000000,'
+         '&H%02X000000,0,0,0,0,100,100,0,0,1,2,0,7,40,40,40,1'
+         % (font_name, max(20, int(font_size * NOTE_SIZE_RATIO)),
+            NOTE_ALPHA, NOTE_ALPHA, min(0xFF, NOTE_ALPHA + 0x20), min(0xFF, NOTE_ALPHA + 0x40))),
         # ★情報カード（サイズ・機能）。**喋るテロップとは別枠**に見せる
         #   （2026-09-24 オーナー「サイズや機能性は別枠で分かりやすく」）。
         #   BorderStyle 3 = 文字の後ろに不透明の箱。箱の色は OutlineColour
@@ -1537,7 +1546,7 @@ def build_ass(captions, w, h, font_size, center=False,
     if disclosure:
         lines.append(
             'Dialogue: 0,0:00:00.00,9:59:59.99,Note,,0,0,0,,'
-            '{\\pos(%d,%d)}%s' % (center_x, int(h * safe['note_y']),
+            '{\\pos(%d,%d)}%s' % (safe['left'], int(h * safe['note_y']),
                                  ass_escape(str(disclosure))))
     """
     ★情報カード（info_cards）。サイズ・色展開・機能など「読ませる情報」を、
@@ -2622,7 +2631,9 @@ def main():
                               font_dir=font_dir,
                               theme=build_theme(job.get('design_tokens'),
                                                 job.get('highlight_words')),
-                              disclosure=job.get('disclosure'),
+                              # ★指定が無ければ部門の既定（PR / #ad）。無表示にしない（#178）
+                              disclosure=(job.get('disclosure')
+                                          or DEFAULT_DISCLOSURE.get(market)),
                               cards=job.get('info_cards'),
                               panel=job.get('product_panel'),
                               safe=SAFE_AREAS.get(
