@@ -23,6 +23,7 @@ import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import shot_plan  # noqa: E402
+import speech_qa  # noqa: E402
 
 START_GAP_SEC = 25     # 起動の間隔。まとめて叩くと 429（E-031）
 POLL_SEC = 30
@@ -75,27 +76,36 @@ def rows(base, key, ids):
 
 
 def verify_cut(base, key, video_url, must_show):
-    """must_show が映っているか（1/0）。呼べない・読めない時は止める（未設定なら閉じる・#185）"""
+    """
+    must_show が映っているか（1/0）と、何と言ったか（said）。must_show が空なら喋りだけを取る（#189）。
+    呼べない・読めない時は止める（未設定なら閉じる・#185）
+    """
     code, res = _req('%s/functions/v1/video-scene' % base, key,
-                     {'action': 'verify', 'video_url': video_url, 'must_show': must_show})
+                     {'action': 'verify', 'video_url': video_url, 'must_show': must_show or ''})
     if code != 200 or (res or {}).get('match') not in (0, 1):
         raise SystemExit('絵の照合を呼べません（%s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:300]))
     # ★判定は毎回ログへ残す（朝の報告と、判定の当たり外れの記録に使う・#185）
-    print('  照合 %s: %s（%s）' % ('OK' if res['match'] else 'NG', must_show[:60], str(res.get('seen') or '')[:120]))
-    return res['match'], str(res.get('seen') or '')
+    print('  照合 %s: %s（%s）／喋り「%s」' % ('OK' if res['match'] else 'NG', (must_show or '（絵の問いなし）')[:60],
+                                         str(res.get('seen') or '')[:100], str(res.get('said') or '')[:60]))
+    return res['match'], str(res.get('seen') or ''), str(res.get('said') or '')
 
 
-def redo_targets(cuts, got, ids, verify):
-    """作り直すカット番号と理由。動画が無い＝フィルタ、must_show が映っていない＝絵のずれ"""
+def redo_targets(cuts, got, ids, verify, lang='ja'):
+    """
+    作り直すカット番号と理由。動画が無い＝フィルタ、must_show が映っていない＝絵のずれ、
+    言い終わりが丁寧語＝Veo の「です」足し（#189。描画側で切れない時に動画ごと止まるので、ここで作り直す）
+    """
     out = {}
     for k, i in enumerate(ids):
         url = got[i].get('video_url')
         if not url:
             out[k] = 'フィルタ等で動画なし'
-        elif cuts[k].get('must_show'):
-            match, seen = verify(url, cuts[k]['must_show'])
-            if not match:
-                out[k] = '絵がセリフと合わない（映っていた物: %s）' % seen[:120]
+            continue
+        match, seen, said = verify(url, cuts[k].get('must_show'))
+        if not match:
+            out[k] = '絵がセリフと合わない（映っていた物: %s）' % seen[:120]
+        elif speech_qa.ends_polite(said, lang):
+            out[k] = '言い終わりが丁寧語（「%s」）' % said[:60]
     return out
 
 

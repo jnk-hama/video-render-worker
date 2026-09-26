@@ -103,6 +103,12 @@ POLITE_STEP = 0.05
 POLITE_TRIES = 6
 
 
+def ends_polite(text, lang):
+    """文字列の言い終わりが丁寧語（FORBID_END_DEFAULT）か。check_speech と同じ基準（#189）"""
+    n = _norm(text, lang)
+    return bool(n) and any(n.endswith(_norm(e, lang)) for e in FORBID_END_DEFAULT.get(lang, []) if _norm(e, lang))
+
+
 def polite_cut_ok(heard, kept, lang):
     """
     切った音声の聞こえ方が合格か（決定#189）。

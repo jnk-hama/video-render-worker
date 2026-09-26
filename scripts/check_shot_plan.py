@@ -105,8 +105,8 @@ calls = []
 
 
 def fake_verify(url, must_show):
-    calls.append(url)
-    return (0, 'bare fingers') if url == 'v%d' % sleeve else (1, 'ok')
+    calls.append((url, must_show))
+    return (0, 'bare fingers', 'x') if url == 'v%d' % sleeve else (1, 'ok', 'ふつうのセリフ')
 
 
 got = {i: {'video_url': 'v%d' % i} for i in ids}
@@ -114,10 +114,15 @@ got[0] = {'video_url': None}
 bad = marie_video.redo_targets(cuts, got, ids, fake_verify)
 expect(set(bad) == {0, sleeve}, '動画なし（フィルタ）と絵のずれ（袖）の両方を作り直しに回す')
 expect('bare fingers' in bad[sleeve], '作り直しの理由に「実際に映っていた物」を残す')
-expect(sorted(calls) == sorted('v%d' % k for k in ids if k and cuts[k].get('must_show')),
-       'must_show の無いカット（フック・CTA）は判定しない（判定も有料）')
+expect(sorted(u for u, _ in calls) == sorted('v%d' % k for k in ids if k),
+       '動画のあるカットは全部照合する（喋りの言い終わりも見るため・#189）')
+expect(all((m is None) == (not cuts[int(u[1:])].get('must_show')) for u, m in calls),
+       'must_show の無いカット（フック・CTA）は絵の問いを渡さない')
 expect(marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                                lambda u, m: (1, 'ok')) == {}, '全部映っていれば作り直さない')
+                                lambda u, m: (1, 'ok', 'サイズ大きめで、シルエットかわいい')) == {}, '全部映っていて喋りも普通なら作り直さない')
+pol = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
+                               lambda u, m: (1, 'ok', '下からも開くからね、座っても楽です。' if u == 'v3' else 'ふつう'))
+expect(list(pol) == [3] and '丁寧語' in pol[3], '言い終わりが「です」のカットは作り直しに回す（#189）')
 
 print('=== 手元のクリップで通す試験の口（reuse_ids）===')
 import json as _json  # noqa: E402
@@ -127,7 +132,7 @@ started = []
 marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
 marie_video.start_cut = lambda *a: started.append(a) or 999
 marie_video.wait_all = lambda base, key, ids: {i: {'video_url': 'u%d' % i} for i in ids}
-marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok')
+marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', 'ふつう')
 with tempfile.TemporaryDirectory() as td:
     pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
     _json.dump(dict(REDIAL, reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))
