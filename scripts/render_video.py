@@ -2184,9 +2184,26 @@ def main():
                   if job.get('auto_trim_polite'):
                       ws2, cut = speech_qa.strip_polite_end(ws, market)
                       if cut:
-                          log('  言い終わりの丁寧語を切ります: 「%s」→「%s」' % (
-                              speech_qa.part_text(ws, market), speech_qa.part_text(ws2, market)))
-                          ws, tail = ws2, speech_qa.POLITE_TAIL
+                          """
+                          ★★切った音声を**起こし直して確かめる**（決定#189）。まだ丁寧語が聞こえたら
+                            POLITE_STEP ずつ手前へ下げる。最後まで消えなければ切らない（下の検査が止める＝安全側）
+                          """
+                          for end in speech_qa.polite_cut_candidates(ws2):
+                              cand = ws2[:-1] + [dict(ws2[-1], end=end)]
+                              a2, d2 = speech_qa.speech_window(cand, st, each, tail=speech_qa.POLITE_TAIL)
+                              if (a2, d2) == (st, each):
+                                  break  # 短くなりすぎる等で窓が元のまま＝切れない
+                              chk_wav = os.path.join(work, 'polite_%02d.wav' % i)
+                              extract_part_audio(src, chk_wav, a2, d2)
+                              heard = speech_qa.transcribe(chk_wav, market)
+                              if heard and not speech_qa.strip_polite_end(heard, market)[1]:
+                                  log('  言い終わりの丁寧語を切ります: 「%s」→「%s」（%.2f秒で切る）' % (
+                                      speech_qa.part_text(ws, market), speech_qa.part_text(heard, market), a2 + d2))
+                                  ws, tail = cand, speech_qa.POLITE_TAIL
+                                  break
+                              log('  まだ丁寧語が聞こえるので手前へ: 「%s」' % speech_qa.part_text(heard, market))
+                          else:
+                              log('  丁寧語を切り切れませんでした（検査に任せます）')
                   st2, each2 = speech_qa.speech_window(ws, st, each, tail=tail)
                   if (st2, each2) != (st, each):
                       log('  無音を詰めます: %.2f〜%.2f秒 → %.2f〜%.2f秒'

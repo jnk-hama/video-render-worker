@@ -285,6 +285,9 @@ w2, cut = speech_qa.strip_polite_end(W(('です', 0.0, 0.4)), 'ja')
 expect(not cut, '喋りが丁寧語だけなら外さない（カットを消さない）')
 w2, cut = speech_qa.strip_polite_end(W(('頭まですっぽり', 0.0, 1.0)), 'ja')
 expect(not cut, '文中の「です」は切らない')
+cands = speech_qa.polite_cut_candidates(W(('座っても', 0.0, 0.8), ('楽', 0.8, 1.2)))
+expect(len(cands) == speech_qa.POLITE_TRIES and cands[0] == 1.2 and all(x > y for x, y in zip(cands, cands[1:]))
+       and min(cands) > 0.8, '切り位置の候補は手前へ下がっていき、最後の語の頭は越えない')
 expect(not speech_qa.check_speech([speech_qa.strip_polite_end(W(('座っても', 0, .8), ('楽です', .8, 1.4)), 'ja')[0]],
                                   [{}], 'ja'), '切った後は喋りの検査を通る')
 

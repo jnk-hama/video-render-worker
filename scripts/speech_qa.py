@@ -97,6 +97,18 @@ def speech_window(words, clip_start, clip_len, lead=None, tail=None):
 
 # 言い終わりの丁寧語を切った時、最後の語の後ろに残す秒（TRIM_TAIL だと「で」の頭が残る）
 POLITE_TAIL = 0.04
+# ★切った音声を起こし直してまだ丁寧語が聞こえたら、この秒ずつ手前へ下げる（決定#189）。
+#   Whisper の語の終わりは緩く、「楽です」の割合切りでは「で」の頭が残り「楽しいです」と聞こえた（run 36256567902）
+POLITE_STEP = 0.12
+POLITE_TRIES = 4
+
+
+def polite_cut_candidates(words):
+    """丁寧語を外した語から、試す切り位置（最後の語の終わり）を手前へ POLITE_STEP ずつ並べる"""
+    if not words:
+        return []
+    last = words[-1]
+    return [max(last['start'] + 0.05, last['end'] - k * POLITE_STEP) for k in range(POLITE_TRIES)]
 
 
 def strip_polite_end(words, lang):
