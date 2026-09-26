@@ -608,7 +608,7 @@ def resolution_is_acceptable(path):
     return rw >= MIN_MATERIAL_DIMENSION and rh >= MIN_MATERIAL_DIMENSION
 
 
-def extract_part_audio(src, dest, start, duration):
+def extract_part_audio(src, dest, start, duration, speed=1.0):
     """
     1パートぶんの音声を、映像と**同じ区間・同じ長さ**で切り出す（決定#166）。
 
@@ -623,9 +623,12 @@ def extract_part_audio(src, dest, start, duration):
         capture_output=True, text=True).stdout.strip()
     common = ['-ar', '44100', '-ac', '2', '-c:a', 'pcm_s16le', dest]
     if probe_a:
+        # ★speed（決定#183）: 素材は duration×speed 秒ぶん読み、atempo で縮めて duration にする
+        #   （atempo は音の高さを変えない）。映像側は normalize の setpts で同じだけ縮める
+        af = ('atempo=%.3f,apad' % speed) if speed != 1.0 else 'apad'
         run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
-             '-ss', str(start), '-t', str(duration), '-i', src,
-             '-vn', '-af', 'apad', '-t', str(duration)] + common)
+             '-ss', str(start), '-t', str(duration * speed), '-i', src,
+             '-vn', '-af', af, '-t', str(duration)] + common)
     else:
         run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
              '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
@@ -658,7 +661,7 @@ def inset_filter(inset):
                     l=f['left'], t=f['top']))
 
 
-def normalize(src, dest, start, duration, w, h, fps, dim=False, inset=None):
+def normalize(src, dest, start, duration, w, h, fps, dim=False, inset=None, speed=1.0):
     """
     1クリップを「指定秒数・9:16・同一規格」に揃える。
 
@@ -668,9 +671,10 @@ def normalize(src, dest, start, duration, w, h, fps, dim=False, inset=None):
     scale=increase → crop で、横長素材を縦型に切り出す（余白を作らない）。
     """
     vf = (
-        '{inset}scale={w}:{h}:force_original_aspect_ratio=increase,'
+        '{inset}{speed}scale={w}:{h}:force_original_aspect_ratio=increase,'
         'crop={w}:{h},{dim}setsar=1,fps={fps},format=yuv420p'
-    ).format(w=w, h=h, fps=fps, dim=dim_filter(dim), inset=inset_filter(inset))
+    ).format(w=w, h=h, fps=fps, dim=dim_filter(dim), inset=inset_filter(inset),
+             speed=('setpts=PTS/%.3f,' % speed) if speed != 1.0 else '')
 
     run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
          '-ss', str(start), '-t', str(duration), '-i', src,
@@ -918,7 +922,11 @@ NOTE_ALPHA = 0x70
 DEFAULT_DISCLOSURE = {'ja': 'PR', 'en': '#ad'}
 # 情報カードの大きさ（字幕の基準サイズに対する比）。字幕より一段小さく、
 # 広告表記よりは大きい。主役の字幕と競合させない
-CARD_SIZE_RATIO = 0.6
+SPEECH_SPEED_MAX = 1.3
+CARD_SIZE_RATIO = 0.72
+CARD_TAG_RATIO = 0.34
+CARD_TOP_Y = 0.128   # 機能の札の中心。PR 表記（0.062）の下、頭の上
+CARD_TAG_Y = 0.088   # 「POINT n」の小札
 # 情報カードを字幕の**下**に置く距離（画面高に対する比）。上に置くと服を隠す
 CARD_BELOW_CAPTION = 0.08
 
@@ -1481,9 +1489,14 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
         #   （2026-09-24 オーナー「サイズや機能性は別枠で分かりやすく」）。
         #   BorderStyle 3 = 文字の後ろに不透明の箱。箱の色は OutlineColour
         #   （libass の仕様。BackColour は影の色）。Outline が箱の余白になる
-        ('Style: Card,%s,%d,&H00FFFFFF,&H00FFFFFF,&H33000000,'
-         '&H00000000,0,0,0,0,100,100,0,0,3,18,0,5,40,40,40,1'
+        #   ★2026-09-26（#183・オーナー「しょぼい・変。デザインして上の方に」）:
+        #     白い札に濃い文字、左上に色付きの「POINT n」の小札。画面の上（頭の上）に出す
+        ('Style: Card,%s,%d,&H00222222,&H00222222,&H00FFFFFF,'
+         '&H00000000,0,0,0,0,100,100,2,0,3,22,0,5,40,40,40,1'
          % (font_name, max(28, int(font_size * CARD_SIZE_RATIO)))),
+        ('Style: CardTag,%s,%d,&H00FFFFFF,&H00FFFFFF,&H005C3BFF,'
+         '&H00000000,0,0,0,0,100,100,4,0,3,10,0,5,40,40,40,1'
+         % (font_name, max(18, int(font_size * CARD_TAG_RATIO)))),
         '',
         '[Events]',
         'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
@@ -1557,15 +1570,27 @@ def build_ass(captions, w, h, font_size, center=False,
     ★文中の \\n で改行できる。行ごとに ass_escape してから \\N で繋ぐ
       （escape は改行を空白へ潰すので、先に割っておく）。
     """
+    n_card = 0
+    accent = (theme or {}).get('accent')
     for cd in (cards or []):
         text = '\\N'.join(ass_escape(t) for t in str(cd.get('text') or '').split('\n') if t.strip())
         start = float(cd.get('start', 0))
         end = float(cd.get('end', start + 2.0))
         if not text or end <= start:
             continue
-        cy = int(h * (0.50 if center else min(0.92, safe['caption_y'] + CARD_BELOW_CAPTION)))
-        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)}%s'
-                     % (ass_time(start), ass_time(end), center_x, cy, text))
+        if center:
+            cy = int(h * 0.50)
+            lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)}%s'
+                         % (ass_time(start), ass_time(end), center_x, cy, text))
+            continue
+        # ★上の方へ（頭の上）。横から滑り込ませて「別枠の情報」だと一目で分かるようにする
+        n_card += 1
+        cy, ty = int(h * CARD_TOP_Y), int(h * CARD_TAG_Y)
+        lines.append('Dialogue: 2,%s,%s,CardTag,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)%s}POINT %d'
+                     % (ass_time(start), ass_time(end), center_x, ty,
+                        ('\\3c%s' % accent) if accent else '', n_card))
+        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\move(%d,%d,%d,%d,0,180)\\fad(120,150)}%s'
+                     % (ass_time(start), ass_time(end), center_x + 80, cy, center_x, cy, text))
     """
     ★商品パネルの見出しとラベル。見出しはパネルの上に大きく（参考の「全色OK」）、
       ラベルは各画像の下に Card の箱で。画像そのものは panel_filter が重ねる。
@@ -1907,6 +1932,15 @@ def main():
     # ★無音詰め（決定#179）。喋った内容から字幕を作る回（新しい作り方）では既定でオン。
     #   従来の依頼（TTS の回・手書き字幕の回）は変えない。trim_silence:false で切れる
     trim_silence = bool(job.get('trim_silence', captions_from_speech))
+    # ★喋るカットの速さ（決定#183・オーナー「ナレーションの速さもう少し早く」）。
+    #   映像と声を同じ倍率で縮める（口は合ったまま・声の高さは変えない）。
+    #   既定 1.0＝従来どおり。上げすぎると早口で聞き取れないので SPEECH_SPEED_MAX で止める
+    try:
+        speech_speed = float(job.get('speech_speed') or 1.0)
+    except (TypeError, ValueError):
+        speech_speed = 1.0
+    if not (1.0 <= speech_speed <= SPEECH_SPEED_MAX) or not job.get('clip_audio'):
+        speech_speed = 1.0
     if trim_silence and not job.get('clip_audio'):
         raise SystemExit('trim_silence は clip_audio の回だけ使えます')
 
@@ -2157,7 +2191,7 @@ def main():
                   ok = still_to_clip(src, dst, each, w, h, fps, rng, dim)
               else:
                   ok = normalize(src, dst, st, each, w, h, fps, dim,
-                                 inset=c.get('inset'))
+                                 inset=c.get('inset'), speed=speech_speed)
           except Exception as e:
               log('  変換に失敗（次のクリップへ）: %s' % e)
               ok = False
@@ -2184,7 +2218,8 @@ def main():
                       else:
                           log('  audio_url が取れないので映像自身の音声を使います')
                   raw = extract_part_audio(
-                      a_src, os.path.join(work, 'pa_raw_%02d.wav' % i), a_st, real)
+                      a_src, os.path.join(work, 'pa_raw_%02d.wav' % i), a_st, real,
+                      speed=(1.0 if looks_like_image(url, src) else speech_speed))
                   # ★カットごとに同じ大きさへ（決定#177）。Veo は1本ずつ音量が違い、
                   #   そのまま繋ぐとカットが替わるたびに音量が跳ねる（E-033）
                   pa = os.path.join(work, 'pa_%02d.wav' % i)

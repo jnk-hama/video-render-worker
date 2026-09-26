@@ -77,6 +77,8 @@ job = shot_plan.render_job(REDIAL, p, ['u%d' % i for i in range(len(p['cuts']))]
 expect([c['cut_index'] for c in job['info_cards']] == [i for i, c in enumerate(p['cuts']) if c.get('card')],
        'カードはカット番号で指定（秒は描画側で解く）')
 expect(job['quality_gate'] == 'block', '自動の回は検査で止める（warn にしない）')
+expect(job['speech_speed'] == shot_plan.SPEECH_SPEED > 1.0, '喋りは少し速く（#183）')
+expect(not any('すっぽり' in r['line'] for r in shot_plan.RULES), '崩れて読まれた語（すっぽり）を規則表に置かない')
 
 print('=== カット番号 → 秒 ===')
 wins = speech_qa.part_windows([5.63, 3.55, 4.25], 0.0)

@@ -24,6 +24,7 @@ HOOK_SECONDS = 6      # フックは言い切りが長い（実測 5.6秒）
 CUT_SECONDS = 4       # 機能のカット。セリフは JA_CHARS_4S 文字まで
 JA_CHARS_4S = 18      # 自然な喋りの実測 約4.5文字/秒 × 4秒（marie-redial-ja-v3 の実測）
 MAX_FEATURE_CUTS = 4  # フック・CTA を除く。20秒前後に収める
+SPEECH_SPEED = 1.15   # 喋りの速さ（オーナー「もう少し早く」#183）。render_video の上限は 1.3
 
 """
 ★規則表。上から順に当てる（先に当たった規則が勝つ）。
@@ -37,13 +38,15 @@ RULES = [
      'still': {'selfie': "She is filming herself on her phone at arm's length, glances down at the faded fabric "
                          "of the garment, tugs it slightly with her free hand, then looks back at the camera and "
                          "talks like she is telling a friend."},
-     'line': '見てて、この色落ちえぐいくらいヴィンテージ感ある', 'must_say': '色落ち'},
+     'line': '見て！この色落ち、えぐいくらいヴィンテージ感ある', 'must_say': '色落ち'},
+    # ★「見てて」より「見て！」が自然（オーナー #183）。「見て、」だと Veo が「見てて」と伸ばした（9/26）ので ！ で言い切らせる
     {'genres': ('apparel', 'hoodie'), 'match': r'フード',
      'still': {'hood': "Waist-up. The big hood is already up over her head; she holds its edges with both hands, "
                        "gently tugs it forward so it frames her face, then smiles and talks to the viewer like a friend.",
                'free_hands': "Waist-up. She pulls the big hood up over her head with both hands so it frames her "
                              "face, then smiles and talks to the viewer like a friend."},
-     'line': 'フードが大きいから、すっぽりかぶれる', 'must_say': 'フード'},
+     'line': 'フードが大きいから、頭まで隠れる', 'must_say': 'フード'},
+    # ★「すっぽり」は Veo が「おっぽり」と崩して読んだ（9/26・オーナー指摘）。崩れやすい語は規則表に置かない
     {'genres': ('apparel', 'hoodie'), 'match': r'袖',
      'still': {'selfie': "She is filming herself at arm's length. With her free hand she pulls the long sleeve down "
                          "over her hand until the cuff covers her fingers, holds that hand up next to her cheek and "
@@ -187,6 +190,7 @@ def render_job(product, plan_, clip_urls, upload_path):
         'target_market': product.get('target_market') or 'ja',
         'product_key': product['product_key'],
         'clip_audio': True, 'captions_from_speech': True, 'transition_seconds': 0,
+        'speech_speed': SPEECH_SPEED,
         'quality_gate': product.get('quality_gate') or 'block',
         'bgm': product.get('bgm') or 'assets/shared/bgm/duru-roomscene-lofi.mp3',
         'design_tokens': {'text_color_hex': '#ffffff', 'accent_color_hex': '#ff3b5c'},
