@@ -93,6 +93,15 @@ jobs:
       #   繋ぎの計算を間違えると**字幕が全部ずれる**のに、動画は正常に
       #   出来上がるので見るまで気づかない（E-010と同じ壊れ方）。
       #   音を作らずに（＝ネットワーク無しで）繋ぎの計算だけを検査する。
+      # ★★2026-09-26、ffmpeg を入れた。この検査は ffmpeg で無音を作って繋ぐが、
+      #   ランナーに ffmpeg が無く「★NG ffmpeg/ffprobe が無い」で**9/12 から毎回落ちていた**
+      #   （run #16〜#19）。ここで止まるので、後ろの検査も2週間走っていなかった。
+      - name: ffmpeg（抑揚の検査で使う）
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg
+          ffmpeg -version | head -1
+
       - name: ナレーションの抑揚（繋いだ後の時刻がずれないこと）
         working-directory: .
         run: python3 scripts/check_tts_prosody.py
