@@ -207,6 +207,22 @@ def _caption(ws, sep):
     }
 
 
+# ★同じ読みで漢字だけ違う取り違え（決定#180）。run 36225782849 で「ガチで盛れる」が
+#   「ガチで漏れる」と字幕に出た。音（もれる）は合っていて、Whisper が辞書で多い方の
+#   漢字を選んだだけ。字幕の表記だけ直し、check_speech には掛けない（音の誤りを隠さない）。
+#   ★台本の俗語（process-job #179）のうち、読みが同じ別の語がある物だけを置く。
+JA_CAPTION_FIX = {'漏れる': '盛れる', '漏れた': '盛れた', '漏れて': '盛れて'}
+
+
+def fix_caption_text(caps, lang):
+    if lang != 'ja':
+        return caps
+    for c in caps:
+        for wrong, right in JA_CAPTION_FIX.items():
+            c['text'] = c['text'].replace(wrong, right)
+    return caps
+
+
 def captions_from_words(parts, lang, group_words):
     """
     パートごとの語から字幕を組む。
@@ -221,7 +237,7 @@ def captions_from_words(parts, lang, group_words):
             caps.extend(group_words(ws, text=part_text(ws, lang)))
         else:
             caps.extend(_caption(c, '') for c in _ja_chunks(ws))
-    return caps
+    return fix_caption_text(caps, lang)
 
 
 def check_speech(parts, clips, lang, forbid=None):

@@ -221,6 +221,32 @@ expect([c['text'] for c in caps[:2]] == ['それ彼氏のってそうよく', '�
        '長いカットは文節で割る（「そうよ｜く」「こな｜れ感」と語の途中で割らない）')
 expect(all(len(c['text']) <= speech_qa.JA_MAX_CHARS for c in caps), '1枚は JA_MAX_CHARS 以下')
 
+print('=== 同じ読みの漢字の取り違え（決定#180・run 36225782849 の h3）===')
+# 本番の文字起こしは「袖長めで指先まで隠れるのでガチで漏れる」。語は1〜2文字ずつに割れて届く
+H3 = W("""
+0.10 0.40 袖
+0.40 0.70 長
+0.70 0.90 め
+0.90 1.00 で
+1.00 1.30 指
+1.30 1.50 先
+1.50 1.70 まで
+1.70 2.00 隠
+2.00 2.20 れる
+2.20 2.40 ので
+2.40 2.70 ガチ
+2.70 2.80 で
+2.80 3.00 漏
+3.00 3.30 れる
+""")
+h3_caps = speech_qa.captions_from_words([H3], 'ja', group_words)
+h3_text = ''.join(c['text'] for c in h3_caps)
+print('     ' + ' | '.join(c['text'] for c in h3_caps))
+expect('盛れる' in h3_text and '漏れる' not in h3_text, '字幕は「ガチで盛れる」（語が「漏｜れる」に割れていても直る）')
+expect(speech_qa.part_text(H3, 'ja').endswith('漏れる'), '検査が見る文字起こしは直さない（音の誤りを隠さない）')
+expect(speech_qa.captions_from_words([[{'text': '漏れる', 'start': 0, 'end': 1}]], 'en', group_words)[0]['text'] == '漏れる',
+       '英語の回には掛けない')
+
 en_caps = speech_qa.captions_from_words([EN4], 'en', group_words)
 expect(' '.join(c['text'] for c in en_caps) == 'This vintage wash gives it so much care.',
        '英語の字幕は空白で繋ぐ')
