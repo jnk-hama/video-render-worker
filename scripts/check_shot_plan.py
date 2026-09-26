@@ -110,6 +110,32 @@ expect(sorted(calls) == sorted('v%d' % k for k in ids if k and cuts[k].get('must
 expect(marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
                                 lambda u, m: (1, 'ok')) == {}, '全部映っていれば作り直さない')
 
+print('=== 手元のクリップで通す試験の口（reuse_ids）===')
+import json as _json  # noqa: E402
+import tempfile  # noqa: E402
+_orig = {k: getattr(marie_video, k) for k in ('_base_and_key', 'start_cut', 'wait_all', 'verify_cut')}
+started = []
+marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
+marie_video.start_cut = lambda *a: started.append(a) or 999
+marie_video.wait_all = lambda base, key, ids: {i: {'video_url': 'u%d' % i} for i in ids}
+marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok')
+with tempfile.TemporaryDirectory() as td:
+    pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
+    _json.dump(dict(REDIAL, reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))
+    sys.argv = ['marie_video.py', pj, oj]
+    marie_video.main()
+    job = _json.load(open(oj))['job']
+    expect(not started, 'reuse_ids の回は Veo を1本も起動しない')
+    expect(len(job['clips']) == len(p['cuts']), '描画の依頼まで作る（カット数ぶんのクリップ）')
+    _json.dump(dict(REDIAL, reuse_ids=[1, 2]), open(pj, 'w'))
+    try:
+        marie_video.main()
+        expect(False, '本数が合わない reuse_ids は止める')
+    except SystemExit:
+        expect(True, '本数が合わない reuse_ids は止める')
+for k, v in _orig.items():
+    setattr(marie_video, k, v)
+
 print('=== カット番号 → 秒 ===')
 wins = speech_qa.part_windows([5.63, 3.55, 4.25], 0.0)
 tc = speech_qa.timed_by_cut([{'text': 'a', 'cut_index': 1}, {'text': 'b', 'start': 1, 'end': 2},

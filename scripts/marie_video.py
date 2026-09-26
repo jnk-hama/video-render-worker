@@ -10,6 +10,8 @@
 ★鍵は環境変数から読み、ログへ出さない。依頼の中身（セリフ・URL）も公開ログへ全文は出さない。
 
 使い方（Actions）: python3 scripts/marie_video.py product.json render_job.json [--dry-run]
+★product.json に reuse_ids（カット順の video_library の id）を入れると、Veo を起動せず手元のクリップで
+  照合→描画までを通す（0円に近い試験・作り直しもしない）。本番の流れを初回で壊さないための口。
 """
 import json
 import os
@@ -124,11 +126,18 @@ def main():
     if dry:
         return
     base, key = _base_and_key()
-    ids = []
-    for i, c in enumerate(plan['cuts']):
-        if i:
-            time.sleep(START_GAP_SEC)
-        ids.append(start_cut(base, key, product, c))
+    reuse = product.get('reuse_ids')
+    if reuse:
+        if len(reuse) != len(plan['cuts']):
+            raise SystemExit('reuse_ids は %d 本（カット数）必要です（%d 本）' % (len(plan['cuts']), len(reuse)))
+        ids = [int(i) for i in reuse]
+        print('手元のクリップを使います（Veo は起動しない）: %s' % ids)
+    else:
+        ids = []
+        for i, c in enumerate(plan['cuts']):
+            if i:
+                time.sleep(START_GAP_SEC)
+            ids.append(start_cut(base, key, product, c))
     got = wait_all(base, key, ids)
     seen_before = {}  # ★同じ動画を2度判定しない（判定も有料）
 
@@ -137,7 +146,7 @@ def main():
             seen_before[url] = verify_cut(base, key, url, must_show)
         return seen_before[url]
 
-    for attempt in range(RETRY_PER_CUT):
+    for attempt in range(0 if reuse else RETRY_PER_CUT):
         bad = redo_targets(plan['cuts'], got, ids, verify)
         if not bad:
             break
