@@ -31,6 +31,10 @@ on:
       - "scripts/shot_plan.py"
       - "scripts/check_shot_plan.py"
       - "scripts/check_pins.py"
+      - "scripts/check_render_golden.py"
+      - "scripts/render_video.py"
+      - "scripts/speech_qa.py"
+      - "tests/golden/**"
       - "constraints.txt"
       - ".github/workflows/*.yml"
   pull_request:
@@ -117,3 +121,13 @@ jobs:
       - name: ナレーションの抑揚（繋いだ後の時刻がずれないこと）
         working-directory: .
         run: python3 scripts/check_tts_prosody.py
+
+      # ★★2026-09-27 追加（決定#190）。描画の回帰試験（黄金の出力との突き合わせ）。
+      #   決まった合成素材を実際に描き、決まった時刻のコマを基準と SSIM で比べる。
+      #   焼き込み文字の検査（RapidOCR）が走るので、その依存だけ入れる（版は constraints.txt）。
+      - name: 描画の回帰試験の依存
+        run: python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt rapidocr_onnxruntime numpy pillow
+
+      - name: 描画の回帰試験（コマ・尺・効果音・パネルが前と同じ）
+        working-directory: .
+        run: python3 scripts/check_render_golden.py
