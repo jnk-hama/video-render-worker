@@ -99,8 +99,20 @@ def speech_window(words, clip_start, clip_len, lead=None, tail=None):
 POLITE_TAIL = 0.04
 # ★切った音声を起こし直してまだ丁寧語が聞こえたら、この秒ずつ手前へ下げる（決定#189）。
 #   Whisper の語の終わりは緩く、「楽です」の割合切りでは「で」の頭が残り「楽しいです」と聞こえた（run 36256567902）
-POLITE_STEP = 0.12
-POLITE_TRIES = 4
+POLITE_STEP = 0.05
+POLITE_TRIES = 6
+
+
+def polite_cut_ok(heard, kept, lang):
+    """
+    切った音声の聞こえ方が合格か（決定#189）。
+    ★丁寧語が聞こえない、**かつ残したい最後の語（「楽」）が聞こえる**こと。
+      0.12秒下げた回に「楽」まで消え「座っても」で終わる喋りが検査を通った（run 36276637562）。
+      言いかけで終わる喋りは「です」より悪いので、通さない（切らずに検査へ任せる＝止まる）。
+    """
+    if not heard or not kept or strip_polite_end(heard, lang)[1]:
+        return False
+    return _norm(part_text(heard, lang), lang).endswith(_norm(kept[-1]['text'], lang))
 
 
 def polite_cut_candidates(words):
