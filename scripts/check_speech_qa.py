@@ -150,6 +150,18 @@ rt = [speech_qa.part_text(p, 'ja') for p in rp]
 expect(rt[2].startswith('萌え袖') and not rt[1].endswith('萌'), '「萌」は3カット目')
 expect(rt[5] == 'リンクから見てみてください', '「リ」は6カット目')
 
+print('=== 無音を詰めた回はカットごとに起こす（run 36227562528）===')
+# 本番: カットの間は 0.35秒。Whisper は次のカットの1語目の開始を前の無音へはみ出させ、
+# 1本で起こして時刻で振ると「…被れちゃうんだよね袖」「楽です気」になった
+PARTS = {'a.wav': [{'text': 'フード', 'start': 0.10, 'end': 0.50}, {'text': 'だよね', 'start': 2.9, 'end': 3.16}],
+         'b.wav': [{'text': '袖', 'start': 0.00, 'end': 0.30}, {'text': '長め', 'start': 0.30, 'end': 0.70}]}
+tp = speech_qa.transcribe_parts(['a.wav', 'b.wav'], [(0.0, 3.41), (3.41, 7.64)], 'ja',
+                                transcribe_fn=lambda p, lang: PARTS[p])
+expect([speech_qa.part_text(p, 'ja') for p in tp] == ['フードだよね', '袖長め'], 'カットの1語目は必ずそのカット')
+expect(abs(tp[1][0]['start'] - 3.41) < 1e-6, '時刻は完成品の時間軸へずらす')
+src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'render_video.py'), encoding='utf-8').read()
+expect('speech_qa.transcribe_parts(part_audio' in src, 'render_video.py がカットごとの起こしを使っている（配線）')
+
 print('=== 喋りの検査（本物の不具合を拾えるか）===')
 clips = [{}, {}, {}, {}, {'must_say': ['色落ち加工']}, {'must_say': ['リンク']}]
 issues = speech_qa.check_speech(parts, clips, 'ja')

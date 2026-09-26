@@ -2332,8 +2332,7 @@ def main():
             eff_trans = trans if (trans > 0 and len(parts) >= 2) else 0.0
             windows = speech_qa.part_windows(
                 [probe_duration(p) or 0.0 for p in parts], eff_trans)
-            words = speech_qa.transcribe(audio_path, market)
-            by_part = speech_qa.words_by_part(words, windows)
+            by_part = speech_qa.transcribe_parts(part_audio, windows, market)
             for i, ws in enumerate(by_part):
                 log('  カット%d の喋り: %s' % (i + 1, speech_qa.part_text(ws, market) or '（無音）'))
             captions = speech_qa.captions_from_words(by_part, market, tts_mod.group_words)

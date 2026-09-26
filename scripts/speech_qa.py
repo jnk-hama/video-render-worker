@@ -113,6 +113,23 @@ def transcribe(audio_path, lang):
     return words
 
 
+def transcribe_parts(part_audio, windows, lang, transcribe_fn=None):
+    """
+    カットごとの音声を1本ずつ文字起こしし、完成品の時間軸へずらして返す [[語...], ...]。
+
+    ★★繋いだ音声を1回で起こして時刻で振り分けると、無音を詰めた回（#179）は
+      カットの間が0.35秒しか無く、Whisper が次のカットの1語目の開始を前の無音へ
+      はみ出させる。run 36227562528 で全カットの頭の1文字が前のカットへ落ちた
+      （「…すっぽり被れちゃうんだよね袖」「楽です気」）。カットの音声を別々に起こせば
+      語がカットをまたぐことは起きない。
+    """
+    fn = transcribe_fn or transcribe
+    out = []
+    for path, (st, _end) in zip(part_audio, windows):
+        out.append([dict(w, start=w['start'] + st, end=w['end'] + st) for w in fn(path, lang)])
+    return out
+
+
 def part_windows(durations, trans):
     """
     各パートが完成品のどこに来るか [(start, end)]。
