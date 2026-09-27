@@ -13,6 +13,7 @@
   hood       フードを被った状態の free_hands（あればフードのカットはこちらを優先）
   mirror     鏡越しの全身 → シルエット・サイズ感
   holding    商品を手に持った／使っている絵（ガジェット等）
+  station    商品が充電台・ステーションに置かれ、その横に立つ絵（置くだけ系の家電）
 
 使い方: python3 scripts/shot_plan.py product.json  → 計画（JSON）を標準出力へ
 """
@@ -74,6 +75,12 @@ RULES = [
      'line': 'ポケット深めで、手ぶらでいける', 'must_say': 'ポケット',
      'must_show': 'Her hands go into the front pockets of the garment.'},
     # ---- ガジェット（商品を持った絵 holding が要る） ----
+    # ★フック（#196）。orage RR35 の説明文「大容量抗菌紙パックで、最大約4－5か月ゴミ捨て不要。※1」から。
+    #   数字は Veo が読み崩しやすいので「4〜5」を言わせず「最大約5か月」に留め、条件（※1日1回の掃除で計測）はカードに書く
+    {'genres': ('gadget',), 'match': r'ゴミ捨て不要', 'hook': True,
+     'still': {'selfie': "She is filming herself at arm's length, leans toward the camera with a surprised, excited look "
+                         "and talks like she is telling a friend a secret. The product stands in its station behind her."},
+     'line': 'ゴミ捨て、最大約5か月いらないって', 'must_say': 'ゴミ捨て'},
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
      'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
                           "camera and talks like she is telling a friend."},
@@ -89,7 +96,9 @@ RULES = [
      'line': '片手で持てる軽さ、ガチで楽', 'must_say': '片手',
      'must_show': 'She holds the product up with one hand.'},
     {'genres': ('gadget',), 'match': r'自動|ステーション|オート',
-     'still': {'holding': "She sets the product on its station and steps back, pointing at it with a relaxed smile "
+     'still': {'station': "The product is docked in its station next to her. She points at it with an open hand, "
+                          "gives a relaxed smile and talks to the camera like a friend.",
+               'holding': "She sets the product on its station and steps back, pointing at it with a relaxed smile "
                           "while talking to the camera like a friend."},
      'line': '置くだけで、あとは勝手にやってくれる', 'must_say': '置くだけ',
      'must_show': 'The product sits on its station or base.'},
