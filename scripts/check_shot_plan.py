@@ -160,6 +160,69 @@ ok_real = ['下からも開くからね、抜け感出せる', 'フードが大�
 expect(all(len(speech_qa._norm(t, 'ja')) <= marie_video.SAID_MAX_RATIO * 13 for t in ok_real), '実際に通った喋りは止めない')
 expect(speech_qa.ends_polite('気になったらね、リンクから見てみてください。', 'ja'), '「ください」終わりも丁寧語として作り直す')
 
+print('=== 合格済みカットの使い回し（#198）===')
+_q = []
+_orig_req = marie_video._req
+marie_video._req = lambda url, key, body=None, method=None: (_q.append(url) or (200, [{'id': 77}]))
+still = 'https://x.supabase.co/storage/v1/object/public/images/scene/gadget/1790490103321-293fa7e9.jpg'
+c0 = dict(k['cuts'][2], still_url=still)
+expect(marie_video.find_reusable('https://x.supabase.co', 'k', RR35, c0) == 77, '同じ商品・同じ動きの前のクリップを拾う')
+import urllib.parse as _up  # noqa: E402
+qs = _up.parse_qs(_up.urlparse(_q[-1]).query)
+expect(qs['product_key'] == ['eq.orage-rr35'] and qs['situation'] == ['eq.' + c0['action'][:500]], '商品と動きの指示で絞る')
+expect(qs['created_at'] == ['gte.2026-09-27T06:21:43Z'], '静止画ができた後の物だけ（ファイル名の時刻・差し替えた静止画の前の物は拾わない）')
+expect(qs['status'] == ['neq.rejected'] and qs['video_url'] == ['not.is.null'], '却下・動画なしは拾わない')
+expect(marie_video.find_reusable('https://x.supabase.co', 'k', RR35, dict(c0, still_url='https://x/hoodie/master.jpg')) is None,
+       '作成時刻の読めない静止画は使い回さない（取り違えるより作る）')
+marie_video._req = lambda url, key, body=None, method=None: (200, [])
+expect(marie_video.find_reusable('https://x.supabase.co', 'k', RR35, c0) is None, '無ければ作る')
+marie_video._req = _orig_req
+
+# 通しで：コードレス・ステーション・CTA は使い回して合格、フックは使い回したが言い方が古い → 数えずに新しく作る
+import json as _j0  # noqa: E402
+import tempfile as _t0  # noqa: E402
+_keep = {n: getattr(marie_video, n) for n in ('_base_and_key', 'find_reusable', 'start_cut', 'wait_all', 'verify_cut', 'START_GAP_SEC')}
+RR35_S = dict(RR35, stills={kk: 'https://x/scene/gadget/1790490103321-293fa7e9.jpg' for kk in RR35['stills']})
+kp = shot_plan.plan(RR35_S)['cuts']
+old = {0: 900, 2: 902, 3: 903, 5: 905}          # フック・コードレス・ステーション・CTA に前のクリップがある
+said_of = {900: 'ゴミ捨てって最大約5ヶ月いらないって'}  # 前のフックは古い言い方
+new_ids = iter(range(1000, 1100))
+started_cuts = []
+marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
+marie_video.START_GAP_SEC = 0
+marie_video.find_reusable = lambda b, kk, p, c: old.get(kp.index(next(x for x in kp if x['action'] == c['action'] and x['line'] == c['line'])))
+new_line = {}
+def _start(b, kk, p, c):
+    started_cuts.append(c['line'])
+    i = next(new_ids)
+    new_line[i] = c['line']
+    return i
+marie_video.start_cut = _start
+marie_video.wait_all = lambda b, kk, ids: {i: {'video_url': 'u%d' % i} for i in ids}
+def _verify(b, kk, url, ms):
+    i = int(url[1:])
+    if i in said_of:
+        return 1, 'ok', said_of[i]
+    line = next((c['line'] for n, c in enumerate(kp) if old.get(n) == i), None)
+    return 1, 'ok', line or new_line[i]
+marie_video.verify_cut = _verify
+with _t0.TemporaryDirectory() as td:
+    pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
+    _j0.dump(RR35_S, open(pj, 'w'))
+    sys.argv = ['marie_video.py', pj, oj]
+    try:
+        marie_video.main()
+        jb = _j0.load(open(oj))['job']
+    except SystemExit as e:
+        jb = None
+        print('     止まった: %s' % e)
+for n, v in _keep.items():
+    setattr(marie_video, n, v)
+expect(jb is not None and jb['review']['clip_ids'][2:4] == [902, 903] and jb['review']['clip_ids'][5] == 905,
+       '合格した前のクリップはそのまま描画に使う')
+expect(kp[0]['line'] in started_cuts and kp[1]['line'] in started_cuts and kp[2]['line'] not in started_cuts,
+       'Veo を起動するのは、前が無いカットと、前の言い方が古いカットだけ')
+
 print('=== 手元のクリップで通す試験の口（reuse_ids）===')
 import json as _json  # noqa: E402
 import tempfile  # noqa: E402

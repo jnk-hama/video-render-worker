@@ -19,7 +19,9 @@ import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import shot_plan  # noqa: E402
@@ -66,6 +68,30 @@ def start_cut(base, key, product, cut):
         raise SystemExit('Veo を起動できません（%s・%s）: %s' % (
             cut['role'], cut.get('feature'), json.dumps(res, ensure_ascii=False)[:300]))
     return started[0]['id']
+
+
+# 静止画のファイル名の頭は作った時刻（ミリ秒）。product-scene の保存名（例: 1790490103321-293fa7e9.jpg）
+STILL_TIME = re.compile(r'/(\d{13})-[0-9a-f]{8}\.[a-z]+$')
+
+
+def find_reusable(base, key, product, cut):
+    """
+    前に作った同じカット（同じ商品・同じ動きの指示・その静止画ができた後に作った物）の id。無ければ None（#198）。
+    ★合格したカットを作り直さない（オーナー「自然に使い回せるならあり」）。Veo は秒で課金されるので、使い回した分がそのまま浮く。
+    ★video_library には元の静止画が残らない。代わりに「静止画の作成時刻より後の物だけ」を拾う。静止画を差し替えれば古いクリップは拾わない。
+      作成時刻が読めない静止画は使い回さない（取り違えるより作る方が安全）。
+    ★拾った物も、新しく作った物と同じ照合（映る物・言うべき語・丁寧語・言い淀み）を通す。落ちれば新しく作る。
+    """
+    m = STILL_TIME.search(cut.get('still_url') or '')
+    if not m:
+        return None
+    since = datetime.fromtimestamp(int(m.group(1)) / 1000, tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    q = urllib.parse.urlencode({
+        'select': 'id', 'product_key': 'eq.%s' % product['product_key'],
+        'situation': 'eq.%s' % cut['action'][:500], 'status': 'neq.rejected',
+        'video_url': 'not.is.null', 'created_at': 'gte.%s' % since, 'order': 'id.desc', 'limit': '1'})
+    code, res = _req('%s/rest/v1/video_library?%s' % (base, q), key)
+    return res[0]['id'] if code == 200 and isinstance(res, list) and res else None
 
 
 def rows(base, key, ids):
@@ -150,6 +176,7 @@ def main():
         return
     base, key = _base_and_key()
     reuse = product.get('reuse_ids')
+    reused = set()  # 前のクリップを使い回したカットの番号（#198）
     if reuse:
         if len(reuse) != len(plan['cuts']):
             raise SystemExit('reuse_ids は %d 本（カット数）必要です（%d 本）' % (len(plan['cuts']), len(reuse)))
@@ -157,10 +184,19 @@ def main():
         print('手元のクリップを使います（Veo は起動しない）: %s' % ids)
     else:
         ids = []
-        for i, c in enumerate(plan['cuts']):
-            if i:
+        started = 0
+        for c in plan['cuts']:
+            rid = None if product.get('reuse') is False else find_reusable(base, key, product, c)
+            if rid:
+                print('  使い回し: %s（前のクリップ id=%s・照合は通し直す）' % (c['role'] + '/' + (c.get('feature') or '').split('\n')[0], rid))
+                reused.add(len(ids))
+                ids.append(rid)
+                continue
+            if started:
                 time.sleep(START_GAP_SEC)
             ids.append(start_cut(base, key, product, c))
+            started += 1
+        print('Veo を起動したカット: %d / %d（残りは使い回し）' % (started, len(ids)))
     got = wait_all(base, key, ids)
     seen_before = {}  # ★同じ動画を2度判定しない（判定も有料）
 
@@ -168,6 +204,17 @@ def main():
         if url not in seen_before:
             seen_before[url] = verify_cut(base, key, url, must_show)
         return seen_before[url]
+
+    # ★使い回して照合に落ちたカットは、作り直しの回数に数えずに新しく作る（新しく作った物には通常どおり作り直しが1回残る）
+    if not reuse and reused:
+        stale = {k: why for k, why in redo_targets(plan['cuts'], got, ids, verify).items() if k in reused}
+        for n, (k, why) in enumerate(stale.items()):
+            print('カット %d は使い回せません（%s）。新しく作ります' % (k + 1, why))
+            if n:
+                time.sleep(START_GAP_SEC)
+            ids[k] = start_cut(base, key, product, plan['cuts'][k])
+        if stale:
+            got.update(wait_all(base, key, [ids[k] for k in stale]))
 
     for attempt in range(0 if reuse else RETRY_PER_CUT):
         bad = redo_targets(plan['cuts'], got, ids, verify)
