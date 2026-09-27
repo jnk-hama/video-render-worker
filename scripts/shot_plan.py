@@ -14,6 +14,7 @@
   mirror     鏡越しの全身 → シルエット・サイズ感
   holding    商品を手に持った／使っている絵（ガジェット等）
   station    商品が充電台・ステーションに置かれ、その横に立つ絵（置くだけ系の家電）
+  cleaning   商品を実際に使っている絵（掃除機なら床のゴミの上をヘッドが通る）。機能の中心は「使って効く所」を見せる
 
 使い方: python3 scripts/shot_plan.py product.json  → 計画（JSON）を標準出力へ
 """
@@ -80,7 +81,15 @@ RULES = [
     {'genres': ('gadget',), 'match': r'ゴミ捨て不要', 'hook': True,
      'still': {'selfie': "She is filming herself at arm's length, leans toward the camera with a surprised, excited look "
                          "and talks like she is telling a friend a secret. The product stands in its station behind her."},
-     'line': 'ゴミ捨て、最大約5か月いらないって', 'must_say': 'ゴミ捨て'},
+     'line': '最大約5か月、ゴミ捨て不要', 'must_say': 'ゴミ捨て不要'},
+    # ★オーナー「ゴミ捨てってではなく、ゴミ捨て不要で のほうがわかりやすい」（2026-09-27）。説明文の語をそのまま言わせる
+    # ★★掃除機の肝は吸い込む所（オーナー「一番肝心な掃除機のパワーや吸い込み描写は絶対いる。何に使うかを考えて」）。
+    #   説明文「強力吸引で細かい粉じんもどんどん吸い込みます」から。数値（Pa）は言わない（説明文自身が「使い方で異なる」と打ち消している）
+    {'genres': ('gadget',), 'match': r'吸引|吸い込',
+     'still': {'cleaning': "She pushes the vacuum slowly across the rug. The floor head passes over scattered crumbs and dust, "
+                           "which disappear into it and leave a clean stripe behind. She glances at the camera, impressed."},
+     'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む',
+     'must_show': 'The floor head passes over visible crumbs or dust on the floor and they disappear.'},
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
      'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
                           "camera and talks like she is telling a friend."},

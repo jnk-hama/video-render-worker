@@ -70,15 +70,17 @@ expect(all(c['still'] == 'holding' for c in g['cuts'][1:-1]), 'ガジェット�
 
 print('=== 家電（orage RR35・#196）===')
 RR35 = {'product_key': 'orage-rr35', 'genre': 'gadget',
-        'features': ['最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測', 'コードレス', '自動ゴミ回収ステーション', '軽量1.6kg'],
-        'image_url': 'https://example/rr35.jpg', 'stills': {'selfie': 's', 'holding': 'h', 'station': 't'}}
+        'features': ['最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測', '強力吸引', 'コードレス', '自動ゴミ回収ステーション', '軽量1.6kg'],
+        'image_url': 'https://example/rr35.jpg', 'stills': {'selfie': 's', 'holding': 'h', 'station': 't', 'cleaning': 'c'}}
 k = shot_plan.plan(RR35)
 for c in k['cuts']:
     print('     %-8s %-8s %-14s %s' % (c['role'], c['still'], (c['feature'] or '').split(chr(10))[0], c['line']))
-expect(k['cuts'][0]['line'].startswith('ゴミ捨て') and k['cuts'][0]['still'] == 'selfie', 'フックは説明文の一番強い数字（ゴミ捨て不要）')
+expect('ゴミ捨て不要' in k['cuts'][0]['line'] and k['cuts'][0]['still'] == 'selfie', 'フックは説明文の一番強い数字を「ゴミ捨て不要」の語で（オーナー指摘）')
+expect(k['cuts'][1]['feature'] == '強力吸引' and k['cuts'][1]['still'] == 'cleaning' and bool(k['cuts'][1].get('must_show')),
+       '掃除機は吸い込む所を、使っている絵で最初に見せる（オーナー「一番肝心」）')
 st = next(c for c in k['cuts'] if c['feature'] == '自動ゴミ回収ステーション')
 expect(st['still'] == 'station', '置くだけ系はステーションの絵を優先')
-expect([c['still'] for c in k['cuts'][1:-1]] == ['holding', 'station', 'holding'], '持つ絵を続けない（ステーションを挟む）')
+expect([c['still'] for c in k['cuts'][2:-1]] == ['holding', 'station', 'holding'], '持つ絵を続けない（ステーションを挟む）')
 
 print('=== 規則表そのもの ===')
 for rule in shot_plan.RULES + [shot_plan.FALLBACK_HOOK, shot_plan.CTA]:
