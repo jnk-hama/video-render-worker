@@ -138,7 +138,7 @@ def main():
             print('  --   基準を書きました: tests/golden/render/%s（見てからコミットすること）' % name)
             continue
         s = ssim(got, gold)
-        expect(s >= SSIM_MIN, '%.1f秒のコマが基準と同じ（SSIM %.4f ≥ %.2f）' % (t, s, SSIM_MIN))
+        expect(s >= SSIM_MIN, '%.1f秒のコマが基準と同じ（SSIM %.4f ≥ %.3f）' % (t, s, SSIM_MIN))
     return finish()
 
 
