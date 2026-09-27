@@ -126,6 +126,7 @@ jobs:
       #   決まった合成素材を実際に描き、決まった時刻のコマを基準と SSIM で比べる。
       #   焼き込み文字の検査（RapidOCR）が走るので、その依存だけ入れる（版は constraints.txt）。
       - name: 描画の回帰試験の依存
+        working-directory: .
         run: python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt rapidocr_onnxruntime numpy pillow
 
       - name: 描画の回帰試験（コマ・尺・効果音・パネルが前と同じ）
