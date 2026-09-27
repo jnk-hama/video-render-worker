@@ -31,6 +31,7 @@ CARD_SFX = 'pop'      # カードが出る時の効果音（assets/shared/sfx/ �
 ★規則表。上から順に当てる（先に当たった規則が勝つ）。
   still は優先順（左が第一候補）。action は静止画ごとに書く（同じ機能でも絵によって出来る動作が違う）。
   line は 18文字以下・タメ口・です/ます・？ 無し（video-scene が ？ を弾く）。
+  must_say は line の中の語を1つ。聞こえなければ描く前に作り直す（#193。Veo の言い換え・言いかけで切れた喋りを通さない）。
   must_show は「セリフが言っている絵」を英語1文で（#185）。見せる主張のある規則だけに付け、動作全体ではなく1点に絞る。
   実地で通った物（2026-09-26 の本番）を元にしている。
 """
@@ -65,32 +66,32 @@ RULES = [
     {'genres': ('apparel', 'hoodie'), 'match': r'サイズ|大きめ|オーバー|ゆったり|ビッグ|[MSL]〜',
      'still': {'mirror': "Mirror selfie, full body. She turns slightly left and right in front of the mirror to show "
                          "the loose, roomy silhouette, then smiles and talks to the mirror like a friend."},
-     'line': 'サイズ大きめで、シルエットかわいい',
+     'line': 'サイズ大きめで、シルエットかわいい', 'must_say': 'シルエット',
      'must_show': 'Her full body is visible in a mirror, showing a loose silhouette.'},
     {'genres': ('apparel', 'hoodie'), 'match': r'ポケット',
      'still': {'free_hands': "Waist-up. She slides both hands into the front pockets, shows how deep they are, then "
                              "smiles and talks to the viewer like a friend."},
-     'line': 'ポケット深めで、手ぶらでいける',
+     'line': 'ポケット深めで、手ぶらでいける', 'must_say': 'ポケット',
      'must_show': 'Her hands go into the front pockets of the garment.'},
     # ---- ガジェット（商品を持った絵 holding が要る） ----
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
      'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
                           "camera and talks like she is telling a friend."},
-     'line': 'コードないから、サッと使える',
+     'line': 'コードないから、サッと使える', 'must_say': 'コード',
      'must_show': 'She holds the product and no cable is attached to it.'},
     {'genres': ('gadget',), 'match': r'静音|静か|dB',
      'still': {'holding': "The product is running next to her; she leans in to listen, smiles because it is quiet, "
                           "and talks softly to the camera like a friend."},
-     'line': '動いてても、ほぼ音しない'},
+     'line': '動いてても、ほぼ音しない', 'must_say': '音'},
     {'genres': ('gadget',), 'match': r'軽量|軽い|[0-9.]+ ?(g|kg)',
      'still': {'holding': "She holds the product up easily with one hand and bounces it slightly to show how light "
                           "it is, then talks to the camera like a friend."},
-     'line': '片手で持てる軽さ、ガチで楽',
+     'line': '片手で持てる軽さ、ガチで楽', 'must_say': '片手',
      'must_show': 'She holds the product up with one hand.'},
     {'genres': ('gadget',), 'match': r'自動|ステーション|オート',
      'still': {'holding': "She sets the product on its station and steps back, pointing at it with a relaxed smile "
                           "while talking to the camera like a friend."},
-     'line': '置くだけで、あとは勝手にやってくれる',
+     'line': '置くだけで、あとは勝手にやってくれる', 'must_say': '置くだけ',
      'must_show': 'The product sits on its station or base.'},
 ]
 

@@ -76,6 +76,10 @@ for rule in shot_plan.RULES + [shot_plan.FALLBACK_HOOK, shot_plan.CTA]:
     expect(not speech_qa.check_speech([[{'text': rule['line'], 'start': 0, 'end': 1}]], [{}], 'ja'),
            'セリフ「%s」は喋りの検査（です終わり・体験談）を通る' % rule['line'])
 
+for rule in shot_plan.RULES + [shot_plan.CTA]:
+    expect(bool(rule.get('must_say')) and rule['must_say'] in rule['line'],
+           'セリフ「%s」は言うべき語を持つ（聞こえなければ描く前に作り直す・#193）' % rule['line'])
+
 print('=== 描画の依頼 ===')
 job = shot_plan.render_job(REDIAL, p, ['u%d' % i for i in range(len(p['cuts']))], 'preview/x.mp4')['job']
 expect([c['cut_index'] for c in job['info_cards']] == [i for i, c in enumerate(p['cuts']) if c.get('card')],
@@ -142,7 +146,7 @@ marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
 marie_video.start_cut = lambda *a: started.append(a) or 999
 marie_video.wait_all = lambda base, key, ids: {i: {'video_url': 'u%d' % i} for i in ids}
 # ★どのカットも言うべき語を言った体（#193 の照合を通す）
-marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', '色落ち フード 指先 抜け感 リンク')
+marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', '色落ち フード 指先 抜け感 シルエット リンク')
 with tempfile.TemporaryDirectory() as td:
     pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
     _json.dump(dict(REDIAL, reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))
