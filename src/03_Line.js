@@ -305,10 +305,19 @@ function adminNotifyTarget_() {
   return first || '';
 }
 
-/** 送信元 userId が許可されているか。ALLOWED_LINE_USER_IDS 未設定なら全許可（非推奨）。 */
+/**
+ * 送信元 userId が許可されているか。
+ * ★★ALLOWED_LINE_USER_IDS が未設定なら**閉じる**（2026-09-27 に全許可から変更）。
+ *   リポジトリを公開したので Web アプリの URL は誰でも読める。WEBHOOK_SECRET も未設定なら、
+ *   全許可のままでは URL を知る誰でも LINE になりすまして投稿・設定変更ができた（jmas-ai-os DECISIONS #202）。
+ *   オーナーは登録済み（2026-09-27 に「ID」で確認）なので、閉じても今のボットは止まらない。
+ */
 function isAllowedLineUser_(userId) {
   const raw = getProp_('ALLOWED_LINE_USER_IDS');
-  if (!raw) return true;
+  if (!raw) {
+    console.warn('ALLOWED_LINE_USER_IDS が未設定のため、全員を拒否しました（未設定なら閉じる）。');
+    return false;
+  }
   return raw.split(',').map(function (s) { return s.trim(); })
             .filter(Boolean)
             .indexOf(userId) !== -1;
