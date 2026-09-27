@@ -189,7 +189,7 @@ def plan(product):
     return {'cuts': cuts, 'cards_only': cards_only, 'panel': panel}
 
 
-def render_job(product, plan_, clip_urls, upload_path):
+def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     """描画の依頼（{"job":{...}}）を組む。clip_urls は cuts と同じ並び"""
     cuts = plan_['cuts']
     clips = []
@@ -216,6 +216,9 @@ def render_job(product, plan_, clip_urls, upload_path):
     }
     if plan_.get('panel'):
         job['product_panel'] = plan_['panel']
+    # ★完成したらオーナーの LINE へ［承認］［作り直し］を送る（決定#191）。押された返事で素材が approved になる
+    if clip_ids:
+        job['review'] = {'clip_ids': [int(i) for i in clip_ids]}
     # ★カードが出る瞬間に短い効果音（決定#189）。目を文字へ向けさせる。秒は描画側がカット番号から解く
     job['sfx'] = [{'tag': CARD_SFX, 'cut_index': c['cut_index']} for c in cards]
     return {'job': job}

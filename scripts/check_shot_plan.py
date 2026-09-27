@@ -141,6 +141,8 @@ with tempfile.TemporaryDirectory() as td:
     job = _json.load(open(oj))['job']
     expect(not started, 'reuse_ids の回は Veo を1本も起動しない')
     expect(len(job['clips']) == len(p['cuts']), '描画の依頼まで作る（カット数ぶんのクリップ）')
+    expect(job.get('review', {}).get('clip_ids') == list(range(100, 100 + len(p['cuts']))),
+           '完成後に LINE で承認を求める素材番号を依頼に載せる（#191）')
     _json.dump(dict(REDIAL, reuse_ids=[1, 2]), open(pj, 'w'))
     try:
         marie_video.main()

@@ -583,6 +583,45 @@ jobs:
       #   artifact は取得に認証と解凍が要り、GAS から扱いにくい。
       #   Release アセットなら1回のGETでMP4そのものが取れる。
       #   タグに job_id を入れておけば、GAS 側は「自分が頼んだ回」を特定できる。
+      # ★★2026-09-27 追加（決定#191）。完成した動画をオーナーの LINE へ送り、［承認］［作り直し］を1タップで返してもらう。
+      #   依頼に review.clip_ids（使った素材の video_library の id）がある回だけ。送るのは video-scene の notify_review
+      #   （service role でしか呼べない）。押された返事は Supabase の line-webhook が受ける。
+      # ★送れなくても動画は出来ているので、この手順の失敗で描画を落とさない（警告だけ）。
+      # ★公開リポジトリなので、URL・素材番号・返りの本文はログへ出さない（件数と状態だけ）。
+      - name: オーナーへ承認依頼（LINE）
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -uo pipefail
+          python3 - <<'PY' || echo "::warning::LINE への承認依頼を送れませんでした（動画は出来ています）"
+          import json, os, re, sys, urllib.error, urllib.request
+          d = json.load(open('payload.json'))
+          d = d.get('job') if isinstance(d.get('job'), dict) else d
+          ids = [int(i) for i in ((d.get('review') or {}).get('clip_ids') or []) if str(i).isdigit()]
+          up = d.get('upload') or {}
+          if not ids or not up.get('bucket') or not up.get('path'):
+              print('承認依頼の指定なし（review.clip_ids か upload が無い）。送りません。')
+              sys.exit(0)
+          raw = re.sub(r'[^A-Za-z0-9:/._-]', '', os.environ.get('SUPABASE_URL') or '')
+          host = re.sub(r'^https?://', '', raw).split('/')[0]
+          host = host if '.' in host else host + '.supabase.co'
+          key = re.sub(r'[^A-Za-z0-9._-]', '', os.environ.get('SUPABASE_SERVICE_ROLE_KEY') or '')
+          if not host or not key:
+              sys.exit('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY がありません')
+          body = {'action': 'notify_review', 'clip_ids': ids,
+                  'title': str(d.get('product_key') or '')[:60],
+                  'video_url': 'https://%s/storage/v1/object/public/%s/%s' % (host, up['bucket'], up['path'])}
+          req = urllib.request.Request('https://%s/functions/v1/video-scene' % host, data=json.dumps(body).encode(),
+                                       headers={'Authorization': 'Bearer ' + key, 'apikey': key,
+                                                'Content-Type': 'application/json'})
+          try:
+              with urllib.request.urlopen(req, timeout=40) as r:
+                  print('LINE へ承認依頼を送りました（HTTP %d・素材 %d 本）' % (r.status, len(ids)))
+          except urllib.error.HTTPError as e:
+              sys.exit('送れません（HTTP %d）' % e.code)
+          PY
+
       - name: Release へ上げる
         env:
           GH_TOKEN: ${{ github.token }}

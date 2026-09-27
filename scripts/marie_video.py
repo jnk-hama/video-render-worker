@@ -176,7 +176,7 @@ def main():
             'カット%d %s %s' % (k + 1, why, str(got[ids[k]].get('reviewed_note') or '')[:120])
             for k, why in still_bad.items()))
     path = 'preview/marie-%s-auto.mp4' % re.sub(r'[^a-z0-9-]', '-', product['product_key'].lower())
-    job = shot_plan.render_job(product, plan, [got[i]['video_url'] for i in ids], path)
+    job = shot_plan.render_job(product, plan, [got[i]['video_url'] for i in ids], path, clip_ids=ids)
     json.dump(job, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False)
     print('描画の依頼を作りました: %s（%d カット）' % (path, len(ids)))
 
