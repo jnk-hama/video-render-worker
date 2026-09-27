@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-26T08:47:00+00:00",
+ "generated_at": "2026-09-27T09:27:27+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -13,9 +13,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wkje9j",
-    "title": "Wrestler wins match then carries injured opponent to locker room",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wkje9j/wrestler_wins_match_then_carries_injured_opponent/",
+    "id": "t3_1wq7k2n",
+    "title": "Octopus Expertly Executes His Camouflage To Hide From Sea Eel",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wq7k2n/octopus_expertly_executes_his_camouflage_to_hide/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,91 +40,100 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wkn561",
-    "title": "Largest wildlife overpass in North America reduced wildlife collision by 91%",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wkn561/largest_wildlife_overpass_in_north_america/",
+    "id": "t3_1wnu2vg",
+    "title": "Comedian Karl Porter’s slow-mo goal celebration",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wnu2vg/comedian_karl_porters_slowmo_goal_celebration/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wm9tmu",
-    "title": "They took care of each other!",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wm9tmu/they_took_care_of_each_other/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wm2o6n",
+    "title": "A Detailed Look at a Bird Specimen and Its Prey",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wm2o6n/a_detailed_look_at_a_bird_specimen_and_its_prey/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wmwnab",
-    "title": "Mother whale teaches baby to see the sunrise",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wmwnab/mother_whale_teaches_baby_to_see_the_sunrise/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wqra5q",
+    "title": "Two galaxies are colliding 60 million light-years away - and this is what it looks like",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wqra5q/two_galaxies_are_colliding_60_million_lightyears/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wq7927",
-    "title": "A 392 year old Greenland Shark that was located in Arctic Ocean. He’s been wandering the ocean since 1627",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wq7927/a_392_year_old_greenland_shark_that_was_located/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wnra3i",
+    "title": "Satellite view of Category 5 Hurricane Polo next to Mexico",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wnra3i/satellite_view_of_category_5_hurricane_polo_next/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wkk7fg",
-    "title": "These geese stop to listen as a man plays a mouth harp",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wkk7fg/these_geese_stop_to_listen_as_a_man_plays_a_mouth/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wlsojm",
+    "title": "A massive supercell towered over eastern Nebraska",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wlsojm/a_massive_supercell_towered_over_eastern_nebraska/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wlb5ct",
-    "title": "NASA has released these new photos from the surface of Mars 🔭",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wlb5ct/nasa_has_released_these_new_photos_from_the/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1woh508",
+    "title": "Diver gets a nice shot of a great white shark with heavy scars",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1woh508/diver_gets_a_nice_shot_of_a_great_white_shark/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wo9xo8",
-    "title": "Efficiency of some trade workers in USA",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wo9xo8/efficiency_of_some_trade_workers_in_usa/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wmokq8",
+    "title": "Security measures for this VIP",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wmokq8/security_measures_for_this_vip/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wp8vni",
-    "title": "a starfish born square due to a birth defect",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wp8vni/a_starfish_born_square_due_to_a_birth_defect/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wp6gz3",
+    "title": "he might actually be the best",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wp6gz3/he_might_actually_be_the_best/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wkstdi",
-    "title": "Man won the billiards game with an incredible series of lucky shots",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wkstdi/man_won_the_billiards_game_with_an_incredible/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wol0z9",
+    "title": "An inverted shuv-it (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wol0z9/an_inverted_shuvit_source_link_in_description/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wp5816",
-    "title": "Long-range hornet nest removal by kid",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wp5816/longrange_hornet_nest_removal_by_kid/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wn1sfy",
+    "title": "Ronan Campos speedflying confusingly close to a mountain (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wn1sfy/ronan_campos_speedflying_confusingly_close_to_a/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wop3g9",
+    "title": "Making a custom leather journal cover \"(source Link in description)\"",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wop3g9/making_a_custom_leather_journal_cover_source_link/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -132,28 +141,37 @@
   ],
   "B": [
    {
-    "id": "t3_1wma2xa",
-    "title": "Fuzzy [Blue Archive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wma2xa/fuzzy_blue_archive/",
-    "subreddit": "awwnime",
+    "id": "t3_1wp1nkp",
+    "title": "Studio Madhouse's Early days of Digital compositing",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wp1nkp/studio_madhouses_early_days_of_digital_compositing/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1woplg1",
-    "title": "Vesna [Genshin Impact]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1woplg1/vesna_genshin_impact/",
-    "subreddit": "awwnime",
+    "id": "t3_1woel0n",
+    "title": "Clevatess Episode 12",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1woel0n/clevatess_episode_12/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wq0tqu",
-    "title": "Toki in a dress [Blue Archive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wq0tqu/toki_in_a_dress_blue_archive/",
-    "subreddit": "awwnime",
+    "id": "t3_1woayb5",
+    "title": "Re:ZERO Season 4 Episode 18 highlights",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1woayb5/rezero_season_4_episode_18_highlights/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wmr64s",
+    "title": "The World Is Dancing #13 KA: Rui (Presumed)",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wmr64s/the_world_is_dancing_13_ka_rui_presumed/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -177,82 +195,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wkxs1p",
-    "title": "Base Kratos, God Of War (2018)",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wkxs1p/base_kratos_god_of_war_2018/",
+    "id": "t3_1wqngzu",
+    "title": "Misa Amane from Death Note",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wqngzu/misa_amane_from_death_note/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wl2q4r",
-    "title": "Apothecary Diaries - \"It's to prevent getting dragged into a back alley.\"",
-    "url": "https://www.reddit.com/r/anime/comments/1wl2q4r/apothecary_diaries_its_to_prevent_getting_dragged/",
-    "subreddit": "anime",
+    "id": "t3_1wlvto9",
+    "title": "[ART] 🍉 - It's a Little Late, but I've Fallen in Love with My Childhood Friend.",
+    "url": "https://www.reddit.com/r/manga/comments/1wlvto9/art_its_a_little_late_but_ive_fallen_in_love_with/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wq502q",
-    "title": "We still don't have the second season of the actual peak isekai.. (Isekai Ojisan)",
-    "url": "https://www.reddit.com/r/anime/comments/1wq502q/we_still_dont_have_the_second_season_of_the/",
-    "subreddit": "anime",
+    "id": "t3_1wmcxz8",
+    "title": "[DISC] - Getsuyoubi no Tawawa - Ep. 605",
+    "url": "https://www.reddit.com/r/manga/comments/1wmcxz8/disc_getsuyoubi_no_tawawa_ep_605/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqd69j",
-    "title": "‘Frieren: Beyond Journey’s End’ 3rd Anniversary Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1wqd69j/frieren_beyond_journeys_end_3rd_anniversary_visual/",
-    "subreddit": "anime",
+    "id": "t3_1wpz7g5",
+    "title": "[DISC] Closet Girl - Oneshot",
+    "url": "https://www.reddit.com/r/manga/comments/1wpz7g5/disc_closet_girl_oneshot/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wptjz2",
-    "title": "Odette and Escoffier namecard looks like a pregnant swan when placed next to each other",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wptjz2/odette_and_escoffier_namecard_looks_like_a/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wkpxhk",
-    "title": "Handmade primogems to give out at the next convention [OC]",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wkpxhk/handmade_primogems_to_give_out_at_the_next/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wnbrzd",
-    "title": "FYI pyroculi spin opposite to the other occuli",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wnbrzd/fyi_pyroculi_spin_opposite_to_the_other_occuli/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wn54dm",
-    "title": "Meeting Sandrone in Snezhnaya",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wn54dm/meeting_sandrone_in_snezhnaya/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wnhek3",
-    "title": "Would swapping Ronova for Rhiendottir will be better for team DPS?",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wnhek3/would_swapping_ronova_for_rhiendottir_will_be/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wozwnl",
+    "title": "[ART] A different reason - Mikoto-chan Doesn’t Want to Be Hated!",
+    "url": "https://www.reddit.com/r/manga/comments/1wozwnl/art_a_different_reason_mikotochan_doesnt_want_to/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -262,6 +244,15 @@
     "title": "AI generated content",
     "url": "https://www.reddit.com/r/cosplay/comments/1wp1l56/ai_generated_content/",
     "subreddit": "cosplay",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wp3te8",
+    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 7",
+    "url": "https://www.reddit.com/r/manga/comments/1wp3te8/disc_the_story_of_a_girl_who_can_read_minds_ch_7/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": false,
     "source": "rss"
