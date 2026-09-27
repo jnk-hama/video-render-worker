@@ -162,6 +162,20 @@ expect(abs(tp[1][0]['start'] - 3.41) < 1e-6, '時刻は完成品の時間軸へ�
 src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'render_video.py'), encoding='utf-8').read()
 expect('speech_qa.transcribe_parts(part_audio' in src, 'render_video.py がカットごとの起こしを使っている（配線）')
 
+print('=== 台本と字幕の一致度（#199）===')
+good = [('見て！この色落ち、えぐいくらいヴィンテージ感ある', '見てます。この色落ちね、えぐいくらいヴィンテージ感ある'),
+        ('サイズ大きめで、シルエットかわいい', 'サイズ大きめでね、シルエット可愛い'),
+        ('コードないから、サッと使える', 'ので コードないから ね サッと使える')]
+bad = [('片手で持てる軽さ、ガチで楽', 'うん、ね、これね、ね、片手で持てる軽さね、マジで楽だよね。あ'),
+       ('下からも開くから、抜け感出せる', '下からも開くから座ったら'),
+       ('大きめフードで、こなれ感出る', '大きさなのです')]
+expect(all(speech_qa.script_match(a, b, 'ja') >= speech_qa.SCRIPT_MATCH_MIN for a, b in good), '実際に通った言い回しは止めない（ね・可愛い・前置き）')
+expect(all(speech_qa.script_match(a, b, 'ja') < speech_qa.SCRIPT_MATCH_MIN for a, b in bad), '言い淀み・言い換え・聞き違いは止める')
+expect(speech_qa.script_match(None, 'なんでも', 'ja') == 1.0, '台本の無い回は比べない（従来どおり）')
+iss = speech_qa.check_speech([[{'text': '下からも開くから座ったら', 'start': 0, 'end': 1}]],
+                             [{'line': '下からも開くから、抜け感出せる'}], 'ja')
+expect(any('台本と大きく違う' in t for t in iss), '描画側の検査でも止める（字幕に焼く前）')
+
 print('=== 喋りの検査（本物の不具合を拾えるか）===')
 clips = [{}, {}, {}, {}, {'must_say': ['色落ち加工']}, {'must_say': ['リンク']}]
 issues = speech_qa.check_speech(parts, clips, 'ja')

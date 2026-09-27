@@ -217,7 +217,8 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     cuts = plan_['cuts']
     clips = []
     for c, url in zip(cuts, clip_urls):
-        clip = {'url': url, 'start': 0, 'duration': c['seconds'], 'product_key': product['product_key']}
+        # ★台本（line）も渡す。描画側が字幕（文字起こし）と比べ、大きくずれたら止める（#199）
+        clip = {'url': url, 'start': 0, 'duration': c['seconds'], 'product_key': product['product_key'], 'line': c['line']}
         if c.get('must_say'):
             clip['must_say'] = [c['must_say']]
         clips.append(clip)

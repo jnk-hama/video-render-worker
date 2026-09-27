@@ -391,6 +391,19 @@ PANEL_BOTTOM = 0.70
 PANEL_FADE = 0.15
 
 
+def panel_boxes(w, n):
+    """
+    商品パネルの横の割り付け（左余白・間隔・1枠の幅）。画像を重ねる側と、ラベルを書く側の**両方がこれを使う**（数字を2箇所に書かない）。
+    ★★右は TikTok の右のアイコン列（いいね・コメント・共有）を避ける（2026-09-27・Gemini のレビュー→オーナー「進めて」#199）。
+      同じ動画を X にも出す（#102）ので、狭い方（TikTok）に合わせる。幅は SAFE_AREAS['tiktok']['right']（1080幅で200px）を画面幅で拡縮。
+      字幕の位置はオーナー確認済みの見た目なので、ここでは動かさない（パネルだけ）。
+    """
+    left = int(w * 0.04)
+    right = max(left, int(SAFE_AREAS['tiktok']['right'] * w / 1080.0))
+    gap = int(w * 0.03)
+    return left, gap, (w - left - right - gap * (n - 1)) // max(1, n)
+
+
 def panel_filter(w, h, n, start, end, sizes):
     """
     商品パネルの filter_complex を作る。入力 0 が本編、1..n が透過PNG。
@@ -401,9 +414,7 @@ def panel_filter(w, h, n, start, end, sizes):
     ★描くのは実画像だけ（#068）。色違いを生成で作らない＝画像が無い色は出さない。
     ★ sizes は各PNGの (幅, 高さ)。横に等分した枠へ、縦横比を保って収める。
     """
-    margin = int(w * 0.04)
-    gap = int(w * 0.03)
-    box_w = (w - 2 * margin - gap * (n - 1)) // n
+    margin, gap, box_w = panel_boxes(w, n)
     box_h = int(h * (PANEL_BOTTOM - PANEL_TOP))
     chains, prev = [], '0:v'
     for i, (iw, ih) in enumerate(sizes):
@@ -1597,15 +1608,15 @@ def build_ass(captions, w, h, font_size, center=False,
     """
     if panel and panel.get('images'):
         ps, pe = float(panel.get('start', 0)), float(panel.get('end', 0))
+        n = min(len(panel['images']), 4)
+        margin, gap, box_w = panel_boxes(w, n)
         if panel.get('title') and pe > ps:
+            # ★見出しはパネルの真ん中に（パネルは右のアイコン列を避けて左へ寄っている・#199）
             lines.append('Dialogue: 2,%s,%s,Pop,,0,0,0,,{\\pos(%d,%d)\\fs%d\\fad(120,120)}%s'
-                         % (ass_time(ps), ass_time(pe), w // 2,
+                         % (ass_time(ps), ass_time(pe), margin + (n * box_w + (n - 1) * gap) // 2,
                             int(h * (PANEL_TOP - 0.05)), int(font_size * 1.6),
                             ass_escape(str(panel['title']))))
         labels = panel.get('labels') or []
-        n = min(len(panel['images']), 4)
-        margin, gap = int(w * 0.04), int(w * 0.03)
-        box_w = (w - 2 * margin - gap * (n - 1)) // max(1, n)
         for i, lb in enumerate(labels[:n]):
             if not lb:
                 continue

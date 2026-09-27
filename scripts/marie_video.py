@@ -143,6 +143,8 @@ def redo_targets(cuts, got, ids, verify, lang='ja'):
             out[k] = '「%s」と言っていない（「%s」）' % (cuts[k]['must_say'], said[:60])
         elif len(speech_qa._norm(said, lang)) > SAID_MAX_RATIO * len(speech_qa._norm(cuts[k]['line'], lang)):
             out[k] = '言い淀み・言い足しが多い（「%s」）' % said[:60]
+        elif speech_qa.script_match(cuts[k]['line'], said, lang) < speech_qa.SCRIPT_MATCH_MIN:
+            out[k] = '台本と大きく違う（「%s」）' % said[:60]
     return out
 
 

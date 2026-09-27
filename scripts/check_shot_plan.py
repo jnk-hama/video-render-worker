@@ -232,7 +232,7 @@ marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
 marie_video.start_cut = lambda *a: started.append(a) or 999
 marie_video.wait_all = lambda base, key, ids: {i: {'video_url': 'u%d' % i} for i in ids}
 # ★どのカットも言うべき語を言った体（#193 の照合を通す）
-marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', '色落ち フード 指先 抜け感 シルエット リンク')
+marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', p['cuts'][int(url[1:]) - 100]['line'])
 with tempfile.TemporaryDirectory() as td:
     pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
     _json.dump(dict(REDIAL, reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))

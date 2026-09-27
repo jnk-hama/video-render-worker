@@ -19,6 +19,7 @@
 """
 
 import os
+import difflib
 import re
 import subprocess
 
@@ -351,6 +352,19 @@ def captions_from_words(parts, lang, group_words):
     return fix_caption_text(caps, lang)
 
 
+# 台本（line）と聞こえた喋りの一致度の下限（difflib の ratio・句読点と空白を落として比べる）。#199
+#   実測（2026-09-27）：通すべき喋り 0.81〜0.97、止めるべき喋り 0.32〜0.62
+#   （言い淀み「うん、ね、これね…」0.56／言い換え「下からも開くから座ったら」0.62／「大きさなのです」0.32）。
+#   ★字幕は文字起こしから焼く。聞き間違い（幻覚）がそのまま字幕に出るのを、台本との差で止める
+SCRIPT_MATCH_MIN = 0.70
+
+
+def script_match(line, said, lang):
+    """台本と聞こえた喋りの一致度（0〜1）。台本が無ければ 1（比べない）"""
+    a, b = _norm(line or '', lang), _norm(said or '', lang)
+    return 1.0 if not a else difflib.SequenceMatcher(None, a, b).ratio()
+
+
 def check_speech(parts, clips, lang, forbid=None):
     """
     @return 問題のリスト（空なら合格）。各要素は人が読める1行。
@@ -372,6 +386,10 @@ def check_speech(parts, clips, lang, forbid=None):
                               % (i + 1, e, said))
                 break
         spec = clips[i] if i < len(clips) else {}
+        r = script_match(spec.get('line'), said, lang)
+        if r < SCRIPT_MATCH_MIN:
+            issues.append('カット%d: 台本と大きく違う（一致度 %.2f < %.2f）→ 台本「%s」／実際「%s」'
+                          % (i + 1, r, SCRIPT_MATCH_MIN, spec.get('line'), said or '（無音）'))
         for must in (spec.get('must_say') or []):
             alts = must if isinstance(must, list) else [must]
             if not any(_norm(a, lang) in n for a in alts if _norm(a, lang)):
