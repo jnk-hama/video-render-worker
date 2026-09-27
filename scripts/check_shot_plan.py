@@ -151,6 +151,15 @@ dev = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids},
                                lambda u, m: (1, 'ok', '下からも開くから座ったら' if u == 'v%d' % zk else cuts[int(u[1:])]['line']))
 expect(list(dev) == [zk] and '抜け感' in dev[zk], 'セリフを言い換えて言うべき語が無いカットは作り直しに回す（#193・実例）')
 
+lk = next(k for k, c in enumerate(cuts) if c['feature'] == 'M〜3L')
+fil = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
+                               lambda u, m: (1, 'ok', 'うん、ね、これね、ね、サイズ大きめでね、シルエットかわいいよね。あ' if u == 'v%d' % lk
+                                             else cuts[int(u[1:])]['line']))
+expect(list(fil) == [lk] and '言い淀み' in fil[lk], '言い淀みで伸びた喋りは作り直しに回す（#197・実例の形）')
+ok_real = ['下からも開くからね、抜け感出せる', 'フードが大きいからね、頭まで隠れる', 'ので コードないから ね サッと使える']
+expect(all(len(speech_qa._norm(t, 'ja')) <= marie_video.SAID_MAX_RATIO * 13 for t in ok_real), '実際に通った喋りは止めない')
+expect(speech_qa.ends_polite('気になったらね、リンクから見てみてください。', 'ja'), '「ください」終わりも丁寧語として作り直す')
+
 print('=== 手元のクリップで通す試験の口（reuse_ids）===')
 import json as _json  # noqa: E402
 import tempfile  # noqa: E402

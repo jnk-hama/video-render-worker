@@ -90,6 +90,11 @@ def verify_cut(base, key, video_url, must_show):
     return res['match'], str(res.get('seen') or ''), str(res.get('said') or '')
 
 
+# ★聞こえた喋りがセリフの何倍まで長ければ許すか（#197）。言い淀み・言い足しで伸びた喋りを止める。
+#   実測（2026-09-27）：通すべき物は 1.07〜1.43 倍、「うん、ね、これね、ね、片手で持てる軽さね、マジで楽だよね。あ」は 2.25 倍
+SAID_MAX_RATIO = 1.6
+
+
 def redo_targets(cuts, got, ids, verify, lang='ja'):
     """
     作り直すカット番号と理由。動画が無い＝フィルタ、must_show が映っていない＝絵のずれ、
@@ -110,6 +115,8 @@ def redo_targets(cuts, got, ids, verify, lang='ja'):
             out[k] = '言い終わりが丁寧語（「%s」）' % said[:60]
         elif cuts[k].get('must_say') and speech_qa._norm(cuts[k]['must_say'], lang) not in speech_qa._norm(said, lang):
             out[k] = '「%s」と言っていない（「%s」）' % (cuts[k]['must_say'], said[:60])
+        elif len(speech_qa._norm(said, lang)) > SAID_MAX_RATIO * len(speech_qa._norm(cuts[k]['line'], lang)):
+            out[k] = '言い淀み・言い足しが多い（「%s」）' % said[:60]
     return out
 
 

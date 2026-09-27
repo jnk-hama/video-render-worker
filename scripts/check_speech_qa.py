@@ -170,7 +170,9 @@ for s in issues:
 expect(any('カット2' in s and 'のです' in s for s in issues), '「大きさなのです」を止める')
 expect(any('カット5' in s and 'のです' in s for s in issues), '「こなれ感出るのです」を止める')
 expect(any('カット5' in s and '色落ち加工' in s for s in issues), '「色打ち加工」を「色落ち加工が言えていない」と止める')
-expect(not any('カット6' in s for s in issues), '言えている「リンク」は止めない')
+expect(not any('カット6' in s and '丁寧語' not in s for s in issues), '言えている「リンク」は止めない')
+# ★この実録の CTA は「見てみてください」で、当時は通っていた。タメ口の子の敬語終わりとして止める（#197）
+expect(any('カット6' in s and 'ください' in s for s in issues), '「見てみてください」を止める')
 expect(not any('カット4' in s for s in issues), '問題の無いカットは止めない')
 
 en_issues = speech_qa.check_speech([EN4], [{'must_say': ['character']}], 'en')
