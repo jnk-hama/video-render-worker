@@ -93,7 +93,9 @@ def verify_cut(base, key, video_url, must_show):
 def redo_targets(cuts, got, ids, verify, lang='ja'):
     """
     作り直すカット番号と理由。動画が無い＝フィルタ、must_show が映っていない＝絵のずれ、
-    言い終わりが丁寧語＝Veo の「です」足し（#189。描画側で切れない時に動画ごと止まるので、ここで作り直す）
+    言い終わりが丁寧語＝Veo の「です」足し（#189。描画側で切れない時に動画ごと止まるので、ここで作り直す）、
+    言うべき語（must_say）が聞こえない＝Veo がセリフを言い換えた（#193。「抜け感出せる」が「座ったら…」になり、
+    切れた喋りのまま描かれた）。描画側の検査も must_say で止めるので、描く前に作り直す方が安い
     """
     out = {}
     for k, i in enumerate(ids):
@@ -106,6 +108,8 @@ def redo_targets(cuts, got, ids, verify, lang='ja'):
             out[k] = '絵がセリフと合わない（映っていた物: %s）' % seen[:120]
         elif speech_qa.ends_polite(said, lang):
             out[k] = '言い終わりが丁寧語（「%s」）' % said[:60]
+        elif cuts[k].get('must_say') and speech_qa._norm(cuts[k]['must_say'], lang) not in speech_qa._norm(said, lang):
+            out[k] = '「%s」と言っていない（「%s」）' % (cuts[k]['must_say'], said[:60])
     return out
 
 

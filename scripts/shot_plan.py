@@ -60,7 +60,7 @@ RULES = [
      'still': {'free_hands': "Waist-up. She looks down, takes the second zipper pull at the bottom hem with both "
                              "hands and slides it up a little so the hem opens, then looks up and talks to the viewer "
                              "like a friend."},
-     'line': '下からも開くから、抜け感出せる',
+     'line': '下からも開くから、抜け感出せる', 'must_say': '抜け感',
      'must_show': 'She moves a zipper pull at the bottom hem of the garment.'},
     {'genres': ('apparel', 'hoodie'), 'match': r'サイズ|大きめ|オーバー|ゆったり|ビッグ|[MSL]〜',
      'still': {'mirror': "Mirror selfie, full body. She turns slightly left and right in front of the mirror to show "
@@ -101,7 +101,7 @@ FALLBACK_HOOK = {'still': {'selfie': "She is filming herself at arm's length, le
 CTA = {'still': {'selfie': "She is filming herself at arm's length, smiles, points down toward the bottom of the "
                            "frame with her free index finger and talks casually to the camera like a friend."},
        'line': '気になったら、リンクから見てみて', 'must_say': 'リンク'}
-# 色・サイズ展開は動画で見せる物ではない。最後の実画像パネルの見出しへ回す
+# 色・サイズ展開は動画で見せる物ではない。最後のカットの POINT カードへ回す（#193）
 PANEL_MATCH = r'[0-9一二三四五]色|カラー|展開|[SML]〜|[0-9]?XL'
 
 
@@ -151,7 +151,7 @@ def plan(product):
         if re.search(PANEL_MATCH, f):
             panel_bits.append(f)
             if not rule:
-                continue  # 色展開など絵で見せない物はパネルの見出しだけ（サイズは鏡のカットにも使う）
+                continue  # 色展開など絵で見せない物は最後の POINT カードだけ（サイズは鏡のカットにも使う）
         if not rule or id(rule) in used:
             cards_only.append(f)
             continue
@@ -180,12 +180,16 @@ def plan(product):
         if len(c['line']) > lim or re.search(r'[?？]|です$|ます$', c['line']):
             raise SystemExit('規則表のセリフが不正: %r（%d文字・上限%d）' % (c['line'], len(c['line']), lim))
     panel = None
-    if product.get('image_url') and cuts and cuts[-1]['role'] == 'cta':
-        # ★前のカードで出した情報は最後の見出しに繰り返さない（オーナー「M〜は前のシーンで書いてるからいらない」#184）
+    if cuts and cuts[-1]['role'] == 'cta':
+        # ★前のカードで出した情報は最後に繰り返さない（オーナー「M〜は前のシーンで書いてるからいらない」#184）
         shown = {c['card'] for c in cuts if c.get('card')}
         rest = [b for b in panel_bits if b not in shown]
-        panel = {'cut_index': len(cuts) - 1, 'title': '・'.join(rest[:2]),
-                 'images': [product['image_url']], 'cutout': False}
+        # ★色展開は前のカットと同じ POINT カードで上に出す。パネルの大見出し（「2色」）は置かない
+        #   （オーナー「最後のシーンの2色はいらない。付けるなら前のシーンみたく上に POINT として」#193）
+        if rest:
+            cuts[-1]['card'] = '・'.join(rest[:2])
+        if product.get('image_url'):
+            panel = {'cut_index': len(cuts) - 1, 'images': [product['image_url']], 'cutout': False}
     return {'cuts': cuts, 'cards_only': cards_only, 'panel': panel}
 
 

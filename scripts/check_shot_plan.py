@@ -41,8 +41,12 @@ size = next((c for c in p['cuts'] if c['feature'] == 'M〜3L'), None)
 expect(size is not None and size['still'] == 'mirror', 'サイズは鏡越しの全身で見せる（パネルの見出しにも使う）')
 zipc = next(c for c in p['cuts'] if c['feature'] == 'ダブルジップ')
 expect(zipc['still'] == 'free_hands', 'ジップは両手が空いた絵から')
-expect(p['panel'] and p['panel']['title'] == '2色' and p['panel']['cut_index'] == len(p['cuts']) - 1,
-       '色展開は最後の実画像パネルの見出しへ。前のカードで出したサイズは繰り返さない（#184）')
+expect(p['panel'] and p['panel']['cut_index'] == len(p['cuts']) - 1 and not p['panel'].get('title'),
+       '最後のカットに実画像パネル。大見出し（「2色」）は置かない（#193）')
+expect(p['cuts'][-1].get('card') == '2色',
+       '色展開は最後のカットの POINT カードへ。前のカードで出したサイズは繰り返さない（#184・#193）')
+c2 = shot_plan.plan(dict(REDIAL, features=['大きめフード', 'グレー・ブラックの2色展開', 'M〜3L']))
+expect(c2['cuts'][-1].get('card') == 'グレー・ブラックの2色展開', '色名つきの色展開もそのままカードに出す')
 expect(all(len(c['line']) <= shot_plan.JA_CHARS_4S * c['seconds'] // 4 for c in p['cuts']), 'セリフは尺に入る長さ')
 
 print('=== 静止画が足りない時は作らない ===')
@@ -106,7 +110,8 @@ calls = []
 
 def fake_verify(url, must_show):
     calls.append((url, must_show))
-    return (0, 'bare fingers', 'x') if url == 'v%d' % sleeve else (1, 'ok', 'ふつうのセリフ')
+    k = int(url[1:])
+    return (0, 'bare fingers', 'x') if k == sleeve else (1, 'ok', cuts[k]['line'])
 
 
 got = {i: {'video_url': 'v%d' % i} for i in ids}
@@ -119,10 +124,14 @@ expect(sorted(u for u, _ in calls) == sorted('v%d' % k for k in ids if k),
 expect(all((m is None) == (not cuts[int(u[1:])].get('must_show')) for u, m in calls),
        'must_show の無いカット（フック・CTA）は絵の問いを渡さない')
 expect(marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                                lambda u, m: (1, 'ok', 'サイズ大きめで、シルエットかわいい')) == {}, '全部映っていて喋りも普通なら作り直さない')
+                                lambda u, m: (1, 'ok', cuts[int(u[1:])]['line'])) == {}, '全部映っていてセリフ通りなら作り直さない')
 pol = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                               lambda u, m: (1, 'ok', '下からも開くからね、座っても楽です。' if u == 'v3' else 'ふつう'))
+                               lambda u, m: (1, 'ok', '下からも開くからね、座っても楽です。' if u == 'v3' else cuts[int(u[1:])]['line']))
 expect(list(pol) == [3] and '丁寧語' in pol[3], '言い終わりが「です」のカットは作り直しに回す（#189）')
+zk = next(k for k, c in enumerate(cuts) if c['feature'] == 'ダブルジップ')
+dev = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
+                               lambda u, m: (1, 'ok', '下からも開くから座ったら' if u == 'v%d' % zk else cuts[int(u[1:])]['line']))
+expect(list(dev) == [zk] and '抜け感' in dev[zk], 'セリフを言い換えて言うべき語が無いカットは作り直しに回す（#193・実例）')
 
 print('=== 手元のクリップで通す試験の口（reuse_ids）===')
 import json as _json  # noqa: E402
@@ -132,7 +141,8 @@ started = []
 marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
 marie_video.start_cut = lambda *a: started.append(a) or 999
 marie_video.wait_all = lambda base, key, ids: {i: {'video_url': 'u%d' % i} for i in ids}
-marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', 'ふつう')
+# ★どのカットも言うべき語を言った体（#193 の照合を通す）
+marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', '色落ち フード 指先 抜け感 リンク')
 with tempfile.TemporaryDirectory() as td:
     pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
     _json.dump(dict(REDIAL, reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))
