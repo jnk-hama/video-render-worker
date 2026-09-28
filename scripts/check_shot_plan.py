@@ -239,6 +239,17 @@ expect(len(calls_f) == len(ids), '動画のあるカットは全部、顔も見�
 expect(marie_video.is_pov({'action': 'First-person view ...'}) and not marie_video.is_pov({'action': 'She holds ...'}),
        '一人称のカットは action の書き出しで見分ける（規則表の書き方と一致）')
 
+print('=== 語尾の「ね」（#217）===')
+nek = next(k for k, c in enumerate(cuts) if c['feature'] == '大きめフード')
+ne = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
+                              lambda u, m: (1, 'ok', 'フードがね、大きいからね、頭まで隠れるね' if u == 'v%d' % nek else cuts[int(u[1:])]['line']))
+expect(list(ne) == [nek] and '「ね」' in ne[nek], '台本に無い「ね」を2回以上足したカットは作り直す')
+one = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
+                               lambda u, m: (1, 'ok', 'フードが大きいからね、頭まで隠れる' if u == 'v%d' % nek else cuts[int(u[1:])]['line']))
+expect(one == {}, '「ね」1回までは自然な喋りとして通す')
+expect(marie_video.situation_text(cuts[0]).endswith(marie_video.NO_NE) and 'ne (ね)' in marie_video.NO_NE,
+       'Veo へ渡す場面の説明に「ね を足さない」を必ず付ける（使い回しの照合も同じ文）')
+
 print('=== 合格済みカットの使い回し（#198）===')
 marie_video.make_face_check = lambda: (lambda u, pov: None)  # 顔の判定は上で単体に確かめた。ここは通信しない
 _q = []
@@ -249,7 +260,7 @@ c0 = dict(k['cuts'][2], still_url=still)
 expect(marie_video.find_reusable('https://x.supabase.co', 'k', RR35, c0) == 77, '同じ商品・同じ動きの前のクリップを拾う')
 import urllib.parse as _up  # noqa: E402
 qs = _up.parse_qs(_up.urlparse(_q[-1]).query)
-expect(qs['product_key'] == ['eq.orage-rr35'] and qs['situation'] == ['eq.' + c0['action'][:500]], '商品と動きの指示で絞る')
+expect(qs['product_key'] == ['eq.orage-rr35'] and qs['situation'] == ['eq.' + marie_video.situation_text(c0)[:500]], '商品と動きの指示で絞る（Veo へ渡した文と同じ）')
 expect(qs['created_at'] == ['gte.2026-09-27T06:21:43Z'], '静止画ができた後の物だけ（ファイル名の時刻・差し替えた静止画の前の物は拾わない）')
 expect(qs['status'] == ['neq.rejected'] and qs['video_url'] == ['not.is.null'], '却下・動画なしは拾わない')
 expect(marie_video.find_reusable('https://x.supabase.co', 'k', RR35, dict(c0, still_url='https://x/hoodie/master.jpg')) is None,

@@ -64,11 +64,28 @@ def _req(url, key, body=None, method=None):
             return e.code, {'error': raw[:2000]}
 
 
+# ★語尾の「ね」を足させない（オーナー指摘 2026-09-24・2026-09-28「語尾にねが多すぎる」#217）。
+#   自然な喋り（speech_style=natural・#176）は言い換えとつなぎ言葉を許すので、Veo が全カットに「ね」を足した。
+#   video-scene のプロンプトを直すにはデプロイが要る（10/1まで不可）ので、場面の説明の末尾で伝える
+NO_NE = (" In her speech she never adds the sentence particle ne (ね) or yo ne (よね) anywhere,"
+         " and adds no filler words beyond the line.")
+EXTRA_NE_MAX = 1   # 台本に無い「ね」は1回まで。2回以上は作り直す
+
+
+def situation_text(cut):
+    """Veo へ渡す場面の説明（使い回しの照合にも同じ文を使う）"""
+    return cut['action'] + NO_NE
+
+
+def extra_ne(line, said):
+    return said.count('ね') - line.count('ね')
+
+
 def start_cut(base, key, product, cut):
     body = {'action': 'start', 'genre': product.get('library_genre') or product.get('genre'),
             'product_key': product['product_key'], 'person_url': cut['still_url'],
             'animate_still': True, 'seconds': cut['seconds'], 'speech_style': 'natural',
-            'speech': cut['line'], 'situations': [cut['action']]}
+            'speech': cut['line'], 'situations': [situation_text(cut)]}
     code, res = _req('%s/functions/v1/video-scene' % base, key, body)
     started = (res or {}).get('started') or []
     if code != 200 or not started:
@@ -100,7 +117,7 @@ def find_reusable(base, key, product, cut):
     since = datetime.fromtimestamp(int(m.group(1)) / 1000, tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     q = urllib.parse.urlencode({
         'select': 'id', 'product_key': 'eq.%s' % product['product_key'],
-        'situation': 'eq.%s' % cut['action'][:500], 'status': 'neq.rejected',
+        'situation': 'eq.%s' % situation_text(cut)[:500], 'status': 'neq.rejected',
         'video_url': 'not.is.null', 'created_at': 'gte.%s' % since, 'order': 'id.desc', 'limit': '1'})
     code, res = _req('%s/rest/v1/video_library?%s' % (base, q), key)
     return res[0]['id'] if code == 200 and isinstance(res, list) and res else None
@@ -206,6 +223,8 @@ def redo_targets(cuts, got, ids, verify, lang='ja', face=None):
             out[k] = '「%s」と言っていない（「%s」）' % ('」「'.join(miss), said[:60])
         elif len(speech_qa._norm(said, lang)) > SAID_MAX_RATIO * len(speech_qa._norm(cuts[k]['line'], lang)):
             out[k] = '言い淀み・言い足しが多い（「%s」）' % said[:60]
+        elif lang == 'ja' and extra_ne(cuts[k]['line'], said) > EXTRA_NE_MAX:
+            out[k] = '「ね」を足しすぎ（%d回・「%s」）' % (extra_ne(cuts[k]['line'], said), said[:60])
         elif speech_qa.script_match(cuts[k]['line'], said, lang) < speech_qa.SCRIPT_MATCH_MIN:
             out[k] = '台本と大きく違う（「%s」）' % said[:60]
         elif face:
