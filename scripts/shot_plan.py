@@ -84,35 +84,42 @@ RULES = [
     #   （「220g」が軽量の規則に、「バッテリー」が充電式の規則に先に当たらないように）。
     #   ★「4K」「フルHD」「高画質」は言わない：入力は4K対応だが本体の解像度は 854×480（優良誤認になる）。
     #   ★映す映像はアニメ・映画の実在作品にしない（著作権）。抽象的な映像と書く
+#   ★★映像はレンズが向いた面にだけ出す（オーナー「商品が写している壁ではない所に映像が出ているのが AI 感」）。
+#     本体は付属のミニ三脚に載せ、レンズ側を壁・天井へ向け、光の筋と映像をその先に置く。must_show でも向きを見る
     {'genres': ('gadget',), 'match': r'天井', 'hook': True,
-     'still': {'ceiling': "She lies on her back on a bed in a dark bedroom, looking up. A big, bright, colorful "
-                          "abstract nature video is projected across the ceiling above her. She turns her head to the "
-                          "camera with an excited smile and talks like she is telling a friend a secret."},
+     'still': {'ceiling': "She lies on her back on a bed in a dark bedroom, looking up. On the bedside table the small "
+                          "projector sits on its mini tripod, tilted so its lens end points straight up; a soft cone of "
+                          "light rises from the lens and the colorful abstract nature video lands on the ceiling directly "
+                          "above it. She turns her head to the camera with an excited smile and talks like she is telling "
+                          "a friend a secret."},
      'line': '寝ながら天井で、映画見れる', 'must_say': '天井',
-     'must_show': 'A large bright projected image covers the ceiling above her.'},
+     'must_show': 'The image on the ceiling is directly above the projector, whose lens points up at it.'},
     {'genres': ('gadget',), 'match': r'スマホサイズ|手のひら',
      'still': {'holding': "She holds the small projector flat on her open palm next to her face to show it is about "
                           "the size of a phone, then talks to the camera like a friend."},
      'line': 'スマホくらいの大きさで、持ち歩ける', 'must_say': 'スマホ',
      'must_show': 'She holds a small projector about the size of a phone in one hand.'},
     {'genres': ('gadget',), 'match': r'アプリ内蔵',
-     'still': {'wall': "She sits on a sofa in a cozy living room at night. A big, bright, colorful video with no logos "
-                       "fills the plain wall in front of her, projected from the small projector on the side table. "
-                       "She turns to the camera, delighted, and talks like a friend.",
-               'holding': "She sets the small projector on a side table and a bright, colorful video appears large on "
-                          "the plain wall behind her. No logos on screen. She gestures at it and talks to the camera "
-                          "like a friend."},
+     'still': {'wall': "She sits on a sofa in a cozy living room at night. On the coffee table in front of her the small "
+                       "projector sits on its mini tripod, lens end aimed at the plain wall across the room; a faint beam "
+                       "runs from the lens to the wall, and the colorful video with no logos fills the wall exactly where "
+                       "the lens points. She turns to the camera, delighted, and talks like a friend.",
+               'holding': "She sets the small projector on its mini tripod on a table with the lens end facing the plain "
+                          "wall in front of her; a colorful video with no logos appears on that wall exactly where the "
+                          "lens points. She gestures at it and talks to the camera like a friend."},
      'line': 'アプリ入りだから、届いてすぐ見れる', 'must_say': 'アプリ',
-     'must_show': 'A bright video image is projected on the wall behind her.'},
+     'must_show': 'The projector lens points at the wall where the video image appears.'},
     {'genres': ('gadget',), 'match': r'ゲーム|Switch|PS[45]',
-     'still': {'gaming': "She sits on the floor holding a plain game controller while a colorful video game is "
-                         "projected large on the wall in front of her. No logos. She glances back at the camera, "
-                         "thrilled, and talks like a friend."},
+     'still': {'gaming': "She sits on the floor facing a plain wall, holding a plain game controller. Between her and the "
+                         "wall the small projector sits on its mini tripod, lens end facing the wall, with an HDMI cable to "
+                         "a small plain game console; the colorful game image appears on the wall right where the lens "
+                         "aims. No logos. She glances back at the camera, thrilled, and talks like a friend."},
      'line': 'ゲームも大画面で、テンション上がる', 'must_say': 'ゲーム',
-     'must_show': 'A video game image is projected large on the wall while she holds a controller.'},
+     'must_show': 'A game image is on the wall where the projector lens points while she holds a controller.'},
     {'genres': ('gadget',), 'match': r'連続[0-9.]+時間',
-     'still': {'holding': "She carries the small projector with no cable attached into another room, sets it down "
-                          "and a video starts on the wall. She smiles and talks to the camera like a friend."},
+     'still': {'holding': "She carries the small projector with no cable attached into another room and sets it on its "
+                          "mini tripod facing a plain wall; a video appears on that wall exactly where the lens points. "
+                          "She smiles and talks to the camera like a friend."},
      'line': '充電式で、映画一本まるっと見れる', 'must_say': '映画',
      'must_show': 'She holds the small projector and no cable is attached to it.'},
     # ★フック（#196）。orage RR35 の説明文「大容量抗菌紙パックで、最大約4－5か月ゴミ捨て不要。※1」から。
