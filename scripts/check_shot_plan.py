@@ -239,6 +239,26 @@ expect(len(calls_f) == len(ids), '動画のあるカットは全部、顔も見�
 expect(marie_video.is_pov({'action': 'First-person view ...'}) and not marie_video.is_pov({'action': 'She holds ...'}),
        '一人称のカットは action の書き出しで見分ける（規則表の書き方と一致）')
 
+print('=== 顔の基準は人物ごと（#218）===')
+import face_score  # noqa: E402
+expect(face_score.master_urls() == face_score.MASTERS['marie'], '指定なしはマリーの基準')
+expect(face_score.master_urls('m1') == face_score.MASTERS['m1'] and face_score.MASTERS['m1'] != face_score.MASTERS['marie'],
+       '男性（m1）は別の基準')
+try:
+    face_score.master_urls('anna')
+    expect(False, '知らない人物は止める')
+except SystemExit:
+    expect(True, '知らない人物は止める（別人の基準で通さない）')
+_seen_p = []
+_orig_rs, _orig_fp = face_score.reference_set, marie_video.face_problem
+face_score.reference_set = lambda p=None: (_seen_p.append(p) or [('m', None)])
+marie_video.face_problem = lambda u, pov, refs, who='marie': None
+_real_mfc = marie_video.make_face_check
+_real_mfc('m1')('v0', False)
+_real_mfc(None)('v0', False)
+face_score.reference_set, marie_video.face_problem = _orig_rs, _orig_fp
+expect(_seen_p == ['m1', 'marie'], 'product_json の persona の基準で判定する（無ければマリー）')
+
 print('=== 語尾の「ね」（#217）===')
 nek = next(k for k, c in enumerate(cuts) if c['feature'] == '大きめフード')
 ne = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
@@ -251,7 +271,7 @@ expect(marie_video.situation_text(cuts[0]).endswith(marie_video.NO_NE) and 'ne (
        'Veo へ渡す場面の説明に「ね を足さない」を必ず付ける（使い回しの照合も同じ文）')
 
 print('=== 合格済みカットの使い回し（#198）===')
-marie_video.make_face_check = lambda: (lambda u, pov: None)  # 顔の判定は上で単体に確かめた。ここは通信しない
+marie_video.make_face_check = lambda persona=None: (lambda u, pov: None)  # 顔の判定は上で単体に確かめた。ここは通信しない
 _q = []
 _orig_req = marie_video._req
 marie_video._req = lambda url, key, body=None, method=None: (_q.append(url) or (200, [{'id': 77}]))

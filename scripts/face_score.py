@@ -30,29 +30,29 @@ import subprocess
 import sys
 
 PASS_THRESHOLD = 0.42
-# ★★2026-09-12（決定#147）、en/ → shared/ へ移した。
-#
-# 【なぜ】オーナー指示「前に生成したAIインフルエンサーを使えばいい」（日本市場）。
-#   ところが決定#082の構造では、ja の依頼が assets/en/... を指すと
-#   **描かずに停止する**。置き場所のせいで使えなかった。
-# ★★彼女は**最初からAB両方で使うために日系アメリカ人として作られている**
-#   （オーナー談 2026-09-12）。つまり Aライン専用の素材ではない。
-#   **設計は最初から共用だったのに、置き場所だけがそれを表していなかった。**
-#   → shared/ が正しい置き場所。#082の構造自体は変えていない。
-# ★私は最初「日本人に見えるから en/ に置いたのが誤り」と書いたが、
-#   それは**見た目からの推測**だった。理由が違えば、次に読む人が
-#   「英語圏では別の人を立てるべきか」と誤解する。**意図を書く。**
-REF_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    'assets', 'shared', 'influencer', 'anna')
-
 # ★★2026-09-25（決定#173）、インフルエンサーをアンナから「マリー」へ替えた。
 #   マスターは生成画（自前の画像）だが、描画のたびに使う物ではないので
 #   リポジトリには置かず URL で持つ。**ここが唯一の置き場所**（1つに集約する）。
-#   空にすると従来どおり REF_DIR（アンナ）を読む。
-MASTER_URLS = [
-    'https://xtbpgpegmbkizuwumvxt.supabase.co/storage/v1/object/public/images/scene/persona/1790304052972-d05df9e8.jpg',
-]
+# ★★2026-09-28（決定#218）、人物ごとに持つ。男性（M1-B1・scene_library id=89）を足した。
+#   どの人物で判定するかは引数か環境変数 PERSONA。**知らない名前は止める**（別人の基準で通さない）。
+#   ★m1 は仮の名前。名前が決まったら差し替える
+MASTERS = {
+    'marie': [
+        'https://xtbpgpegmbkizuwumvxt.supabase.co/storage/v1/object/public/images/scene/persona/1790304052972-d05df9e8.jpg',
+    ],
+    'm1': [
+        'https://xtbpgpegmbkizuwumvxt.supabase.co/storage/v1/object/public/images/scene/persona/1790593413117-b4f2b8e4.jpg',
+    ],
+}
+DEFAULT_PERSONA = 'marie'
+
+
+def master_urls(persona=None):
+    name = persona or os.environ.get('PERSONA') or DEFAULT_PERSONA
+    if name not in MASTERS:
+        raise SystemExit('知らない人物です: %r（face_score.MASTERS にある名前: %s）' % (name, ', '.join(MASTERS)))
+    return MASTERS[name]
+
 
 _app = None
 
@@ -89,27 +89,21 @@ def embeddings(path):
     return [f.normed_embedding for f in _analyzer().get(img)]
 
 
-def reference_set():
-    """マスターを読み込む。MASTER_URLS があればそれ、無ければ REF_DIR の全方向。"""
+def reference_set(persona=None):
+    """その人物のマスターを読み込む（既定はマリー）。"""
+    import tempfile
+    import urllib.request
+    urls = master_urls(persona)
     out = []
-    if MASTER_URLS:
-        import tempfile
-        import urllib.request
-        d = tempfile.mkdtemp(prefix='face_ref_')
-        for i, u in enumerate(MASTER_URLS):
-            dest = os.path.join(d, 'master_%02d.jpg' % i)
-            urllib.request.urlretrieve(u, dest)
-            for e in embeddings(dest):
-                out.append((os.path.basename(u), e))
-        # ★1件も読めないまま「全員不合格」や「判定なし」を返さない（E-021 の形）
-        if not out:
-            raise SystemExit('マスターから顔を1つも読めませんでした: %s' % MASTER_URLS)
-        return out
-    for fn in sorted(os.listdir(REF_DIR)):
-        if fn.startswith('_') or not fn.lower().endswith(('.jpg', '.png')):
-            continue
-        for e in embeddings(os.path.join(REF_DIR, fn)):
-            out.append((fn, e))
+    d = tempfile.mkdtemp(prefix='face_ref_')
+    for i, u in enumerate(urls):
+        dest = os.path.join(d, 'master_%02d.jpg' % i)
+        urllib.request.urlretrieve(u, dest)
+        for e in embeddings(dest):
+            out.append((os.path.basename(u), e))
+    # ★1件も読めないまま「全員不合格」や「判定なし」を返さない（E-021 の形）
+    if not out:
+        raise SystemExit('マスターから顔を1つも読めませんでした: %s' % urls)
     return out
 
 

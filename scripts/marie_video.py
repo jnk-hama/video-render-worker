@@ -160,7 +160,7 @@ def is_pov(cut):
     return str(cut.get('action') or '').startswith('First-person')
 
 
-def face_problem(url, pov, refs):
+def face_problem(url, pov, refs, who='marie'):
     import face_score
     import hand_score
     d = tempfile.mkdtemp(prefix='clip_')
@@ -181,21 +181,25 @@ def face_problem(url, pov, refs):
         if pov:
             return '一人称のカットに顔が映っている（%.1f秒）' % at
         if not s['passed']:
-            return 'マリーではない顔（%.1f秒・類似度 %.2f）' % (at, s['best'])
+            return '本人（%s）ではない顔（%.1f秒・類似度 %.2f）' % (who, at, s['best'])
     return None
 
 
-def make_face_check():
-    """クリップの顔の判定（同じ動画を2度見ない）。マスターは初回に読む。読めなければ止まる（未設定なら閉じる）"""
+def make_face_check(persona=None):
+    """
+    クリップの顔の判定（同じ動画を2度見ない）。マスターは初回に読む。読めなければ止まる（未設定なら閉じる）。
+    persona は product_json の "persona"（無ければマリー・#218）。知らない名前は face_score が止める
+    """
     import face_score
+    who = persona or face_score.DEFAULT_PERSONA
     state = {}
 
     def face(url, pov):
         if 'refs' not in state:
-            state['refs'] = face_score.reference_set()
+            state['refs'] = face_score.reference_set(who)
         if (url, pov) not in state:
-            state[(url, pov)] = face_problem(url, pov, state['refs'])
-            print('  顔 %s: %s' % ('NG' if state[(url, pov)] else 'OK', state[(url, pov)] or ('一人称・顔なし' if pov else 'マリー')))
+            state[(url, pov)] = face_problem(url, pov, state['refs'], who)
+            print('  顔 %s: %s' % ('NG' if state[(url, pov)] else 'OK', state[(url, pov)] or ('一人称・顔なし' if pov else who)))
         return state[(url, pov)]
     return face
 
@@ -293,7 +297,7 @@ def main():
             seen_before[url] = verify_cut(base, key, url, must_show)
         return seen_before[url]
 
-    face = make_face_check()
+    face = make_face_check(product.get('persona'))
 
     # ★使い回して照合に落ちたカットは、作り直しの回数に数えずに新しく作る（新しく作った物には通常どおり作り直しが1回残る）
     if not reuse and reused:
