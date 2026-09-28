@@ -76,6 +76,7 @@ def job():
         'info_cards': [{'text': '大きめフード', 'cut_index': 0}, {'text': '長め袖', 'cut_index': 1}],
         'sfx': [{'tag': 'pop', 'cut_index': 0}, {'tag': 'pop', 'cut_index': 1}],
         'product_panel': {'cut_index': 1, 'title': '2色', 'images': ['%s/panel.png' % WORK_REL], 'cutout': False},
+        'cta_arrow': {'cut_index': 1},
     }}
 
 
@@ -96,8 +97,30 @@ def ssim(a, b):
     return float(m.group(1)) if m else 0.0
 
 
+def unit_checks():
+    """描かずに確かめられる部品（#204）"""
+    sys.path.insert(0, HERE)
+    import render_video as rv
+    import shot_plan
+    print('=== 部品 ===')
+    name, fdir, ratio = rv.caption_font('あ')
+    m = lambda t: rv.measure_char_ratio(t, name, fdir)  # noqa: E731
+    maxw = 1080 - 120 - 2 * rv.CARD_BOX_PAD
+    expect(rv.card_font_size(['グレー・ブラックの2色展開'], 86, ratio, maxw, m) == 86,
+           '収まる札は縮めない（実測で見る・固定値だけだと縮めてしまう）')
+    small = rv.card_font_size(['吸引力26400Paのパワフル吸引で細かいゴミも'], 86, ratio, maxw, m)
+    expect(int(86 * rv.CARD_MIN_SCALE) <= small < 86, '長い札は枠に収まるまで縮める（下限あり）: %d' % small)
+    ev = rv.cta_arrow_events(10.0, 13.5, 540, 1560, None)
+    expect(len(ev) == 7 and all('\\p1' in e for e in ev), 'CTA の矢印は往復ごとに1行（3.5秒で7行）')
+    job = shot_plan.render_job({'product_key': 'x'}, {'cuts': [{'role': 'hook', 'seconds': 6, 'line': 'a'},
+                                                               {'role': 'cta', 'seconds': 4, 'line': 'b'}]},
+                               ['u0', 'u1'], 'preview/x.mp4')['job']
+    expect(job.get('cta_arrow') == {'cut_index': 1}, '依頼は最後の CTA カットに矢印を付ける')
+
+
 def main():
     update = '--update' in sys.argv
+    unit_checks()
     make_fixtures()
     jp, out = os.path.join(WORK, 'job.json'), os.path.join(WORK, 'out.mp4')
     json.dump(job(), open(jp, 'w', encoding='utf-8'), ensure_ascii=False)

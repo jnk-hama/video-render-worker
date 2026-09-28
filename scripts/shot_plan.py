@@ -240,6 +240,9 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     }
     if plan_.get('panel'):
         job['product_panel'] = plan_['panel']
+    # ★最後のカット（CTA）で画面下を指す矢印を弾ませる（#204）。秒は描画側がカット番号から解く
+    if cuts and cuts[-1]['role'] == 'cta':
+        job['cta_arrow'] = {'cut_index': len(cuts) - 1}
     # ★完成したらオーナーの LINE へ［承認］［作り直し］を送る（決定#191）。押された返事で素材が approved になる
     if clip_ids:
         job['review'] = {'clip_ids': [int(i) for i in clip_ids]}

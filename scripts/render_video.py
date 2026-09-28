@@ -937,6 +937,14 @@ SPEECH_SPEED_MAX = 1.3
 CARD_SIZE_RATIO = 0.72
 CARD_TAG_RATIO = 0.34
 CARD_TOP_Y = 0.128   # 機能の札の中心。PR 表記（0.062）の下、頭の上
+CARD_BOX_PAD = 22    # 札の箱の余白（Card スタイルの Outline＝BorderStyle 3 の箱の厚み）。幅の計算にも同じ値を使う
+CARD_SPACING = 2     # 札の字間（Card スタイルの Spacing）
+# ★札の文字は枠に収まるまで縮める（#204・Remotion の measuring-text の考え方）。ここより小さくはしない（読めなくなる）
+CARD_MIN_SCALE = 0.55
+# ★CTA の矢印（#204）。最後のカットで画面下を指して弾ませる。中心の高さ（画面高比）と、1往復の秒・振れ幅（px）
+CTA_ARROW_Y = 0.815
+CTA_ARROW_BOUNCE_SEC = 0.5
+CTA_ARROW_BOUNCE_PX = 24
 CARD_TAG_Y = 0.088   # 「POINT n」の小札
 # 情報カードを字幕の**下**に置く距離（画面高に対する比）。上に置くと服を隠す
 CARD_BELOW_CAPTION = 0.08
@@ -1503,8 +1511,8 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
         #   ★2026-09-26（#183・オーナー「しょぼい・変。デザインして上の方に」）:
         #     白い札に濃い文字、左上に色付きの「POINT n」の小札。画面の上（頭の上）に出す
         ('Style: Card,%s,%d,&H00222222,&H00222222,&H00FFFFFF,'
-         '&H00000000,0,0,0,0,100,100,2,0,3,22,0,5,40,40,40,1'
-         % (font_name, max(28, int(font_size * CARD_SIZE_RATIO)))),
+         '&H00000000,0,0,0,0,100,100,%d,0,3,%d,0,5,40,40,40,1'
+         % (font_name, max(28, int(font_size * CARD_SIZE_RATIO)), CARD_SPACING, CARD_BOX_PAD)),
         ('Style: CardTag,%s,%d,&H00FFFFFF,&H00FFFFFF,&H005C3BFF,'
          '&H00000000,0,0,0,0,100,100,4,0,3,10,0,5,40,40,40,1'
          % (font_name, max(18, int(font_size * CARD_TAG_RATIO)))),
@@ -1514,9 +1522,50 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
     ])
 
 
+def card_font_size(text_lines, card_fs, ratio, max_w, measure=None):
+    """
+    札の文字の大きさ。一番長い行が max_w に収まるまで縮める（#204）。
+    ★まず固定の字幅比（ratio）で見積もり、はみ出しそうな時だけ **libass で実際に描いて測る**（measure）。
+      固定値は日本語で 1.05 だが、「ー」「・」や英数字が混ざると実測は 0.5〜0.66 まで下がる
+      （2026-09-28 実測：「グレー・ブラックの2色展開」0.64）。固定値だけで縮めると、収まる札まで小さくなる。
+    ★字間（CARD_SPACING）も足す。CARD_MIN_SCALE より小さくはしない
+    """
+    lines = [t for t in text_lines if t]
+    if not lines:
+        return card_fs
+    longest = max(lines, key=len)
+
+    def need(r):
+        return len(longest) * (card_fs * r + CARD_SPACING)
+
+    r = ratio or CHAR_WIDTH_RATIO
+    if need(r) > max_w and measure:
+        r = measure(longest) or r
+    if need(r) <= max_w:
+        return card_fs
+    return max(int(card_fs * CARD_MIN_SCALE), int(card_fs * max_w / float(need(r))))
+
+
+def cta_arrow_events(start, end, x, y, accent):
+    """
+    CTA の下向き矢印（#204）。ASS の図形（\\p1）で描き、CTA_ARROW_BOUNCE_SEC ごとに上下へ弾ませる。
+    ★ASS は繰り返しができないので、往復ごとに1行ずつ並べる（\\move で下へ→次の行で上へ）
+    """
+    shape = 'm -22 0 l 22 0 l 22 60 l 58 60 l 0 120 l -58 60 l -22 60'
+    color = ('\\1c%s' % accent) if accent else '\\1c&H005C3BFF'
+    out, t, down = [], start, True
+    while t < end - 0.05:
+        t2 = min(end, t + CTA_ARROW_BOUNCE_SEC)
+        y0, y1 = (y, y + CTA_ARROW_BOUNCE_PX) if down else (y + CTA_ARROW_BOUNCE_PX, y)
+        out.append('Dialogue: 3,%s,%s,Pop,,0,0,0,,{\\an5\\move(%d,%d,%d,%d)%s\\3c&H00FFFFFF&\\bord5\\shad0'
+                   '\\p1}%s{\\p0}' % (ass_time(t), ass_time(t2), x, y0, x, y1, color, shape))
+        t, down = t2, not down
+    return out
+
+
 def build_ass(captions, w, h, font_size, center=False,
               font_name='DejaVu Sans', ratio=None, font_dir=None,
-              theme=None, disclosure=None, safe=None, cards=None, panel=None):
+              theme=None, disclosure=None, safe=None, cards=None, panel=None, cta_arrow=None):
     """
     単語ごとに色が変わる字幕（karaoke）を作る。
 
@@ -1583,8 +1632,14 @@ def build_ass(captions, w, h, font_size, center=False,
     """
     n_card = 0
     accent = (theme or {}).get('accent')
+    card_fs = max(28, int(font_size * CARD_SIZE_RATIO))
     for cd in (cards or []):
-        text = '\\N'.join(ass_escape(t) for t in str(cd.get('text') or '').split('\n') if t.strip())
+        raw_lines = [t for t in str(cd.get('text') or '').split('\n') if t.strip()]
+        text = '\\N'.join(ass_escape(t) for t in raw_lines)
+        # ★長い売り文句は枠に収まるまで縮める（#204）。収まる物は1バイトも変えない
+        fs = card_font_size(raw_lines, card_fs, ratio, usable_w - 2 * CARD_BOX_PAD,
+                            measure=lambda t: measure_char_ratio(t, font_name, font_dir))
+        fit = ('\\fs%d' % fs) if fs != card_fs else ''
         start = float(cd.get('start', 0))
         end = float(cd.get('end', start + 2.0))
         if not text or end <= start:
@@ -1600,8 +1655,10 @@ def build_ass(captions, w, h, font_size, center=False,
         lines.append('Dialogue: 2,%s,%s,CardTag,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)%s}POINT %d'
                      % (ass_time(start), ass_time(end), center_x, ty,
                         ('\\3c%s' % accent) if accent else '', n_card))
-        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\move(%d,%d,%d,%d,0,180)\\fad(120,150)}%s'
-                     % (ass_time(start), ass_time(end), center_x + 80, cy, center_x, cy, text))
+        # ★弾んで出る（#204・Remotion の spring の考え方を ASS の \\t で）。小さく→少し大きく→元の大きさ。効果音の「ポン」と同じ瞬間
+        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)%s\\fscx30\\fscy30'
+                     '\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)}%s'
+                     % (ass_time(start), ass_time(end), center_x, cy, fit, text))
     """
     ★商品パネルの見出しとラベル。見出しはパネルの上に大きく（参考の「全色OK」）、
       ラベルは各画像の下に Card の箱で。画像そのものは panel_filter が重ねる。
@@ -1760,6 +1817,11 @@ def build_ass(captions, w, h, font_size, center=False,
 
         lines.append('Dialogue: 0,%s,%s,Pop,,0,0,0,,%s%s'
                      % (ass_time(start), ass_time(end), effect, karaoke.strip()))
+
+    # ★CTA の矢印（#204）。最後のカットで「リンクは下」を目で見せる（喋りの「リンクから見てみて」に合わせる）
+    if cta_arrow and float(cta_arrow.get('end', 0)) > float(cta_arrow.get('start', 0)):
+        lines += cta_arrow_events(float(cta_arrow['start']), float(cta_arrow['end']),
+                                  center_x, int(h * CTA_ARROW_Y), accent)
 
     return '\n'.join(head + lines) + '\n'
 
@@ -2516,13 +2578,15 @@ def main():
 
     # ★カード・パネルをカット番号（cut_index）で指定した回は、ここで実際の秒へ直す（決定#182）
     if (any('cut_index' in (c or {}) for c in (job.get('info_cards') or []) + (job.get('sfx') or []))
-            or 'cut_index' in (job.get('product_panel') or {})):
+            or 'cut_index' in (job.get('product_panel') or {}) or 'cut_index' in (job.get('cta_arrow') or {})):
         import speech_qa
         eff = trans if (trans > 0 and len(parts) >= 2) else 0.0
         wins = speech_qa.part_windows([probe_duration(p) or 0.0 for p in parts], eff)
         job['info_cards'] = speech_qa.timed_by_cut(job.get('info_cards') or [], wins)
         if job.get('product_panel'):
             job['product_panel'] = (speech_qa.timed_by_cut([job['product_panel']], wins) or [None])[0]
+        if job.get('cta_arrow'):
+            job['cta_arrow'] = (speech_qa.timed_by_cut([job['cta_arrow']], wins) or [None])[0]
         # ★効果音もカット番号で受ける（カードが出る瞬間に鳴らすため・決定#189）。鳴らす秒＝カードの出る秒
         if job.get('sfx'):
             job['sfx'] = [dict(c, at=c['start']) if 'start' in c and 'at' not in c else c
@@ -2758,6 +2822,7 @@ def main():
                                           or DEFAULT_DISCLOSURE.get(market)),
                               cards=job.get('info_cards'),
                               panel=job.get('product_panel'),
+                              cta_arrow=job.get('cta_arrow'),
                               safe=SAFE_AREAS.get(
                                   str(job.get('safe_area') or 'none').lower(),
                                   SAFE_AREAS['none'])))
