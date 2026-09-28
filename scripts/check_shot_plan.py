@@ -4,6 +4,7 @@ shot_plan（商品ごとのカット選び・決定#182）を検証する。
 ★入力は本物の商品（REDIAL redial-850019）の売り文句と、本番で使った静止画の種類。
 使い方: python3 scripts/check_shot_plan.py
 """
+import re
 import os
 import sys
 
@@ -263,11 +264,28 @@ expect(marie_video.persona_of({'target': 'women'}) == 'marie', '女性用はマ�
 expect(marie_video.persona_of({'target': 'men'}) == 'hiro', '男性用はヒロ')
 expect(marie_video.persona_of({'target': 'men', 'persona': 'marie'}) == 'marie', 'persona を書けばそちらが優先（男女兼用はここで決める）')
 expect(marie_video.persona_of({}) == 'marie', 'どちらも無ければマリー（既存の依頼は変わらない）')
+expect(marie_video.persona_of({'target': 'unisex', 'genre': 'gadget'}) == 'hiro', '兼用のガジェット・家電はヒロ（#221）')
+expect(marie_video.persona_of({'target': 'unisex', 'genre': 'apparel'}) == 'marie', 'それ以外の兼用はマリー（#221）')
 try:
-    marie_video.persona_of({'target': 'unisex'})
-    expect(False, '男女兼用を target で書いたら止める')
+    marie_video.persona_of({'target': 'kids'})
+    expect(False, '知らない target は止める')
 except SystemExit:
-    expect(True, '男女兼用を target で書いたら止める（誰にするかは persona で明示）')
+    expect(True, '知らない target は止める')
+print('=== ヒロの回は代名詞を男性に（#221）===')
+g = shot_plan.gendered
+expect(g("She holds it next to her face; the station is behind her.", 'hiro') == "He holds it next to his face; the station is behind him.",
+       'She→He・所有の her→his・目的格の her→him')
+expect(g("She is filming herself. Her voice is heard off-camera.", 'hiro') == "He is filming himself. His voice is heard off-camera.",
+       'herself→himself・文頭の Her→His')
+expect(g("She holds it.", 'marie') == "She holds it.", 'マリーの回は変えない')
+expect(g(g("She holds her phone.", 'hiro'), 'hiro') == "He holds his phone.", '2回掛けても同じ（使い回しの照合がずれない）')
+_all = []
+for _r in shot_plan.RULES:
+    for _a in list((_r.get('still') or {}).values()) + [_r.get('must_show') or '']:
+        _all.append(g(_a, 'hiro'))
+_all += [g(shot_plan.LONG_CALM, 'hiro'), marie_video.situation_text({'action': 'x', 'persona': 'hiro'})]
+expect(len(_all) > 20 and not any(re.search(r'\b(she|her|herself|hers)\b', t, re.I) for t in _all),
+       '規則表の全ての指示文（%d本）から、ヒロの回は女性の代名詞が消える' % len(_all))
 expect(set(marie_video.TARGET_PERSONA.values()) <= set(face_score.MASTERS), '担当の名前は全部、顔の基準がある')
 
 print('=== 語尾の「ね」（#217）===')

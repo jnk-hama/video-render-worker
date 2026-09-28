@@ -74,7 +74,7 @@ EXTRA_NE_MAX = 1   # 台本に無い「ね」は1回まで。2回以上は作り
 
 def situation_text(cut):
     """Veo へ渡す場面の説明（使い回しの照合にも同じ文を使う）"""
-    return cut['action'] + NO_NE
+    return cut['action'] + shot_plan.gendered(NO_NE, cut.get('persona'))
 
 
 def extra_ne(line, said):
@@ -186,16 +186,20 @@ def face_problem(url, pov, refs, who='marie'):
 
 
 # ★誰が紹介するかは「商品を使う人の性別」で決める（#220・オーナー決定）。言語では分けない（日英どちらも同じ2人）。
-#   product_json の persona が最優先、無ければ target（women / men）から引く。どちらも無ければマリー（従来どおり）
+#   product_json の persona が最優先、無ければ target から引く。どちらも無ければマリー（従来どおり）。
+#   男女兼用（unisex）は、ガジェット・家電（genre=gadget）ならヒロ、それ以外はマリー（#221・オーナー決定「B」）
 TARGET_PERSONA = {'women': 'marie', 'men': 'hiro'}
+UNISEX_BY_GENRE = {'gadget': 'hiro'}
 
 
 def persona_of(product):
     if product.get('persona'):
         return product['persona']
     target = product.get('target')
+    if target == 'unisex':
+        return UNISEX_BY_GENRE.get(product.get('genre'), 'marie')
     if target and target not in TARGET_PERSONA:
-        raise SystemExit('target は %s のどれか（男女兼用は persona を直接書く）: %r' % (' / '.join(TARGET_PERSONA), target))
+        raise SystemExit('target は women / men / unisex のどれか: %r' % target)
     return TARGET_PERSONA.get(target, 'marie')
 
 
@@ -272,6 +276,13 @@ def main():
     out_path = sys.argv[2]
     dry = '--dry-run' in sys.argv
     plan = shot_plan.plan_long(product) if product.get('layout') == 'long' else shot_plan.plan(product)
+    persona = persona_of(product)
+    for c in plan['cuts']:
+        c['persona'] = persona
+        c['action'] = shot_plan.gendered(c['action'], persona)
+        if c.get('must_show'):
+            c['must_show'] = shot_plan.gendered(c['must_show'], persona)
+    print('紹介者: %s' % persona)
     print('カット計画（%d本）:' % len(plan['cuts']))
     for i, c in enumerate(plan['cuts']):
         print('  %d. %-7s %-10s %s' % (i + 1, c['role'], c['still'], c.get('feature') or ''))
@@ -311,7 +322,7 @@ def main():
             seen_before[url] = verify_cut(base, key, url, must_show)
         return seen_before[url]
 
-    face = make_face_check(persona_of(product))
+    face = make_face_check(persona)
 
     # ★使い回して照合に落ちたカットは、作り直しの回数に数えずに新しく作る（新しく作った物には通常どおり作り直しが1回残る）
     if not reuse and reused:

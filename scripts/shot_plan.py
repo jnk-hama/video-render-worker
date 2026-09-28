@@ -355,6 +355,20 @@ def is_pov_action(action):
     return str(action or '').startswith('First-person')
 
 
+# ★規則表の指示文はマリー（女性）で書いてある。ヒロ（男性・#220）の回は代名詞だけを機械で差し替える。
+#   規則表を男女で2本持つと必ずずれる（一度決めたら全部で強制する）。目的格の her（to her. / behind her;）は him、他は his
+_TO_HE = [(r'\bherself\b', 'himself'), (r'\bShe\b', 'He'), (r'\bshe\b', 'he'), (r'\bHer\b', 'His'),
+          (r'\bher\b(?=\s*(?:[.,;:"]|$))', 'him'), (r'\bher\b', 'his')]
+
+
+def gendered(text, persona):
+    if persona != 'hiro' or not text:
+        return text
+    for pat, rep in _TO_HE:
+        text = re.sub(pat, rep, text)
+    return text
+
+
 def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     """描画の依頼（{"job":{...}}）を組む。clip_urls は cuts と同じ並び"""
     cuts = plan_['cuts']
