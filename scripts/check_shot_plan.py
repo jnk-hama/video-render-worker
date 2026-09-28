@@ -117,6 +117,28 @@ for rule in shot_plan.RULES:
             expect('off-camera' in action and 'no face ever appears' in action,
                    '一人称のカットは声を画面外にし、顔を出さない（%s・別人が喋った #215）' % key)
 
+print('=== 長回し（#216）===')
+lk = shot_plan.plan_long(dict(KABENI, layout='long'))
+for c in lk['cuts']:
+    print('     %-8s %-8s %ds %s %s' % (c['role'], c['still'], c['seconds'], c['line'], shot_plan.says(c)))
+expect([c['role'] for c in lk['cuts']] == ['hook', 'feature', 'cta'], '6カットを3シーンにまとめる（フック・本編・CTA）')
+expect(all(c['seconds'] == shot_plan.LONG_SECONDS and len(c['line']) <= shot_plan.JA_CHARS_LONG for c in lk['cuts']),
+       '各シーンは8秒・セリフは尺に入る長さ')
+expect(not any(shot_plan.is_pov_action(c['action']) for c in lk['cuts']), '一人称のカットは作らない（別人・手の破綻の元）')
+expect(all(shot_plan.LONG_CALM in c['action'] for c in lk['cuts']), '長回しは動きを小さく・別人を出さない指示を付ける')
+mid = lk['cuts'][1]
+expect(mid['still'] == 'holding' and shot_plan.says(mid) == ['スマホ', '映画'], '同じ静止画の機能を1シーンにまとめる（手のひら：大きさ＋充電式）')
+expect(not lk['cards_only'], '5つの機能を全部どこかで言う（捨てない）')
+jl = shot_plan.render_job(KABENI, lk, ['u'] * 3, 'preview/x.mp4')['job']
+expect([c.get('part') for c in jl['info_cards'] if c['cut_index'] == 1] == [[0, 2], [1, 2]], 'カードは前半・後半に出し分ける')
+expect(jl['clips'][1]['must_say'] == ['スマホ', '映画'], '言うべき語は機能ごとに全部渡す')
+tw = speech_qa.timed_by_cut([{'text': 'a', 'cut_index': 0, 'part': [1, 2]}], [(0.0, 8.0)])
+expect(abs(tw[0]['start'] - 4.15) < 1e-6 and abs(tw[0]['end'] - 7.85) < 1e-6, 'part は窓を等分した区間になる')
+import marie_video  # noqa: E402
+lb = marie_video.redo_targets(lk['cuts'], {i: {'video_url': 'v%d' % i} for i in range(3)}, list(range(3)),
+                              lambda u, m: (1, 'ok', 'スマホくらいの大きさで持ち歩ける' if u == 'v1' else lk['cuts'][int(u[1:])]['line']))
+expect(list(lb) == [1] and '映画' in lb[1], '長回しで2つ目の語を言い落としたら作り直す')
+
 print('=== 規則表そのもの ===')
 for rule in shot_plan.RULES + [shot_plan.FALLBACK_HOOK, shot_plan.CTA]:
     lim = shot_plan.JA_CHARS_4S * (shot_plan.HOOK_SECONDS if rule.get('hook') else 4) // 4

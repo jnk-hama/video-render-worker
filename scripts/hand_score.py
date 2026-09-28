@@ -95,6 +95,31 @@ def _landmarker():
     return _lmk
 
 
+_counter = None
+
+
+def count_hands(path):
+    """
+    画面に映る手の数（最大4まで数える）。数えられなければ None（#216）。
+    ★check_hand の検出器は num_hands=2 なので、3本目以降が見えない。数える専用に別に作る
+    """
+    global _counter
+    import mediapipe as mp
+    if _counter is None:
+        from mediapipe.tasks import python as mpy
+        from mediapipe.tasks.python import vision
+        if not ensure_model():
+            return None
+        _counter = vision.HandLandmarker.create_from_options(
+            vision.HandLandmarkerOptions(
+                base_options=mpy.BaseOptions(model_asset_path=POSE_MODEL),
+                running_mode=vision.RunningMode.IMAGE, num_hands=4))
+    img, _w, _h = read_bgr(path)
+    if img is None:
+        return None
+    return len(_counter.detect(mp.Image(image_format=mp.ImageFormat.SRGB, data=img)).hand_landmarks or [])
+
+
 def check_hand(path):
     """
     @return {?dict} 手が見つからなければ None

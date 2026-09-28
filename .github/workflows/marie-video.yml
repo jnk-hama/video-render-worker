@@ -39,8 +39,8 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
-          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt insightface onnxruntime
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1 libgles2
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt insightface onnxruntime mediapipe
       - name: 計画 → Veo → 回収
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

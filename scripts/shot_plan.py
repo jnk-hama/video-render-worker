@@ -259,6 +259,94 @@ def plan(product):
     return {'cuts': cuts, 'cards_only': cards_only, 'panel': panel}
 
 
+LONG_SECONDS = 8                              # Veo の1本の上限（video-scene の MAX_SECONDS）
+JA_CHARS_LONG = JA_CHARS_4S * LONG_SECONDS // CUT_SECONDS
+# ★長回しは動きを小さくする（オーナー「手が4本あったり意味のない描写なら1シーン長くして色んな紹介したらいい」#216）。
+#   カットが多いほど Veo の破綻（手の数・別人・商品の変形）が入る機会が増える
+LONG_CALM = (" Keep it calm and continuous: she talks to the camera the whole time with small natural gestures, "
+             "the product stays the same shape and color and stays in view, and no other person appears.")
+
+
+def says(cut):
+    """言うべき語の一覧（通常のカットは1語、長回しは機能ごとに1語）"""
+    v = cut.get('must_say')
+    return [v] if isinstance(v, str) else list(v or [])
+
+
+def plan_long(product):
+    """
+    長回しの計画（#216）。通常の計画を作り、同じ静止画の機能を1シーンにまとめる。
+    余った1機能はフック→CTA の順に相乗りさせる。セリフが JA_CHARS_LONG を超える組は作らない。
+    一人称の絵だけで成り立つ機能は相乗り先の絵で語る（一人称のカットは作らない）。
+    """
+    base = plan(product)
+    cuts = base['cuts']
+    if len(cuts) < 3 or cuts[0]['role'] != 'hook' or cuts[-1]['role'] != 'cta':
+        return base
+    hook, body, cta = cuts[0], cuts[1:-1], cuts[-1]
+    groups, order = {}, []
+    for c in body:
+        if c['still'] not in groups:
+            groups[c['still']] = []
+            order.append(c['still'])
+        groups[c['still']].append(c)
+
+    def scene(primary, extras):
+        parts = [primary] + extras
+        # ★機能ごとの句を「、」で繋ぐ。句の中の読点は外す（読点が多いと Veo が細切れに間を取る）
+        line = '、'.join(p['line'].replace('、', '') for p in parts) if extras else primary['line']
+        if len(line) > JA_CHARS_LONG:
+            return None
+        s = dict(primary, seconds=LONG_SECONDS, line=line, action=primary['action'] + LONG_CALM,
+                 must_say=[w for p in parts for w in says(p)],
+                 cards=[p['card'] for p in parts if p.get('card')])
+        s.pop('card', None)
+        return s
+
+    singles, scenes = [], []
+    for st in order:
+        g = groups[st]
+        while len(g) >= 2:
+            sc = scene(g[0], [g[1]])
+            if not sc:
+                break
+            scenes.append(sc)
+            g = g[2:]
+        singles += g
+    first, last = scene(hook, []), scene(cta, [])
+    for c in singles:
+        for slot in ('first', 'last'):
+            cur = first if slot == 'first' else last
+            prim = hook if slot == 'first' else cta
+            if len(says(cur)) - len(says(prim)) >= 1:
+                continue  # その枠は埋まっている
+            merged = scene(prim, [c]) if slot == 'first' else scene(c, [prim])
+            if merged:
+                if slot == 'last':   # CTA の絵とリンクの一言は CTA 側を使う
+                    merged = dict(merged, still=cta['still'], still_url=cta['still_url'],
+                                  action=cta['action'] + LONG_CALM, role='cta')
+                if slot == 'first':
+                    first = merged
+                else:
+                    last = merged
+                break
+        else:
+            if not is_pov_action(c['action']):
+                scenes.append(scene(c, []) or dict(c))
+            else:
+                base['cards_only'].append(c['feature'])
+    out = [first] + scenes + [last]
+    if base.get('panel'):
+        base['panel'] = dict(base['panel'], cut_index=len(out) - 1)
+    if cta.get('card') and not last.get('cards'):
+        last['cards'] = [cta['card']]
+    return {'cuts': out, 'cards_only': base['cards_only'], 'panel': base.get('panel'), 'layout': 'long'}
+
+
+def is_pov_action(action):
+    return str(action or '').startswith('First-person')
+
+
 def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     """描画の依頼（{"job":{...}}）を組む。clip_urls は cuts と同じ並び"""
     cuts = plan_['cuts']
@@ -266,10 +354,17 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     for c, url in zip(cuts, clip_urls):
         # ★台本（line）も渡す。描画側が字幕（文字起こし）と比べ、大きくずれたら止める（#199）
         clip = {'url': url, 'start': 0, 'duration': c['seconds'], 'product_key': product['product_key'], 'line': c['line']}
-        if c.get('must_say'):
-            clip['must_say'] = [c['must_say']]
+        if says(c):
+            clip['must_say'] = says(c)
         clips.append(clip)
-    cards = [{'text': c['card'], 'cut_index': i} for i, c in enumerate(cuts) if c.get('card')]
+    cards = []
+    for i, c in enumerate(cuts):
+        if c.get('cards'):
+            # ★長回しは機能ごとにカードを出し分ける（前半・後半）。秒は描画側がカット番号と part から解く（#216）
+            n = len(c['cards'])
+            cards += [{'text': txt, 'cut_index': i, 'part': [k, n]} for k, txt in enumerate(c['cards'])]
+        elif c.get('card'):
+            cards.append({'text': c['card'], 'cut_index': i})
     job = {
         'job_id': upload_path.rsplit('/', 1)[-1].rsplit('.', 1)[0],
         'mode': 'A', 'width': 1080, 'height': 1920, 'fps': 30,
@@ -281,7 +376,7 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
         'quality_gate': product.get('quality_gate') or 'block',
         'bgm': product.get('bgm') or 'assets/shared/bgm/duru-roomscene-lofi.mp3',
         'design_tokens': {'text_color_hex': '#ffffff', 'accent_color_hex': '#ff3b5c'},
-        'highlight_words': [c['must_say'] for c in cuts if c.get('must_say')],
+        'highlight_words': [w for c in cuts for w in says(c)],
         'clips': clips, 'info_cards': cards,
         'upload': {'bucket': 'videos', 'path': upload_path},
     }
@@ -294,7 +389,8 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     if clip_ids:
         job['review'] = {'clip_ids': [int(i) for i in clip_ids]}
     # ★カードが出る瞬間に短い効果音（決定#189）。目を文字へ向けさせる。秒は描画側がカット番号から解く
-    job['sfx'] = [{'tag': CARD_SFX, 'cut_index': c['cut_index']} for c in cards]
+    job['sfx'] = [dict({'tag': CARD_SFX, 'cut_index': c['cut_index']}, **({'part': c['part']} if 'part' in c else {}))
+                  for c in cards]
     return {'job': job}
 
 

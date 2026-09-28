@@ -145,6 +145,7 @@ def is_pov(cut):
 
 def face_problem(url, pov, refs):
     import face_score
+    import hand_score
     d = tempfile.mkdtemp(prefix='clip_')
     path = os.path.join(d, 'clip.mp4')
     urllib.request.urlretrieve(url, path)
@@ -154,6 +155,9 @@ def face_problem(url, pov, refs):
         at = dur * (i + 0.5) / FACE_FRAMES
         f = os.path.join(d, 'f%02d.jpg' % i)
         subprocess.run(['ffmpeg', '-y', '-v', 'error', '-ss', '%.3f' % at, '-i', path, '-frames:v', '1', f], check=True)
+        n = hand_score.count_hands(f)
+        if n is not None and n > 2:
+            return '手が%d本映っている（%.1f秒）' % (n, at)
         s = face_score.score(f, refs)
         if s is None:
             continue
@@ -197,8 +201,9 @@ def redo_targets(cuts, got, ids, verify, lang='ja', face=None):
             out[k] = '絵がセリフと合わない（映っていた物: %s）' % seen[:120]
         elif speech_qa.ends_polite(said, lang):
             out[k] = '言い終わりが丁寧語（「%s」）' % said[:60]
-        elif cuts[k].get('must_say') and speech_qa._norm(cuts[k]['must_say'], lang) not in speech_qa._norm(said, lang):
-            out[k] = '「%s」と言っていない（「%s」）' % (cuts[k]['must_say'], said[:60])
+        elif any(speech_qa._norm(w, lang) not in speech_qa._norm(said, lang) for w in shot_plan.says(cuts[k])):
+            miss = [w for w in shot_plan.says(cuts[k]) if speech_qa._norm(w, lang) not in speech_qa._norm(said, lang)]
+            out[k] = '「%s」と言っていない（「%s」）' % ('」「'.join(miss), said[:60])
         elif len(speech_qa._norm(said, lang)) > SAID_MAX_RATIO * len(speech_qa._norm(cuts[k]['line'], lang)):
             out[k] = '言い淀み・言い足しが多い（「%s」）' % said[:60]
         elif speech_qa.script_match(cuts[k]['line'], said, lang) < speech_qa.SCRIPT_MATCH_MIN:
@@ -229,7 +234,7 @@ def main():
     product = json.load(open(sys.argv[1], encoding='utf-8'))
     out_path = sys.argv[2]
     dry = '--dry-run' in sys.argv
-    plan = shot_plan.plan(product)
+    plan = shot_plan.plan_long(product) if product.get('layout') == 'long' else shot_plan.plan(product)
     print('カット計画（%d本）:' % len(plan['cuts']))
     for i, c in enumerate(plan['cuts']):
         print('  %d. %-7s %-10s %s' % (i + 1, c['role'], c['still'], c.get('feature') or ''))

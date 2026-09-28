@@ -225,6 +225,10 @@ def timed_by_cut(items, windows, pad=CUT_PAD):
         if not 0 <= k < len(windows):
             continue
         st, en = windows[k]
+        if it.get('part'):
+            # ★長回しの前半・後半（#216）。カットの窓を n 等分した i 番目
+            i, n = int(it['part'][0]), max(1, int(it['part'][1]))
+            st, en = st + (en - st) * i / n, st + (en - st) * (i + 1) / n
         out.append(dict(it, start=round(st + pad, 3), end=round(max(st + pad, en - pad), 3)))
     return out
 
