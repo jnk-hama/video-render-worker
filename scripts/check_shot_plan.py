@@ -140,6 +140,7 @@ for c in lr['cuts']:
 expect(any(c['still'] == 'cleaning' and c.get('must_show') for c in lr['cuts']),
        '吸い込む所（見せる主張のあるカット）は相乗りさせず単独で残す（#197）')
 expect(sum(c['seconds'] for c in lr['cuts']) <= 30, '長回しでも全体は30秒以内')
+expect(lr['cuts'][1]['still'] == 'cleaning', '吸い込む所はフックの直後（元の計画の並びを保つ）')
 import marie_video  # noqa: E402
 lb = marie_video.redo_targets(lk['cuts'], {i: {'video_url': 'v%d' % i} for i in range(3)}, list(range(3)),
                               lambda u, m: (1, 'ok', 'スマホくらいの大きさで持ち歩ける' if u == 'v1' else lk['cuts'][int(u[1:])]['line']))

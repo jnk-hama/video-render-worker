@@ -341,6 +341,8 @@ def plan_long(product):
                 scenes.append(scene(c, []) or dict(c))
             else:
                 base['cards_only'].append(c['feature'])
+    # ★本編は元の計画の並び順を保つ（吸い込む所をフックの直後に出す等・規則表の優先を崩さない）
+    scenes.sort(key=lambda s: min((k for k, c in enumerate(body) if c['feature'] == s['feature']), default=99))
     out = [first] + scenes + [last]
     if base.get('panel'):
         base['panel'] = dict(base['panel'], cut_index=len(out) - 1)
