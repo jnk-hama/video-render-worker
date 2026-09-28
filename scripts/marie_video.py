@@ -16,7 +16,9 @@
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -121,7 +123,53 @@ def verify_cut(base, key, video_url, must_show):
 SAID_MAX_RATIO = 1.6
 
 
-def redo_targets(cuts, got, ids, verify, lang='ja'):
+# ★生成クリップの顔（#215）。Veo は静止画の人物を保たないことがある（一人称の絵から別人が正面で喋った）。
+#   描く前に数コマ抜いて face_score で見る：一人称のカットは顔が出たら不合格、それ以外はマリーでない顔が出たら不合格。
+#   顔が映らないコマ（横を向いた等）は落とさない（見えない物は判定しない）
+FACE_FRAMES = 6
+
+
+def is_pov(cut):
+    return str(cut.get('action') or '').startswith('First-person')
+
+
+def face_problem(url, pov, refs):
+    import face_score
+    d = tempfile.mkdtemp(prefix='clip_')
+    path = os.path.join(d, 'clip.mp4')
+    urllib.request.urlretrieve(url, path)
+    dur = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path],
+                               capture_output=True, text=True, check=True).stdout.strip() or 0)
+    for i in range(FACE_FRAMES):
+        at = dur * (i + 0.5) / FACE_FRAMES
+        f = os.path.join(d, 'f%02d.jpg' % i)
+        subprocess.run(['ffmpeg', '-y', '-v', 'error', '-ss', '%.3f' % at, '-i', path, '-frames:v', '1', f], check=True)
+        s = face_score.score(f, refs)
+        if s is None:
+            continue
+        if pov:
+            return '一人称のカットに顔が映っている（%.1f秒）' % at
+        if not s['passed']:
+            return 'マリーではない顔（%.1f秒・類似度 %.2f）' % (at, s['best'])
+    return None
+
+
+def make_face_check():
+    """クリップの顔の判定（同じ動画を2度見ない）。マスターは初回に読む。読めなければ止まる（未設定なら閉じる）"""
+    import face_score
+    state = {}
+
+    def face(url, pov):
+        if 'refs' not in state:
+            state['refs'] = face_score.reference_set()
+        if (url, pov) not in state:
+            state[(url, pov)] = face_problem(url, pov, state['refs'])
+            print('  顔 %s: %s' % ('NG' if state[(url, pov)] else 'OK', state[(url, pov)] or ('一人称・顔なし' if pov else 'マリー')))
+        return state[(url, pov)]
+    return face
+
+
+def redo_targets(cuts, got, ids, verify, lang='ja', face=None):
     """
     作り直すカット番号と理由。動画が無い＝フィルタ、must_show が映っていない＝絵のずれ、
     言い終わりが丁寧語＝Veo の「です」足し（#189。描画側で切れない時に動画ごと止まるので、ここで作り直す）、
@@ -145,6 +193,10 @@ def redo_targets(cuts, got, ids, verify, lang='ja'):
             out[k] = '言い淀み・言い足しが多い（「%s」）' % said[:60]
         elif speech_qa.script_match(cuts[k]['line'], said, lang) < speech_qa.SCRIPT_MATCH_MIN:
             out[k] = '台本と大きく違う（「%s」）' % said[:60]
+        elif face:
+            why = face(url, is_pov(cuts[k]))
+            if why:
+                out[k] = why
     return out
 
 
@@ -207,9 +259,11 @@ def main():
             seen_before[url] = verify_cut(base, key, url, must_show)
         return seen_before[url]
 
+    face = make_face_check()
+
     # ★使い回して照合に落ちたカットは、作り直しの回数に数えずに新しく作る（新しく作った物には通常どおり作り直しが1回残る）
     if not reuse and reused:
-        stale = {k: why for k, why in redo_targets(plan['cuts'], got, ids, verify).items() if k in reused}
+        stale = {k: why for k, why in redo_targets(plan['cuts'], got, ids, verify, face=face).items() if k in reused}
         for n, (k, why) in enumerate(stale.items()):
             print('カット %d は使い回せません（%s）。新しく作ります' % (k + 1, why))
             if n:
@@ -219,7 +273,7 @@ def main():
             got.update(wait_all(base, key, [ids[k] for k in stale]))
 
     for attempt in range(0 if reuse else RETRY_PER_CUT):
-        bad = redo_targets(plan['cuts'], got, ids, verify)
+        bad = redo_targets(plan['cuts'], got, ids, verify, face=face)
         if not bad:
             break
         for k, why in bad.items():
@@ -230,7 +284,7 @@ def main():
             ids[k] = start_cut(base, key, product, plan['cuts'][k])
         got.update(wait_all(base, key, [ids[k] for k in bad]))
     # ★作り直した後も、動画が無い・絵が合わないカットがあれば描かずに止める
-    still_bad = redo_targets(plan['cuts'], got, ids, verify)
+    still_bad = redo_targets(plan['cuts'], got, ids, verify, face=face)
     if still_bad:
         raise SystemExit('描画の前で止めました: %s' % '; '.join(
             'カット%d %s %s' % (k + 1, why, str(got[ids[k]].get('reviewed_note') or '')[:120])

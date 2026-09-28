@@ -35,6 +35,12 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+      - name: 顔の判定に要る物を入れる
+        if: ${{ !inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt insightface onnxruntime
       - name: 計画 → Veo → 回収
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

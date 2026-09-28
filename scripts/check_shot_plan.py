@@ -195,7 +195,23 @@ ok_real = ['下からも開くからね、抜け感出せる', 'フードが大�
 expect(all(len(speech_qa._norm(t, 'ja')) <= marie_video.SAID_MAX_RATIO * 13 for t in ok_real), '実際に通った喋りは止めない')
 expect(speech_qa.ends_polite('気になったらね、リンクから見てみてください。', 'ja'), '「ください」終わりも丁寧語として作り直す')
 
+print('=== 生成クリップの顔（#215）===')
+expect(speech_qa.ends_polite('最大約5ヶ月でゴミ捨て不要ですはぁー', 'ja'), '「です」の後ろに「はぁー」が付いても丁寧語として作り直す（実例）')
+expect(speech_qa.ends_polite('最大約5ヶ月でゴミ捨て不要です。はーい', 'ja'), '「です。はーい」も丁寧語')
+expect(not speech_qa.ends_polite('ゲームも大画面で、テンション上がる', 'ja'), '普通の言い切りは止めない')
+calls_f = []
+def fake_face(u, pov):
+    calls_f.append((u, pov))
+    return '一人称のカットに顔が映っている（2.0秒）' if u == 'v2' else None
+okv = lambda u, m: (1, 'ok', cuts[int(u[1:])]['line'])
+ff = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids, okv, face=fake_face)
+expect(list(ff) == [2] and '顔' in ff[2], '顔の判定に落ちたカットは作り直しに回す')
+expect(len(calls_f) == len(ids), '動画のあるカットは全部、顔も見る')
+expect(marie_video.is_pov({'action': 'First-person view ...'}) and not marie_video.is_pov({'action': 'She holds ...'}),
+       '一人称のカットは action の書き出しで見分ける（規則表の書き方と一致）')
+
 print('=== 合格済みカットの使い回し（#198）===')
+marie_video.make_face_check = lambda: (lambda u, pov: None)  # 顔の判定は上で単体に確かめた。ここは通信しない
 _q = []
 _orig_req = marie_video._req
 marie_video._req = lambda url, key, body=None, method=None: (_q.append(url) or (200, [{'id': 77}]))

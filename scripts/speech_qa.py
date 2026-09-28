@@ -105,9 +105,16 @@ POLITE_STEP = 0.05
 POLITE_TRIES = 6
 
 
+# ★言い終わりに付いた間投詞（「です。はーい」「ですはぁー」）。外してから丁寧語を見る（#215。run 36390357616 で素通りした）
+TRAIL_INTERJ = re.compile(r'(はー+い?|はぁ+ー*|はい|うん|あー+|えへへ|ふふ)$')
+
+
 def ends_polite(text, lang):
     """文字列の言い終わりが丁寧語（FORBID_END_DEFAULT）か。check_speech と同じ基準（#189）"""
     n = _norm(text, lang)
+    if lang == 'ja':
+        while n and TRAIL_INTERJ.search(n):
+            n = TRAIL_INTERJ.sub('', n)
     return bool(n) and any(n.endswith(_norm(e, lang)) for e in FORBID_END_DEFAULT.get(lang, []) if _norm(e, lang))
 
 
