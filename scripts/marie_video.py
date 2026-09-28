@@ -67,8 +67,16 @@ def start_cut(base, key, product, cut):
     started = (res or {}).get('started') or []
     if code != 200 or not started:
         # ★429（1日の上限・E-031）/ 402（前払い残高・E-028）は待っても直らない。止めて知らせる
-        raise SystemExit('Veo を起動できません（%s・%s）: %s' % (
-            cut['role'], cut.get('feature'), json.dumps(res, ensure_ascii=False)[:300]))
+        # ★状態と本文を先に出す。場面の説明（長い）から出すと 300 字で切れて理由が読めなかった（#215）
+        errs = []
+        try:
+            errs = json.loads((res or {}).get('error') or '{}').get('errors') or []
+        except (ValueError, AttributeError):
+            errs = (res or {}).get('errors') or []
+        why = '; '.join('HTTP %s %s' % (e.get('status'), str(e.get('body') or '')[:400]) for e in errs) \
+            or json.dumps(res, ensure_ascii=False)[:400]
+        raise SystemExit('Veo を起動できません（%s・%s・HTTP %s）: %s' % (
+            cut['role'], (cut.get('feature') or '').split('\n')[0], code, why))
     return started[0]['id']
 
 
