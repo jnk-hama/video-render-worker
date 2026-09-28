@@ -55,7 +55,13 @@ def _req(url, key, body=None, method=None):
         with urllib.request.urlopen(r, timeout=150) as res:
             return res.status, json.loads(res.read().decode() or 'null')
     except urllib.error.HTTPError as e:
-        return e.code, {'error': e.read()[:400].decode('utf-8', 'replace')}
+        # ★本文は JSON なら読んで返す。400字で切ると Veo の状態コードまで届かなかった（#215）
+        raw = e.read()[:8000].decode('utf-8', 'replace')
+        try:
+            parsed = json.loads(raw)
+            return e.code, parsed if isinstance(parsed, dict) else {'error': raw[:2000]}
+        except ValueError:
+            return e.code, {'error': raw[:2000]}
 
 
 def start_cut(base, key, product, cut):
@@ -68,11 +74,7 @@ def start_cut(base, key, product, cut):
     if code != 200 or not started:
         # ★429（1日の上限・E-031）/ 402（前払い残高・E-028）は待っても直らない。止めて知らせる
         # ★状態と本文を先に出す。場面の説明（長い）から出すと 300 字で切れて理由が読めなかった（#215）
-        errs = []
-        try:
-            errs = json.loads((res or {}).get('error') or '{}').get('errors') or []
-        except (ValueError, AttributeError):
-            errs = (res or {}).get('errors') or []
+        errs = (res or {}).get('errors') or []
         why = '; '.join('HTTP %s %s' % (e.get('status'), str(e.get('body') or '')[:400]) for e in errs) \
             or json.dumps(res, ensure_ascii=False)[:400]
         raise SystemExit('Veo を起動できません（%s・%s・HTTP %s）: %s' % (
