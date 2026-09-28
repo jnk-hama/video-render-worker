@@ -138,7 +138,7 @@ on:
         type: string
       # ★2026-09-28（決定#218）。顔の基準を人物ごとに持つ。空ならマリー。知らない名前は止まる
       persona:
-        description: 'verify_urls の顔の基準（marie / m1）。空ならマリー'
+        description: 'verify_urls の顔の基準（marie / hiro）。空ならマリー'
         required: false
         type: string
       # ★★2026-09-23 追加。**喋らせたクリップが台本どおりに喋ったか**を文字で見る。

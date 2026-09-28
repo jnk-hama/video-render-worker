@@ -242,8 +242,8 @@ expect(marie_video.is_pov({'action': 'First-person view ...'}) and not marie_vid
 print('=== 顔の基準は人物ごと（#218）===')
 import face_score  # noqa: E402
 expect(face_score.master_urls() == face_score.MASTERS['marie'], '指定なしはマリーの基準')
-expect(face_score.master_urls('m1') == face_score.MASTERS['m1'] and face_score.MASTERS['m1'] != face_score.MASTERS['marie'],
-       '男性（m1）は別の基準')
+expect(face_score.master_urls('hiro') == face_score.MASTERS['hiro'] and face_score.MASTERS['hiro'] != face_score.MASTERS['marie'],
+       'ヒロは別の基準')
 try:
     face_score.master_urls('anna')
     expect(False, '知らない人物は止める')
@@ -254,10 +254,21 @@ _orig_rs, _orig_fp = face_score.reference_set, marie_video.face_problem
 face_score.reference_set = lambda p=None: (_seen_p.append(p) or [('m', None)])
 marie_video.face_problem = lambda u, pov, refs, who='marie': None
 _real_mfc = marie_video.make_face_check
-_real_mfc('m1')('v0', False)
+_real_mfc('hiro')('v0', False)
 _real_mfc(None)('v0', False)
 face_score.reference_set, marie_video.face_problem = _orig_rs, _orig_fp
-expect(_seen_p == ['m1', 'marie'], 'product_json の persona の基準で判定する（無ければマリー）')
+expect(_seen_p == ['hiro', 'marie'], 'product_json の persona の基準で判定する（無ければマリー）')
+print('=== 誰が紹介するか（商品を使う人の性別・#220）===')
+expect(marie_video.persona_of({'target': 'women'}) == 'marie', '女性用はマリー')
+expect(marie_video.persona_of({'target': 'men'}) == 'hiro', '男性用はヒロ')
+expect(marie_video.persona_of({'target': 'men', 'persona': 'marie'}) == 'marie', 'persona を書けばそちらが優先（男女兼用はここで決める）')
+expect(marie_video.persona_of({}) == 'marie', 'どちらも無ければマリー（既存の依頼は変わらない）')
+try:
+    marie_video.persona_of({'target': 'unisex'})
+    expect(False, '男女兼用を target で書いたら止める')
+except SystemExit:
+    expect(True, '男女兼用を target で書いたら止める（誰にするかは persona で明示）')
+expect(set(marie_video.TARGET_PERSONA.values()) <= set(face_score.MASTERS), '担当の名前は全部、顔の基準がある')
 
 print('=== 語尾の「ね」（#217）===')
 nek = next(k for k, c in enumerate(cuts) if c['feature'] == '大きめフード')

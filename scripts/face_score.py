@@ -33,14 +33,14 @@ PASS_THRESHOLD = 0.42
 # ★★2026-09-25（決定#173）、インフルエンサーをアンナから「マリー」へ替えた。
 #   マスターは生成画（自前の画像）だが、描画のたびに使う物ではないので
 #   リポジトリには置かず URL で持つ。**ここが唯一の置き場所**（1つに集約する）。
-# ★★2026-09-28（決定#218）、人物ごとに持つ。男性（M1-B1・scene_library id=89）を足した。
+# ★★2026-09-28（決定#218）、人物ごとに持つ。男性（ヒロ・M1-B1・scene_library id=89）を足した。
 #   どの人物で判定するかは引数か環境変数 PERSONA。**知らない名前は止める**（別人の基準で通さない）。
-#   ★m1 は仮の名前。名前が決まったら差し替える
+#   名前：ヒロ（オーナー決定 2026-09-28）。担当は「商品を使う人の性別」で分ける（女性用＝マリー／男性用＝ヒロ・#220）
 MASTERS = {
     'marie': [
         'https://xtbpgpegmbkizuwumvxt.supabase.co/storage/v1/object/public/images/scene/persona/1790304052972-d05df9e8.jpg',
     ],
-    'm1': [
+    'hiro': [
         'https://xtbpgpegmbkizuwumvxt.supabase.co/storage/v1/object/public/images/scene/persona/1790593413117-b4f2b8e4.jpg',
     ],
 }
