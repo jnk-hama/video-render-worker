@@ -106,7 +106,7 @@ expect(not any(w in r['line'] for r in shot_plan.RULES for w in ('4K', 'フルHD
 import re as _re  # noqa: E402
 for rule in shot_plan.RULES:
     for key, action in rule['still'].items():
-        if _re.search(r'project|video (appears|lands|fills)|game image', action):
+        if _re.search(r'projected|projecting|video (appears|lands|fills)|game image', action):
             expect('lens' in action, '映像が出る絵はレンズの向きを書く（%s・オーナー「写している壁ではない所に映像」#213）' % key)
     if 'must_show' in rule and _re.search(r'projected|image', rule['must_show']) and 'projector' in rule['must_show']:
         expect('lens' in rule['must_show'], 'must_show も映像とレンズの向きを照合する「%s」' % rule['must_show'][:40])
