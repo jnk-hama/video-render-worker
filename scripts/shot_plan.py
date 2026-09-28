@@ -15,6 +15,9 @@
   holding    商品を手に持った／使っている絵（ガジェット等）
   station    商品が充電台・ステーションに置かれ、その横に立つ絵（置くだけ系の家電）
   cleaning   商品を実際に使っている絵（掃除機なら床のゴミの上をヘッドが通る）。機能の中心は「使って効く所」を見せる
+  ceiling    暗い寝室のベッドに仰向け、天井に映像が大きく映っている絵（プロジェクター・#211）
+  gaming     床に座ってコントローラーを持ち、壁に大きくゲームが映っている絵（プロジェクター・#211）
+  wall       夜のリビングのソファに座り、壁いっぱいに映像が映っている絵（プロジェクター・#211）
 
 使い方: python3 scripts/shot_plan.py product.json  → 計画（JSON）を標準出力へ
 """
@@ -76,6 +79,42 @@ RULES = [
      'line': 'ポケット深めで、手ぶらでいける', 'must_say': 'ポケット',
      'must_show': 'Her hands go into the front pockets of the garment.'},
     # ---- ガジェット（商品を持った絵 holding が要る） ----
+    # ★プロジェクター（カベーニ・#211）。説明文「お子様と一緒に横になりながら天井でアニメを楽しむ」から、
+    #   一番の見せ場（何に使うか）＝寝ながら天井に映す、をフックにする。汎用のガジェット規則より前に置く
+    #   （「220g」が軽量の規則に、「バッテリー」が充電式の規則に先に当たらないように）。
+    #   ★「4K」「フルHD」「高画質」は言わない：入力は4K対応だが本体の解像度は 854×480（優良誤認になる）。
+    #   ★映す映像はアニメ・映画の実在作品にしない（著作権）。抽象的な映像と書く
+    {'genres': ('gadget',), 'match': r'天井', 'hook': True,
+     'still': {'ceiling': "She lies on her back on a bed in a dark bedroom, looking up. A big, bright, colorful "
+                          "abstract nature video is projected across the ceiling above her. She turns her head to the "
+                          "camera with an excited smile and talks like she is telling a friend a secret."},
+     'line': '寝ながら天井で、映画見れる', 'must_say': '天井',
+     'must_show': 'A large bright projected image covers the ceiling above her.'},
+    {'genres': ('gadget',), 'match': r'スマホサイズ|手のひら',
+     'still': {'holding': "She holds the small projector flat on her open palm next to her face to show it is about "
+                          "the size of a phone, then talks to the camera like a friend."},
+     'line': 'スマホくらいの大きさで、持ち歩ける', 'must_say': 'スマホ',
+     'must_show': 'She holds a small projector about the size of a phone in one hand.'},
+    {'genres': ('gadget',), 'match': r'アプリ内蔵',
+     'still': {'wall': "She sits on a sofa in a cozy living room at night. A big, bright, colorful video with no logos "
+                       "fills the plain wall in front of her, projected from the small projector on the side table. "
+                       "She turns to the camera, delighted, and talks like a friend.",
+               'holding': "She sets the small projector on a side table and a bright, colorful video appears large on "
+                          "the plain wall behind her. No logos on screen. She gestures at it and talks to the camera "
+                          "like a friend."},
+     'line': 'アプリ入りだから、届いてすぐ見れる', 'must_say': 'アプリ',
+     'must_show': 'A bright video image is projected on the wall behind her.'},
+    {'genres': ('gadget',), 'match': r'ゲーム|Switch|PS[45]',
+     'still': {'gaming': "She sits on the floor holding a plain game controller while a colorful video game is "
+                         "projected large on the wall in front of her. No logos. She glances back at the camera, "
+                         "thrilled, and talks like a friend."},
+     'line': 'ゲームも大画面で、テンション上がる', 'must_say': 'ゲーム',
+     'must_show': 'A video game image is projected large on the wall while she holds a controller.'},
+    {'genres': ('gadget',), 'match': r'連続[0-9.]+時間',
+     'still': {'holding': "She carries the small projector with no cable attached into another room, sets it down "
+                          "and a video starts on the wall. She smiles and talks to the camera like a friend."},
+     'line': '充電式で、映画一本まるっと見れる', 'must_say': '映画',
+     'must_show': 'She holds the small projector and no cable is attached to it.'},
     # ★フック（#196）。orage RR35 の説明文「大容量抗菌紙パックで、最大約4－5か月ゴミ捨て不要。※1」から。
     #   数字は Veo が読み崩しやすいので「4〜5」を言わせず「最大約5か月」に留め、条件（※1日1回の掃除で計測）はカードに書く
     {'genres': ('gadget',), 'match': r'ゴミ捨て不要', 'hook': True,

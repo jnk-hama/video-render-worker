@@ -82,6 +82,27 @@ st = next(c for c in k['cuts'] if c['feature'] == '自動ゴミ回収ステー�
 expect(st['still'] == 'station', '置くだけ系はステーションの絵を優先')
 expect([c['still'] for c in k['cuts'][2:-1]] == ['holding', 'station', 'holding'], '持つ絵を続けない（ステーションを挟む）')
 
+print('=== プロジェクター（カベーニ・#211）===')
+KABENI = {'product_key': 'kabeni-projector', 'genre': 'gadget',
+          'features': ['天井に投影できる\n※投影サイズ 6〜130インチ', 'スマホサイズ・220g', 'アプリ内蔵（YouTube・Netflix・プライムビデオ）',
+                       'バッテリー内蔵・連続2.5時間再生', 'Switch・PS4をHDMIでつないでゲーム'],
+          'image_url': 'https://example/kabeni.jpg',
+          'stills': {'selfie': 's', 'holding': 'h', 'ceiling': 'c', 'gaming': 'g', 'wall': 'w'}}
+kb = shot_plan.plan(KABENI)
+for c in kb['cuts']:
+    print('     %-8s %-8s %-18s %s' % (c['role'], c['still'], (c['feature'] or '').split(chr(10))[0], c['line']))
+expect(kb['cuts'][0]['still'] == 'ceiling' and '天井' in kb['cuts'][0]['line'],
+       'フックは一番の見せ場（寝ながら天井に映す）')
+sz = next(c for c in kb['cuts'] if c['feature'] == 'スマホサイズ・220g')
+expect('スマホ' in sz['line'], '「220g」が汎用の軽量の規則に先に当たらない（スマホサイズの規則が勝つ）')
+bt = next(c for c in kb['cuts'] if c['feature'].startswith('バッテリー'))
+expect('映画' in bt['line'], '「バッテリー内蔵」が汎用の充電式の規則に先に当たらない')
+expect(len(kb['cuts']) == 6 and not kb['cards_only'], 'フック＋機能4つ＋CTA。捨てる機能なし')
+kst = [c['still'] for c in kb['cuts'][1:-1]]
+expect(all(a != b for a, b in zip(kst, kst[1:])), '機能カットで同じ静止画を続けない（アプリは壁に映す絵・%s）' % kst)
+expect(not any(w in r['line'] for r in shot_plan.RULES for w in ('4K', 'フルHD', '高画質')),
+       '本体の解像度は 854×480。4K・フルHD・高画質は言わせない（優良誤認）')
+
 print('=== 規則表そのもの ===')
 for rule in shot_plan.RULES + [shot_plan.FALLBACK_HOOK, shot_plan.CTA]:
     lim = shot_plan.JA_CHARS_4S * (shot_plan.HOOK_SECONDS if rule.get('hook') else 4) // 4
