@@ -266,6 +266,9 @@ expect(marie_video.persona_of({'target': 'men', 'persona': 'marie'}) == 'marie',
 expect(marie_video.persona_of({}) == 'marie', 'どちらも無ければマリー（既存の依頼は変わらない）')
 expect(marie_video.persona_of({'target': 'unisex', 'genre': 'gadget'}) == 'hiro', '兼用のガジェット・家電はヒロ（#221）')
 expect(marie_video.persona_of({'target': 'unisex', 'genre': 'apparel'}) == 'marie', 'それ以外の兼用はマリー（#221）')
+expect(marie_video.persona_of({'target': 'unisex', 'genre': 'gadget', 'category': 'cleaning'}) == 'marie', '掃除機はガジェットでもマリー（#222）')
+expect(marie_video.persona_of({'target': 'unisex', 'genre': 'gadget', 'category': 'kitchen'}) == 'marie', 'キッチン用品もマリー（#222）')
+expect(marie_video.persona_of({'target': 'men', 'category': 'kitchen'}) == 'hiro', '男性用と明示した物は家事の道具でもヒロ（兼用だけの規則）')
 try:
     marie_video.persona_of({'target': 'kids'})
     expect(False, '知らない target は止める')

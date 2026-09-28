@@ -187,9 +187,11 @@ def face_problem(url, pov, refs, who='marie'):
 
 # ★誰が紹介するかは「商品を使う人の性別」で決める（#220・オーナー決定）。言語では分けない（日英どちらも同じ2人）。
 #   product_json の persona が最優先、無ければ target から引く。どちらも無ければマリー（従来どおり）。
-#   男女兼用（unisex）は、ガジェット・家電（genre=gadget）ならヒロ、それ以外はマリー（#221・オーナー決定「B」）
+#   男女兼用（unisex）は、ガジェット・家電（genre=gadget）ならヒロ、それ以外はマリー（#221・オーナー決定「B」）。
+#   ただし家事の道具（キッチン用品・掃除機など＝category）はガジェットでもマリー（#222・オーナー「キッチン用品や掃除機などはマリーの方がいい」）
 TARGET_PERSONA = {'women': 'marie', 'men': 'hiro'}
 UNISEX_BY_GENRE = {'gadget': 'hiro'}
+HOUSEWORK = {'kitchen', 'cleaning', 'laundry'}
 
 
 def persona_of(product):
@@ -197,6 +199,8 @@ def persona_of(product):
         return product['persona']
     target = product.get('target')
     if target == 'unisex':
+        if product.get('category') in HOUSEWORK:
+            return 'marie'
         return UNISEX_BY_GENRE.get(product.get('genre'), 'marie')
     if target and target not in TARGET_PERSONA:
         raise SystemExit('target は women / men / unisex のどれか: %r' % target)
