@@ -111,6 +111,12 @@ for rule in shot_plan.RULES:
     if 'must_show' in rule and _re.search(r'projected|image', rule['must_show']) and 'projector' in rule['must_show']:
         expect('lens' in rule['must_show'], 'must_show も映像とレンズの向きを照合する「%s」' % rule['must_show'][:40])
 
+for rule in shot_plan.RULES:
+    for key, action in rule['still'].items():
+        if action.startswith('First-person'):
+            expect('off-camera' in action and 'no face ever appears' in action,
+                   '一人称のカットは声を画面外にし、顔を出さない（%s・別人が喋った #215）' % key)
+
 print('=== 規則表そのもの ===')
 for rule in shot_plan.RULES + [shot_plan.FALLBACK_HOOK, shot_plan.CTA]:
     lim = shot_plan.JA_CHARS_4S * (shot_plan.HOOK_SECONDS if rule.get('hook') else 4) // 4

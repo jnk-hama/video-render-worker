@@ -87,6 +87,8 @@ RULES = [
 #   ★★映像はレンズが向いた面にだけ出す（オーナー「商品が写している壁ではない所に映像が出ているのが AI 感」）。
 #     本体は付属のミニ三脚に載せ、レンズ側を壁・天井へ向け、光の筋と映像をその先に置く。must_show でも向きを見る
 #   ★壁・ゲームは一人称視点（手だけ・顔なし。オーナー案・#214）。顔が崩れる場所を減らし、使う人の目線で見せる
+#   ★★一人称でもセリフがあると Veo は話す人を足した（別人が正面で喋った・#215）。声は画面外と明記する。
+#     動き回らせると商品が別物に描き変わった（充電式のカット）。商品は持って見せるだけにする
     {'genres': ('gadget',), 'match': r'天井', 'hook': True,
      'still': {'ceiling': "She lies on her back on a bed in a dark bedroom, looking up. On the bedside table the small "
                           "projector sits on its mini tripod, tilted so its lens end points straight up; a soft cone of "
@@ -104,19 +106,20 @@ RULES = [
      'still': {'wall': "First-person view from the sofa at night: her hands in cream knit sleeves set the small projector "
                        "on its mini tripod on the coffee table, lens end aimed at the plain wall ahead; a faint beam runs "
                        "from the lens to the wall and a colorful video with no logos fills the wall exactly where the lens "
-                       "points. No face in frame."},
+                       "points. Her voice is heard off-camera; the camera never turns around and no face ever appears."},
      'line': 'アプリ入りだから、届いてすぐ見れる', 'must_say': 'アプリ',
      'must_show': 'The projector lens points at the wall where the video image appears.'},
     {'genres': ('gadget',), 'match': r'ゲーム|Switch|PS[45]',
      'still': {'gaming': "First-person view sitting on the floor: her hands in cream knit sleeves hold a plain game controller. "
                          "Just ahead on the floor the small projector sits on its mini tripod, lens end facing the plain wall, "
                          "with an HDMI cable to a small plain game console; the colorful game image appears on the wall right "
-                         "where the lens aims. No logos, no face in frame."},
+                         "where the lens aims. No logos. Her voice is heard off-camera; the camera never turns around "
+                         "and no face ever appears."},
      'line': 'ゲームも大画面で、テンション上がる', 'must_say': 'ゲーム',
      'must_show': 'A game image is on the wall where the projector lens points while she holds a controller.'},
     {'genres': ('gadget',), 'match': r'連続[0-9.]+時間',
-     'still': {'holding': "She carries the small projector with no cable attached into another room and sets it on its "
-                          "mini tripod facing a plain wall; a video appears on that wall exactly where the lens points. "
+     'still': {'holding': "She holds the small projector up next to her face and turns it slowly so the viewer sees "
+                          "no cable is attached; the projector keeps exactly the same shape and colors throughout. "
                           "She smiles and talks to the camera like a friend."},
      'line': '充電式で、映画一本まるっと見れる', 'must_say': '映画',
      'must_show': 'She holds the small projector and no cable is attached to it.'},
