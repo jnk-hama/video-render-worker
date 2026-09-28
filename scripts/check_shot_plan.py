@@ -134,6 +134,12 @@ expect([c.get('part') for c in jl['info_cards'] if c['cut_index'] == 1] == [[0, 
 expect(jl['clips'][1]['must_say'] == ['スマホ', '映画'], '言うべき語は機能ごとに全部渡す')
 tw = speech_qa.timed_by_cut([{'text': 'a', 'cut_index': 0, 'part': [1, 2]}], [(0.0, 8.0)])
 expect(abs(tw[0]['start'] - 4.15) < 1e-6 and abs(tw[0]['end'] - 7.85) < 1e-6, 'part は窓を等分した区間になる')
+lr = shot_plan.plan_long(dict(RR35, layout='long'))
+for c in lr['cuts']:
+    print('     %-8s %-8s %ds %s' % (c['role'], c['still'], c['seconds'], c['line']))
+expect(any(c['still'] == 'cleaning' and c.get('must_show') for c in lr['cuts']),
+       '吸い込む所（見せる主張のあるカット）は相乗りさせず単独で残す（#197）')
+expect(sum(c['seconds'] for c in lr['cuts']) <= 30, '長回しでも全体は30秒以内')
 import marie_video  # noqa: E402
 lb = marie_video.redo_targets(lk['cuts'], {i: {'video_url': 'v%d' % i} for i in range(3)}, list(range(3)),
                               lambda u, m: (1, 'ok', 'スマホくらいの大きさで持ち歩ける' if u == 'v1' else lk['cuts'][int(u[1:])]['line']))

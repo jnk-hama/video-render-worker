@@ -297,7 +297,8 @@ def plan_long(product):
         line = '、'.join(p['line'].replace('、', '') for p in parts) if extras else primary['line']
         if len(line) > JA_CHARS_LONG:
             return None
-        s = dict(primary, seconds=LONG_SECONDS, line=line, action=primary['action'] + LONG_CALM,
+        s = dict(primary, seconds=LONG_SECONDS if extras else primary['seconds'], line=line,
+                 action=primary['action'] + (LONG_CALM if extras else ''),
                  must_say=[w for p in parts for w in says(p)],
                  cards=[p['card'] for p in parts if p.get('card')])
         s.pop('card', None)
@@ -315,6 +316,11 @@ def plan_long(product):
         singles += g
     first, last = scene(hook, []), scene(cta, [])
     for c in singles:
+        # ★見せる主張のあるカット（must_show。掃除機の吸い込み等）は相乗りさせず単独で残す。
+        #   オーナー「一番肝心な吸い込み描写は絶対いる」（#197）。相乗りは絵で見せられない一人称だけ
+        if c.get('must_show') and not is_pov_action(c['action']):
+            scenes.append(scene(c, []))
+            continue
         for slot in ('first', 'last'):
             cur = first if slot == 'first' else last
             prim = hook if slot == 'first' else cta
