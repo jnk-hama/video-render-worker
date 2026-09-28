@@ -89,6 +89,7 @@ RULES = [
 #   ★壁・ゲームは一人称視点（手だけ・顔なし。オーナー案・#214）。顔が崩れる場所を減らし、使う人の目線で見せる
 #   ★★一人称でもセリフがあると Veo は話す人を足した（別人が正面で喋った・#215）。声は画面外と明記する。
 #     動き回らせると商品が別物に描き変わった（充電式のカット）。商品は持って見せるだけにする
+# ★セリフは2つ繋いで27文字（6秒）に収まる長さにする（オーナー「カベーニのセリフも27文字に詰めて」#224）
     {'genres': ('gadget',), 'match': r'天井', 'hook': True,
      'still': {'ceiling': "She lies on her back on a bed in a dark bedroom, looking up. On the bedside table the small "
                           "projector sits on its mini tripod, tilted so its lens end points straight up; a soft cone of "
@@ -100,14 +101,14 @@ RULES = [
     {'genres': ('gadget',), 'match': r'スマホサイズ|手のひら',
      'still': {'holding': "She holds the small projector flat on her open palm next to her face to show it is about "
                           "the size of a phone, then talks to the camera like a friend."},
-     'line': 'スマホくらいの大きさで、持ち歩ける', 'must_say': 'スマホ',
+     'line': 'スマホサイズで、持ち歩ける', 'must_say': 'スマホ',
      'must_show': 'She holds a small projector about the size of a phone in one hand.'},
     {'genres': ('gadget',), 'match': r'アプリ内蔵',
      'still': {'wall': "First-person view from the sofa at night: her hands in cream knit sleeves set the small projector "
                        "on its mini tripod on the coffee table, lens end aimed at the plain wall ahead; a faint beam runs "
                        "from the lens to the wall and a colorful video with no logos fills the wall exactly where the lens "
                        "points. Her voice is heard off-camera; the camera never turns around and no face ever appears."},
-     'line': 'アプリ入りだから、届いてすぐ見れる', 'must_say': 'アプリ',
+     'line': 'アプリ入りで、届いてすぐ見れる', 'must_say': 'アプリ',
      'must_show': 'The projector lens points at the wall where the video image appears.'},
     {'genres': ('gadget',), 'match': r'ゲーム|Switch|PS[45]',
      'still': {'gaming': "First-person view sitting on the floor: her hands in cream knit sleeves hold a plain game controller. "
@@ -115,13 +116,13 @@ RULES = [
                          "with an HDMI cable to a small plain game console; the colorful game image appears on the wall right "
                          "where the lens aims. No logos. Her voice is heard off-camera; the camera never turns around "
                          "and no face ever appears."},
-     'line': 'ゲームも大画面で、テンション上がる', 'must_say': 'ゲーム',
+     'line': 'ゲームも大画面で、遊べる', 'must_say': 'ゲーム',
      'must_show': 'A game image is on the wall where the projector lens points while she holds a controller.'},
     {'genres': ('gadget',), 'match': r'連続[0-9.]+時間',
      'still': {'holding': "She holds the small projector up next to her face and turns it slowly so the viewer sees "
                           "no cable is attached; the projector keeps exactly the same shape and colors throughout. "
                           "She smiles and talks to the camera like a friend."},
-     'line': '充電式で、映画一本まるっと見れる', 'must_say': '映画',
+     'line': '充電式で、映画一本見れる', 'must_say': '映画',
      'must_show': 'She holds the small projector and no cable is attached to it.'},
     # ★フック（#196）。orage RR35 の説明文「大容量抗菌紙パックで、最大約4－5か月ゴミ捨て不要。※1」から。
     #   数字は Veo が読み崩しやすいので「4〜5」を言わせず「最大約5か月」に留め、条件（※1日1回の掃除で計測）はカードに書く

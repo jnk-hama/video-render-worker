@@ -123,8 +123,8 @@ lk = shot_plan.plan_long(dict(KABENI, layout='long'))
 for c in lk['cuts']:
     print('     %-8s %-8s %ds %s %s' % (c['role'], c['still'], c['seconds'], c['line'], shot_plan.says(c)))
 expect([c['role'] for c in lk['cuts']] == ['hook', 'feature', 'cta'], '6カットを3シーンにまとめる（フック・本編・CTA）')
-expect(all(c['seconds'] == shot_plan.LONG_SECONDS and len(c['line']) <= shot_plan.JA_CHARS_LONG for c in lk['cuts']),
-       '各シーンは8秒・セリフは尺に入る長さ')
+expect(all(c['seconds'] in shot_plan.LONG_STEPS and len(c['line']) <= shot_plan.JA_CHARS_4S * c['seconds'] // shot_plan.CUT_SECONDS
+           for c in lk['cuts']), '各シーンは6秒か8秒・セリフはそのシーンの尺に入る長さ（等分しない・#223）')
 expect(not any(shot_plan.is_pov_action(c['action']) for c in lk['cuts']), '一人称のカットは作らない（別人・手の破綻の元）')
 expect(all(shot_plan.LONG_CALM in c['action'] for c in lk['cuts']), '長回しは動きを小さく・別人を出さない指示を付ける')
 mid = lk['cuts'][1]
@@ -411,6 +411,14 @@ _pair = [c for c in _rr['cuts'] if len(shot_plan.says(c)) == 2 and c['role'] == 
 expect(_pair and all(c['seconds'] == 6 for c in _pair) and all(len(c['line']) <= 27 for c in _pair),
        'RR35 の2機能のシーン（26文字）は6秒に縮む')
 expect(all(c['seconds'] in (4, 6, 8) for c in _rr['cuts']), '長さは作れたことのある 4・6・8秒だけ')
+_kb = shot_plan.plan_long({"product_key": "kabeni-projector", "genre": "gadget", "layout": "long", "image_url": "x",
+    "features": ["天井に投影できる\n※投影サイズ 6〜130インチ", "スマホサイズ・220g", "アプリ内蔵（YouTube・Netflix・プライムビデオ）",
+                 "バッテリー内蔵・連続2.5時間再生", "Switch・PS4をHDMIでつないでゲーム"],
+    "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "selfie", "ceiling", "wall", "gaming"])}})
+expect([c['seconds'] for c in _kb['cuts']] == [6, 6, 6] and all(len(c['line']) <= 27 for c in _kb['cuts']),
+       'カベーニは3シーンとも27文字以内・6秒（#224）')
+expect(sorted(w for c in _kb['cuts'] for w in shot_plan.says(c)) == sorted(['天井', 'アプリ', 'スマホ', '映画', 'ゲーム', 'リンク']),
+       '詰めても言うべき語は全部残る')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
