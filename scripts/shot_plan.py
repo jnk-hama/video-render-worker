@@ -16,8 +16,8 @@
   station    商品が充電台・ステーションに置かれ、その横に立つ絵（置くだけ系の家電）
   cleaning   商品を実際に使っている絵（掃除機なら床のゴミの上をヘッドが通る）。機能の中心は「使って効く所」を見せる
   ceiling    暗い寝室のベッドに仰向け、天井に映像が大きく映っている絵（プロジェクター・#211）
-  gaming     床に座ってコントローラーを持ち、壁に大きくゲームが映っている絵（プロジェクター・#211）
-  wall       夜のリビングのソファに座り、壁いっぱいに映像が映っている絵（プロジェクター・#211）
+  gaming     一人称視点。手にコントローラー、前の床に三脚の本体、レンズの先の壁にゲーム（顔なし・#214）
+  wall       一人称視点。手で三脚の本体をテーブルに置き、レンズの先の壁に映像（顔なし・#214）
 
 使い方: python3 scripts/shot_plan.py product.json  → 計画（JSON）を標準出力へ
 """
@@ -86,6 +86,7 @@ RULES = [
     #   ★映す映像はアニメ・映画の実在作品にしない（著作権）。抽象的な映像と書く
 #   ★★映像はレンズが向いた面にだけ出す（オーナー「商品が写している壁ではない所に映像が出ているのが AI 感」）。
 #     本体は付属のミニ三脚に載せ、レンズ側を壁・天井へ向け、光の筋と映像をその先に置く。must_show でも向きを見る
+#   ★壁・ゲームは一人称視点（手だけ・顔なし。オーナー案・#214）。顔が崩れる場所を減らし、使う人の目線で見せる
     {'genres': ('gadget',), 'match': r'天井', 'hook': True,
      'still': {'ceiling': "She lies on her back on a bed in a dark bedroom, looking up. On the bedside table the small "
                           "projector sits on its mini tripod, tilted so its lens end points straight up; a soft cone of "
@@ -100,20 +101,17 @@ RULES = [
      'line': 'スマホくらいの大きさで、持ち歩ける', 'must_say': 'スマホ',
      'must_show': 'She holds a small projector about the size of a phone in one hand.'},
     {'genres': ('gadget',), 'match': r'アプリ内蔵',
-     'still': {'wall': "She sits on a sofa in a cozy living room at night. On the coffee table in front of her the small "
-                       "projector sits on its mini tripod, lens end aimed at the plain wall across the room; a faint beam "
-                       "runs from the lens to the wall, and the colorful video with no logos fills the wall exactly where "
-                       "the lens points. She turns to the camera, delighted, and talks like a friend.",
-               'holding': "She sets the small projector on its mini tripod on a table with the lens end facing the plain "
-                          "wall in front of her; a colorful video with no logos appears on that wall exactly where the "
-                          "lens points. She gestures at it and talks to the camera like a friend."},
+     'still': {'wall': "First-person view from the sofa at night: her hands in cream knit sleeves set the small projector "
+                       "on its mini tripod on the coffee table, lens end aimed at the plain wall ahead; a faint beam runs "
+                       "from the lens to the wall and a colorful video with no logos fills the wall exactly where the lens "
+                       "points. No face in frame."},
      'line': 'アプリ入りだから、届いてすぐ見れる', 'must_say': 'アプリ',
      'must_show': 'The projector lens points at the wall where the video image appears.'},
     {'genres': ('gadget',), 'match': r'ゲーム|Switch|PS[45]',
-     'still': {'gaming': "She sits on the floor facing a plain wall, holding a plain game controller. Between her and the "
-                         "wall the small projector sits on its mini tripod, lens end facing the wall, with an HDMI cable to "
-                         "a small plain game console; the colorful game image appears on the wall right where the lens "
-                         "aims. No logos. She glances back at the camera, thrilled, and talks like a friend."},
+     'still': {'gaming': "First-person view sitting on the floor: her hands in cream knit sleeves hold a plain game controller. "
+                         "Just ahead on the floor the small projector sits on its mini tripod, lens end facing the plain wall, "
+                         "with an HDMI cable to a small plain game console; the colorful game image appears on the wall right "
+                         "where the lens aims. No logos, no face in frame."},
      'line': 'ゲームも大画面で、テンション上がる', 'must_say': 'ゲーム',
      'must_show': 'A game image is on the wall where the projector lens points while she holds a controller.'},
     {'genres': ('gadget',), 'match': r'連続[0-9.]+時間',
