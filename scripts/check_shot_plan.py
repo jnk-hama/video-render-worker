@@ -403,6 +403,14 @@ expect(abs(tc[0]['start'] - 5.78) < 1e-6 and abs(tc[0]['end'] - 9.03) < 1e-6, '2
 expect(tc[1] == {'text': 'b', 'start': 1, 'end': 2}, '秒指定はそのまま')
 expect(len(tc) == 2, '範囲外のカット番号は捨てる')
 
+print('=== シーンの長さはセリフに合わせる（#223）===')
+expect(shot_plan.fit_seconds('あ' * 27) == 6 and shot_plan.fit_seconds('あ' * 28) == 8, '27文字までは6秒、28文字からは8秒（4.5文字/秒）')
+expect(shot_plan.fit_seconds('あ' * shot_plan.JA_CHARS_LONG) == shot_plan.LONG_SECONDS, '上限の文字数は8秒に入る')
+_rr = shot_plan.plan_long(dict(RR35, layout='long'))
+_pair = [c for c in _rr['cuts'] if len(shot_plan.says(c)) == 2 and c['role'] == 'feature']
+expect(_pair and all(c['seconds'] == 6 for c in _pair) and all(len(c['line']) <= 27 for c in _pair),
+       'RR35 の2機能のシーン（26文字）は6秒に縮む')
+expect(all(c['seconds'] in (4, 6, 8) for c in _rr['cuts']), '長さは作れたことのある 4・6・8秒だけ')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))

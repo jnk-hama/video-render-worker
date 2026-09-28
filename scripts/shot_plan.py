@@ -261,6 +261,13 @@ def plan(product):
 
 LONG_SECONDS = 8                              # Veo の1本の上限（video-scene の MAX_SECONDS）
 JA_CHARS_LONG = JA_CHARS_4S * LONG_SECONDS // CUT_SECONDS
+# ★シーンの長さは等分しない。セリフが入る一番短い長さにする（オーナー「セリフが長いシーンは1〜2秒長くても大丈夫」#223）。
+#   短いシーンは Veo の費用（秒課金）がそのまま減る。長さは本番で作れたことのある 6秒・8秒だけを使う
+LONG_STEPS = (6, LONG_SECONDS)
+
+
+def fit_seconds(line):
+    return next(s for s in LONG_STEPS if len(line) <= JA_CHARS_4S * s // CUT_SECONDS)
 # ★長回しは動きを小さくする（オーナー「手が4本あったり意味のない描写なら1シーン長くして色んな紹介したらいい」#216）。
 #   カットが多いほど Veo の破綻（手の数・別人・商品の変形）が入る機会が増える
 LONG_CALM = (" Keep it calm and continuous: she talks to the camera the whole time with small natural gestures, "
@@ -297,7 +304,7 @@ def plan_long(product):
         line = '、'.join(p['line'].replace('、', '') for p in parts) if extras else primary['line']
         if len(line) > JA_CHARS_LONG:
             return None
-        s = dict(primary, seconds=LONG_SECONDS if extras else primary['seconds'], line=line,
+        s = dict(primary, seconds=fit_seconds(line) if extras else primary['seconds'], line=line,
                  action=primary['action'] + (LONG_CALM if extras else ''),
                  must_say=[w for p in parts for w in says(p)],
                  cards=[p['card'] for p in parts if p.get('card')])
