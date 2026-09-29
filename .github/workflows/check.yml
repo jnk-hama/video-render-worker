@@ -34,6 +34,8 @@ on:
       - "scripts/check_render_golden.py"
       - "scripts/qc_video.py"
       - "scripts/check_qc_video.py"
+      - "scripts/notify_stop.py"
+      - "scripts/check_notify_stop.py"
       - "scripts/render_video.py"
       - "scripts/speech_qa.py"
       - "tests/golden/**"
@@ -129,6 +131,11 @@ jobs:
       - name: 動画の品質検査（欠陥を仕込んで落とせるか）
         working-directory: .
         run: python3 scripts/check_qc_video.py
+
+      # ★★2026-09-29 追加（決定#228）。止まった時に LINE へ理由を送る仕組みが、理由を拾えて、工程に配線されているか
+      - name: 止まった時の LINE 通知（理由を拾えるか・配線されているか）
+        working-directory: .
+        run: python3 scripts/check_notify_stop.py
 
       # ★★2026-09-27 追加（決定#190）。描画の回帰試験（黄金の出力との突き合わせ）。
       #   決まった合成素材を実際に描き、決まった時刻のコマを基準と SSIM で比べる。

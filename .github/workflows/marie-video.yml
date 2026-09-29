@@ -52,7 +52,8 @@ jobs:
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python3 scripts/marie_video.py product.json job.json --dry-run
           else
-            python3 scripts/marie_video.py product.json job.json
+            # ★ログを残す（止まった時に理由を LINE へ送るため・#228）
+            python3 scripts/marie_video.py product.json job.json 2>&1 | tee run.log
           fi
       - name: 描画を依頼する
         if: ${{ !inputs.dry_run }}
@@ -63,3 +64,14 @@ jobs:
           gh workflow run render-video.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" \
             -f payload_json="$(cat job.json)"
           echo "render-video を起動しました"
+      # ★★2026-09-29 追加（決定#228）。止まったら、理由をオーナーの LINE へ1通送る。
+      #   9/29 は2本とも描く前に止まったのに何も届かず、オーナーは LINE を待っていた（#227）
+      - name: 止まったことを LINE で知らせる
+        if: ${{ failure() && !inputs.dry_run }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PRODUCT_JSON: ${{ inputs.product_json }}
+        run: |
+          KEY=$(printf '%s' "$PRODUCT_JSON" | python3 -c 'import sys,json; print(json.load(sys.stdin).get("product_key","?"))' 2>/dev/null || echo '?')
+          python3 scripts/notify_stop.py "$KEY（描く前に停止）" run.log

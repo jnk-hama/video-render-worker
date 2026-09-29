@@ -320,8 +320,9 @@ jobs:
         if: steps.renderer.outputs.engine == 'ffmpeg'
         run: |
           set -euo pipefail
+          # ★ログを残す（止まった時に理由を LINE へ送るため・#228）
           python3 scripts/render_video.py \
-            --payload ${{ steps.pf.outputs.file }} --out out.mp4
+            --payload ${{ steps.pf.outputs.file }} --out out.mp4 2>&1 | tee render.log
           ls -lh out.mp4
 
       # ------------------------------------------------------------------
@@ -458,7 +459,7 @@ jobs:
           set -- $OUT
           EXTRA=""
           [ "$3" = "block" ] || EXTRA="--warn-only"
-          python3 scripts/qc_video.py out.mp4 --size "${1}x${2}" $EXTRA
+          python3 scripts/qc_video.py out.mp4 --size "${1}x${2}" $EXTRA 2>&1 | tee -a render.log
 
       # ★★2026-09-20 追加。**出来上がった絵を見る**ための口。
       #
@@ -774,3 +775,17 @@ jobs:
           for k in sorted(job):
               print('  %-18s %s' % (k, shape(k, job[k])))
           PY
+      # ★★2026-09-29 追加（決定#228）。マリーの依頼（承認に回す回＝review がある）が描画・検査で止まったら LINE で知らせる。
+      #   他部署（GAS 経路）の依頼には review が無いので送らない
+      - name: 止まったことを LINE で知らせる（マリーの依頼だけ）
+        if: ${{ failure() }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if python3 -c "import json,sys; j=json.load(open('payload.json')).get('job') or {}; sys.exit(0 if j.get('review') else 1)" 2>/dev/null; then
+            touch render.log
+            python3 scripts/notify_stop.py "描画で停止" render.log
+          else
+            echo "マリーの依頼ではない（review なし）ので LINE へは送りません"
+          fi
