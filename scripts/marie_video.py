@@ -161,6 +161,17 @@ SAID_MAX_RATIO = 1.6
 #   描く前に数コマ抜いて face_score で見る：一人称のカットは顔が出たら不合格、それ以外はマリーでない顔が出たら不合格。
 #   顔が映らないコマ（横を向いた等）は落とさない（見えない物は判定しない）
 FACE_FRAMES = 6
+# ★見えてよい手の数（#231）。一人称は片手がスマホなので1本、それ以外は2本（3本目は生成の破綻・#216）
+MAX_HANDS = 2
+MAX_HANDS_POV = 1
+
+
+def hand_problem(n, pov):
+    """数えた手の本数 n が多すぎれば理由の文、よければ None（数えられない None は判定しない）"""
+    limit = MAX_HANDS_POV if pov else MAX_HANDS
+    if n is None or n <= limit:
+        return None
+    return ('一人称なのに手が%d本（片手はスマホのはず）' % n) if pov else ('手が%d本映っている' % n)
 
 
 def is_pov(cut):
@@ -179,9 +190,9 @@ def face_problem(url, pov, refs, who='marie'):
         at = dur * (i + 0.5) / FACE_FRAMES
         f = os.path.join(d, 'f%02d.jpg' % i)
         subprocess.run(['ffmpeg', '-y', '-v', 'error', '-ss', '%.3f' % at, '-i', path, '-frames:v', '1', f], check=True)
-        n = hand_score.count_hands(f)
-        if n is not None and n > 2:
-            return '手が%d本映っている（%.1f秒）' % (n, at)
+        why = hand_problem(hand_score.count_hands(f), pov)
+        if why:
+            return '%s（%.1f秒）' % (why, at)
         s = face_score.score(f, refs)
         if s is None:
             continue
@@ -312,6 +323,33 @@ def choose(cut, tried, got, verify, lang='ja', face=None):
     return None, None, ['静止画だけ・声なし（%s）' % (last[0] if last else 'Veo を起動できず')]
 
 
+def check_pov_stills(cuts, count=None):
+    """
+    一人称の静止画に手が2本以上映っていたら、Veo を起動する前に止める（#231・まだ1円も使っていない）。
+    ★その静止画から作る動画も、差し替えに使う静止画も両手になるので、描いてから気づいても直せない。
+      直すのは静止画（作り直して verify_urls で手の数を見る）。数えられない時は通す（見えない物は判定しない）
+    """
+    bad = []
+    for k, c in enumerate(cuts):
+        if not is_pov(c):
+            continue
+        if count is None:
+            import hand_score
+            count = hand_score.count_hands
+        d = tempfile.mkdtemp(prefix='still_')
+        path = os.path.join(d, 'still.jpg')
+        try:
+            urllib.request.urlretrieve(c['still_url'], path)
+        except Exception as e:  # noqa: BLE001 — 取れない静止画は Veo も読めない。ここでは判定しない
+            print('  静止画を取れません（%s）: %s' % (c['still'], e))
+            continue
+        why = hand_problem(count(path), True)
+        if why:
+            bad.append('カット%d（%s）: %s' % (k + 1, c['still'], why))
+    if bad:
+        raise SystemExit('一人称の静止画を直してください（Veo は起動していません・費用なし）: ' + '; '.join(bad))
+
+
 def wait_all(base, key, ids):
     ids = [i for i in ids if i is not None]
     if not ids:
@@ -354,6 +392,7 @@ def main():
     if dry:
         return
     base, key = _base_and_key()
+    check_pov_stills(plan['cuts'])
     reuse = product.get('reuse_ids')
     reused = set()  # 前のクリップを使い回したカットの番号（#198）
     if reuse:

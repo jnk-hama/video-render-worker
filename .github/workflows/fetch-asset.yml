@@ -250,7 +250,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
-            insightface onnxruntime pillow
+            insightface onnxruntime pillow mediapipe
           mkdir -p faces
           python3 - <<'PY2'
           import os, re, sys, urllib.request
@@ -269,19 +269,27 @@ jobs:
           python3 - <<'PY2'
           import os, sys
           sys.path.insert(0, 'scripts')
-          import face_score, outfit_score
-          refs = face_score.reference_set()
-          print('\n顔（マスター %d枚との最大類似度 / 閾値 %.2f）' % (len(refs), face_score.PASS_THRESHOLD))
+          import face_score, outfit_score, hand_score
+          # ★人物ごとの基準で見る（#218）。以前は PERSONA を受け取りながら使っておらず、ヒロの絵もマリーと比べていた（#231 で直した）
+          who = (os.environ.get('PERSONA') or '').strip() or None
+          refs = face_score.reference_set(who)
+          print('\n顔（%s のマスター %d枚との最大類似度 / 閾値 %.2f）' % (who or face_score.DEFAULT_PERSONA, len(refs), face_score.PASS_THRESHOLD))
           files = sorted(os.listdir('faces'))
           ng = 0
           for f in files:
               r = face_score.score(os.path.join('faces', f), refs)
+              # ★手の本数（#231）。顔の無い絵＝一人称は片手がスマホなので1本まで、顔のある絵は2本まで
+              n = hand_score.count_hands(os.path.join('faces', f))
+              pov = not r
+              limit = 1 if pov else 2
+              hands = '手 ?' if n is None else ('手 %d本' % n) + ('' if n <= limit else ' ★NG（%s）' % ('一人称なら1本まで・片手はスマホ' if pov else '3本以上'))
+              ng += 1 if (n is not None and n > limit) else 0
               if not r:
-                  print('  %-8s 顔が見つからない（寄りの画なら正常）' % f)
+                  print('  %-8s 顔なし（一人称）  %s' % (f, hands))
                   continue
               mark = 'OK  本人' if r['passed'] else '★NG 別人'
               ng += 0 if r['passed'] else 1
-              print('  %-8s %.3f  %s' % (f, r['best'], mark))
+              print('  %-8s %.3f  %s  %s' % (f, r['best'], mark, hands))
           o = outfit_score.compare([os.path.join('faces', f) for f in files])
           print('\n服の一致（胴体の色分布・1.0が完全一致）')
           for a, b, sim in o['pairs']:
@@ -291,7 +299,7 @@ jobs:
           if o['worst'] is not None:
               print('  最小 %.3f / 閾値 %.2f → %s' % (o['worst'], outfit_score.PASS_THRESHOLD,
                     '服は揃っている' if o['passed'] else '★服が変わっている疑い'))
-          print('\n別人判定: %d件' % ng)
+          print('\nNG（別人・手の本数）: %d件' % ng)
           PY2
           python3 scripts/preview_b64.py faces/*.jpg --max 360 --cols 5
           bash scripts/push_preview.sh preview.jpg "verify_urls $(date -u +%H:%MZ)"

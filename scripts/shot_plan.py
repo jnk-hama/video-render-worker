@@ -40,6 +40,15 @@ CARD_SFX = 'pop'      # カードが出る時の効果音（assets/shared/sfx/ �
   must_show は「セリフが言っている絵」を英語1文で（#185）。見せる主張のある規則だけに付け、動作全体ではなく1点に絞る。
   実地で通った物（2026-09-26 の本番）を元にしている。
 """
+# ★★一人称の絵では、片手はスマホを持っている（オーナー「カメラを撮りながら両手で掃除機を使うのは不自然。片手の描写で」#231）。
+#   だから作業に使える手は1本だけ。一人称の指示は全部、この一文で終える（言い換えない・機械で見張る）。
+#   自撮り・鏡の自撮りも同じく片手はスマホ（両手を使う動きを書かない）
+ONE_HAND_POV = (" She is filming with the phone in her other hand, so exactly one of her hands is visible, doing the"
+                " action; the phone and the second hand never appear. Her voice is heard off-camera; the camera never"
+                " turns around and no face ever appears.")
+PHONE_IN_HAND = ('selfie', 'mirror')   # 本人がスマホを持って撮る絵（作業に使える手は1本）
+
+
 RULES = [
     # ---- アパレル ----
     {'genres': ('apparel', 'hoodie'), 'match': r'ヴィンテージ|洗い|色落ち|ウォッシュ|加工', 'hook': True,
@@ -104,18 +113,17 @@ RULES = [
      'line': 'スマホサイズで、持ち歩ける', 'must_say': 'スマホ',
      'must_show': 'She holds a small projector about the size of a phone in one hand.'},
     {'genres': ('gadget',), 'match': r'アプリ内蔵',
-     'still': {'wall': "First-person view from the sofa at night: her hands in cream knit sleeves set the small projector "
+     'still': {'wall': "First-person view from the sofa at night: one hand in a cream knit sleeve sets the small projector "
                        "on its mini tripod on the coffee table, lens end aimed at the plain wall ahead; a faint beam runs "
                        "from the lens to the wall and a colorful video with no logos fills the wall exactly where the lens "
-                       "points. Her voice is heard off-camera; the camera never turns around and no face ever appears."},
+                       "points." + ONE_HAND_POV},
      'line': 'アプリ入りで、届いてすぐ見れる', 'must_say': 'アプリ',
      'must_show': 'The projector lens points at the wall where the video image appears.'},
     {'genres': ('gadget',), 'match': r'ゲーム|Switch|PS[45]',
-     'still': {'gaming': "First-person view sitting on the floor: her hands in cream knit sleeves hold a plain game controller. "
-                         "Just ahead on the floor the small projector sits on its mini tripod, lens end facing the plain wall, "
-                         "with an HDMI cable to a small plain game console; the colorful game image appears on the wall right "
-                         "where the lens aims. No logos. Her voice is heard off-camera; the camera never turns around "
-                         "and no face ever appears."},
+     'still': {'gaming': "First-person view sitting on the floor: one hand in a cream knit sleeve holds a plain game "
+                         "controller. Just ahead on the floor the small projector sits on its mini tripod, lens end facing "
+                         "the plain wall, with an HDMI cable to a small plain game console; the colorful game image appears "
+                         "on the wall right where the lens aims. No logos." + ONE_HAND_POV},
      'line': 'ゲームも大画面で、遊べる', 'must_say': 'ゲーム',
      'must_show': 'A game image is on the wall where the projector lens points while she holds a controller.'},
     {'genres': ('gadget',), 'match': r'連続[0-9.]+時間',
@@ -135,10 +143,9 @@ RULES = [
     #   説明文「強力吸引で細かい粉じんもどんどん吸い込みます」から。数値（Pa）は言わない（説明文自身が「使い方で異なる」と打ち消している）
     # ★手だけの静止画（cleaning_pov）を先に見る。顔の無い絵に「カメラを見る」を渡すと Veo が顔を足し、顔の判定で落ちる（#229）
     {'genres': ('gadget',), 'match': r'吸引|吸い込',
-     'still': {'cleaning_pov': "First-person view looking down: her hands in her sleeves hold the handle and push the "
-                               "vacuum slowly across the rug. The floor head passes over scattered crumbs and dust, which "
-                               "disappear into it and leave a clean stripe behind. Her voice is heard off-camera; the "
-                               "camera never turns around and no face ever appears.",
+     'still': {'cleaning_pov': "First-person view looking down: one hand in her sleeve holds the stick vacuum's handle "
+                               "and pushes it slowly across the rug. The floor head passes over scattered crumbs and dust, "
+                               "which disappear into it and leave a clean stripe behind." + ONE_HAND_POV,
                'cleaning': "She pushes the vacuum slowly across the rug. The floor head passes over scattered crumbs and dust, "
                            "which disappear into it and leave a clean stripe behind. She glances at the camera, impressed."},
      'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True,

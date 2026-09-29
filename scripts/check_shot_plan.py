@@ -395,6 +395,48 @@ with tempfile.TemporaryDirectory() as td:
 for k, v in _orig.items():
     setattr(marie_video, k, v)
 
+print('=== 一人称・自撮りは片手がスマホ（#231）===')
+_acts = []
+for _r in shot_plan.RULES + [shot_plan.FALLBACK_HOOK, shot_plan.CTA]:
+    for _k, _a in (_r.get('still') or {}).items():
+        _acts.append((_k, _a))
+_pov_acts = [(k, a) for k, a in _acts if a.startswith('First-person')]
+expect(len(_pov_acts) >= 3, '一人称の指示を全部見る（%d本）' % len(_pov_acts))
+for _k, _a in _pov_acts:
+    expect(_a.endswith(shot_plan.ONE_HAND_POV), '%s：一人称の指示は「片手はスマホ・見える手は1本」で終える' % _k)
+    expect(not re.search(r'\bhands\b|\bboth\b|\btwo hands\b', _a.replace(shot_plan.ONE_HAND_POV, ''), re.I),
+           '%s：両手で作業する書き方が無い' % _k)
+for _k, _a in _acts:
+    if _k in shot_plan.PHONE_IN_HAND:
+        expect(not re.search(r'\bboth hands\b|\bhands\b|\btwo hands\b', _a, re.I), '%s（本人がスマホを持つ絵）に両手の動きが無い' % _k)
+expect(_a and all(k.endswith('_pov') or not a.startswith('First-person') or k in ('wall', 'gaming') for k, a in _acts),
+       '一人称の指示は _pov キー（旧カベーニの wall/gaming を除く）')
+expect(marie_video.hand_problem(2, True) and '片手はスマホ' in marie_video.hand_problem(2, True),
+       '一人称のクリップに手が2本なら落とす（片手はスマホのはず）')
+expect(marie_video.hand_problem(1, True) is None and marie_video.hand_problem(2, False) is None,
+       '一人称で1本・それ以外で2本は通す')
+expect(marie_video.hand_problem(3, False) and marie_video.hand_problem(None, True) is None,
+       '3本は落とす・数えられない時は判定しない')
+_pc2 = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x",
+    "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
+    "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
+_orig_ur = marie_video.urllib.request.urlretrieve
+marie_video.urllib.request.urlretrieve = lambda u, p: open(p, 'wb').close()
+try:
+    marie_video.check_pov_stills(_pc2, count=lambda p: 2)
+    expect(False, '一人称の静止画に手が2本なら Veo の前で止める')
+except SystemExit as e:
+    expect('一人称' in str(e) and '費用なし' in str(e), '一人称の静止画に手が2本なら Veo の前で止める（費用なし・理由つき）')
+try:
+    marie_video.check_pov_stills(_pc2, count=lambda p: 1)
+    expect(True, '手が1本の一人称の静止画は通す')
+except SystemExit:
+    expect(False, '手が1本の一人称の静止画は通す')
+_seen_s = []
+marie_video.check_pov_stills(shot_plan.plan_long(dict(RR35, layout='long'))['cuts'], count=lambda p: _seen_s.append(p) or 2)
+expect(not _seen_s, '一人称の無い回は静止画を数えない（通信もしない）')
+marie_video.urllib.request.urlretrieve = _orig_ur
+
 print('=== 止めない：作り直しても合格しないカットは埋めて描く（#230）===')
 _keep2 = {n: getattr(marie_video, n) for n in ('_base_and_key', 'find_reusable', 'start_cut', 'wait_all', 'verify_cut',
                                                'START_GAP_SEC', 'make_face_check')}
