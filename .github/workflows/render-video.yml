@@ -440,6 +440,26 @@ jobs:
             echo "ナレーションを作っていない回なので、音声の検査はしません。"
           fi
 
+      # ★★2026-09-29 追加（決定#225）。**出来上がった動画の品質を機械で測る。**
+      #   上の検査は音声トラックの有無だけで、黒いコマ・固まった映像・途中の無音・音量・大きさは見ていなかった。
+      #   ffmpeg の公式フィルターだけで測る（0円・LLMなし）。しきい値は scripts/qc_video.py の定数だけが持つ。
+      # ★他部署（GAS 経路）の動画は基準の実測がまだ無いので、既定は「記録だけ」（warn）。
+      #   落とすのは、依頼が job.video_qc: "block" を付けた回だけ（マリーの動画は付く・実測 -14.17 LUFS で基準を取った）。
+      #   基準を実測できた部署から block へ切り替える。
+      - name: 動画の品質を測る（黒・固まり・無音・音量・大きさ）
+        run: |
+          set -euo pipefail
+          OUT=$(python3 - <<'PY'
+          import json
+          j = json.load(open('payload.json')).get('job') or {}
+          print(int(j.get('width') or 1080), int(j.get('height') or 1920), str(j.get('video_qc') or 'warn').lower())
+          PY
+          )
+          set -- $OUT
+          EXTRA=""
+          [ "$3" = "block" ] || EXTRA="--warn-only"
+          python3 scripts/qc_video.py out.mp4 --size "${1}x${2}" $EXTRA
+
       # ★★2026-09-20 追加。**出来上がった絵を見る**ための口。
       #
       # 【なぜ要るか】

@@ -32,6 +32,8 @@ on:
       - "scripts/check_shot_plan.py"
       - "scripts/check_pins.py"
       - "scripts/check_render_golden.py"
+      - "scripts/qc_video.py"
+      - "scripts/check_qc_video.py"
       - "scripts/render_video.py"
       - "scripts/speech_qa.py"
       - "tests/golden/**"
@@ -121,6 +123,12 @@ jobs:
       - name: ナレーションの抑揚（繋いだ後の時刻がずれないこと）
         working-directory: .
         run: python3 scripts/check_tts_prosody.py
+
+      # ★★2026-09-29 追加（決定#225）。動画の品質検査（黒・固まり・無音・音量・大きさ）。
+      #   欠陥を仕込んだ動画を ffmpeg で作り、落とすべき物を落とすかを見る（止める側の例を必ず流す）。
+      - name: 動画の品質検査（欠陥を仕込んで落とせるか）
+        working-directory: .
+        run: python3 scripts/check_qc_video.py
 
       # ★★2026-09-27 追加（決定#190）。描画の回帰試験（黄金の出力との突き合わせ）。
       #   決まった合成素材を実際に描き、決まった時刻のコマを基準と SSIM で比べる。
