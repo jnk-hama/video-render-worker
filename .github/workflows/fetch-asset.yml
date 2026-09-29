@@ -248,7 +248,8 @@ jobs:
           PERSONA: ${{ inputs.persona }}
         run: |
           set -euo pipefail
-          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          # ★libegl1 等は mediapipe（手の本数）が dlopen する。無いと libEGL.so.1 で落ちる（#231 で2度目を踏んだ）
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1 libgles2
           python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
             insightface onnxruntime pillow mediapipe
           mkdir -p faces

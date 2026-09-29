@@ -437,6 +437,17 @@ marie_video.check_pov_stills(shot_plan.plan_long(dict(RR35, layout='long'))['cut
 expect(not _seen_s, '一人称の無い回は静止画を数えない（通信もしない）')
 marie_video.urllib.request.urlretrieve = _orig_ur
 
+print('=== mediapipe を入れる手順は libegl1 も入れる（#231・同じエラーを2度踏んだ）===')
+import glob as _glob  # noqa: E402
+_wf_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.github', 'workflows')
+_steps_mp = 0
+for _wf in sorted(_glob.glob(os.path.join(_wf_dir, '*.yml'))):
+    for _st in re.split(r'\n\s*- name:', open(_wf, encoding='utf-8').read()):
+        if re.search(r'pip install[^\n]*(\\\n[^\n]*)*mediapipe', _st):
+            _steps_mp += 1
+            expect('libegl1' in _st, '%s：mediapipe を入れる手順で libegl1 も入れる' % os.path.basename(_wf))
+expect(_steps_mp >= 2, 'mediapipe を入れる手順を読めている（%d件・0件の合格にしない）' % _steps_mp)
+
 print('=== 止めない：作り直しても合格しないカットは埋めて描く（#230）===')
 _keep2 = {n: getattr(marie_video, n) for n in ('_base_and_key', 'find_reusable', 'start_cut', 'wait_all', 'verify_cut',
                                                'START_GAP_SEC', 'make_face_check')}
