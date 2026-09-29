@@ -302,6 +302,9 @@ expect(one == {}, '「ね」1回までは自然な喋りとして通す')
 expect(marie_video.situation_text(cuts[0]).endswith(marie_video.NO_NE) and 'ne (ね)' in marie_video.NO_NE,
        'Veo へ渡す場面の説明に「ね を足さない」を必ず付ける（使い回しの照合も同じ文）')
 
+_real_preflight = marie_video.preflight_stills
+marie_video.preflight_stills = lambda *a, **k: None   # 通しの試験では静止画の点検を通信しない（点検は下で単体に確かめる）
+marie_video.still_face = lambda persona: (lambda u: 0.9)
 print('=== 合格済みカットの使い回し（#198）===')
 marie_video.make_face_check = lambda persona=None: (lambda u, pov: None)  # 顔の判定は上で単体に確かめた。ここは通信しない
 _q = []
@@ -420,19 +423,37 @@ expect(marie_video.hand_problem(3, False) and marie_video.hand_problem(None, Tru
 _pc2 = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x",
     "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
     "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
-try:
-    marie_video.check_pov_stills(_pc2, count=lambda p: 2)
-    expect(False, '一人称の静止画に手が2本なら Veo の前で止める')
-except SystemExit as e:
-    expect('一人称' in str(e) and '費用なし' in str(e), '一人称の静止画に手が2本なら Veo の前で止める（費用なし・理由つき）')
-try:
-    marie_video.check_pov_stills(_pc2, count=lambda p: 1)
-    expect(True, '手が1本の一人称の静止画は通す')
-except SystemExit:
-    expect(False, '手が1本の一人称の静止画は通す')
-_seen_s = []
-marie_video.check_pov_stills(shot_plan.plan_long(dict(RR35, layout='long'))['cuts'], count=lambda p: _seen_s.append(p) or 2)
-expect(not _seen_s, '一人称の無い回は静止画を数えない（通信もしない）')
+print('=== 本番の前の静止画の点検（#227 の自動化・#232）===')
+def _pf(cuts, hands, face):
+    try:
+        _real_preflight(cuts, hands, face)
+        return None
+    except SystemExit as e:
+        return str(e)
+_isp = lambda u: u.endswith('3-a.jpg')          # _pc2 の cleaning_pov（一人称）の絵
+_good_h = lambda u: 1 if _isp(u) else 2
+_good_f = lambda u: None if _isp(u) else 0.8
+expect(_pf(_pc2, _good_h, _good_f) is None, '手も顔も揃った RR35 の静止画は通す')
+_e = _pf(_pc2, lambda u: 2, _good_f)
+expect(_e and '片手はスマホ' in _e and '費用なし' in _e, '一人称の静止画に手が2本なら Veo の前で止める（費用なし・理由つき）')
+_e = _pf(_pc2, _good_h, lambda u: None if _isp(u) else (0.6 if u.endswith('1-a.jpg') else 0.8))
+expect(_e and '0.60' in _e and 'station' in _e, '顔の点が 0.7 未満の絵（暗い・小さい）は Veo の前で止める（E-038 の再発防止）')
+_e = _pf(_pc2, _good_h, lambda u: None)
+expect(_e and '顔が見つからない' in _e, '顔の出るはずの絵で顔が見つからなければ止める')
+_e = _pf(_pc2, _good_h, lambda u: 0.8)
+expect(_e and '一人称の静止画に顔' in _e, '一人称の絵に顔が映っていたら止める')
+_e = _pf(_pc2, lambda u: 3, _good_f)
+expect(_e and '手が3本' in _e, '一人称でない絵も手3本は止める')
+_mix = [dict(c) for c in _pc2]
+_mix[-2]['must_show'] = next(c['must_show'] for c in _pc2 if c['still'] == 'holding')   # ステーションの絵に「持つ」の問い
+_e = _pf(_mix, _good_h, _good_f)
+expect(_e and 'E-037' in _e, '絵の問いが別の絵の物なら止める（E-037）')
+_hi = [dict(c, persona='hiro', must_show=shot_plan.gendered(c.get('must_show'), 'hiro'),
+            action=shot_plan.gendered(c['action'], 'hiro')) for c in _pc2]
+expect(_pf(_hi, _good_h, _good_f) is None, 'ヒロの回（代名詞を男性にした問い）も通る')
+_calls = []
+_pf([_pc2[0], dict(_pc2[0])], lambda u: _calls.append(u) or 1, lambda u: 0.8)
+expect(len(_calls) == 1, '同じ静止画は1回だけ数える（判定も有料）')
 _povc = next(c for c in _pc2 if marie_video.is_pov(c))
 _selc = next(c for c in _pc2 if c['still'] == 'selfie')
 _v2 = lambda u, m: (1, 'ok', _povc['line'], 2)
@@ -443,9 +464,10 @@ expect(not marie_video.issues_of(_selc, {'video_url': 'u'}, lambda u, m: (1, 'ok
 expect(not marie_video.issues_of(_povc, {'video_url': 'u'}, lambda u, m: (1, 'ok', _povc['line']))[0],
        '手の本数が返らない照合（古い形）は判定しない')
 import inspect as _insp  # noqa: E402
-expect("check_pov_stills(plan['cuts'], lambda u: still_hands(base, key, u))" in _insp.getsource(marie_video.main)
-       and _insp.getsource(marie_video.main).index('check_pov_stills') < _insp.getsource(marie_video.main).index('start_cut'),
-       '本番は Veo を起動する前に、一人称の静止画の手を Gemini で数える')
+_ms = _insp.getsource(marie_video.main)
+expect("preflight_stills(plan['cuts'], lambda u: still_hands(base, key, u), still_face(persona))" in _ms
+       and _ms.index('preflight_stills') < _ms.index('start_cut') and _ms.index('preflight_stills') < _ms.index('if dry:\n        return'),
+       '本番も予行も、Veo を起動する前に静止画を全部点検する（予行＝#227 の点検）')
 
 print('=== mediapipe を入れる手順は libegl1 も入れる（#231・同じエラーを2度踏んだ）===')
 import glob as _glob  # noqa: E402
@@ -528,6 +550,7 @@ expect(jE and jE['quality_gate'] == 'warn' and jE['video_qc'] == 'warn', '描画
 for n, v in _keep2.items():
     setattr(marie_video, n, v)
 
+marie_video.preflight_stills = _real_preflight
 print('=== カット番号 → 秒 ===')
 wins = speech_qa.part_windows([5.63, 3.55, 4.25], 0.0)
 tc = speech_qa.timed_by_cut([{'text': 'a', 'cut_index': 1}, {'text': 'b', 'start': 1, 'end': 2},

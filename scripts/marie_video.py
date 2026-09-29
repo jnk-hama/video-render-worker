@@ -338,24 +338,61 @@ def still_hands(base, key, url):
     return res.get('hands')
 
 
-def check_pov_stills(cuts, count):
+# ★本番の前の点検（#227 の自動化・#232）。顔の点がこれ未満の静止画は Veo に渡さない（暗い・小さい・横顔・寝転び・E-038）。
+#   face_score の合否（0.42）より厳しい。Veo は静止画の顔を保ちきれないので、元の顔がはっきりしている物だけ使う
+PREFLIGHT_FACE_MIN = 0.7
+
+
+def still_face(persona):
+    """静止画の顔の点（persona のマスターと比べる）。顔が見つからなければ None"""
+    import face_score
+    refs = face_score.reference_set(persona)
+
+    def face(url):
+        d = tempfile.mkdtemp(prefix='still_')
+        path = os.path.join(d, 'still.jpg')
+        urllib.request.urlretrieve(url, path)
+        r = face_score.score(path, refs)
+        return None if not r else r['best']
+    return face
+
+
+def preflight_stills(cuts, hands, face):
     """
-    一人称の静止画に手が2本以上映っていたら、Veo を起動する前に止める（#231・まだ Veo の費用は出ていない）。
-    ★その静止画から作る動画も、差し替えに使う静止画も両手になるので、描いてから気づいても直せない。直すのは静止画。
-    ★数えるのは Gemini（verify）。mediapipe は袖に隠れた手を数え損ねた（同じ両手の絵が 1/2/1/3 本と揺れた・実測）。
-      数えられない時は通す（見えない物は判定しない）。count(url) → 本数 か None
+    本番の前に、使う静止画を全部機械で点検する（#227 を人の手順から機械へ・#232）。落ちたら Veo を起動せずに止める（費用なし）。
+      一人称：手は1本まで（片手はスマホ・#231）・顔が映っていない
+      それ以外：顔が見つかり、点が PREFLIGHT_FACE_MIN 以上・手は2本まで
+      全部：絵の問い（must_show）がその絵の規則の物（E-037）
+    ★静止画から作る動画も、差し替えに使う静止画もその絵になるので、描いてから気づいても直せない。直すのは静止画。
+    ★手は Gemini（verify）、顔は insightface（face_score）で見る。数えられない時（None）は判定しない。
+    hands(url) → 本数 か None／face(url) → 点 か None（顔なし）
     """
-    bad = []
+    def owners(ms, who):
+        """その絵の問いを持つ規則の静止画キー（紹介者の代名詞に直して比べる）"""
+        return {k for r in shot_plan.RULES if r.get('must_show') and shot_plan.gendered(r['must_show'], who) == ms
+                for k in (r.get('still') or {})}
+    bad, seen = [], {}
     for k, c in enumerate(cuts):
-        if not is_pov(c):
-            continue
-        n = count(c['still_url'])
-        print('  一人称の静止画（%s）の手: %s' % (c['still'], n))
-        why = hand_problem(n, True)
-        if why:
-            bad.append('カット%d（%s）: %s' % (k + 1, c['still'], why))
+        url = c['still_url']
+        if url not in seen:
+            seen[url] = (hands(url), face(url))
+        n, f = seen[url]
+        pov = is_pov(c)
+        print('  点検 カット%d（%s）: 手 %s／顔 %s' % (k + 1, c['still'], n, '—' if f is None else '%.3f' % f))
+        why = [hand_problem(n, pov)]
+        if pov and f is not None:
+            why.append('一人称の静止画に顔が映っている（%.2f）' % f)
+        if not pov and f is None:
+            why.append('顔が見つからない')
+        elif not pov and f < PREFLIGHT_FACE_MIN:
+            why.append('顔の点が %.2f（%.1f 未満・暗い／小さい／横顔）' % (f, PREFLIGHT_FACE_MIN))
+        ms = c.get('must_show')
+        if ms and owners(ms, c.get('persona')) and c['still'] not in owners(ms, c.get('persona')):
+            why.append('絵の問いがこの絵の物ではない（E-037）')
+        bad += ['カット%d（%s）: %s' % (k + 1, c['still'], w) for w in why if w]
     if bad:
-        raise SystemExit('一人称の静止画を直してください（Veo は起動していません・費用なし）: ' + '; '.join(bad))
+        raise SystemExit('静止画を直してください（Veo は起動していません・費用なし）: ' + '; '.join(bad))
+    print('静止画の点検: 合格（%d枚）' % len(seen))
 
 
 def wait_all(base, key, ids):
@@ -397,10 +434,14 @@ def main():
     if plan['cards_only']:
         print('  カードだけ（絵にしない）: %s' % ' / '.join(plan['cards_only']))
     print('Veo の見積り: $%.2f' % (sum(c['seconds'] for c in plan['cuts']) * 0.05))
-    if dry:
+    # ★予行でも本番と同じ点検を回す（予行＝#227 の点検そのもの。鍵が無い手元の試験では飛ばす）
+    if dry and not os.environ.get('SUPABASE_SERVICE_ROLE_KEY'):
+        print('静止画の点検: 鍵が無いので飛ばします（Actions の予行では必ず回る）')
         return
     base, key = _base_and_key()
-    check_pov_stills(plan['cuts'], lambda u: still_hands(base, key, u))
+    preflight_stills(plan['cuts'], lambda u: still_hands(base, key, u), still_face(persona))
+    if dry:
+        return
     reuse = product.get('reuse_ids')
     reused = set()  # 前のクリップを使い回したカットの番号（#198）
     if reuse:

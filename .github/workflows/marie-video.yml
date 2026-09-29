@@ -5,7 +5,7 @@
 #    "features":["大きめフード","長め袖","ダブルジップ","ヴィンテージ洗い加工","2色","M〜3L"],
 #    "image_url":"https://…/product/redial-850019.jpg",
 #    "stills":{"selfie":"…","mirror":"…","free_hands":"…","hood":"…"}}
-# ★dry_run: true なら計画と見積りだけ出して、Veo は起動しない（0円）
+# ★dry_run: true なら計画と見積り、静止画の点検（顔の点・手の本数・絵の問い・#232）まで出して、Veo は起動しない（Veo は0円・点検の判定は数セント）
 name: marie-video
 
 on:
@@ -35,8 +35,8 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+      # ★予行でも入れる（#232）。予行は静止画の点検（顔の点・手の本数・絵の問い）を本番と同じに回す＝#227 の点検そのもの
       - name: 顔の判定に要る物を入れる
-        if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1 libgles2
