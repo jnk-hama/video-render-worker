@@ -147,9 +147,10 @@ def verify_cut(base, key, video_url, must_show):
     if code != 200 or (res or {}).get('match') not in (0, 1):
         raise SystemExit('絵の照合を呼べません（%s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:300]))
     # ★判定は毎回ログへ残す（朝の報告と、判定の当たり外れの記録に使う・#185）
-    print('  照合 %s: %s（%s）／喋り「%s」' % ('OK' if res['match'] else 'NG', (must_show or '（絵の問いなし）')[:60],
-                                         str(res.get('seen') or '')[:100], str(res.get('said') or '')[:60]))
-    return res['match'], str(res.get('seen') or ''), str(res.get('said') or '')
+    print('  照合 %s: %s（%s）／喋り「%s」／手 %s' % ('OK' if res['match'] else 'NG', (must_show or '（絵の問いなし）')[:60],
+                                         str(res.get('seen') or '')[:100], str(res.get('said') or '')[:60], res.get('hands')))
+    # ★手の本数も同じ判定で数える（#231）。読めない時は None（判定しない）
+    return res['match'], str(res.get('seen') or ''), str(res.get('said') or ''), res.get('hands')
 
 
 # ★聞こえた喋りがセリフの何倍まで長ければ許すか（#197）。言い淀み・言い足しで伸びた喋りを止める。
@@ -254,13 +255,18 @@ def issues_of(cut, row, verify, lang='ja', face=None):
     if not url:
         return ['フィルタ等で動画なし'], []
     try:
-        match, seen, said = verify(url, cut.get('must_show'))
+        r = verify(url, cut.get('must_show'))
+        match, seen, said = r[:3]
+        hands = r[3] if len(r) > 3 else None
     except SystemExit as e:
         # ★照合が呼べない時も止めない。確かめられなかったことを LINE に書く（オーナーが目で見る）
         return [], ['照合できず（%s）' % str(e)[:80]]
     visual, speech = [], []
     if not match:
         visual.append('絵がセリフと合わない（映っていた物: %s）' % seen[:120])
+    why_hands = hand_problem(hands, is_pov(cut))
+    if why_hands:
+        visual.append(why_hands)
     if speech_qa.ends_polite(said, lang):
         speech.append('言い終わりが丁寧語（「%s」）' % said[:60])
     miss = [w for w in shot_plan.says(cut) if speech_qa._norm(w, lang) not in speech_qa._norm(said, lang)]
@@ -323,27 +329,29 @@ def choose(cut, tried, got, verify, lang='ja', face=None):
     return None, None, ['静止画だけ・声なし（%s）' % (last[0] if last else 'Veo を起動できず')]
 
 
-def check_pov_stills(cuts, count=None):
+def still_hands(base, key, url):
+    """静止画に見える手の本数（video-scene の verify・Gemini）。数えられなければ None"""
+    code, res = _req('%s/functions/v1/video-scene' % base, key, {'action': 'verify', 'image_url': url, 'must_show': ''})
+    if code != 200:
+        print('  静止画の手を数えられません（HTTP %s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:200]))
+        return None
+    return res.get('hands')
+
+
+def check_pov_stills(cuts, count):
     """
-    一人称の静止画に手が2本以上映っていたら、Veo を起動する前に止める（#231・まだ1円も使っていない）。
-    ★その静止画から作る動画も、差し替えに使う静止画も両手になるので、描いてから気づいても直せない。
-      直すのは静止画（作り直して verify_urls で手の数を見る）。数えられない時は通す（見えない物は判定しない）
+    一人称の静止画に手が2本以上映っていたら、Veo を起動する前に止める（#231・まだ Veo の費用は出ていない）。
+    ★その静止画から作る動画も、差し替えに使う静止画も両手になるので、描いてから気づいても直せない。直すのは静止画。
+    ★数えるのは Gemini（verify）。mediapipe は袖に隠れた手を数え損ねた（同じ両手の絵が 1/2/1/3 本と揺れた・実測）。
+      数えられない時は通す（見えない物は判定しない）。count(url) → 本数 か None
     """
     bad = []
     for k, c in enumerate(cuts):
         if not is_pov(c):
             continue
-        if count is None:
-            import hand_score
-            count = hand_score.count_hands
-        d = tempfile.mkdtemp(prefix='still_')
-        path = os.path.join(d, 'still.jpg')
-        try:
-            urllib.request.urlretrieve(c['still_url'], path)
-        except Exception as e:  # noqa: BLE001 — 取れない静止画は Veo も読めない。ここでは判定しない
-            print('  静止画を取れません（%s）: %s' % (c['still'], e))
-            continue
-        why = hand_problem(count(path), True)
+        n = count(c['still_url'])
+        print('  一人称の静止画（%s）の手: %s' % (c['still'], n))
+        why = hand_problem(n, True)
         if why:
             bad.append('カット%d（%s）: %s' % (k + 1, c['still'], why))
     if bad:
@@ -392,7 +400,7 @@ def main():
     if dry:
         return
     base, key = _base_and_key()
-    check_pov_stills(plan['cuts'])
+    check_pov_stills(plan['cuts'], lambda u: still_hands(base, key, u))
     reuse = product.get('reuse_ids')
     reused = set()  # 前のクリップを使い回したカットの番号（#198）
     if reuse:

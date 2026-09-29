@@ -246,12 +246,13 @@ jobs:
         env:
           URLS: ${{ inputs.verify_urls }}
           PERSONA: ${{ inputs.persona }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
-          # ★libegl1 等は mediapipe（手の本数）が dlopen する。無いと libEGL.so.1 で落ちる（#231 で2度目を踏んだ）
-          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1 libgles2
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
-            insightface onnxruntime pillow mediapipe
+            insightface onnxruntime pillow
           mkdir -p faces
           python3 - <<'PY2'
           import os, re, sys, urllib.request
@@ -270,7 +271,25 @@ jobs:
           python3 - <<'PY2'
           import os, sys
           sys.path.insert(0, 'scripts')
-          import face_score, outfit_score, hand_score
+          import json, re, urllib.error, urllib.request
+          import face_score, outfit_score
+          # ★手の本数は Gemini（video-scene の verify・image_url）で数える（#231）。
+          #   mediapipe は袖に隠れた手を数え損ねた（同じ両手の絵が、しきい値で 1/2/1/3 本と揺れた・実測）
+          _raw = re.sub(r'[^A-Za-z0-9:/._-]', '', os.environ.get('SUPABASE_URL') or '')
+          _host = re.sub(r'^https?://', '', _raw).split('/')[0]
+          _host = _host if '.' in _host else _host + '.supabase.co'
+          _key = re.sub(r'[^A-Za-z0-9._-]', '', os.environ.get('SUPABASE_SERVICE_ROLE_KEY') or '')
+          _urls = [u for u in re.split(r'\s+', (os.environ.get('URLS') or '').strip()) if u]
+          def gemini_hands(i):
+              req = urllib.request.Request('https://%s/functions/v1/video-scene' % _host,
+                  data=json.dumps({'action': 'verify', 'image_url': _urls[i], 'must_show': ''}).encode(),
+                  headers={'Authorization': 'Bearer ' + _key, 'apikey': _key, 'Content-Type': 'application/json'})
+              try:
+                  with urllib.request.urlopen(req, timeout=120) as r:
+                      return json.loads(r.read().decode()).get('hands')
+              except (urllib.error.URLError, ValueError) as e:
+                  print('  （手を数えられません: %s）' % str(e)[:120])
+                  return None
           # ★人物ごとの基準で見る（#218）。以前は PERSONA を受け取りながら使っておらず、ヒロの絵もマリーと比べていた（#231 で直した）
           who = (os.environ.get('PERSONA') or '').strip() or None
           refs = face_score.reference_set(who)
@@ -280,7 +299,7 @@ jobs:
           for f in files:
               r = face_score.score(os.path.join('faces', f), refs)
               # ★手の本数（#231）。顔の無い絵＝一人称は片手がスマホなので1本まで、顔のある絵は2本まで
-              n = hand_score.count_hands(os.path.join('faces', f))
+              n = gemini_hands(int(f[1:3]))
               pov = not r
               limit = 1 if pov else 2
               hands = '手 ?' if n is None else ('手 %d本' % n) + ('' if n <= limit else ' ★NG（%s）' % ('一人称なら1本まで・片手はスマホ' if pov else '3本以上'))

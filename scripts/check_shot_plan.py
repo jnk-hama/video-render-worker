@@ -420,8 +420,6 @@ expect(marie_video.hand_problem(3, False) and marie_video.hand_problem(None, Tru
 _pc2 = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x",
     "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
     "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
-_orig_ur = marie_video.urllib.request.urlretrieve
-marie_video.urllib.request.urlretrieve = lambda u, p: open(p, 'wb').close()
 try:
     marie_video.check_pov_stills(_pc2, count=lambda p: 2)
     expect(False, '一人称の静止画に手が2本なら Veo の前で止める')
@@ -435,7 +433,19 @@ except SystemExit:
 _seen_s = []
 marie_video.check_pov_stills(shot_plan.plan_long(dict(RR35, layout='long'))['cuts'], count=lambda p: _seen_s.append(p) or 2)
 expect(not _seen_s, '一人称の無い回は静止画を数えない（通信もしない）')
-marie_video.urllib.request.urlretrieve = _orig_ur
+_povc = next(c for c in _pc2 if marie_video.is_pov(c))
+_selc = next(c for c in _pc2 if c['still'] == 'selfie')
+_v2 = lambda u, m: (1, 'ok', _povc['line'], 2)
+expect(any('片手はスマホ' in v for v in marie_video.issues_of(_povc, {'video_url': 'u'}, _v2)[0]),
+       '一人称のクリップで照合（Gemini）が手2本と数えたら、映像の問題にする')
+expect(not marie_video.issues_of(_selc, {'video_url': 'u'}, lambda u, m: (1, 'ok', _selc['line'], 2))[0],
+       '一人称でないカットは手2本まで通す')
+expect(not marie_video.issues_of(_povc, {'video_url': 'u'}, lambda u, m: (1, 'ok', _povc['line']))[0],
+       '手の本数が返らない照合（古い形）は判定しない')
+import inspect as _insp  # noqa: E402
+expect("check_pov_stills(plan['cuts'], lambda u: still_hands(base, key, u))" in _insp.getsource(marie_video.main)
+       and _insp.getsource(marie_video.main).index('check_pov_stills') < _insp.getsource(marie_video.main).index('start_cut'),
+       '本番は Veo を起動する前に、一人称の静止画の手を Gemini で数える')
 
 print('=== mediapipe を入れる手順は libegl1 も入れる（#231・同じエラーを2度踏んだ）===')
 import glob as _glob  # noqa: E402
