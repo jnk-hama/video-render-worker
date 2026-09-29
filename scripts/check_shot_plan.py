@@ -441,6 +441,22 @@ for _c in _kb2['cuts'] + _rr['cuts']:
         expect(_c['still'] in _owner.get(_c['must_show'], set()),
                '%s の絵（%s）に、その絵の規則の問いだけを問う' % (_c['role'], _c['still']))
 expect(not _kb2['cuts'][-1].get('must_show'), 'カベーニの CTA（自撮り）に、ゲームの「壁に映像」を問わない')
+print('=== 一人称の静止画には一人称の指示（#229）===')
+for _r in shot_plan.RULES + [shot_plan.FALLBACK_HOOK, shot_plan.CTA]:
+    for _k, _a in (_r.get('still') or {}).items():
+        if _k.endswith('_pov'):
+            expect(_a.startswith('First-person') and 'no face ever appears' in _a,
+                   '%s（手だけの絵）の指示は一人称で、顔を出さない' % _k)
+            expect(not re.search(r'glances at the camera|looks at the camera|to the camera', _a),
+                   '%s の指示にカメラを見る動きが無い（顔の無い絵と食い違う）' % _k)
+_pov = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x",
+    "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
+    "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})
+_pc = next(c for c in _pov['cuts'] if c.get('feature') == '強力吸引')
+expect(_pc['still'] == 'cleaning_pov' and marie_video.is_pov(_pc),
+       'RR35 の吸引は手だけの静止画（cleaning_pov）なら一人称のカットになる（顔の判定も一人称で見る）')
+_old = next(c for c in _rr['cuts'] if c.get('feature') == '強力吸引')
+expect(_old['still'] == 'cleaning' and not marie_video.is_pov(_old), '顔の出る cleaning の回は今までどおり')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))

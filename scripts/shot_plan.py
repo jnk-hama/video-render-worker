@@ -133,10 +133,15 @@ RULES = [
     # ★オーナー「ゴミ捨てってではなく、ゴミ捨て不要で のほうがわかりやすい」（2026-09-27）。説明文の語をそのまま言わせる
     # ★★掃除機の肝は吸い込む所（オーナー「一番肝心な掃除機のパワーや吸い込み描写は絶対いる。何に使うかを考えて」）。
     #   説明文「強力吸引で細かい粉じんもどんどん吸い込みます」から。数値（Pa）は言わない（説明文自身が「使い方で異なる」と打ち消している）
+    # ★手だけの静止画（cleaning_pov）を先に見る。顔の無い絵に「カメラを見る」を渡すと Veo が顔を足し、顔の判定で落ちる（#229）
     {'genres': ('gadget',), 'match': r'吸引|吸い込',
-     'still': {'cleaning': "She pushes the vacuum slowly across the rug. The floor head passes over scattered crumbs and dust, "
+     'still': {'cleaning_pov': "First-person view looking down: her hands in her sleeves hold the handle and push the "
+                               "vacuum slowly across the rug. The floor head passes over scattered crumbs and dust, which "
+                               "disappear into it and leave a clean stripe behind. Her voice is heard off-camera; the "
+                               "camera never turns around and no face ever appears.",
+               'cleaning': "She pushes the vacuum slowly across the rug. The floor head passes over scattered crumbs and dust, "
                            "which disappear into it and leave a clean stripe behind. She glances at the camera, impressed."},
-     'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む',
+     'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True,
      'must_show': 'The floor head passes over visible crumbs or dust on the floor and they disappear.'},
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
      'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
@@ -190,6 +195,8 @@ def _cut(role, rule, stills, feature, seconds):
         cut['must_say'] = rule['must_say']
     if rule.get('must_show'):
         cut['must_show'] = rule['must_show']  # 映っているべき物。出来た動画を video-scene の verify で照合する（#185）
+    if rule.get('demo'):
+        cut['demo'] = True  # 商品を使う所の絵。長回しでも一人称でも相乗りさせず単独のシーンに残す（#197・#229）
     return cut
 
 
@@ -334,7 +341,7 @@ def plan_long(product):
     for c in singles:
         # ★見せる主張のあるカット（must_show。掃除機の吸い込み等）は相乗りさせず単独で残す。
         #   オーナー「一番肝心な吸い込み描写は絶対いる」（#197）。相乗りは絵で見せられない一人称だけ
-        if c.get('must_show') and not is_pov_action(c['action']):
+        if c.get('must_show') and (c.get('demo') or not is_pov_action(c['action'])):
             scenes.append(scene(c, []))
             continue
         for slot in ('first', 'last'):
