@@ -345,8 +345,10 @@ def plan_long(product):
             merged = scene(prim, [c]) if slot == 'first' else scene(c, [prim])
             if merged:
                 if slot == 'last':   # CTA の絵とリンクの一言は CTA 側を使う
+                    # ★絵を CTA の物に替えるので、絵の問い（must_show）も CTA の物にする。相乗りした機能の問いを残すと、
+                    #   その絵では満たせない問いで必ず作り直しになる（E-037：ゲームの「壁に映像」を自撮りの絵に問うていた）
                     merged = dict(merged, still=cta['still'], still_url=cta['still_url'],
-                                  action=cta['action'] + LONG_CALM, role='cta')
+                                  action=cta['action'] + LONG_CALM, role='cta', must_show=cta.get('must_show'))
                 if slot == 'first':
                     first = merged
                 else:

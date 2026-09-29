@@ -426,6 +426,21 @@ import inspect  # noqa: E402
 _src = inspect.getsource(marie_video.main)
 expect("product.get('look') == 'phone'" in _src and 'shot_plan.PHONE_LOOK if phone' in _src,
        '質感は look=phone の回だけに付ける（静止画と質感をそろえる。今ある静止画の回は変わらない）')
+print('=== 絵の問いは、そのシーンの絵で満たせる物だけ（E-037）===')
+_kb2 = shot_plan.plan_long({"product_key": "kabeni-projector", "genre": "gadget", "layout": "long", "image_url": "x",
+    "features": ["天井に投影できる", "スマホサイズ・220g", "アプリ内蔵（YouTube）", "バッテリー内蔵・連続2.5時間再生",
+                 "Switch・PS4をHDMIでつないでゲーム"],
+    "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "selfie", "ceiling", "wall", "gaming"])}})
+_owner = {}
+for _r in shot_plan.RULES:
+    for _k in (_r.get('still') or {}):
+        if _r.get('must_show'):
+            _owner.setdefault(_r['must_show'], set()).add(_k)
+for _c in _kb2['cuts'] + _rr['cuts']:
+    if _c.get('must_show'):
+        expect(_c['still'] in _owner.get(_c['must_show'], set()),
+               '%s の絵（%s）に、その絵の規則の問いだけを問う' % (_c['role'], _c['still']))
+expect(not _kb2['cuts'][-1].get('must_show'), 'カベーニの CTA（自撮り）に、ゲームの「壁に映像」を問わない')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
