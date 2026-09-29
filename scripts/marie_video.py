@@ -281,9 +281,10 @@ def main():
     dry = '--dry-run' in sys.argv
     plan = shot_plan.plan_long(product) if product.get('layout') == 'long' else shot_plan.plan(product)
     persona = persona_of(product)
+    phone = product.get('look') == 'phone'
     for c in plan['cuts']:
         c['persona'] = persona
-        c['action'] = shot_plan.gendered(c['action'], persona)
+        c['action'] = shot_plan.gendered(c['action'], persona) + (shot_plan.PHONE_LOOK if phone else '')
         if c.get('must_show'):
             c['must_show'] = shot_plan.gendered(c['must_show'], persona)
     print('紹介者: %s' % persona)

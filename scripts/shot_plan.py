@@ -275,6 +275,14 @@ LONG_CALM = (" Keep it calm and continuous: she talks to the camera the whole ti
              "the product stays the same shape and color and stays in view, and no other person appears.")
 
 
+# ★スマホで撮った日常の質感（#226・オーナー「人間かと思うくらいわからない」参考動画の分析）。
+#   人間に見える理由は画質ではなく「本物の場所・スマホの手持ち・その場の光」。スタジオ感を消す。
+#   ★他の人は出さない：背景の人は手の数（3本以上で作り直し）と一人称の顔の判定に引っかかる。
+#   静止画もこの質感で作った回だけ使う（product_json の "look": "phone"）。静止画と動画の質感をそろえるため
+PHONE_LOOK = (" It looks like a real phone video, not a studio: slight natural handheld movement and only the "
+              "natural light of the place itself. No other person appears.")
+
+
 def says(cut):
     """言うべき語の一覧（通常のカットは1語、長回しは機能ごとに1語）"""
     v = cut.get('must_say')

@@ -419,6 +419,13 @@ expect([c['seconds'] for c in _kb['cuts']] == [6, 6, 6] and all(len(c['line']) <
        'カベーニは3シーンとも27文字以内・6秒（#224）')
 expect(sorted(w for c in _kb['cuts'] for w in shot_plan.says(c)) == sorted(['天井', 'アプリ', 'スマホ', '映画', 'ゲーム', 'リンク']),
        '詰めても言うべき語は全部残る')
+print('=== スマホで撮った日常の質感（#226）===')
+expect(not re.search(r'\b(she|her|he|his)\b', shot_plan.PHONE_LOOK, re.I), '質感の一文に代名詞が無い（マリーにもヒロにもそのまま付く）')
+expect('No other person' in shot_plan.PHONE_LOOK, '他の人は出さない（手の数・一人称の顔の判定に引っかかるため）')
+import inspect  # noqa: E402
+_src = inspect.getsource(marie_video.main)
+expect("product.get('look') == 'phone'" in _src and 'shot_plan.PHONE_LOOK if phone' in _src,
+       '質感は look=phone の回だけに付ける（静止画と質感をそろえる。今ある静止画の回は変わらない）')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
