@@ -163,7 +163,7 @@ print('=== 描画の依頼 ===')
 job = shot_plan.render_job(REDIAL, p, ['u%d' % i for i in range(len(p['cuts']))], 'preview/x.mp4')['job']
 expect([c['cut_index'] for c in job['info_cards']] == [i for i, c in enumerate(p['cuts']) if c.get('card')],
        'カードはカット番号で指定（秒は描画側で解く）')
-expect(job['quality_gate'] == 'block', '自動の回は検査で止める（warn にしない）')
+expect(job['quality_gate'] == 'warn', '検査は止めずに記録し、LINE の承認依頼に書く（#230）')
 expect(job['speech_speed'] == shot_plan.SPEECH_SPEED > 1.0, '喋りは少し速く（#183）')
 expect(job.get('auto_trim_polite') is True, 'Veo が足す言い終わりの「です」は描画側で切る（#189）')
 expect(not any('すっぽり' in r['line'] for r in shot_plan.RULES), '崩れて読まれた語（すっぽり）を規則表に置かない')
@@ -394,6 +394,76 @@ with tempfile.TemporaryDirectory() as td:
         expect(True, '本数が合わない reuse_ids は止める')
 for k, v in _orig.items():
     setattr(marie_video, k, v)
+
+print('=== 止めない：作り直しても合格しないカットは埋めて描く（#230）===')
+_keep2 = {n: getattr(marie_video, n) for n in ('_base_and_key', 'find_reusable', 'start_cut', 'wait_all', 'verify_cut',
+                                               'START_GAP_SEC', 'make_face_check')}
+RR_T = dict(RR35_S, reuse=False)
+tp = shot_plan.plan(RR_T)['cuts']
+marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
+marie_video.START_GAP_SEC = 0
+marie_video.find_reusable = lambda *a: None
+
+
+def _run(start_ok, said_for, face_for):
+    """start_ok(k, n)：k番目のカットの n 回目の起動が通るか。said_for(k, n)：喋り。face_for(k, n)：顔の問題"""
+    seq = iter(range(2000, 2100))
+    who = {}
+    count = {}
+
+    def st(b, kk, pr, c):
+        k = next(n for n, x in enumerate(tp) if x['action'] == c['action'] and x['line'] == c['line'])
+        n = count[k] = count.get(k, 0) + 1
+        if not start_ok(k, n):
+            return None
+        i = next(seq)
+        who[i] = (k, n)
+        return i
+    marie_video.start_cut = st
+    marie_video.wait_all = lambda b, kk, ids: {i: {'video_url': 'u%d' % i} for i in ids if i is not None}
+    marie_video.verify_cut = lambda b, kk, url, ms: (1, 'ok', said_for(*who[int(url[1:])]))
+    marie_video.make_face_check = lambda persona=None: (lambda u, pov: face_for(*who[int(u[1:])]))
+    with _t0.TemporaryDirectory() as td:
+        pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
+        _j0.dump(RR_T, open(pj, 'w'))
+        sys.argv = ['marie_video.py', pj, oj]
+        try:
+            marie_video.main()
+        except SystemExit as e:
+            print('     止まった: %s' % e)
+            return None, who
+        return _j0.load(open(oj))['job'], who
+
+
+# A. フックが2回とも別人の顔・喋りは正しい → 静止画を動かし、声はクリップから
+jA, wA = _run(lambda k, n: True, lambda k, n: tp[k]['line'], lambda k, n: '本人ではない顔' if k == 0 else None)
+expect(jA is not None, 'A: 顔が2回落ちても止めずに描画の依頼を作る')
+cA = jA['clips'][0] if jA else {}
+expect(cA.get('url') == tp[0]['still_url'] and cA.get('audio_url', '').startswith('u') and 'must_say' not in cA,
+       'A: 映像は承認済みの静止画、声は顔が落ちたクリップから（喋りは合っていた）')
+expect(jA and any('カット1' in n and '静止画' in n for n in jA['review']['notes']), 'A: 差し替えたことを LINE の承認依頼に書く')
+# B. 吸引のカットが2回とも「ね」を足しすぎ → 映像も声もクリップを使い、問題を書く
+kB = next(k for k, c in enumerate(tp) if c['feature'] == '強力吸引')
+jB, wB = _run(lambda k, n: True, lambda k, n: 'ね、細かいゴミもね、どんどん吸い込むね' if k == kB else tp[k]['line'], lambda k, n: None)
+expect(jB and jB['clips'][kB]['url'].startswith('u') and jB['clips'][kB].get('must_say'),
+       'B: 喋りだけの問題は、そのクリップをそのまま使う（検査も掛ける）')
+expect(jB and any('「ね」' in n for n in jB['review']['notes']), 'B: 喋りの問題を LINE に書く')
+# C. ステーションのカットは2回とも起動できない（429）→ 静止画だけ・声なし
+kC = next(k for k, c in enumerate(tp) if c['still'] == 'station')
+jC, wC = _run(lambda k, n: k != kC, lambda k, n: tp[k]['line'], lambda k, n: None)
+expect(jC and jC['clips'][kC]['url'] == tp[kC]['still_url'] and 'audio_url' not in jC['clips'][kC],
+       'C: 起動できないカットは承認済みの静止画だけで埋める（止めない）')
+expect(jC and len(jC['clips']) == len(tp) and jC['review']['clip_ids'], 'C: 他のカットはそのまま・承認ボタン用の素材番号もある')
+# D. 全部起動できない（枠切れ）→ 静止画だけの動画でも依頼は作る
+jD, wD = _run(lambda k, n: False, lambda k, n: '', lambda k, n: None)
+expect(jD and all(c['url'] == tp[k]['still_url'] for k, c in enumerate(jD['clips'])), 'D: 全部起動できなくても止めない')
+# E. 1回目が顔NG・作り直しで合格 → 合格の方を使い、問題は書かない
+jE, wE = _run(lambda k, n: True, lambda k, n: tp[k]['line'], lambda k, n: '顔NG' if (k == 0 and n == 1) else None)
+expect(jE and wE[int(jE['clips'][0]['url'][1:])] == (0, 2) and not jE.get('review', {}).get('notes'),
+       'E: 作り直して合格した物を使う（いつもの流れは変わらない）')
+expect(jE and jE['quality_gate'] == 'warn' and jE['video_qc'] == 'warn', '描画の検査も止めずに記録する（問題は LINE へ）')
+for n, v in _keep2.items():
+    setattr(marie_video, n, v)
 
 print('=== カット番号 → 秒 ===')
 wins = speech_qa.part_windows([5.63, 3.55, 4.25], 0.0)

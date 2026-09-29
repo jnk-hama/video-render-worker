@@ -420,8 +420,10 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
         'clip_audio': True, 'captions_from_speech': True, 'transition_seconds': 0,
         'speech_speed': SPEECH_SPEED,
         'auto_trim_polite': True,  # ★Veo が足す言い終わりの「です」を描画側で切る（#189）
-        'quality_gate': product.get('quality_gate') or 'block',
-        'video_qc': product.get('video_qc') or 'block',   # 出来上がった動画の品質検査（qc_video.py・#225）。マリーは実測の基準があるので落とす
+        # ★検査は止めずに記録する（#230・オーナー「停止という概念がおかしい」）。見つけた問題は LINE の承認依頼に書き、
+        #   オーナーが見て承認か作り直しを選ぶ（#191）。block を付けた依頼だけ従来どおり止める
+        'quality_gate': product.get('quality_gate') or 'warn',
+        'video_qc': product.get('video_qc') or 'warn',   # 出来上がった動画の品質検査（qc_video.py・#225）
         'bgm': product.get('bgm') or 'assets/shared/bgm/duru-roomscene-lofi.mp3',
         'design_tokens': {'text_color_hex': '#ffffff', 'accent_color_hex': '#ff3b5c'},
         'highlight_words': [w for c in cuts for w in says(c)],

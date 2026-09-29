@@ -97,7 +97,7 @@ expect('render-video.yml が qc_video.py を呼ぶ', 'scripts/qc_video.py out.mp
 expect('render-video.yml は job.video_qc（既定 warn）で落とすかを決める', "j.get('video_qc') or 'warn'" in rv)
 expect('check.yml が check_qc_video.py を回す', 'scripts/check_qc_video.py' in ck)
 sp = open(os.path.join(ROOT, 'scripts', 'shot_plan.py'), encoding='utf-8').read()
-expect('マリーの依頼（shot_plan.render_job）は video_qc を block にする', "'video_qc': product.get('video_qc') or 'block'" in sp)
+expect('マリーの依頼（shot_plan.render_job）は video_qc を記録だけにする（#230・問題は LINE へ）', "'video_qc': product.get('video_qc') or 'warn'" in sp)
 
 print('=== 本物の完成動画（カベーニ・-14.17 LUFS）===')
 real = os.environ.get('QC_REAL_VIDEO')

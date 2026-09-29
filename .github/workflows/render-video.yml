@@ -621,8 +621,8 @@ jobs:
           d = d.get('job') if isinstance(d.get('job'), dict) else d
           ids = [int(i) for i in ((d.get('review') or {}).get('clip_ids') or []) if str(i).isdigit()]
           up = d.get('upload') or {}
-          if not ids or not up.get('bucket') or not up.get('path'):
-              print('承認依頼の指定なし（review.clip_ids か upload が無い）。送りません。')
+          if 'review' not in d or not up.get('bucket') or not up.get('path'):
+              print('承認依頼の指定なし（review か upload が無い）。送りません。')
               sys.exit(0)
           raw = re.sub(r'[^A-Za-z0-9:/._-]', '', os.environ.get('SUPABASE_URL') or '')
           host = re.sub(r'^https?://', '', raw).split('/')[0]
@@ -630,7 +630,17 @@ jobs:
           key = re.sub(r'[^A-Za-z0-9._-]', '', os.environ.get('SUPABASE_SERVICE_ROLE_KEY') or '')
           if not host or not key:
               sys.exit('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY がありません')
-          body = {'action': 'notify_review', 'clip_ids': ids,
+          # ★止めずに描いた回の問題（#230）：差し替えたカット（依頼の review.notes）と、描画・品質検査で見つけた問題（render.log）を
+          #   承認依頼に添える。オーナーが動画を見て、承認か作り直しを選ぶ
+          notes = [str(n) for n in ((d.get('review') or {}).get('notes') or [])]
+          try:
+              for line in open('render.log', encoding='utf-8', errors='replace'):
+                  m = re.search(r'(★検査: |★NG: |⚠ 注意: )(.*)', line)
+                  if m:
+                      notes.append(m.group(2).strip())
+          except OSError:
+              pass
+          body = {'action': 'notify_review', 'clip_ids': ids, 'notes': notes[:12],
                   'title': str(d.get('product_key') or '')[:60],
                   'video_url': 'https://%s/storage/v1/object/public/%s/%s' % (host, up['bucket'], up['path'])}
           req = urllib.request.Request('https://%s/functions/v1/video-scene' % host, data=json.dumps(body).encode(),
