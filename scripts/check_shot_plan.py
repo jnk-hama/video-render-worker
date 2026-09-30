@@ -731,6 +731,18 @@ _lx = _rv.panel_split(1080)[2]
 expect(all(int(_re.search(r'\\pos\((\d+),', l).group(1)) >= _lx for l in _pl), 'まとめは写真の右（写真に重ならない）')
 _ix, _iw, _lx2, _lw = _rv.panel_split(1080)
 expect(_ix + _iw < _lx2 and _lx2 + _lw <= 1080 - int(_rv.SAFE_AREAS['tiktok']['right']), '写真とまとめが並び、右のアイコン列を避ける')
+# ★投稿文（#244）：#PR が先頭・※はフックのすぐ下・#AI生成・X は長さに収める・リンクは楽天だけ
+_pp = _nhj['post_pack']
+expect(_pp['tiktok'].startswith('#PR ') and _pp['x'].startswith('#PR '), '投稿文は #PR から始まる（ステマ規制）')
+expect(_pp['tiktok'].split('\n')[1].startswith('※'), '条件（※）はフックの主張のすぐ下')
+expect('#AI生成' in _pp['tiktok'] and '#AI生成' in _pp['x'], 'AI の人物なので #AI生成')
+expect(not _re.search(r'[0-9,]+ ?円', _pp['tiktok'] + _pp['x']), '価格を書かない（有利誤認）')
+expect('リンクはプロフから' in _pp['x'], 'リンクが無ければプロフへ')
+_lk = dict(_nh, affiliate_url='https://hb.afl.rakuten.co.jp/hgc/x/?pc=y')
+_ppl = shot_plan.post_pack(_lk, _nhp['cuts'])
+expect('https://hb.afl.rakuten.co.jp/hgc/x/?pc=y' in _ppl['x'] and shot_plan.x_weight(_ppl['x']) <= shot_plan.X_MAX_WEIGHT, 'X はリンクを付けて280に収める')
+_long = dict(_lk, features=['とても長い性能の説明がここに入ります番号%d' % i for i in range(12)])
+expect(shot_plan.x_weight(shot_plan.post_pack(_long, _nhp['cuts'])['x']) <= shot_plan.X_MAX_WEIGHT, '性能が多くても X は削って収める')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))

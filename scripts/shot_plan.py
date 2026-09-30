@@ -450,6 +450,45 @@ def gendered(text, persona):
     return text
 
 
+# ★投稿文（#244）。承認したらコピーして貼るだけにする。作るのは計画と商品情報からの組み立てだけ（LLM を使わない・0円）。
+#   ★ステマ規制：#PR は先頭。★優良誤認：性能は features（楽天の説明文から抜いた物）だけ・※の条件は消さない。
+#   ★AI の人物なので #AI生成 を付ける（jp-affiliate-compliance 5）。価格は書かない（有利誤認）
+X_MAX_WEIGHT = 280            # X の上限（日本語など全角は1字で2と数える）
+X_URL_WEIGHT = 23             # X はリンクを長さに関わらず23字と数える
+
+
+def x_weight(text):
+    """X の長さ（全角2・半角1・リンクは23）"""
+    urls = re.findall(r'https?://\S+', text)
+    body = re.sub(r'https?://\S+', '', text)
+    return sum(1 if ord(ch) < 0x1100 else 2 for ch in body) + X_URL_WEIGHT * len(urls)
+
+
+def post_pack(product, cuts):
+    """{'tiktok': 投稿文, 'x': 投稿文}。フックのセリフ・性能のトピック・※の条件・#PR・#AI生成から組む。
+    ★フックと同じ性能はトピックに繰り返さず、その※の条件をフックのすぐ下に置く（条件は主張と離さない）"""
+    hook_cut = next((c for c in cuts if c.get('role') == 'hook'), cuts[0] if cuts else {})
+    hook, hook_words = hook_cut.get('line', ''), says(hook_cut) if hook_cut else []
+    head, rows = ['#PR ' + hook], []
+    for f in (product.get('features') or []):
+        parts = [x.strip() for x in str(f).split('\n') if x.strip()]
+        if not parts:
+            continue
+        notes = [x for x in parts[1:] if x.startswith('※')]
+        if any(w and w in parts[0] for w in hook_words):
+            head += notes
+        else:
+            rows.append(['✓' + parts[0]] + notes)
+    link = str(product.get('affiliate_url') or '').strip()
+    tiktok = '\n'.join(head + [l for r in rows for l in r] + ['気になったらプロフのリンクから', '#AI生成'])
+    tail = [link] if link.startswith('https://') else ['リンクはプロフから']
+    for n in range(len(rows), -1, -1):
+        x = '\n'.join(head + [l for r in rows[:n] for l in r] + tail + ['#AI生成'])
+        if x_weight(x) <= X_MAX_WEIGHT:
+            break
+    return {'tiktok': tiktok, 'x': x}
+
+
 def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     """描画の依頼（{"job":{...}}）を組む。clip_urls は cuts と同じ並び"""
     cuts = plan_['cuts']
@@ -494,6 +533,7 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     # ★完成したらオーナーの LINE へ［承認］［作り直し］を送る（決定#191）。押された返事で素材が approved になる
     if clip_ids:
         job['review'] = {'clip_ids': [int(i) for i in clip_ids]}
+    job['post_pack'] = post_pack(product, cuts)
     # ★カードが出る瞬間に短い効果音（決定#189）。目を文字へ向けさせる。秒は描画側がカット番号から解く
     job['sfx'] = [dict({'tag': CARD_SFX, 'cut_index': c['cut_index']}, **({'part': c['part']} if 'part' in c else {}))
                   for c in cards]
