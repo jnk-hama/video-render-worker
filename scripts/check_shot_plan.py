@@ -464,6 +464,8 @@ expect('handle' in shot_plan.gendered(shot_plan.STICK_GRIP, 'hiro') and 'His han
 _gc = next(c for c in _pc2 if c['still'] == 'cleaning_pov')
 expect(_gc.get('grip') == shot_plan.STICK_GRIP_CHECK and len(_gc['grip']) <= 200 and not any(ch in _gc['grip'] for ch in '"\n「」'),
        '掃除のカットは掴む位置の問いを持つ（verify の must_show の制限内）')
+expect(all(w in shot_plan.STICK_GRIP_CHECK for w in ('only', 'motor body', 'battery pack', 'dust cup', 'pipe')),
+       '問いは「ハンドルだけ」と握ってはいけない部分を名指しする（大まかな問いは id93 を通した・実測）')
 _asked = []
 _pf(_pc2, _good_h, _good_f, lambda u, q: _asked.append((u, q)) or 1)
 expect([q for u, q in _asked] == [shot_plan.STICK_GRIP_CHECK] and _isp(_asked[0][0]),

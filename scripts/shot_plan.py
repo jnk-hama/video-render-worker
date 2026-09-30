@@ -51,10 +51,14 @@ PHONE_IN_HAND = ('selfie', 'mirror')   # 本人がスマホを持って撮る絵
 # ★★掴む位置（オーナー「Id93 掃除機を掴む位置が違う」2026-09-30・#235）。スティック掃除機は上端のハンドルを握る。
 #   パイプ・本体・ダストカップを握らせない。絵の指示（STICK_GRIP）と、本番前の静止画の点検の問い（STICK_GRIP_CHECK）を
 #   同じ規則に置く（言い換えない）
+#   ★問いは実物で合わせた（2026-09-30）。「上端のハンドルを握っているか」だけだと、本体の下の黒い部分を握った id93 も
+#     1（合格）と答えた。「ハンドル**だけ**を持ち、本体・バッテリー・ダストカップ・パイプに触れていない」と聞くと
+#     id93=0（オーナーの目視 NG と一致）／id95=1／id94=1 になった
 STICK_GRIP = (" Her hand is wrapped around the handle grip at the very top of the vacuum, exactly where the handle is"
-              " in the product photo, never around the pipe, the motor body or the dust cup.")
-STICK_GRIP_CHECK = ("A hand is wrapped around the vacuum's handle grip at its top end,"
-                    " not around the pipe, the motor body or the dust cup.")
+              " in the product photo, and touches nothing else: never the pipe, the motor body, the battery pack"
+              " or the dust cup.")
+STICK_GRIP_CHECK = ("The hand holds the vacuum by its top handle only; the hand is not touching the motor body,"
+                    " the battery pack, the dust cup or the pipe.")
 
 
 RULES = [
