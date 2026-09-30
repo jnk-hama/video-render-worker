@@ -424,9 +424,9 @@ _pc2 = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "lay
     "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
     "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
 print('=== 本番の前の静止画の点検（#227 の自動化・#232）===')
-def _pf(cuts, hands, face):
+def _pf(cuts, hands, face, grip=lambda u, q: 1):
     try:
-        _real_preflight(cuts, hands, face)
+        _real_preflight(cuts, lambda u, q: (hands(u), grip(u, q) if q else None), face)
         return None
     except SystemExit as e:
         return str(e)
@@ -454,6 +454,32 @@ expect(_pf(_hi, _good_h, _good_f) is None, 'ヒロの回（代名詞を男性に
 _calls = []
 _pf([_pc2[0], dict(_pc2[0])], lambda u: _calls.append(u) or 1, lambda u: 0.8)
 expect(len(_calls) == 1, '同じ静止画は1回だけ数える（判定も有料）')
+print('=== 掴む位置（#235・オーナー「Id93 掃除機を掴む位置が違う」）===')
+_rv = next(r for r in shot_plan.RULES if 'cleaning_pov' in (r.get('still') or {}))
+expect(all(shot_plan.STICK_GRIP in _rv['still'][k] for k in ('cleaning_pov', 'cleaning')),
+       '掃除する絵の指示は全部、上端のハンドルを握る一文を持つ（絵も Veo も同じ文）')
+expect(_rv['still']['cleaning_pov'].endswith(shot_plan.ONE_HAND_POV), '一人称の指示は片手の一文で終わるまま（#231）')
+expect('handle' in shot_plan.gendered(shot_plan.STICK_GRIP, 'hiro') and 'His hand' in shot_plan.gendered(shot_plan.STICK_GRIP, 'hiro'),
+       'ヒロの回は掴む位置の文も男性に')
+_gc = next(c for c in _pc2 if c['still'] == 'cleaning_pov')
+expect(_gc.get('grip') == shot_plan.STICK_GRIP_CHECK and len(_gc['grip']) <= 200 and not any(ch in _gc['grip'] for ch in '"\n「」'),
+       '掃除のカットは掴む位置の問いを持つ（verify の must_show の制限内）')
+_asked = []
+_pf(_pc2, _good_h, _good_f, lambda u, q: _asked.append((u, q)) or 1)
+expect([q for u, q in _asked] == [shot_plan.STICK_GRIP_CHECK] and _isp(_asked[0][0]),
+       '問いは掃除の絵にだけ聞く（他の絵は手と顔だけ）')
+_e = _pf(_pc2, _good_h, _good_f, lambda u, q: 0)
+expect(_e and '掴む位置が違う' in _e and 'cleaning_pov' in _e and '費用なし' in _e,
+       'パイプや本体を握った掃除の静止画は Veo の前で止める（id93 の再発防止）')
+expect(_pf(_pc2, _good_h, _good_f, lambda u, q: None) is None, '判定できない時（None）は止めない（手・顔と同じ扱い）')
+_n = []
+marie_video._req = lambda url, key, body: (_n.append(body) or 200, {'hands': 1, 'match': 0})
+expect(marie_video.still_look('b', 'k', 'u', 'Q') == (1, 0) and _n[-1]['must_show'] == 'Q',
+       '手の本数と問いの答えを1回の verify で取る（判定も有料）')
+expect(marie_video.still_look('b', 'k', 'u') == (1, None), '問いが無ければ答えは使わない')
+marie_video._req = lambda url, key, body: (502, {'error': 'x'})
+expect(marie_video.still_look('b', 'k', 'u', 'Q') == (None, None), '判定を呼べなければ (None, None)')
+marie_video._req = _orig_req
 _povc = next(c for c in _pc2 if marie_video.is_pov(c))
 _selc = next(c for c in _pc2 if c['still'] == 'selfie')
 _v2 = lambda u, m: (1, 'ok', _povc['line'], 2)
@@ -465,7 +491,7 @@ expect(not marie_video.issues_of(_povc, {'video_url': 'u'}, lambda u, m: (1, 'ok
        '手の本数が返らない照合（古い形）は判定しない')
 import inspect as _insp  # noqa: E402
 _ms = _insp.getsource(marie_video.main)
-expect("preflight_stills(plan['cuts'], lambda u: still_hands(base, key, u), still_face(persona))" in _ms
+expect("preflight_stills(plan['cuts'], lambda u, q: still_look(base, key, u, q), still_face(persona))" in _ms
        and _ms.index('preflight_stills') < _ms.index('start_cut') and _ms.index('preflight_stills') < _ms.index('if dry:\n        return'),
        '本番も予行も、Veo を起動する前に静止画を全部点検する（予行＝#227 の点検）')
 

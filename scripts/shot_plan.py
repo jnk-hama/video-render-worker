@@ -48,6 +48,14 @@ ONE_HAND_POV = (" She is filming with the phone in her other hand, so exactly on
                 " turns around and no face ever appears.")
 PHONE_IN_HAND = ('selfie', 'mirror')   # 本人がスマホを持って撮る絵（作業に使える手は1本）
 
+# ★★掴む位置（オーナー「Id93 掃除機を掴む位置が違う」2026-09-30・#235）。スティック掃除機は上端のハンドルを握る。
+#   パイプ・本体・ダストカップを握らせない。絵の指示（STICK_GRIP）と、本番前の静止画の点検の問い（STICK_GRIP_CHECK）を
+#   同じ規則に置く（言い換えない）
+STICK_GRIP = (" Her hand is wrapped around the handle grip at the very top of the vacuum, exactly where the handle is"
+              " in the product photo, never around the pipe, the motor body or the dust cup.")
+STICK_GRIP_CHECK = ("A hand is wrapped around the vacuum's handle grip at its top end,"
+                    " not around the pipe, the motor body or the dust cup.")
+
 
 RULES = [
     # ---- アパレル ----
@@ -143,12 +151,13 @@ RULES = [
     #   説明文「強力吸引で細かい粉じんもどんどん吸い込みます」から。数値（Pa）は言わない（説明文自身が「使い方で異なる」と打ち消している）
     # ★手だけの静止画（cleaning_pov）を先に見る。顔の無い絵に「カメラを見る」を渡すと Veo が顔を足し、顔の判定で落ちる（#229）
     {'genres': ('gadget',), 'match': r'吸引|吸い込',
-     'still': {'cleaning_pov': "First-person view looking down: one hand in her sleeve holds the stick vacuum's handle "
-                               "and pushes it slowly across the rug. The floor head passes over scattered crumbs and dust, "
+     'still': {'cleaning_pov': "First-person view looking down: one hand in her sleeve pushes the stick vacuum slowly "
+                               "across the rug." + STICK_GRIP + " The floor head passes over scattered crumbs and dust, "
                                "which disappear into it and leave a clean stripe behind." + ONE_HAND_POV,
-               'cleaning': "She pushes the vacuum slowly across the rug. The floor head passes over scattered crumbs and dust, "
-                           "which disappear into it and leave a clean stripe behind. She glances at the camera, impressed."},
-     'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True,
+               'cleaning': "She pushes the vacuum slowly across the rug." + STICK_GRIP + " The floor head passes over "
+                           "scattered crumbs and dust, which disappear into it and leave a clean stripe behind. "
+                           "She glances at the camera, impressed."},
+     'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True, 'grip': STICK_GRIP_CHECK,
      'must_show': 'The floor head passes over visible crumbs or dust on the floor and they disappear.'},
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
      'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
@@ -202,6 +211,8 @@ def _cut(role, rule, stills, feature, seconds):
         cut['must_say'] = rule['must_say']
     if rule.get('must_show'):
         cut['must_show'] = rule['must_show']  # 映っているべき物。出来た動画を video-scene の verify で照合する（#185）
+    if rule.get('grip'):
+        cut['grip'] = rule['grip']  # 静止画の掴む位置の問い。本番の前に verify で見る（#235）
     if rule.get('demo'):
         cut['demo'] = True  # 商品を使う所の絵。長回しでも一人称でも相乗りさせず単独のシーンに残す（#197・#229）
     return cut

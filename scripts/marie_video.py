@@ -329,13 +329,14 @@ def choose(cut, tried, got, verify, lang='ja', face=None):
     return None, None, ['静止画だけ・声なし（%s）' % (last[0] if last else 'Veo を起動できず')]
 
 
-def still_hands(base, key, url):
-    """静止画に見える手の本数（video-scene の verify・Gemini）。数えられなければ None"""
-    code, res = _req('%s/functions/v1/video-scene' % base, key, {'action': 'verify', 'image_url': url, 'must_show': ''})
+def still_look(base, key, url, ask=''):
+    """静止画を video-scene の verify（Gemini）で1回見る → (手の本数, 問いの答え 1/0)。
+    ask（掴む位置など・#235）が無ければ答えは None。見られなければ (None, None)。★1回の呼び出しで両方取る（判定も有料）"""
+    code, res = _req('%s/functions/v1/video-scene' % base, key, {'action': 'verify', 'image_url': url, 'must_show': ask})
     if code != 200:
-        print('  静止画の手を数えられません（HTTP %s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:200]))
-        return None
-    return res.get('hands')
+        print('  静止画を判定できません（HTTP %s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:200]))
+        return None, None
+    return res.get('hands'), (res.get('match') if ask else None)
 
 
 # ★本番の前の点検（#227 の自動化・#232）。顔の点がこれ未満の静止画は Veo に渡さない（暗い・小さい・横顔・寝転び・E-038）。
@@ -357,29 +358,35 @@ def still_face(persona):
     return face
 
 
-def preflight_stills(cuts, hands, face):
+def preflight_stills(cuts, look, face):
     """
     本番の前に、使う静止画を全部機械で点検する（#227 を人の手順から機械へ・#232）。落ちたら Veo を起動せずに止める（費用なし）。
       一人称：手は1本まで（片手はスマホ・#231）・顔が映っていない
       それ以外：顔が見つかり、点が PREFLIGHT_FACE_MIN 以上・手は2本まで
       全部：絵の問い（must_show）がその絵の規則の物（E-037）
+      掴む位置の問い（grip）がある絵：その通りに握っている（#235・オーナー「掃除機を掴む位置が違う」）
     ★静止画から作る動画も、差し替えに使う静止画もその絵になるので、描いてから気づいても直せない。直すのは静止画。
-    ★手は Gemini（verify）、顔は insightface（face_score）で見る。数えられない時（None）は判定しない。
-    hands(url) → 本数 か None／face(url) → 点 か None（顔なし）
+    ★手と掴む位置は Gemini（verify）、顔は insightface（face_score）で見る。判定できない時（None）は判定しない。
+    look(url, ask) → (本数 か None, 問いの答え 1/0 か None)／face(url) → 点 か None（顔なし）
     """
     def owners(ms, who):
         """その絵の問いを持つ規則の静止画キー（紹介者の代名詞に直して比べる）"""
         return {k for r in shot_plan.RULES if r.get('must_show') and shot_plan.gendered(r['must_show'], who) == ms
                 for k in (r.get('still') or {})}
-    bad, seen = [], {}
+    bad, seen, faces = [], {}, {}
     for k, c in enumerate(cuts):
-        url = c['still_url']
-        if url not in seen:
-            seen[url] = (hands(url), face(url))
-        n, f = seen[url]
+        url, ask = c['still_url'], c.get('grip') or ''
+        if (url, ask) not in seen:
+            seen[(url, ask)] = look(url, ask)
+        if url not in faces:
+            faces[url] = face(url)
+        (n, grip_ok), f = seen[(url, ask)], faces[url]
         pov = is_pov(c)
-        print('  点検 カット%d（%s）: 手 %s／顔 %s' % (k + 1, c['still'], n, '—' if f is None else '%.3f' % f))
+        print('  点検 カット%d（%s）: 手 %s／顔 %s%s' % (k + 1, c['still'], n, '—' if f is None else '%.3f' % f,
+                                                  '／掴む位置 %s' % grip_ok if ask else ''))
         why = [hand_problem(n, pov)]
+        if ask and grip_ok == 0:
+            why.append('掴む位置が違う（%s）' % ask)
         if pov and f is not None:
             why.append('一人称の静止画に顔が映っている（%.2f）' % f)
         if not pov and f is None:
@@ -392,7 +399,7 @@ def preflight_stills(cuts, hands, face):
         bad += ['カット%d（%s）: %s' % (k + 1, c['still'], w) for w in why if w]
     if bad:
         raise SystemExit('静止画を直してください（Veo は起動していません・費用なし）: ' + '; '.join(bad))
-    print('静止画の点検: 合格（%d枚）' % len(seen))
+    print('静止画の点検: 合格（%d枚）' % len(faces))
 
 
 def wait_all(base, key, ids):
@@ -439,7 +446,7 @@ def main():
         print('静止画の点検: 鍵が無いので飛ばします（Actions の予行では必ず回る）')
         return
     base, key = _base_and_key()
-    preflight_stills(plan['cuts'], lambda u: still_hands(base, key, u), still_face(persona))
+    preflight_stills(plan['cuts'], lambda u, q: still_look(base, key, u, q), still_face(persona))
     if dry:
         return
     reuse = product.get('reuse_ids')
