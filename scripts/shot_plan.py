@@ -54,12 +54,21 @@ PHONE_IN_HAND = ('selfie', 'mirror')   # 本人がスマホを持って撮る絵
 #   絵の指示（STICK_GRIP）と、本番前の静止画の点検の問い（STICK_GRIP_CHECK）を同じ規則に置く（言い換えない）
 #   ★問いは実物で合わせた（2026-09-30・verify を実際に呼んだ）。大まかな問い（上端のハンドルを握っているか）は
 #     本体の下を握った id93 を通した。下の問いは id93=0・id95=0（どちらもオーナーの目視 NG）・id98=1（かばん持ち）
-STICK_GRIP = (" Her hand grips the top of the vacuum's handle, the light-coloured handle part in the product photo,"
-              " from above like the handle of a bag: back of the hand up, fingers curled under it. The hand touches"
-              " nothing else: never the motor body, the battery pack, the dust cup or the pipe. The vacuum keeps"
-              " exactly the shape and colours of the product photo.")
-STICK_GRIP_CHECK = ("The hand holds the vacuum handle like a bag handle, back of the hand on top and fingers curled"
-                    " under it; the hand is not touching the motor body, the battery pack, the dust cup or the pipe.")
+# ★握る部分は商品ごとに違う（RR35 は「ベージュ部分」・オーナー 2026-09-30）。product の handle で名指しする。
+#   無ければ HANDLE_DEFAULT。{handle} は plan() が必ず埋める（Veo や verify に {handle} のまま渡さない）
+HANDLE_DEFAULT = "the handle shown in the product photo"
+STICK_GRIP = (" Her hand holds {handle} from above like the handle of a bag: back of the hand up, fingers curled"
+              " under it. Every finger and the palm touch only {handle}: never the motor body, the battery pack,"
+              " the dust cup, the pipe or any other part. The vacuum keeps exactly the shape and colours of the"
+              " product photo.")
+# ★verify の must_show は200文字まで。超えると判定が呼べない（preflight_stills は長すぎる問いで止める）
+STICK_GRIP_CHECK = ("The hand holds {handle} like a bag handle, back of the hand on top, fingers curled under it;"
+                    " it does not touch the motor body, battery pack, dust cup or pipe.")
+
+
+def with_handle(text, handle=None):
+    """{handle} を商品の握る部分（product['handle']）で埋める。無ければ HANDLE_DEFAULT"""
+    return text.replace('{handle}', handle or HANDLE_DEFAULT) if text else text
 
 
 RULES = [
@@ -287,6 +296,10 @@ def plan(product):
             cuts[-1]['card'] = '・'.join(rest[:2])
         if product.get('image_url'):
             panel = {'cut_index': len(cuts) - 1, 'images': [product['image_url']], 'cutout': False}
+    for c in cuts:  # ★握る部分を埋める（#235）。{handle} のまま外へ出さない
+        c['action'] = with_handle(c['action'], product.get('handle'))
+        if c.get('grip'):
+            c['grip'] = with_handle(c['grip'], product.get('handle'))
     return {'cuts': cuts, 'cards_only': cards_only, 'panel': panel}
 
 

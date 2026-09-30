@@ -462,16 +462,28 @@ expect(_rv['still']['cleaning_pov'].endswith(shot_plan.ONE_HAND_POV), '一人称
 expect('handle' in shot_plan.gendered(shot_plan.STICK_GRIP, 'hiro') and 'His hand' in shot_plan.gendered(shot_plan.STICK_GRIP, 'hiro'),
        'ヒロの回は掴む位置の文も男性に')
 _gc = next(c for c in _pc2 if c['still'] == 'cleaning_pov')
-expect(_gc.get('grip') == shot_plan.STICK_GRIP_CHECK and len(_gc['grip']) <= 200 and not any(ch in _gc['grip'] for ch in '"\n「」'),
+expect(_gc.get('grip') == shot_plan.with_handle(shot_plan.STICK_GRIP_CHECK) and len(_gc['grip']) <= 200 and not any(ch in _gc['grip'] for ch in '"\n「」'),
        '掃除のカットは掴む位置の問いを持つ（verify の must_show の制限内）')
 expect(all(w in shot_plan.STICK_GRIP_CHECK for w in ('like a bag handle', 'back of the hand on top', 'motor body',
                                                      'battery pack', 'dust cup', 'pipe')),
        '問いは「かばん持ち」と握ってはいけない部分を名指しする（大まかな問いは id93 を通した・実測で id93/id95=0・id98=1）')
+_bg = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x",
+    "handle": "the beige part of the handle", "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
+    "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
+_bc = next(c for c in _bg if c['still'] == 'cleaning_pov')
+expect('the beige part of the handle' in _bc['action'] and 'the beige part of the handle' in _bc['grip'],
+       '商品ごとの握る部分（RR35＝ベージュ部分・オーナー）が絵の指示と点検の問いの両方に入る')
+expect(len(_bc['grip']) <= 200, 'RR35（ベージュ部分）の問いも verify の200文字以内')
+_lg = [dict(c, grip='x' * 201) if c['still'] == 'cleaning_pov' else c for c in _pc2]
+_e = _pf(_lg, _good_h, _good_f)
+expect(_e and '長すぎる' in _e, '200文字を超える掴む位置の問いは、判定できないまま通さず止める')
+expect(not any('{handle}' in (c['action'] + c.get('grip', '')) for c in _bg + _pc2),
+       '{handle} のまま Veo や verify へ出さない')
 expect('like the handle of a bag' in shot_plan.STICK_GRIP and 'back of the hand up' in shot_plan.STICK_GRIP,
        '絵の指示も同じ持ち方（オーナー「あの場面はかばんのような持ち方で掃除するのが普通」）')
 _asked = []
 _pf(_pc2, _good_h, _good_f, lambda u, q: _asked.append((u, q)) or 1)
-expect([q for u, q in _asked] == [shot_plan.STICK_GRIP_CHECK] and _isp(_asked[0][0]),
+expect([q for u, q in _asked] == [shot_plan.with_handle(shot_plan.STICK_GRIP_CHECK)] and _isp(_asked[0][0]),
        '問いは掃除の絵にだけ聞く（他の絵は手と顔だけ）')
 _e = _pf(_pc2, _good_h, _good_f, lambda u, q: 0)
 expect(_e and '掴む位置が違う' in _e and 'cleaning_pov' in _e and '費用なし' in _e,

@@ -387,6 +387,8 @@ def preflight_stills(cuts, look, face):
         why = [hand_problem(n, pov)]
         if ask and grip_ok == 0:
             why.append('掴む位置が違う（%s）' % ask)
+        if len(ask) > 200:  # ★verify が断る長さ。判定できないまま通さない
+            why.append('掴む位置の問いが長すぎる（%d文字・200まで）。product の handle を短く' % len(ask))
         if pov and f is not None:
             why.append('一人称の静止画に顔が映っている（%.2f）' % f)
         if not pov and f is None:
