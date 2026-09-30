@@ -52,18 +52,21 @@ PHONE_IN_HAND = ('selfie', 'mirror')   # 本人がスマホを持って撮る絵
 #   掃除するのが普通」2026-09-30・#235）。持ち手（RR35 ではベージュの部分）を、かばんの持ち手のように上から握る
 #   （手の甲が上・指は持ち手の下に回す）。本体・バッテリー・ダストカップ・パイプには触れない。
 #   絵の指示（STICK_GRIP）と、本番前の静止画の点検の問い（STICK_GRIP_CHECK）を同じ規則に置く（言い換えない）
-#   ★問いは実物で合わせた（2026-09-30・verify を実際に呼んだ）。大まかな問い（上端のハンドルを握っているか）は
-#     本体の下を握った id93 を通した。下の問いは id93=0・id95=0（どちらもオーナーの目視 NG）・id98=1（かばん持ち）
+#   ★問いは実物で合わせた（2026-09-30・verify を実際に呼んだ）。オーナーの目視との比較：
+#     「かばん持ちか」→ オーナー OK の id99 を 0 にした（厳しすぎ）。「指が1本も黒に触れない」→ id99 を 0（同）。
+#     下の「持ち手そのものを握っているか」→ id99=1・id93=0（本体の下を握った）は一致。id98（持ち手の上端・境目）は 1＝見抜けない。
+#     ＝機械が止めるのは大きな外れ（本体・パイプを握る）まで。境目のような細かい所はオーナーの目視で落とす
 # ★握る部分は商品ごとに違う（RR35 は「ベージュ部分」・オーナー 2026-09-30）。product の handle で名指しする。
 #   無ければ HANDLE_DEFAULT。{handle} は plan() が必ず埋める（Veo や verify に {handle} のまま渡さない）
 HANDLE_DEFAULT = "the handle shown in the product photo"
-STICK_GRIP = (" Her hand holds {handle} from above like the handle of a bag: back of the hand up, fingers curled"
-              " under it. Every finger and the palm touch only {handle}: never the motor body, the battery pack,"
-              " the dust cup, the pipe or any other part. The vacuum keeps exactly the shape and colours of the"
-              " product photo.")
+# 絵の指示はオーナー OK の id99 を作った文から（持ち手の真ん中を包む・他の部分に触れない）
+STICK_GRIP = (" Her hand is wrapped around the middle of {handle} like a bag handle, back of the hand up, fingers"
+              " curled under it. Every finger and the palm touch only {handle}: never the motor body, the battery"
+              " pack, the dust cup, the pipe or any other part. The vacuum keeps exactly the shape and colours of"
+              " the product photo.")
 # ★verify の must_show は200文字まで。超えると判定が呼べない（preflight_stills は長すぎる問いで止める）
-STICK_GRIP_CHECK = ("The hand holds {handle} like a bag handle, back of the hand on top, fingers curled under it;"
-                    " it does not touch the motor body, battery pack, dust cup or pipe.")
+STICK_GRIP_CHECK = ("The hand is wrapped around {handle} itself, not around the motor body, the battery pack,"
+                    " the dust cup or the pipe.")
 
 
 def with_handle(text, handle=None):
