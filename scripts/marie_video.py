@@ -137,20 +137,41 @@ def rows(base, key, ids):
     return {r['id']: r for r in (res or [])}
 
 
-def verify_cut(base, key, video_url, must_show):
+def verify_cut(base, key, video_url, must_show, demo=False):
     """
     must_show が映っているか（1/0）と、何と言ったか（said）。must_show が空なら喋りだけを取る（#189）。
+    demo（実演のカット）は、最初と最後を比べた travel / debris も選ばせる（#239）。
     呼べない・読めない時は止める（未設定なら閉じる・#185）
     """
-    code, res = _req('%s/functions/v1/video-scene' % base, key,
-                     {'action': 'verify', 'video_url': video_url, 'must_show': must_show or ''})
+    body = {'action': 'verify', 'video_url': video_url, 'must_show': must_show or ''}
+    if demo:
+        body['demo'] = True
+    code, res = _req('%s/functions/v1/video-scene' % base, key, body)
     if code != 200 or (res or {}).get('match') not in (0, 1):
         raise SystemExit('絵の照合を呼べません（%s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:300]))
     # ★判定は毎回ログへ残す（朝の報告と、判定の当たり外れの記録に使う・#185）
     print('  照合 %s: %s（%s）／喋り「%s」／手 %s' % ('OK' if res['match'] else 'NG', (must_show or '（絵の問いなし）')[:60],
                                          str(res.get('seen') or '')[:100], str(res.get('said') or '')[:60], res.get('hands')))
+    if demo:
+        print('    実演: travel %s／debris %s' % (res.get('travel'), res.get('debris')))
     # ★手の本数も同じ判定で数える（#231）。読めない時は None（判定しない）
-    return res['match'], str(res.get('seen') or ''), str(res.get('said') or ''), res.get('hands')
+    return (res['match'], str(res.get('seen') or ''), str(res.get('said') or ''), res.get('hands'),
+            {'travel': res.get('travel'), 'debris': res.get('debris')} if demo else None)
+
+
+def demo_problem(d):
+    """
+    実演（吸い込む等）が映っていない所を返す（無ければ空・#239）。判定できなかった項目（None）は見ない。
+    ★must_show の 1 だけでは通さない：ヘッドがほぼ動かずパン屑が全部残った動画を 1 で通した（RR35 本番）
+    """
+    if not d:
+        return []
+    out = []
+    if d.get('travel') in ('short', 'none'):
+        out.append('実演でヘッドがほとんど動いていない（travel=%s）' % d['travel'])
+    if d.get('debris') in ('some_left', 'unchanged', 'no_debris'):
+        out.append('ゴミが吸い込まれて消えていない（debris=%s）' % d['debris'])
+    return out
 
 
 # ★聞こえた喋りがセリフの何倍まで長ければ許すか（#197）。言い淀み・言い足しで伸びた喋りを止める。
@@ -255,15 +276,17 @@ def issues_of(cut, row, verify, lang='ja', face=None):
     if not url:
         return ['フィルタ等で動画なし'], []
     try:
-        r = verify(url, cut.get('must_show'))
+        r = verify(url, cut.get('must_show'), True) if cut.get('demo') else verify(url, cut.get('must_show'))
         match, seen, said = r[:3]
         hands = r[3] if len(r) > 3 else None
+        demo = r[4] if len(r) > 4 else None
     except SystemExit as e:
         # ★照合が呼べない時も止めない。確かめられなかったことを LINE に書く（オーナーが目で見る）
         return [], ['照合できず（%s）' % str(e)[:80]]
     visual, speech = [], []
     if not match:
         visual.append('絵がセリフと合わない（映っていた物: %s）' % seen[:120])
+    visual += demo_problem(demo)
     why_hands = hand_problem(hands, is_pov(cut))
     if why_hands:
         visual.append(why_hands)
@@ -507,9 +530,9 @@ def main():
     got = wait_all(base, key, ids)
     seen_before = {}  # ★同じ動画を2度判定しない（判定も有料）
 
-    def verify(url, must_show):
+    def verify(url, must_show, demo=False):
         if url not in seen_before:
-            seen_before[url] = verify_cut(base, key, url, must_show)
+            seen_before[url] = verify_cut(base, key, url, must_show, demo)
         return seen_before[url]
 
     face = make_face_check(persona)

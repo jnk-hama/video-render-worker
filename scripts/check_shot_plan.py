@@ -144,7 +144,7 @@ expect(sum(c['seconds'] for c in lr['cuts']) <= 30, '長回しでも全体は30�
 expect(lr['cuts'][1]['still'] == 'cleaning', '吸い込む所はフックの直後（元の計画の並びを保つ）')
 import marie_video  # noqa: E402
 lb = marie_video.redo_targets(lk['cuts'], {i: {'video_url': 'v%d' % i} for i in range(3)}, list(range(3)),
-                              lambda u, m: (1, 'ok', 'スマホくらいの大きさで持ち歩ける' if u == 'v1' else lk['cuts'][int(u[1:])]['line']))
+                              lambda u, m, demo=False: (1, 'ok', 'スマホくらいの大きさで持ち歩ける' if u == 'v1' else lk['cuts'][int(u[1:])]['line']))
 expect(list(lb) == [1] and '映画' in lb[1], '長回しで2つ目の語を言い落としたら作り直す')
 
 print('=== 規則表そのもの ===')
@@ -207,18 +207,18 @@ expect(sorted(u for u, _ in calls) == sorted('v%d' % k for k in ids if k),
 expect(all((m is None) == (not cuts[int(u[1:])].get('must_show')) for u, m in calls),
        'must_show の無いカット（フック・CTA）は絵の問いを渡さない')
 expect(marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                                lambda u, m: (1, 'ok', cuts[int(u[1:])]['line'])) == {}, '全部映っていてセリフ通りなら作り直さない')
+                                lambda u, m, demo=False: (1, 'ok', cuts[int(u[1:])]['line'])) == {}, '全部映っていてセリフ通りなら作り直さない')
 pol = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                               lambda u, m: (1, 'ok', '下からも開くからね、座っても楽です。' if u == 'v3' else cuts[int(u[1:])]['line']))
+                               lambda u, m, demo=False: (1, 'ok', '下からも開くからね、座っても楽です。' if u == 'v3' else cuts[int(u[1:])]['line']))
 expect(list(pol) == [3] and '丁寧語' in pol[3], '言い終わりが「です」のカットは作り直しに回す（#189）')
 zk = next(k for k, c in enumerate(cuts) if c['feature'] == 'ダブルジップ')
 dev = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                               lambda u, m: (1, 'ok', '下からも開くから座ったら' if u == 'v%d' % zk else cuts[int(u[1:])]['line']))
+                               lambda u, m, demo=False: (1, 'ok', '下からも開くから座ったら' if u == 'v%d' % zk else cuts[int(u[1:])]['line']))
 expect(list(dev) == [zk] and '抜け感' in dev[zk], 'セリフを言い換えて言うべき語が無いカットは作り直しに回す（#193・実例）')
 
 lk = next(k for k, c in enumerate(cuts) if c['feature'] == 'M〜3L')
 fil = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                               lambda u, m: (1, 'ok', 'うん、ね、これね、ね、サイズ大きめでね、シルエットかわいいよね。あ' if u == 'v%d' % lk
+                               lambda u, m, demo=False: (1, 'ok', 'うん、ね、これね、ね、サイズ大きめでね、シルエットかわいいよね。あ' if u == 'v%d' % lk
                                              else cuts[int(u[1:])]['line']))
 expect(list(fil) == [lk] and '言い淀み' in fil[lk], '言い淀みで伸びた喋りは作り直しに回す（#197・実例の形）')
 ok_real = ['下からも開くからね、抜け感出せる', 'フードが大きいからね、頭まで隠れる', 'ので コードないから ね サッと使える']
@@ -233,7 +233,7 @@ calls_f = []
 def fake_face(u, pov):
     calls_f.append((u, pov))
     return '一人称のカットに顔が映っている（2.0秒）' if u == 'v2' else None
-okv = lambda u, m: (1, 'ok', cuts[int(u[1:])]['line'])
+okv = lambda u, m, demo=False: (1, 'ok', cuts[int(u[1:])]['line'])
 ff = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids, okv, face=fake_face)
 expect(list(ff) == [2] and '顔' in ff[2], '顔の判定に落ちたカットは作り直しに回す')
 expect(len(calls_f) == len(ids), '動画のあるカットは全部、顔も見る')
@@ -294,10 +294,10 @@ expect(set(marie_video.TARGET_PERSONA.values()) <= set(face_score.MASTERS), '担
 print('=== 語尾の「ね」（#217）===')
 nek = next(k for k, c in enumerate(cuts) if c['feature'] == '大きめフード')
 ne = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                              lambda u, m: (1, 'ok', 'フードがね、大きいからね、頭まで隠れるね' if u == 'v%d' % nek else cuts[int(u[1:])]['line']))
+                              lambda u, m, demo=False: (1, 'ok', 'フードがね、大きいからね、頭まで隠れるね' if u == 'v%d' % nek else cuts[int(u[1:])]['line']))
 expect(list(ne) == [nek] and '「ね」' in ne[nek], '台本に無い「ね」を2回以上足したカットは作り直す')
 one = marie_video.redo_targets(cuts, {i: {'video_url': 'v%d' % i} for i in ids}, ids,
-                               lambda u, m: (1, 'ok', 'フードが大きいからね、頭まで隠れる' if u == 'v%d' % nek else cuts[int(u[1:])]['line']))
+                               lambda u, m, demo=False: (1, 'ok', 'フードが大きいからね、頭まで隠れる' if u == 'v%d' % nek else cuts[int(u[1:])]['line']))
 expect(one == {}, '「ね」1回までは自然な喋りとして通す')
 expect(marie_video.situation_text(cuts[0]).endswith(marie_video.NO_NE) and 'ne (ね)' in marie_video.NO_NE,
        'Veo へ渡す場面の説明に「ね を足さない」を必ず付ける（使い回しの照合も同じ文）')
@@ -345,7 +345,7 @@ def _start(b, kk, p, c):
     return i
 marie_video.start_cut = _start
 marie_video.wait_all = lambda b, kk, ids: {i: {'video_url': 'u%d' % i} for i in ids}
-def _verify(b, kk, url, ms):
+def _verify(b, kk, url, ms, demo=False):
     i = int(url[1:])
     if i in said_of:
         return 1, 'ok', said_of[i]
@@ -378,7 +378,7 @@ marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
 marie_video.start_cut = lambda *a: started.append(a) or 999
 marie_video.wait_all = lambda base, key, ids: {i: {'video_url': 'u%d' % i} for i in ids}
 # ★どのカットも言うべき語を言った体（#193 の照合を通す）
-marie_video.verify_cut = lambda base, key, url, ms: (1, 'ok', p['cuts'][int(url[1:]) - 100]['line'])
+marie_video.verify_cut = lambda base, key, url, ms, demo=False: (1, 'ok', p['cuts'][int(url[1:]) - 100]['line'])
 with tempfile.TemporaryDirectory() as td:
     pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
     _json.dump(dict(REDIAL, reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))
@@ -519,12 +519,12 @@ expect(marie_video.still_look('b', 'k', 'u', ('P', 'Q')) == (None, None), '判�
 marie_video._req = _orig_req
 _povc = next(c for c in _pc2 if marie_video.is_pov(c))
 _selc = next(c for c in _pc2 if c['still'] == 'selfie')
-_v2 = lambda u, m: (1, 'ok', _povc['line'], 2)
+_v2 = lambda u, m, demo=False: (1, 'ok', _povc['line'], 2)
 expect(any('片手はスマホ' in v for v in marie_video.issues_of(_povc, {'video_url': 'u'}, _v2)[0]),
        '一人称のクリップで照合（Gemini）が手2本と数えたら、映像の問題にする')
-expect(not marie_video.issues_of(_selc, {'video_url': 'u'}, lambda u, m: (1, 'ok', _selc['line'], 2))[0],
+expect(not marie_video.issues_of(_selc, {'video_url': 'u'}, lambda u, m, demo=False: (1, 'ok', _selc['line'], 2))[0],
        '一人称でないカットは手2本まで通す')
-expect(not marie_video.issues_of(_povc, {'video_url': 'u'}, lambda u, m: (1, 'ok', _povc['line']))[0],
+expect(not marie_video.issues_of(_povc, {'video_url': 'u'}, lambda u, m, demo=False: (1, 'ok', _povc['line']))[0],
        '手の本数が返らない照合（古い形）は判定しない')
 import inspect as _insp  # noqa: E402
 _ms = _insp.getsource(marie_video.main)
@@ -569,7 +569,7 @@ def _run(start_ok, said_for, face_for):
         return i
     marie_video.start_cut = st
     marie_video.wait_all = lambda b, kk, ids: {i: {'video_url': 'u%d' % i} for i in ids if i is not None}
-    marie_video.verify_cut = lambda b, kk, url, ms: (1, 'ok', said_for(*who[int(url[1:])]))
+    marie_video.verify_cut = lambda b, kk, url, ms, demo=False: (1, 'ok', said_for(*who[int(url[1:])]))
     marie_video.make_face_check = lambda persona=None: (lambda u, pov: face_for(*who[int(u[1:])]))
     with _t0.TemporaryDirectory() as td:
         pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
@@ -676,6 +676,20 @@ expect(_pc['still'] == 'cleaning_pov' and marie_video.is_pov(_pc),
        'RR35 の吸引は手だけの静止画（cleaning_pov）なら一人称のカットになる（顔の判定も一人称で見る）')
 _old = next(c for c in _rr['cuts'] if c.get('feature') == '強力吸引')
 expect(_old['still'] == 'cleaning' and not marie_video.is_pov(_old), '顔の出る cleaning の回は今までどおり')
+# ★実演（#239）：must_show が 1 でも、ヘッドが動かない・ゴミが残るなら映像は使えない（RR35 本番で 1 と通した実物）
+expect(not marie_video.demo_problem(None), '実演でないカットは見ない')
+expect(not marie_video.demo_problem({'travel': 'far', 'debris': 'gone'}), 'ヘッドが進み、通った所がきれいなら通す')
+expect(len(marie_video.demo_problem({'travel': 'short', 'debris': 'unchanged'})) == 2, 'RR35 本番（ほぼ動かず・全部残る）は2つとも落とす')
+expect(marie_video.demo_problem({'travel': 'far', 'debris': 'no_debris'}), 'ゴミが最初から無いのは実演になっていない')
+expect(not marie_video.demo_problem({'travel': None, 'debris': None}), '選択肢の外（None）は判定しない')
+_dc = next(c for c in _rr['cuts'] if c.get('feature') == '強力吸引')
+_dcalls = []
+def _dv(url, ms, demo=False):
+    _dcalls.append(demo)
+    return 1, 'The vacuum head moves over the crumbs, sucking them up.', _dc['line'], 1, {'travel': 'short', 'debris': 'unchanged'}
+_vis, _sp = marie_video.issues_of(_dc, {'video_url': 'v1'}, _dv)
+expect(_dcalls == [True] and any('ゴミ' in v for v in _vis), '実演のカットは demo で照合し、吸い込めていなければ映像を使えない側へ')
+expect('slowly' not in _dc['action'] and 'steady stroke' in _dc['action'], '吸引のカットは「ゆっくり」と言わない（4秒で進まない）')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
