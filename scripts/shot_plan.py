@@ -247,8 +247,8 @@ def _no_repeat(cuts):
     return out
 
 
-# 最後のカットにまとめて出す性能の数。札は上（頭の上）に出るので、増やすと顔にかかる
-CTA_TOPICS_MAX = 3
+# 最後のカットのまとめに並べる性能の数（#242）。商品写真の右の帯（PANEL_TOP〜PANEL_BOTTOM）に1行ずつ入る数
+CTA_TOPICS_MAX = 5
 
 
 def plan(product):
@@ -301,14 +301,15 @@ def plan(product):
         rest = [b for b in panel_bits if b not in shown]
         # ★色展開は前のカットと同じ POINT カードで上に出す。パネルの大見出し（「2色」）は置かない
         #   （オーナー「最後のシーンの2色はいらない。付けるなら前のシーンみたく上に POINT として」#193）
-        # ★★絵にしなかった性能（静止画が無い・カット数の上限）も、最後に1行1つのトピックとしてまとめて出す（#240・
-        #   オーナー「性能を分かりやすくまとめてトピックにして上げれば視聴者にも伝わりやすい」）。今までは描画へ渡さず捨てていた
-        topics = [f for f in cards_only if f not in shown and f not in panel_bits][:CTA_TOPICS_MAX]
-        lines = (['・'.join(rest[:2])] if rest else []) + topics
-        if lines:
-            cuts[-1]['card'] = '\n'.join(lines)
+        if rest:
+            cuts[-1]['card'] = '・'.join(rest[:2])
         if product.get('image_url'):
             panel = {'cut_index': len(cuts) - 1, 'images': [product['image_url']], 'cutout': False}
+            # ★★最後は「商品写真＋性能のまとめ」（#242・オーナー「わかりやすいのが前提で、おしゃれにデザインしてまとめてトピック。
+            #   他の人が作ったアフィリエイト動画も参考に」）。絵にしなかった性能も含め、全部を1行1つで並べる（#240 の札はこれに置き換えた）。
+            #   ★まとめなので前のカードと重なってよい（#184 は服のサイズを最後に繰り返した件）。色展開を出す回（panel_bits）は従来どおり
+            if not panel_bits:
+                panel['topics'] = features[:CTA_TOPICS_MAX]
     # ★★掃除機を手に持つ絵（holding）も握り方を見る（2026-09-30 RR35 本番：軽量1.6kg のカットで黒いパイプを握っていた・
     #   オーナー「静止画の説明も変」）。掃除機（category=cleaning）の回だけ。持っていない絵（station・selfie）は見ない
     if product.get('category') == 'cleaning':

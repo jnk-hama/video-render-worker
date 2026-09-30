@@ -404,7 +404,25 @@ def panel_boxes(w, n):
     return left, gap, (w - left - right - gap * (n - 1)) // max(1, n)
 
 
-def panel_filter(w, h, n, start, end, sizes):
+# ★まとめ付きのパネル（#242）：左に商品写真、右に性能のトピック。写真が占める幅の割合
+PANEL_TOPICS_IMG_SHARE = 0.40
+# ★数字と単位はアクセント色で「見せる」（#242・参考「読ませるより見せる」）
+_NUM_RE = re.compile(r'[0-9０-９][0-9０-９.,．〜~\-]*\s*(?:kg|ｋｇ|g|か月|ヶ月|カ月|分|時間|秒|W|mAh|L|ml|mm|cm|%|％|倍|円|段階)?')
+
+
+def panel_split(w):
+    """まとめ付きパネルの割り付け (写真の左端, 写真の幅, トピックの左端, トピックの幅)。写真側と文字側の両方がこれを使う"""
+    left, gap, full = panel_boxes(w, 1)
+    img_w = int(full * PANEL_TOPICS_IMG_SHARE)
+    return left, img_w, left + img_w + gap, full - img_w - gap
+
+
+def highlight_numbers(escaped, accent):
+    """ass_escape 済みの文字列の数字と単位だけをアクセント色にする"""
+    return _NUM_RE.sub(lambda m: '{\\1c%s}%s{\\1c&H00FFFFFF&}' % (accent, m.group(0)), escaped)
+
+
+def panel_filter(w, h, n, start, end, sizes, topics=False):
     """
     商品パネルの filter_complex を作る。入力 0 が本編、1..n が透過PNG。
 
@@ -415,6 +433,8 @@ def panel_filter(w, h, n, start, end, sizes):
     ★ sizes は各PNGの (幅, 高さ)。横に等分した枠へ、縦横比を保って収める。
     """
     margin, gap, box_w = panel_boxes(w, n)
+    if topics:
+        margin, box_w = panel_split(w)[:2]
     box_h = int(h * (PANEL_BOTTOM - PANEL_TOP))
     chains, prev = [], '0:v'
     for i, (iw, ih) in enumerate(sizes):
@@ -1560,6 +1580,8 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
 
 
 CARD_NOTE_RATIO = 0.5  # 「※」の注記の大きさ（札の字の倍）
+# ★「※」の条件（打ち消し表示）の最小の字の大きさ（1920px 画面で）。20px は試し描きで読めなかった（#242）。景表法の打ち消し表示は読めないと表示した事にならない
+NOTE_MIN_PX = 30
 
 
 def check_shape(size):
@@ -1725,7 +1747,7 @@ def build_ass(captions, w, h, font_size, center=False,
         if notes:
             note_y = y0 + (len(topics) - 1) * line_h + int(fs * 0.5) + int(fs * CARD_NOTE_RATIO * 0.9)
             lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an8\\pos(%d,%d)\\fs%d\\bord3\\fad(120,150)}%s'
-                         % (ass_time(start), ass_time(end), center_x, note_y, max(20, int(fs * CARD_NOTE_RATIO)),
+                         % (ass_time(start), ass_time(end), center_x, note_y, max(NOTE_MIN_PX, int(fs * CARD_NOTE_RATIO)),
                             '\\N'.join(ass_escape(topic) for topic in notes)))
     """
     ★商品パネルの見出しとラベル。見出しはパネルの上に大きく（参考の「全色OK」）、
@@ -1749,6 +1771,42 @@ def build_ass(captions, w, h, font_size, center=False,
             lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)}%s'
                          % (ass_time(ps), ass_time(pe), cx,
                             int(h * (PANEL_BOTTOM - 0.015)), ass_escape(str(lb))))
+    """
+    ★まとめ（#242・オーナー「わかりやすいのが前提で、おしゃれにデザインしてまとめてトピック」）。
+      写真の右に、性能を1行1つ・行頭にチェック・数字はアクセント色で並べ、1行ずつ弾んで出す。「※」は小さく添える
+    """
+    if panel and panel.get('topics') and len(panel.get('images') or []) == 1:
+        ps, pe = float(panel.get('start', 0)), float(panel.get('end', 0))
+        acc = accent or '&H005C3BFF'
+        items = []
+        for raw in panel['topics']:
+            parts = [x for x in str(raw).split('\n') if x.strip()]
+            if parts:
+                items.append((parts[0], [x for x in parts[1:] if x.startswith('※')]))
+        if items and pe > ps:
+            list_x, list_w = panel_split(w)[2:]
+            band_top = int(h * PANEL_TOP)
+            row_h = int(h * (PANEL_BOTTOM - PANEL_TOP)) // len(items)
+            tfs = card_font_size([it[0] for it in items], card_fs, ratio,
+                                 list_w - int(card_fs * (CARD_CHECK + 0.25)) - 2 * CARD_OUTLINE,
+                                 measure=lambda t: measure_char_ratio(t, font_name, font_dir))
+            tfs = min(tfs, int(row_h * 0.55))
+            check_px, check_gap = int(tfs * CARD_CHECK), max(6, tfs // 4)
+            pop = '\\fscx30\\fscy30\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)'
+            for row, (topic, notes) in enumerate(items):
+                row_y = band_top + row_h * row + row_h // 2 - (int(tfs * 0.3) if notes else 0)
+                row_start = min(pe, ps + PANEL_FADE + row * CARD_STAGGER)
+                lines.append('Dialogue: 3,%s,%s,Card,,0,0,0,,{\\an5\\pos(%d,%d)%s\\bord3\\3c&H00FFFFFF&\\1c%s\\p1}%s{\\p0}'
+                             % (ass_time(row_start), ass_time(pe), list_x + check_px // 2, row_y, pop, acc,
+                                check_shape(check_px)))
+                lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an4\\pos(%d,%d)\\fs%d%s}%s'
+                             % (ass_time(row_start), ass_time(pe), list_x + check_px + check_gap, row_y, tfs, pop,
+                                highlight_numbers(ass_escape(topic), acc)))
+                if notes:
+                    lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an7\\pos(%d,%d)\\fs%d\\bord3\\fad(120,150)}%s'
+                                 % (ass_time(row_start), ass_time(pe), list_x + check_px + check_gap,
+                                    row_y + int(tfs * 0.62), max(NOTE_MIN_PX, int(tfs * 0.6)),
+                                    '\\N'.join(ass_escape(x) for x in notes)))
     for c in captions:
         text = ass_escape(c.get('text', ''))
         if not text:
@@ -2719,7 +2777,8 @@ def main():
             if pngs:
                 ps, pe = float(panel.get('start', 0)), float(panel.get('end', 0))
                 fc, last = panel_filter(w, h, len(pngs), ps, pe,
-                                        [probe_size(pp) for pp in pngs])
+                                        [probe_size(pp) for pp in pngs],
+                                        topics=bool(panel.get('topics')) and len(pngs) == 1)
                 paneled = os.path.join(work, 'paneled.mp4')
                 pcmd = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-i', joined]
                 for pp in pngs:

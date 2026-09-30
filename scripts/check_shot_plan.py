@@ -690,16 +690,14 @@ def _dv(url, ms, demo=False):
 _vis, _sp = marie_video.issues_of(_dc, {'video_url': 'v1'}, _dv)
 expect(_dcalls == [True] and any('ゴミ' in v for v in _vis), '実演のカットは demo で照合し、吸い込めていなければ映像を使えない側へ')
 expect('slowly' not in _dc['action'] and 'steady stroke' in _dc['action'], '吸引のカットは「ゆっくり」と言わない（4秒で進まない）')
-# ★絵にしなかった性能は最後にトピックとしてまとめて出す（#240）。手に持つ絵をやめた RR35（オーナー「1で」）
+# ★最後は「商品写真＋性能のまとめ」（#242）。手に持つ絵をやめた RR35（#240）でも、全部の性能が並ぶ
 _nh = dict(RR35, layout='long', stills={k: v for k, v in RR35['stills'].items() if k != 'holding'})
 _nhp = shot_plan.plan_long(_nh)
 expect(not any(c['still'] == 'holding' for c in _nhp['cuts']), '手に持つ静止画が無ければ、そのカットは作らない')
-expect(_nhp['cuts'][-1].get('cards') == ['コードレス\n軽量1.6kg'], '作らなかったカットの性能は、最後のカットに1行1つで出す')
+expect(_nhp['panel'].get('topics') == RR35['features'][:shot_plan.CTA_TOPICS_MAX], '最後のパネルに性能を全部（上限まで）並べる')
+expect(not _nhp['cuts'][-1].get('cards'), 'まとめがあるので、最後の札で繰り返さない')
 _nhj = shot_plan.render_job(_nh, _nhp, ['u'] * len(_nhp['cuts']), 'preview/x.mp4')['job']
-expect(any(c['text'] == 'コードレス\n軽量1.6kg' and c['cut_index'] == len(_nhp['cuts']) - 1 for c in _nhj['info_cards']),
-       'まとめの札が描画の依頼に載る（捨てない）')
-_wh = shot_plan.plan_long(dict(RR35, layout='long'))
-expect(not _wh['cuts'][-1].get('cards'), '前のカットで出した性能は最後に繰り返さない（#184）')
+expect(_nhj['product_panel'].get('topics') == _nhp['panel']['topics'], 'まとめが描画の依頼に載る（捨てない）')
 # ★札（#241・オーナー「枠いらない」「おしゃれにまとめてトピック」）：枠なし・1行1トピック・行頭にチェック・※は注記
 import re as _re
 import render_video as _rv
@@ -723,6 +721,16 @@ expect('BorderStyle' not in _rv.build_ass_head(1080, 1920, 108, 'x') or ',1,%d,%
 # ★札を出しても字幕の高さは変わらない（試し描きで、札の行の変数が字幕の高さを上書きして字幕が上に出た）
 _cap = [l for l in _events('コードレス\n軽量1.6kg', [{'text': 'テスト', 'start': 0, 'end': 2}]) if ',Pop,' in l]
 expect(_cap and _ys(_cap, '')[0] == int(1920 * _rv.SAFE_AREAS['none']['caption_y']), '札があっても字幕は元の高さ')
+_pan = _rv.build_ass([], 1080, 1920, 108, panel={'images': ['x'], 'start': 0, 'end': 3,
+                     'topics': ['最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測', '強力吸引', '軽量1.6kg']})
+_pl = [l for l in _pan.split('\n') if l.startswith('Dialogue:')]
+expect(len([l for l in _pl if '\\p1' in l]) == 3, 'まとめは1行ごとにチェック')
+expect(any('1.6kg' in l and '\\1c&H005C3BFF' in l for l in _pl), '数字と単位はアクセント色')
+expect(any('※1日1回' in l for l in _pl), 'まとめでも※の条件を残す')
+_lx = _rv.panel_split(1080)[2]
+expect(all(int(_re.search(r'\\pos\((\d+),', l).group(1)) >= _lx for l in _pl), 'まとめは写真の右（写真に重ならない）')
+_ix, _iw, _lx2, _lw = _rv.panel_split(1080)
+expect(_ix + _iw < _lx2 and _lx2 + _lw <= 1080 - int(_rv.SAFE_AREAS['tiktok']['right']), '写真とまとめが並び、右のアイコン列を避ける')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
