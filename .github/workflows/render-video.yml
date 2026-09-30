@@ -681,9 +681,13 @@ jobs:
                --repo "$GH_REPO"; then
             echo "アップロード完了: $TAG"
           else
-            echo "Release が既にあるので、資産だけ差し替えます: $TAG"
-            gh release upload "$TAG" out.mp4 --clobber --repo "$GH_REPO"
-            echo "差し替え完了: $TAG"
+            # ★★2026-09-30、資産だけ差し替えると Release の作成日時は古いまま残り、直後の「古い Release を片づける」
+            #   （作成日時が3日より前を消す）が、今描いたばかりの動画ごと消していた（RR35 本番・render-marie-orage-rr35-auto）。
+            #   → 作り直して作成日時を今にする
+            echo "Release が既にあるので、作り直します（古い作成日時のままだと片づけで消えるため）: $TAG"
+            gh release delete "$TAG" --yes --cleanup-tag --repo "$GH_REPO" || true
+            gh release create "$TAG" out.mp4 --title "$TAG" --notes "bytes=$(stat -c%s out.mp4)" --repo "$GH_REPO"
+            echo "作り直し完了: $TAG"
           fi
 
       # ★★2026-08-25 追加。放っておくと Release が無限に積もる。
