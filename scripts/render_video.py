@@ -967,6 +967,11 @@ SPEECH_SPEED_MAX = 1.3
 CARD_SIZE_RATIO = 0.72
 CARD_TAG_RATIO = 0.34
 CARD_TOP_Y = 0.128   # 機能の札の中心。PR 表記（0.062）の下、頭の上
+CARD_OUTLINE = 6     # 札の縁取り（枠をやめた #241）。映像の上でも読めるよう字幕並みに太く
+CARD_SHADOW = 3
+CARD_LINE_GAP = 1.32 # 札の行の間隔（字の大きさの倍）
+CARD_STAGGER = 0.18  # トピックを1行ずつ出す間隔（秒）。全部一度に出すより目で追える
+CARD_CHECK = 0.78    # 行頭のチェックの大きさ（字の大きさの倍）
 CARD_BOX_PAD = 22    # 札の箱の余白（Card スタイルの Outline＝BorderStyle 3 の箱の厚み）。幅の計算にも同じ値を使う
 CARD_SPACING = 2     # 札の字間（Card スタイルの Spacing）
 # ★札の文字は枠に収まるまで縮める（#204・Remotion の measuring-text の考え方）。ここより小さくはしない（読めなくなる）
@@ -1540,16 +1545,28 @@ def build_ass_head(w, h, font_size, font_name, outline=CAPTION_OUTLINE,
         #   （libass の仕様。BackColour は影の色）。Outline が箱の余白になる
         #   ★2026-09-26（#183・オーナー「しょぼい・変。デザインして上の方に」）:
         #     白い札に濃い文字、左上に色付きの「POINT n」の小札。画面の上（頭の上）に出す
-        ('Style: Card,%s,%d,&H00222222,&H00222222,&H00FFFFFF,'
-         '&H00000000,0,0,0,0,100,100,%d,0,3,%d,0,5,40,40,40,1'
-         % (font_name, max(28, int(font_size * CARD_SIZE_RATIO)), CARD_SPACING, CARD_BOX_PAD)),
-        ('Style: CardTag,%s,%d,&H00FFFFFF,&H00FFFFFF,&H005C3BFF,'
-         '&H00000000,0,0,0,0,100,100,4,0,3,10,0,5,40,40,40,1'
+        #   ★★2026-09-30（#241・オーナー「枠いらない」「おしゃれに」）：箱（BorderStyle 3）をやめ、白文字＋濃い縁取り＋影へ。
+        #     字幕（黄）と色で分け、行頭のチェック（アクセント色）で「性能のトピック」だと分かるようにする
+        ('Style: Card,%s,%d,&H00FFFFFF,&H00FFFFFF,&H002E1A1A,'
+         '&H96000000,0,0,0,0,100,100,%d,0,1,%d,%d,5,40,40,40,1'
+         % (font_name, max(28, int(font_size * CARD_SIZE_RATIO)), CARD_SPACING, CARD_OUTLINE, CARD_SHADOW)),
+        ('Style: CardTag,%s,%d,&H005C3BFF,&H005C3BFF,&H00FFFFFF,'
+         '&H96000000,0,0,0,0,100,100,6,0,1,4,2,5,40,40,40,1'
          % (font_name, max(18, int(font_size * CARD_TAG_RATIO)))),
         '',
         '[Events]',
         'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
     ])
+
+
+CARD_NOTE_RATIO = 0.5  # 「※」の注記の大きさ（札の字の倍）
+
+
+def check_shape(size):
+    """行頭のチェック（✓）の図形（ASS の \\p1）。フォントに ✓ が無い（Dela Gothic One 実測）ので図形で描く"""
+    k = size / 100.0
+    pts = [(0, 52), (16, 36), (38, 58), (84, 12), (100, 28), (38, 90)]
+    return 'm %d %d l ' % (pts[0][0] * k, pts[0][1] * k) + ' '.join('%d %d' % (x * k, y * k) for x, y in pts[1:])
 
 
 def card_font_size(text_lines, card_fs, ratio, max_w, measure=None):
@@ -1667,7 +1684,9 @@ def build_ass(captions, w, h, font_size, center=False,
         raw_lines = [t for t in str(cd.get('text') or '').split('\n') if t.strip()]
         text = '\\N'.join(ass_escape(t) for t in raw_lines)
         # ★長い売り文句は枠に収まるまで縮める（#204）。収まる物は1バイトも変えない
-        fs = card_font_size(raw_lines, card_fs, ratio, usable_w - 2 * CARD_BOX_PAD,
+        # ★行頭のチェックの分も幅から引く（#241）。注記（※）は小さく出すので測らない
+        fs = card_font_size([t for t in raw_lines if not t.startswith('※')] or raw_lines, card_fs, ratio,
+                            usable_w - 2 * CARD_OUTLINE - int(card_fs * (CARD_CHECK + 0.25)),
                             measure=lambda t: measure_char_ratio(t, font_name, font_dir))
         fit = ('\\fs%d' % fs) if fs != card_fs else ''
         start = float(cd.get('start', 0))
@@ -1679,20 +1698,35 @@ def build_ass(captions, w, h, font_size, center=False,
             lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)}%s'
                          % (ass_time(start), ass_time(end), center_x, cy, text))
             continue
-        # ★上の方へ（頭の上）。横から滑り込ませて「別枠の情報」だと一目で分かるようにする
+        # ★上の方へ（頭の上）。1行1トピック（#241）：行頭にアクセント色のチェック、1行ずつ弾んで出る。
+        #   「※」で始まる行は条件の注記として小さく添える（景表法の打ち消し表示は消さない）
         n_card += 1
-        cy, ty = int(h * CARD_TOP_Y), int(h * CARD_TAG_Y)
-        # ★2行以上は1行目の位置を1行の札とそろえ、下へ伸ばす（#240）。中心で置くと上へも伸び、1行目が「POINT n」の小札に重なった（実測）
-        top = ''
-        if len(raw_lines) > 1:
-            cy, top = cy - fs // 2, '\\an8'
+        topics = [topic for topic in raw_lines if not topic.startswith('※')] or raw_lines[:1]
+        notes = [topic for topic in raw_lines if topic.startswith('※') and topic not in topics]
+        check_px = int(fs * CARD_CHECK)
+        check_gap = max(8, fs // 4)
+        line_h = int(fs * CARD_LINE_GAP)
+        y0, ty = int(h * CARD_TOP_Y), int(h * CARD_TAG_Y)
         lines.append('Dialogue: 2,%s,%s,CardTag,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)%s}POINT %d'
                      % (ass_time(start), ass_time(end), center_x, ty,
-                        ('\\3c%s' % accent) if accent else '', n_card))
-        # ★弾んで出る（#204・Remotion の spring の考え方を ASS の \\t で）。小さく→少し大きく→元の大きさ。効果音の「ポン」と同じ瞬間
-        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{%s\\pos(%d,%d)%s\\fscx30\\fscy30'
-                     '\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)}%s'
-                     % (ass_time(start), ass_time(end), top, center_x, cy, fit, text))
+                        ('\\1c%s' % accent) if accent else '', n_card))
+        for row, topic in enumerate(topics):
+            card_y = y0 + row * line_h
+            row_start = min(end, start + row * CARD_STAGGER)
+            text_w = int(len(topic) * fs * (measure_char_ratio(topic, font_name, font_dir) or ratio or CHAR_WIDTH_RATIO))
+            line_x = center_x - (check_px + check_gap + text_w) // 2
+            # ★弾んで出る（#204）。小さく→少し大きく→元の大きさ
+            pop = '\\fscx30\\fscy30\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)'
+            lines.append('Dialogue: 3,%s,%s,Card,,0,0,0,,{\\an5\\pos(%d,%d)%s\\bord4\\3c&H00FFFFFF&\\1c%s\\p1}%s{\\p0}'
+                         % (ass_time(row_start), ass_time(end), line_x + check_px // 2, card_y, pop, accent or '&H005C3BFF',
+                            check_shape(check_px)))
+            lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an4\\pos(%d,%d)\\fs%d%s}%s'
+                         % (ass_time(row_start), ass_time(end), line_x + check_px + check_gap, card_y, fs, pop, ass_escape(topic)))
+        if notes:
+            note_y = y0 + (len(topics) - 1) * line_h + int(fs * 0.5) + int(fs * CARD_NOTE_RATIO * 0.9)
+            lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an8\\pos(%d,%d)\\fs%d\\bord3\\fad(120,150)}%s'
+                         % (ass_time(start), ass_time(end), center_x, note_y, max(20, int(fs * CARD_NOTE_RATIO)),
+                            '\\N'.join(ass_escape(topic) for topic in notes)))
     """
     ★商品パネルの見出しとラベル。見出しはパネルの上に大きく（参考の「全色OK」）、
       ラベルは各画像の下に Card の箱で。画像そのものは panel_filter が重ねる。

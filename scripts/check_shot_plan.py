@@ -700,13 +700,29 @@ expect(any(c['text'] == 'コードレス\n軽量1.6kg' and c['cut_index'] == len
        'まとめの札が描画の依頼に載る（捨てない）')
 _wh = shot_plan.plan_long(dict(RR35, layout='long'))
 expect(not _wh['cuts'][-1].get('cards'), '前のカットで出した性能は最後に繰り返さない（#184）')
-# ★2行以上の札は上端そろえ（\\an8）で下へ伸ばす。中心で置くと1行目が「POINT n」の小札に重なった（#240・実測）
+# ★札（#241・オーナー「枠いらない」「おしゃれにまとめてトピック」）：枠なし・1行1トピック・行頭にチェック・※は注記
+import re as _re
 import render_video as _rv
-def _card_line(text):
-    a = _rv.build_ass([], 1080, 1920, 108, cards=[{'text': text, 'start': 0, 'end': 2}])
-    return next(l for l in a.split('\n') if ',Card,' in l)
-expect('\\an8' in _card_line('コードレス\n軽量1.6kg'), '2行の札は上端をそろえる')
-expect('\\an8' not in _card_line('強力吸引'), '1行の札は今までどおり（見た目を変えない）')
+def _events(text, caps=()):
+    a = _rv.build_ass(list(caps), 1080, 1920, 108, cards=[{'text': text, 'start': 0, 'end': 2}])
+    return [l for l in a.split('\n') if l.startswith('Dialogue:')]
+def _ys(evs, pat):
+    return [int(_re.search(r'\\pos\(\d+,(\d+)\)', l).group(1)) for l in evs if _re.search(pat, l)]
+_two = _events('コードレス\n軽量1.6kg')
+_txt = [l for l in _two if ',Card,' in l and '\\p1' not in l]
+expect(len(_txt) == 2 and len([l for l in _two if '\\p1' in l]) == 2, '2トピックは2行・行ごとにチェックの図形')
+_tag_y = _ys(_two, ',CardTag,')[0]
+_y = _ys(_txt, '')
+expect(_y[0] < _y[1] and _y[0] > _tag_y, '上から順に並び、POINT の小札に重ならない')
+expect(_y[0] == _ys([l for l in _events('強力吸引') if ',Card,' in l and '\\p1' not in l], '')[0], '1行目は1行の札と同じ高さ')
+_hook = _events('最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測')
+_note = [l for l in _hook if '※' in l]
+expect(len([l for l in _hook if '\\p1' in l]) == 1 and _note and '\\fs' in _note[0], '※の行はチェックを付けず小さな注記で残す（打ち消し表示を消さない）')
+expect('BorderStyle' not in _rv.build_ass_head(1080, 1920, 108, 'x') or ',1,%d,%d,5,' % (_rv.CARD_OUTLINE, _rv.CARD_SHADOW) in _rv.build_ass_head(1080, 1920, 108, 'x'),
+       '札は箱（BorderStyle 3）でなく縁取り＋影')
+# ★札を出しても字幕の高さは変わらない（試し描きで、札の行の変数が字幕の高さを上書きして字幕が上に出た）
+_cap = [l for l in _events('コードレス\n軽量1.6kg', [{'text': 'テスト', 'start': 0, 'end': 2}]) if ',Pop,' in l]
+expect(_cap and _ys(_cap, '')[0] == int(1920 * _rv.SAFE_AREAS['none']['caption_y']), '札があっても字幕は元の高さ')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
