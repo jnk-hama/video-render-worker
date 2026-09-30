@@ -376,6 +376,43 @@ def script_match(line, said, lang):
     return 1.0 if not a else difflib.SequenceMatcher(None, a, b).ratio()
 
 
+# ★★Whisper が無音・雑音に出す決まり文句（幻聴）。2026-09-30 RR35 本番で、声の無い静止画のカットに
+#   「ご視聴ありがとうございました」が起こされ、そのまま字幕に焼かれた（オーナー「途中に出してるのもおかしい」）
+HALLUCINATIONS = {
+    'ja': ('ご視聴ありがとうございました', 'ご視聴ありがとうございます', 'チャンネル登録',
+           'ご覧いただきありがとうございます', '最後までご覧'),
+    'en': ('thanks for watching', 'thank you for watching', 'subscribe to'),
+}
+
+
+def is_hallucination(said, lang):
+    n = _norm(said or '', lang)
+    return bool(n) and any(_norm(h, lang) in n for h in HALLUCINATIONS.get(lang, ()))
+
+
+# ★この一致度より下の喋りは、字幕にも声にも使わない（決定#238）。SCRIPT_MATCH_MIN と同じ値＝同じ量に2つ目の名前を付けない
+def bad_speech(parts, clips, lang):
+    """
+    字幕・声に使えないカット [(番号0始まり, 理由)]。台本（line）のあるカットだけ見る。
+    ・無音（静止画で埋めたカット） ・幻聴（決まり文句） ・台本と大きく違う（一致度 < SCRIPT_MATCH_MIN）
+    ★★2026-09-30 RR35 本番：検査は「一致度 0.69」「0.05」と見つけていたのに、止めない方針（#230）で
+      崩れた文字起こし（「ゴミ捨て不要不要タイタイル」）と幻聴をそのまま字幕に焼いた。見つけたら直す側へ回す
+    """
+    out = []
+    for i, ws in enumerate(parts):
+        line = (clips[i] if i < len(clips) else {}).get('line')
+        if not _norm(line or '', lang):
+            continue
+        said = part_text(ws, lang)
+        if not _norm(said, lang):
+            out.append((i, '声なし'))
+        elif is_hallucination(said, lang):
+            out.append((i, '幻聴「%s」' % said))
+        elif script_match(line, said, lang) < SCRIPT_MATCH_MIN:
+            out.append((i, '台本と大きく違う（一致度 %.2f）「%s」' % (script_match(line, said, lang), said)))
+    return out
+
+
 def check_speech(parts, clips, lang, forbid=None):
     """
     @return 問題のリスト（空なら合格）。各要素は人が読める1行。

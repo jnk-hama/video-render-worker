@@ -313,6 +313,23 @@ expect(len(cands) == speech_qa.POLITE_TRIES and cands[0] == 1.2 and all(x > y fo
 expect(not speech_qa.check_speech([speech_qa.strip_polite_end(W(('座っても', 0, .8), ('楽です', .8, 1.4)), 'ja')[0]],
                                   [{}], 'ja'), '切った後は喋りの検査を通る')
 
+print('=== 崩れた喋り・幻聴・無音は字幕にも声にも使わない（#238・RR35 本番 2026-09-30）===')
+_clips = [{'line': '最大約5か月、ゴミ捨て不要'}, {'line': '細かいゴミも、どんどん吸い込む'},
+          {'line': 'コードないからサッと使える、片手で持てる軽さガチで楽'}, {'line': 'ただ置くだけで、あとは勝手にやってくれる'},
+          {}]
+_parts = [W(('最大約5ヶ月ね', 0, 1), ('ゴミ捨て不要不要タイタイル', 1, 2.5)),   # 本番の実物（一致度 0.69）
+          W(('細かいゴミもね', 0, 1), ('どんどん吸い込む', 1, 2)),
+          W(('ご視聴ありがとうございました', 0, 2)),                         # 本番の実物（声の無い静止画に幻聴）
+          [],                                                              # 声なし
+          W(('なんでも', 0, 1))]                                           # 台本の無いカットは見ない
+_bad = dict(speech_qa.bad_speech(_parts, _clips, 'ja'))
+expect(0 in _bad and '台本と大きく違う' in _bad[0], '「ゴミ捨て不要不要タイタイル」（一致度 0.69）は使わない')
+expect(2 in _bad and '幻聴' in _bad[2], '「ご視聴ありがとうございました」は幻聴として使わない')
+expect(3 in _bad and '声なし' in _bad[3], '声の無いカットも台本の読み上げを当てる対象')
+expect(1 not in _bad and 4 not in _bad, '台本どおりの喋り（「ね」入りでも一致度が高い）と台本の無いカットはそのまま')
+expect(speech_qa.is_hallucination('チャンネル登録お願いします', 'ja') and not speech_qa.is_hallucination('どんどん吸い込む', 'ja'),
+       '幻聴の決まり文句だけを拾う')
+
 print()
 if fails:
     print('不合格 %d 件' % len(fails))

@@ -299,6 +299,12 @@ def plan(product):
             cuts[-1]['card'] = '・'.join(rest[:2])
         if product.get('image_url'):
             panel = {'cut_index': len(cuts) - 1, 'images': [product['image_url']], 'cutout': False}
+    # ★★掃除機を手に持つ絵（holding）も握り方を見る（2026-09-30 RR35 本番：軽量1.6kg のカットで黒いパイプを握っていた・
+    #   オーナー「静止画の説明も変」）。掃除機（category=cleaning）の回だけ。持っていない絵（station・selfie）は見ない
+    if product.get('category') == 'cleaning':
+        for c in cuts:
+            if c['still'] == 'holding' and not c.get('grip_parts'):
+                c['grip_parts'] = list(STICK_PARTS)
     for c in cuts:  # ★握る部分を埋める（#235）。{handle} のまま外へ出さない
         c['action'] = with_handle(c['action'], product.get('handle'))
         if c.get('grip_parts'):

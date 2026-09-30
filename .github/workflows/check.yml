@@ -26,6 +26,7 @@ on:
       - "scripts/check_tts_prosody.py"
       - "scripts/speech_qa.py"
       - "scripts/check_speech_qa.py"
+      - "scripts/check_speak_line.py"
       - "scripts/expand_hooks.py"
       - "scripts/check_expand_hooks.py"
       - "scripts/shot_plan.py"
@@ -125,6 +126,11 @@ jobs:
       - name: ナレーションの抑揚（繋いだ後の時刻がずれないこと）
         working-directory: .
         run: python3 scripts/check_tts_prosody.py
+
+      # ★★2026-09-30 追加（決定#238）。崩れた喋り・幻聴・無音のカットを、台本の読み上げへ差し替える口
+      - name: 台本の読み上げで声を差し替える（長さと字幕の時刻）
+        working-directory: .
+        run: python3 scripts/check_speak_line.py
 
       # ★★2026-09-29 追加（決定#225）。動画の品質検査（黒・固まり・無音・音量・大きさ）。
       #   欠陥を仕込んだ動画を ffmpeg で作り、落とすべき物を落とすかを見る（止める側の例を必ず流す）。

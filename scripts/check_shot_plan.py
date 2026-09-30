@@ -478,6 +478,12 @@ expect(not any('{handle}' in (c['action'] + ''.join(c.get('grip_parts', []))) fo
        '{handle} のまま Veo や verify へ出さない')
 expect('like a bag handle' in shot_plan.STICK_GRIP and 'Every finger and the palm touch only {handle}' in shot_plan.STICK_GRIP,
        '絵の指示はオーナー OK の id99 を作った文（持ち手の真ん中を包む・他の部分に触れない）')
+_hc = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x", "category": "cleaning",
+    "handle": "the beige part of the handle", "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
+    "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
+expect(all(c.get('grip_parts', [None])[0] == 'the beige part of the handle' for c in _hc if c['still'] == 'holding')
+       and any(c['still'] == 'holding' for c in _hc) and not any(c.get('grip_parts') for c in _hc if c['still'] in ('station', 'selfie')),
+       '掃除機の回は手に持つ絵（holding）も握り方を見る（RR35 本番：黒いパイプを握っていた）。持っていない絵は見ない')
 print('=== 握り方の人間工学（#237・オーナー「判定システムにもっと柔軟性と人間工学の理解が必要」）===')
 _P = _gc['grip_parts']
 _E = lambda **kw: dict({'held_part': _P[0], 'grip': 'power', 'wrist': 'neutral', 'anatomy': 'normal'}, **kw)

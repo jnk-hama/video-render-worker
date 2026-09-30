@@ -647,6 +647,36 @@ def extract_part_audio(src, dest, start, duration, speed=1.0):
     return dest
 
 
+# ★台本を読み上げて差し替える時の声（決定#238）。日本語は部署Bの声（CLAUDE.md・ja-JP-NanamiNeural）
+FALLBACK_VOICE = {'ja': 'ja-JP-NanamiNeural'}
+# 読み上げがカットより長い時に速める上限（これ以上速いと聞き取れない）
+FALLBACK_MAX_TEMPO = 1.5
+
+
+def speak_line(line, dest, duration, market, voice=None, synth=None):
+    """
+    台本の1行を読み上げ、カットと同じ長さの音声（dest・44.1kHz ステレオ）にする（決定#238）。
+    @return 語の時刻 [{'text','start','end'}]（カットの頭を0とする）。作れなければ None
+    ★長ければ atempo で最大 FALLBACK_MAX_TEMPO 倍まで速め、余りは無音で埋める（長さは必ず duration）
+    """
+    try:
+        if synth is None:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            import tts as tts_mod
+            synth = tts_mod.synthesize
+        raw = dest + '.tts.mp3'
+        r = synth(line, raw, voice=voice or FALLBACK_VOICE.get(market))
+    except Exception as e:
+        log('  台本の読み上げを作れません: %s' % e)
+        return None
+    tempo = min(max((r.get('duration') or 0.0) / duration, 1.0), FALLBACK_MAX_TEMPO) if duration > 0 else 1.0
+    run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-i', r['path'],
+         '-af', ('atempo=%.3f,apad' % tempo) if tempo > 1.0 else 'apad', '-t', str(duration),
+         '-ar', '44100', '-ac', '2', '-c:a', 'pcm_s16le', dest])
+    return [dict(w, start=w['start'] / tempo, end=min(duration, w['end'] / tempo))
+            for w in (r.get('words') or []) if w['start'] / tempo < duration]
+
+
 def inset_filter(inset):
     """
     素材の上下左右を割合で切り落とす crop（決定#171）。
@@ -2409,6 +2439,33 @@ def main():
     ★尺はこの音声の長さで決まる（下の「映像が短い回に伸ばす」処理も、
       ここで決めた target_seconds を基準に動く）。
     """
+    """
+    ★★崩れた喋り・幻聴・声の無いカットは、繋ぐ前に台本の読み上げへ差し替える（決定#238）。
+      2026-09-30 RR35 本番：検査は台本との差（一致度 0.69・0.05）を見つけていたのに、止めない方針（#230）で
+      「ゴミ捨て不要不要タイタイル」「ご視聴ありがとうございました」を字幕に焼き、声もそのまま流した。
+      見つけた物は直してから描く。差し替えたことは ⚠ 注意 で LINE の確認欄へ出す（声が変わるのでオーナーが見る）
+    """
+    by_part, replaced = None, []
+    if clip_audio and captions_from_speech:
+        import speech_qa
+        eff0 = trans if (trans > 0 and len(parts) >= 2) else 0.0
+        wins0 = speech_qa.part_windows([probe_duration(p) or 0.0 for p in parts], eff0)
+        by_part = speech_qa.transcribe_parts(part_audio, wins0, market)
+        clips_spec = job.get('clips') or []
+        for k, why in speech_qa.bad_speech(by_part, clips_spec, market):
+            line = clips_spec[k]['line']
+            fixed = os.path.join(work, 'part_%02d_line.wav' % k)
+            words = speak_line(line, fixed, probe_duration(part_audio[k]) or 0.0, market,
+                               voice=job.get('fallback_voice'))
+            if words is None:
+                by_part[k] = []   # ★崩れた字幕を焼くより、字幕なし
+                replaced.append('カット%d: %s → 読み上げを作れず、字幕を外しました' % (k + 1, why))
+                continue
+            part_audio[k] = fixed
+            by_part[k] = [dict(w, start=w['start'] + wins0[k][0], end=w['end'] + wins0[k][0]) for w in words]
+            replaced.append('カット%d: %s → 声と字幕を台本の読み上げ「%s」に差し替え' % (k + 1, why, line))
+        for r_ in replaced:
+            log('⚠ 注意: ' + r_)
     if clip_audio:
         if len(part_audio) != len(parts):
             raise SystemExit('音声と映像のパート数が合いません（映像%d / 音声%d）'
@@ -2465,7 +2522,8 @@ def main():
             eff_trans = trans if (trans > 0 and len(parts) >= 2) else 0.0
             windows = speech_qa.part_windows(
                 [probe_duration(p) or 0.0 for p in parts], eff_trans)
-            by_part = speech_qa.transcribe_parts(part_audio, windows, market)
+            if by_part is None:
+                by_part = speech_qa.transcribe_parts(part_audio, windows, market)
             for i, ws in enumerate(by_part):
                 log('  カット%d の喋り: %s' % (i + 1, speech_qa.part_text(ws, market) or '（無音）'))
             captions = speech_qa.captions_from_words(by_part, market, tts_mod.group_words)
