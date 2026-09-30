@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-29T10:01:55+00:00",
+ "generated_at": "2026-09-30T09:53:37+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -76,64 +76,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wq2bph",
-    "title": "Japan has developed a drug that could regrow missing teeth by blocking USAG-1, a protein that inhibits tooth development. Phase I has been completed and Phase II trials are now being prepared",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wq2bph/japan_has_developed_a_drug_that_could_regrow/",
+    "id": "t3_1wti2jg",
+    "title": "Hungary to impose wealth tax on the richest people starting next year",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wti2jg/hungary_to_impose_wealth_tax_on_the_richest/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wp6gz3",
-    "title": "he might actually be the best",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wp6gz3/he_might_actually_be_the_best/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wprwvb",
+    "title": "Moose is all over the pages waiting for its turn.",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wprwvb/moose_is_all_over_the_pages_waiting_for_its_turn/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrh4ka",
-    "title": "After 6 years of failed attempts, a photographer finally captured this rare alignment of the Moon, a mountain, and a basilica.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wrh4ka/after_6_years_of_failed_attempts_a_photographer/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wr0fzf",
+    "title": "Scholarship Interview Prank (0:30)",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wr0fzf/scholarship_interview_prank_030/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqwevc",
-    "title": "A man in Mexico risks his life to save someone, then casually goes back to work",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wqwevc/a_man_in_mexico_risks_his_life_to_save_someone/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wowx9a",
+    "title": "He wanted to scare his grandmother, and he did.",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wowx9a/he_wanted_to_scare_his_grandmother_and_he_did/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wo9xo8",
-    "title": "Efficiency of some trade workers in USA",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wo9xo8/efficiency_of_some_trade_workers_in_usa/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wp8vni",
-    "title": "a starfish born square due to a birth defect",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wp8vni/a_starfish_born_square_due_to_a_birth_defect/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wrpa1r",
-    "title": "Earthquake frequencies affects buildings of different heights",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wrpa1r/earthquake_frequencies_affects_buildings_of/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wrb0c7",
+    "title": "It looks good though lol",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wrb0c7/it_looks_good_though_lol/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -177,55 +159,73 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wqouz9",
-    "title": "Succubus swimsuit reveal",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wqouz9/succubus_swimsuit_reveal/",
-    "subreddit": "animegifs",
+    "id": "t3_1wque0t",
+    "title": "A date with Hsin [Wuthering Waves]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1wque0t/a_date_with_hsin_wuthering_waves/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqve4z",
-    "title": "No more filler characters, bad pacing, and unnecessary padding! [BLEACH]",
-    "url": "https://www.reddit.com/r/anime/comments/1wqve4z/no_more_filler_characters_bad_pacing_and/",
-    "subreddit": "anime",
+    "id": "t3_1wqkat4",
+    "title": "Yor Forger, Spy x Family",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wqkat4/yor_forger_spy_x_family/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wq502q",
-    "title": "We still don't have the second season of the actual peak isekai.. (Isekai Ojisan)",
-    "url": "https://www.reddit.com/r/anime/comments/1wq502q/we_still_dont_have_the_second_season_of_the/",
-    "subreddit": "anime",
+    "id": "t3_1wpz7g5",
+    "title": "[DISC] Closet Girl - Oneshot",
+    "url": "https://www.reddit.com/r/manga/comments/1wpz7g5/disc_closet_girl_oneshot/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqd69j",
-    "title": "‘Frieren: Beyond Journey’s End’ 3rd Anniversary Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1wqd69j/frieren_beyond_journeys_end_3rd_anniversary_visual/",
-    "subreddit": "anime",
+    "id": "t3_1wozwnl",
+    "title": "[ART] A different reason - Mikoto-chan Doesn’t Want to Be Hated!",
+    "url": "https://www.reddit.com/r/manga/comments/1wozwnl/art_a_different_reason_mikotochan_doesnt_want_to/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wsakzt",
-    "title": "Voice Actress Asami Yaguchi has sadly passed away suddenly due to heart failure, Oricon reports. She was only 43 years old",
-    "url": "https://www.reddit.com/r/anime/comments/1wsakzt/voice_actress_asami_yaguchi_has_sadly_passed_away/",
-    "subreddit": "anime",
+    "id": "t3_1wr7olq",
+    "title": "[DISC] My Childhood Friend Is Always Down Whenever I Make a Move - Ch1",
+    "url": "https://www.reddit.com/r/manga/comments/1wr7olq/disc_my_childhood_friend_is_always_down_whenever/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrmf28",
-    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 14 discussion - FINAL",
-    "url": "https://www.reddit.com/r/anime/comments/1wrmf28/mushoku_tensei_jobless_reincarnation_season_3/",
-    "subreddit": "anime",
+    "id": "t3_1wp1l56",
+    "title": "AI generated content",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wp1l56/ai_generated_content/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wp3te8",
+    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 7",
+    "url": "https://www.reddit.com/r/manga/comments/1wp3te8/disc_the_story_of_a_girl_who_can_read_minds_ch_7/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wotx0v",
+    "title": "[DISC] Until you fill my canvas - Chapter 01",
+    "url": "https://www.reddit.com/r/manga/comments/1wotx0v/disc_until_you_fill_my_canvas_chapter_01/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": false,
     "source": "rss"
