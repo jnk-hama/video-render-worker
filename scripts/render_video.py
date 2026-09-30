@@ -1682,13 +1682,17 @@ def build_ass(captions, w, h, font_size, center=False,
         # ★上の方へ（頭の上）。横から滑り込ませて「別枠の情報」だと一目で分かるようにする
         n_card += 1
         cy, ty = int(h * CARD_TOP_Y), int(h * CARD_TAG_Y)
+        # ★2行以上は1行目の位置を1行の札とそろえ、下へ伸ばす（#240）。中心で置くと上へも伸び、1行目が「POINT n」の小札に重なった（実測）
+        top = ''
+        if len(raw_lines) > 1:
+            cy, top = cy - fs // 2, '\\an8'
         lines.append('Dialogue: 2,%s,%s,CardTag,,0,0,0,,{\\pos(%d,%d)\\fad(120,120)%s}POINT %d'
                      % (ass_time(start), ass_time(end), center_x, ty,
                         ('\\3c%s' % accent) if accent else '', n_card))
         # ★弾んで出る（#204・Remotion の spring の考え方を ASS の \\t で）。小さく→少し大きく→元の大きさ。効果音の「ポン」と同じ瞬間
-        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\pos(%d,%d)%s\\fscx30\\fscy30'
+        lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{%s\\pos(%d,%d)%s\\fscx30\\fscy30'
                      '\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)}%s'
-                     % (ass_time(start), ass_time(end), center_x, cy, fit, text))
+                     % (ass_time(start), ass_time(end), top, center_x, cy, fit, text))
     """
     ★商品パネルの見出しとラベル。見出しはパネルの上に大きく（参考の「全色OK」）、
       ラベルは各画像の下に Card の箱で。画像そのものは panel_filter が重ねる。

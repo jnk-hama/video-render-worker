@@ -690,6 +690,23 @@ def _dv(url, ms, demo=False):
 _vis, _sp = marie_video.issues_of(_dc, {'video_url': 'v1'}, _dv)
 expect(_dcalls == [True] and any('ゴミ' in v for v in _vis), '実演のカットは demo で照合し、吸い込めていなければ映像を使えない側へ')
 expect('slowly' not in _dc['action'] and 'steady stroke' in _dc['action'], '吸引のカットは「ゆっくり」と言わない（4秒で進まない）')
+# ★絵にしなかった性能は最後にトピックとしてまとめて出す（#240）。手に持つ絵をやめた RR35（オーナー「1で」）
+_nh = dict(RR35, layout='long', stills={k: v for k, v in RR35['stills'].items() if k != 'holding'})
+_nhp = shot_plan.plan_long(_nh)
+expect(not any(c['still'] == 'holding' for c in _nhp['cuts']), '手に持つ静止画が無ければ、そのカットは作らない')
+expect(_nhp['cuts'][-1].get('cards') == ['コードレス\n軽量1.6kg'], '作らなかったカットの性能は、最後のカットに1行1つで出す')
+_nhj = shot_plan.render_job(_nh, _nhp, ['u'] * len(_nhp['cuts']), 'preview/x.mp4')['job']
+expect(any(c['text'] == 'コードレス\n軽量1.6kg' and c['cut_index'] == len(_nhp['cuts']) - 1 for c in _nhj['info_cards']),
+       'まとめの札が描画の依頼に載る（捨てない）')
+_wh = shot_plan.plan_long(dict(RR35, layout='long'))
+expect(not _wh['cuts'][-1].get('cards'), '前のカットで出した性能は最後に繰り返さない（#184）')
+# ★2行以上の札は上端そろえ（\\an8）で下へ伸ばす。中心で置くと1行目が「POINT n」の小札に重なった（#240・実測）
+import render_video as _rv
+def _card_line(text):
+    a = _rv.build_ass([], 1080, 1920, 108, cards=[{'text': text, 'start': 0, 'end': 2}])
+    return next(l for l in a.split('\n') if ',Card,' in l)
+expect('\\an8' in _card_line('コードレス\n軽量1.6kg'), '2行の札は上端をそろえる')
+expect('\\an8' not in _card_line('強力吸引'), '1行の札は今までどおり（見た目を変えない）')
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
