@@ -48,17 +48,18 @@ ONE_HAND_POV = (" She is filming with the phone in her other hand, so exactly on
                 " turns around and no face ever appears.")
 PHONE_IN_HAND = ('selfie', 'mirror')   # 本人がスマホを持って撮る絵（作業に使える手は1本）
 
-# ★★掴む位置（オーナー「Id93 掃除機を掴む位置が違う」2026-09-30・#235）。スティック掃除機は上端のハンドルを握る。
-#   パイプ・本体・ダストカップを握らせない。絵の指示（STICK_GRIP）と、本番前の静止画の点検の問い（STICK_GRIP_CHECK）を
-#   同じ規則に置く（言い換えない）
-#   ★問いは実物で合わせた（2026-09-30）。「上端のハンドルを握っているか」だけだと、本体の下の黒い部分を握った id93 も
-#     1（合格）と答えた。「ハンドル**だけ**を持ち、本体・バッテリー・ダストカップ・パイプに触れていない」と聞くと
-#     id93=0（オーナーの目視 NG と一致）／id95=1／id94=1 になった
-STICK_GRIP = (" Her hand is wrapped around the handle grip at the very top of the vacuum, exactly where the handle is"
-              " in the product photo, and touches nothing else: never the pipe, the motor body, the battery pack"
-              " or the dust cup.")
-STICK_GRIP_CHECK = ("The hand holds the vacuum by its top handle only; the hand is not touching the motor body,"
-                    " the battery pack, the dust cup or the pipe.")
+# ★★掴む位置（オーナー「Id93 掃除機を掴む位置が違う」→「ベージュ部分を掴んで。あの場面はかばんのような持ち方で
+#   掃除するのが普通」2026-09-30・#235）。持ち手（RR35 ではベージュの部分）を、かばんの持ち手のように上から握る
+#   （手の甲が上・指は持ち手の下に回す）。本体・バッテリー・ダストカップ・パイプには触れない。
+#   絵の指示（STICK_GRIP）と、本番前の静止画の点検の問い（STICK_GRIP_CHECK）を同じ規則に置く（言い換えない）
+#   ★問いは実物で合わせた（2026-09-30・verify を実際に呼んだ）。大まかな問い（上端のハンドルを握っているか）は
+#     本体の下を握った id93 を通した。下の問いは id93=0・id95=0（どちらもオーナーの目視 NG）・id98=1（かばん持ち）
+STICK_GRIP = (" Her hand grips the top of the vacuum's handle, the light-coloured handle part in the product photo,"
+              " from above like the handle of a bag: back of the hand up, fingers curled under it. The hand touches"
+              " nothing else: never the motor body, the battery pack, the dust cup or the pipe. The vacuum keeps"
+              " exactly the shape and colours of the product photo.")
+STICK_GRIP_CHECK = ("The hand holds the vacuum handle like a bag handle, back of the hand on top and fingers curled"
+                    " under it; the hand is not touching the motor body, the battery pack, the dust cup or the pipe.")
 
 
 RULES = [
@@ -155,8 +156,8 @@ RULES = [
     #   説明文「強力吸引で細かい粉じんもどんどん吸い込みます」から。数値（Pa）は言わない（説明文自身が「使い方で異なる」と打ち消している）
     # ★手だけの静止画（cleaning_pov）を先に見る。顔の無い絵に「カメラを見る」を渡すと Veo が顔を足し、顔の判定で落ちる（#229）
     {'genres': ('gadget',), 'match': r'吸引|吸い込',
-     'still': {'cleaning_pov': "First-person view looking down: one hand in her sleeve pushes the stick vacuum slowly "
-                               "across the rug." + STICK_GRIP + " The floor head passes over scattered crumbs and dust, "
+     'still': {'cleaning_pov': "First-person view from her own eyes, looking down and forward; her body is not in the frame. "
+                               "One hand in her sleeve pushes the stick vacuum slowly across the rug." + STICK_GRIP + " The floor head passes over scattered crumbs and dust, "
                                "which disappear into it and leave a clean stripe behind." + ONE_HAND_POV,
                'cleaning': "She pushes the vacuum slowly across the rug." + STICK_GRIP + " The floor head passes over "
                            "scattered crumbs and dust, which disappear into it and leave a clean stripe behind. "
