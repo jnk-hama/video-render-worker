@@ -424,9 +424,12 @@ _pc2 = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "lay
     "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
     "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
 print('=== 本番の前の静止画の点検（#227 の自動化・#232）===')
-def _pf(cuts, hands, face, grip=lambda u, q: 1):
+_OKE = lambda u, parts: {'held_part': parts[0], 'grip': 'power', 'wrist': 'neutral', 'anatomy': 'normal'}
+
+
+def _pf(cuts, hands, face, ergo=_OKE):
     try:
-        _real_preflight(cuts, lambda u, q: (hands(u), grip(u, q) if q else None), face)
+        _real_preflight(cuts, lambda u, parts: (hands(u), ergo(u, parts) if parts else None), face)
         return None
     except SystemExit as e:
         return str(e)
@@ -462,39 +465,51 @@ expect(_rv['still']['cleaning_pov'].endswith(shot_plan.ONE_HAND_POV), '一人称
 expect('handle' in shot_plan.gendered(shot_plan.STICK_GRIP, 'hiro') and 'His hand' in shot_plan.gendered(shot_plan.STICK_GRIP, 'hiro'),
        'ヒロの回は掴む位置の文も男性に')
 _gc = next(c for c in _pc2 if c['still'] == 'cleaning_pov')
-expect(_gc.get('grip') == shot_plan.with_handle(shot_plan.STICK_GRIP_CHECK) and len(_gc['grip']) <= 200 and not any(ch in _gc['grip'] for ch in '"\n「」'),
-       '掃除のカットは掴む位置の問いを持つ（verify の must_show の制限内）')
-expect(all(w in shot_plan.STICK_GRIP_CHECK for w in ('{handle} itself', 'motor body', 'battery pack', 'dust cup', 'pipe')),
-       '問いは「持ち手そのもの」と握ってはいけない部分を名指しする（実測：オーナー OK の id99=1・id93=0）')
+expect(_gc.get('grip_parts') == [shot_plan.with_handle(x) for x in shot_plan.STICK_PARTS]
+       and 2 <= len(_gc['grip_parts']) <= 8 and all(len(x) <= 60 and not any(ch in x for ch in '"\n「」|') for x in _gc['grip_parts']),
+       '掃除のカットは握る所の選択肢を持つ（先頭が持ち手・verify の制限内）')
 _bg = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x",
     "handle": "the beige part of the handle", "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
     "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
 _bc = next(c for c in _bg if c['still'] == 'cleaning_pov')
-expect('the beige part of the handle' in _bc['action'] and 'the beige part of the handle' in _bc['grip'],
-       '商品ごとの握る部分（RR35＝ベージュ部分・オーナー）が絵の指示と点検の問いの両方に入る')
-expect(len(_bc['grip']) <= 200, 'RR35（ベージュ部分）の問いも verify の200文字以内')
-_lg = [dict(c, grip='x' * 201) if c['still'] == 'cleaning_pov' else c for c in _pc2]
-_e = _pf(_lg, _good_h, _good_f)
-expect(_e and '長すぎる' in _e, '200文字を超える掴む位置の問いは、判定できないまま通さず止める')
-expect(not any('{handle}' in (c['action'] + c.get('grip', '')) for c in _bg + _pc2),
+expect('the beige part of the handle' in _bc['action'] and _bc['grip_parts'][0] == 'the beige part of the handle',
+       '商品ごとの握る部分（RR35＝ベージュ部分・オーナー）が絵の指示と点検の正解の両方に入る')
+expect(not any('{handle}' in (c['action'] + ''.join(c.get('grip_parts', []))) for c in _bg + _pc2),
        '{handle} のまま Veo や verify へ出さない')
 expect('like a bag handle' in shot_plan.STICK_GRIP and 'Every finger and the palm touch only {handle}' in shot_plan.STICK_GRIP,
-       '絵の指示も同じ持ち方（オーナー「あの場面はかばんのような持ち方で掃除するのが普通」）')
+       '絵の指示はオーナー OK の id99 を作った文（持ち手の真ん中を包む・他の部分に触れない）')
+print('=== 握り方の人間工学（#237・オーナー「判定システムにもっと柔軟性と人間工学の理解が必要」）===')
+_P = _gc['grip_parts']
+_E = lambda **kw: dict({'held_part': _P[0], 'grip': 'power', 'wrist': 'neutral', 'anatomy': 'normal'}, **kw)
+expect(not marie_video.ergo_problem(_E(), _P), '持ち手を手のひらで包む（id99 の握り）は通す')
+expect(not marie_video.ergo_problem(_E(grip='hook'), _P), 'かばん持ち（上から提げる）も通す＝どちらの握りでもよい（柔軟性）')
+expect(any('握っている所' in w and 'the motor body' in w for w in marie_video.ergo_problem(_E(held_part='the motor body'), _P)),
+       '本体を握っていたら落とす（id93 の形）')
+expect(any('pinch' in w for w in marie_video.ergo_problem(_E(grip='pinch'), _P)),
+       '重い掃除機を指先でつまむ持ち方は落とす')
+expect(any('push' in w for w in marie_video.ergo_problem(_E(grip='push'), _P)), '手のひらで押すだけ（握っていない）は落とす')
+expect(any('手首' in w for w in marie_video.ergo_problem(_E(wrist='bent'), _P)), '手首が大きく曲がった持ち方は落とす')
+expect(any('手の形' in w for w in marie_video.ergo_problem(_E(anatomy='distorted'), _P)), '指の数・関節が崩れた手は落とす')
+expect(not marie_video.ergo_problem(dict.fromkeys(('held_part', 'grip', 'wrist', 'anatomy')), _P)
+       and not marie_video.ergo_problem(None, _P), '判定できなかった項目（None）では落とさない（手・顔と同じ扱い）')
 _asked = []
-_pf(_pc2, _good_h, _good_f, lambda u, q: _asked.append((u, q)) or 1)
-expect([q for u, q in _asked] == [shot_plan.with_handle(shot_plan.STICK_GRIP_CHECK)] and _isp(_asked[0][0]),
-       '問いは掃除の絵にだけ聞く（他の絵は手と顔だけ）')
-_e = _pf(_pc2, _good_h, _good_f, lambda u, q: 0)
-expect(_e and '掴む位置が違う' in _e and 'cleaning_pov' in _e and '費用なし' in _e,
-       'パイプや本体を握った掃除の静止画は Veo の前で止める（id93 の再発防止）')
-expect(_pf(_pc2, _good_h, _good_f, lambda u, q: None) is None, '判定できない時（None）は止めない（手・顔と同じ扱い）')
+_pf(_pc2, _good_h, _good_f, lambda u, parts: _asked.append((u, parts)) or _OKE(u, parts))
+expect([p for u, p in _asked] == [tuple(_P)] and _isp(_asked[0][0]), '握り方は掃除の絵にだけ聞く（他の絵は手と顔だけ）')
+_e = _pf(_pc2, _good_h, _good_f, lambda u, parts: dict(_OKE(u, parts), held_part='the motor body'))
+expect(_e and '握っている所' in _e and 'cleaning_pov' in _e and '費用なし' in _e,
+       '本体を握った掃除の静止画は Veo の前で止める（id93 の再発防止）')
+_lg = [dict(c, grip_parts=['x' * 61, 'y']) if c['still'] == 'cleaning_pov' else c for c in _pc2]
+_e = _pf(_lg, _good_h, _good_f)
+expect(_e and '制限を超える' in _e, 'verify が断る長さの選択肢は、判定できないまま通さず止める')
 _n = []
-marie_video._req = lambda url, key, body: (_n.append(body) or 200, {'hands': 1, 'match': 0})
-expect(marie_video.still_look('b', 'k', 'u', 'Q') == (1, 0) and _n[-1]['must_show'] == 'Q',
-       '手の本数と問いの答えを1回の verify で取る（判定も有料）')
-expect(marie_video.still_look('b', 'k', 'u') == (1, None), '問いが無ければ答えは使わない')
+marie_video._req = lambda url, key, body: (_n.append(body) or 200,
+                                           {'hands': 1, 'held_part': 'P', 'grip': 'hook', 'wrist': 'neutral', 'anatomy': 'normal'})
+expect(marie_video.still_look('b', 'k', 'u', ('P', 'Q')) == (1, {'held_part': 'P', 'grip': 'hook', 'wrist': 'neutral', 'anatomy': 'normal'})
+       and _n[-1]['grip_parts'] == ['P', 'Q'] and _n[-1]['must_show'] == '',
+       '手の本数と握り方を1回の verify で取る（はい／いいえの問いは渡さない）')
+expect(marie_video.still_look('b', 'k', 'u') == (1, None) and 'grip_parts' not in _n[-1], '選択肢が無ければ握り方は聞かない')
 marie_video._req = lambda url, key, body: (502, {'error': 'x'})
-expect(marie_video.still_look('b', 'k', 'u', 'Q') == (None, None), '判定を呼べなければ (None, None)')
+expect(marie_video.still_look('b', 'k', 'u', ('P', 'Q')) == (None, None), '判定を呼べなければ (None, None)')
 marie_video._req = _orig_req
 _povc = next(c for c in _pc2 if marie_video.is_pov(c))
 _selc = next(c for c in _pc2 if c['still'] == 'selfie')
@@ -507,7 +522,7 @@ expect(not marie_video.issues_of(_povc, {'video_url': 'u'}, lambda u, m: (1, 'ok
        '手の本数が返らない照合（古い形）は判定しない')
 import inspect as _insp  # noqa: E402
 _ms = _insp.getsource(marie_video.main)
-expect("preflight_stills(plan['cuts'], lambda u, q: still_look(base, key, u, q), still_face(persona))" in _ms
+expect("preflight_stills(plan['cuts'], lambda u, parts: still_look(base, key, u, parts), still_face(persona))" in _ms
        and _ms.index('preflight_stills') < _ms.index('start_cut') and _ms.index('preflight_stills') < _ms.index('if dry:\n        return'),
        '本番も予行も、Veo を起動する前に静止画を全部点検する（予行＝#227 の点検）')
 

@@ -329,14 +329,47 @@ def choose(cut, tried, got, verify, lang='ja', face=None):
     return None, None, ['静止画だけ・声なし（%s）' % (last[0] if last else 'Veo を起動できず')]
 
 
-def still_look(base, key, url, ask=''):
-    """静止画を video-scene の verify（Gemini）で1回見る → (手の本数, 問いの答え 1/0)。
-    ask（掴む位置など・#235）が無ければ答えは None。見られなければ (None, None)。★1回の呼び出しで両方取る（判定も有料）"""
-    code, res = _req('%s/functions/v1/video-scene' % base, key, {'action': 'verify', 'image_url': url, 'must_show': ask})
+def still_look(base, key, url, parts=()):
+    """静止画を video-scene の verify（Gemini）で1回見る → (手の本数, 握り方 dict か None)。
+    parts（握る所の選択肢・先頭が正・#237）を渡すと、どこを・どう握っているかを選ばせる。見られなければ (None, None)。
+    ★1回の呼び出しで両方取る（判定も有料）"""
+    body = {'action': 'verify', 'image_url': url, 'must_show': ''}
+    if parts:
+        body['grip_parts'] = list(parts)
+    code, res = _req('%s/functions/v1/video-scene' % base, key, body)
     if code != 200:
         print('  静止画を判定できません（HTTP %s）: %s' % (code, json.dumps(res, ensure_ascii=False)[:200]))
         return None, None
-    return res.get('hands'), (res.get('match') if ask else None)
+    ergo = {k: res.get(k) for k in ('held_part', 'grip', 'wrist', 'anatomy')} if parts else None
+    return res.get('hands'), ergo
+
+
+# ★人間工学の規則（決定#237）。重い道具（掃除機 1.6kg）を片手で操るなら、手のひらで包む（power）か、
+#   かばんのように上から提げる（hook）。指先でつまむ（pinch）・手のひらで押すだけ（push）は落とす／持てない。
+#   手首が大きく曲がった持ち方は長く続かない（掃除機の持ち手の研究で、手首の曲げ＝不快の主因）。
+#   ★どちらの握りも通す＝柔軟性（オーナー OK の id99 は power、オーナーが普通と言ったかばん持ちは hook）
+# ★実物で合わせた（2026-09-30・RR35 の5枚）：オーナー OK の id99＝持ち手・power で通る。本体の下を握った id93＝held_part none で落ちる。
+#   持ち手の端を握った id95 / id98（オーナー NG）は持ち手・power と返り、通る＝細かい位置は見抜けない（目視で落とす）。
+#   hook と power の見分けは5枚とも power と返った（どちらも通すので合否には効かない）
+ERGO_GRIPS_OK = ('power', 'hook')
+
+
+def ergo_problem(ergo, parts):
+    """握り方の答えから、人間工学的におかしい所を返す（無ければ空）。判定できなかった項目（None）は見ない"""
+    if not ergo or not parts:
+        return []
+    out = []
+    if ergo.get('anatomy') == 'distorted':
+        out.append('手の形が崩れている（指の数・関節・物と溶け合う）')
+    held = ergo.get('held_part')
+    if held is not None and held != parts[0]:
+        out.append('握っている所が %s（%s を握るはず）' % (held, parts[0]))
+    grip = ergo.get('grip')
+    if grip is not None and grip not in ERGO_GRIPS_OK:
+        out.append('握り方が %s（重い道具は手のひらで包むか、かばんのように提げる）' % grip)
+    if ergo.get('wrist') == 'bent':
+        out.append('手首が不自然に曲がっている')
+    return out
 
 
 # ★本番の前の点検（#227 の自動化・#232）。顔の点がこれ未満の静止画は Veo に渡さない（暗い・小さい・横顔・寝転び・E-038）。
@@ -364,10 +397,10 @@ def preflight_stills(cuts, look, face):
       一人称：手は1本まで（片手はスマホ・#231）・顔が映っていない
       それ以外：顔が見つかり、点が PREFLIGHT_FACE_MIN 以上・手は2本まで
       全部：絵の問い（must_show）がその絵の規則の物（E-037）
-      掴む位置の問い（grip）がある絵：その通りに握っている（#235・オーナー「掃除機を掴む位置が違う」）
+      握る所の選択肢（grip_parts）がある絵：正しい所を、無理のない握り方で握っている（#235・#237 ergo_problem）
     ★静止画から作る動画も、差し替えに使う静止画もその絵になるので、描いてから気づいても直せない。直すのは静止画。
-    ★手と掴む位置は Gemini（verify）、顔は insightface（face_score）で見る。判定できない時（None）は判定しない。
-    look(url, ask) → (本数 か None, 問いの答え 1/0 か None)／face(url) → 点 か None（顔なし）
+    ★手と握り方は Gemini（verify）、顔は insightface（face_score）で見る。判定できない時（None）は判定しない。
+    look(url, parts) → (本数 か None, 握り方 dict か None)／face(url) → 点 か None（顔なし）
     """
     def owners(ms, who):
         """その絵の問いを持つ規則の静止画キー（紹介者の代名詞に直して比べる）"""
@@ -375,20 +408,18 @@ def preflight_stills(cuts, look, face):
                 for k in (r.get('still') or {})}
     bad, seen, faces = [], {}, {}
     for k, c in enumerate(cuts):
-        url, ask = c['still_url'], c.get('grip') or ''
-        if (url, ask) not in seen:
-            seen[(url, ask)] = look(url, ask)
+        url, parts = c['still_url'], tuple(c.get('grip_parts') or ())
+        if (url, parts) not in seen:
+            seen[(url, parts)] = look(url, parts)
         if url not in faces:
             faces[url] = face(url)
-        (n, grip_ok), f = seen[(url, ask)], faces[url]
+        (n, ergo), f = seen[(url, parts)], faces[url]
         pov = is_pov(c)
         print('  点検 カット%d（%s）: 手 %s／顔 %s%s' % (k + 1, c['still'], n, '—' if f is None else '%.3f' % f,
-                                                  '／掴む位置 %s' % grip_ok if ask else ''))
-        why = [hand_problem(n, pov)]
-        if ask and grip_ok == 0:
-            why.append('掴む位置が違う（%s）' % ask)
-        if len(ask) > 200:  # ★verify が断る長さ。判定できないまま通さない
-            why.append('掴む位置の問いが長すぎる（%d文字・200まで）。product の handle を短く' % len(ask))
+                                                  '／握り方 %s' % json.dumps(ergo, ensure_ascii=False) if parts else ''))
+        why = [hand_problem(n, pov)] + ergo_problem(ergo, parts)
+        if parts and (len(parts) > 8 or any(len(x) > 60 for x in parts)):  # ★verify が断る形。判定できないまま通さない
+            why.append('握る所の選択肢が verify の制限を超える（8個・各60文字まで）。product の handle を短く')
         if pov and f is not None:
             why.append('一人称の静止画に顔が映っている（%.2f）' % f)
         if not pov and f is None:
@@ -448,7 +479,7 @@ def main():
         print('静止画の点検: 鍵が無いので飛ばします（Actions の予行では必ず回る）')
         return
     base, key = _base_and_key()
-    preflight_stills(plan['cuts'], lambda u, q: still_look(base, key, u, q), still_face(persona))
+    preflight_stills(plan['cuts'], lambda u, parts: still_look(base, key, u, parts), still_face(persona))
     if dry:
         return
     reuse = product.get('reuse_ids')

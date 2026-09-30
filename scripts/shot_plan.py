@@ -51,7 +51,7 @@ PHONE_IN_HAND = ('selfie', 'mirror')   # 本人がスマホを持って撮る絵
 # ★★掴む位置（オーナー「Id93 掃除機を掴む位置が違う」→「ベージュ部分を掴んで。あの場面はかばんのような持ち方で
 #   掃除するのが普通」2026-09-30・#235）。持ち手（RR35 ではベージュの部分）を、かばんの持ち手のように上から握る
 #   （手の甲が上・指は持ち手の下に回す）。本体・バッテリー・ダストカップ・パイプには触れない。
-#   絵の指示（STICK_GRIP）と、本番前の静止画の点検の問い（STICK_GRIP_CHECK）を同じ規則に置く（言い換えない）
+#   絵の指示（STICK_GRIP）と、本番前の静止画の点検の部品名（STICK_PARTS）を同じ規則に置く（言い換えない）
 #   ★問いは実物で合わせた（2026-09-30・verify を実際に呼んだ）。オーナーの目視との比較：
 #     「かばん持ちか」→ オーナー OK の id99 を 0 にした（厳しすぎ）。「指が1本も黒に触れない」→ id99 を 0（同）。
 #     下の「持ち手そのものを握っているか」→ id99=1・id93=0（本体の下を握った）は一致。id98（持ち手の上端・境目）は 1＝見抜けない。
@@ -64,9 +64,9 @@ STICK_GRIP = (" Her hand is wrapped around the middle of {handle} like a bag han
               " curled under it. Every finger and the palm touch only {handle}: never the motor body, the battery"
               " pack, the dust cup, the pipe or any other part. The vacuum keeps exactly the shape and colours of"
               " the product photo.")
-# ★verify の must_show は200文字まで。超えると判定が呼べない（preflight_stills は長すぎる問いで止める）
-STICK_GRIP_CHECK = ("The hand is wrapped around {handle} itself, not around the motor body, the battery pack,"
-                    " the dust cup or the pipe.")
+# ★点検は「はい／いいえ」の1問にしない（決定#237）。はい／いいえは「はい」に寄り、言い回しで正しい絵も落とした。
+#   verify に部品名の選択肢を渡し、どこを・どう握っているかを選ばせる。先頭が握るべき所。合否は marie_video.ergo_problem
+STICK_PARTS = ("{handle}", "the motor body", "the battery pack", "the dust cup", "the pipe", "the floor head")
 
 
 def with_handle(text, handle=None):
@@ -174,7 +174,7 @@ RULES = [
                'cleaning': "She pushes the vacuum slowly across the rug." + STICK_GRIP + " The floor head passes over "
                            "scattered crumbs and dust, which disappear into it and leave a clean stripe behind. "
                            "She glances at the camera, impressed."},
-     'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True, 'grip': STICK_GRIP_CHECK,
+     'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True, 'grip_parts': STICK_PARTS,
      'must_show': 'The floor head passes over visible crumbs or dust on the floor and they disappear.'},
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
      'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
@@ -228,8 +228,8 @@ def _cut(role, rule, stills, feature, seconds):
         cut['must_say'] = rule['must_say']
     if rule.get('must_show'):
         cut['must_show'] = rule['must_show']  # 映っているべき物。出来た動画を video-scene の verify で照合する（#185）
-    if rule.get('grip'):
-        cut['grip'] = rule['grip']  # 静止画の掴む位置の問い。本番の前に verify で見る（#235）
+    if rule.get('grip_parts'):
+        cut['grip_parts'] = list(rule['grip_parts'])  # 握る所の選択肢（先頭が正）。本番の前に verify で見る（#235・#237）
     if rule.get('demo'):
         cut['demo'] = True  # 商品を使う所の絵。長回しでも一人称でも相乗りさせず単独のシーンに残す（#197・#229）
     return cut
@@ -301,8 +301,8 @@ def plan(product):
             panel = {'cut_index': len(cuts) - 1, 'images': [product['image_url']], 'cutout': False}
     for c in cuts:  # ★握る部分を埋める（#235）。{handle} のまま外へ出さない
         c['action'] = with_handle(c['action'], product.get('handle'))
-        if c.get('grip'):
-            c['grip'] = with_handle(c['grip'], product.get('handle'))
+        if c.get('grip_parts'):
+            c['grip_parts'] = [with_handle(x, product.get('handle')) for x in c['grip_parts']]
     return {'cuts': cuts, 'cards_only': cards_only, 'panel': panel}
 
 
