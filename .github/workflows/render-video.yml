@@ -664,6 +664,8 @@ jobs:
         run: |
           set -euo pipefail
           TAG="render-${JOB_ID}"
+          # ★投稿文（#244）も同じ Release に置く。GAS の「X投稿 <job_id>」が動画と一緒に取りに来る（jmas 決定#245）
+          python3 -c "import json;d=json.load(open('payload.json'));d=d.get('job') if isinstance(d.get('job'),dict) else d;json.dump(d.get('post_pack') or {},open('post.json','w'),ensure_ascii=False)"
           # ★GitHubの式展開を run の中で直接使わない（値に引用符や改行が
           #   入るとコマンドが壊れる／注入される）。env 経由で渡す。
           #   ※この注意書きに式の記法そのものを書くと、**コメントであっても
@@ -678,7 +680,7 @@ jobs:
           #   ★描き直しは**設計された動作**である。依頼側は「25分待っても
           #     動画が来なければ再依頼」する作りなので、混雑した回は必ずここを通る。
           #   タグがあれば資産だけ差し替える（--clobber）。
-          if gh release create "$TAG" out.mp4 \
+          if gh release create "$TAG" out.mp4 post.json \
                --title "$TAG" \
                --notes "bytes=$(stat -c%s out.mp4)" \
                --repo "$GH_REPO"; then
@@ -689,7 +691,7 @@ jobs:
             #   → 作り直して作成日時を今にする
             echo "Release が既にあるので、作り直します（古い作成日時のままだと片づけで消えるため）: $TAG"
             gh release delete "$TAG" --yes --cleanup-tag --repo "$GH_REPO" || true
-            gh release create "$TAG" out.mp4 --title "$TAG" --notes "bytes=$(stat -c%s out.mp4)" --repo "$GH_REPO"
+            gh release create "$TAG" out.mp4 post.json --title "$TAG" --notes "bytes=$(stat -c%s out.mp4)" --repo "$GH_REPO"
             echo "作り直し完了: $TAG"
           fi
 
