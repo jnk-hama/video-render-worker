@@ -583,28 +583,31 @@ def _run(start_ok, said_for, face_for):
         return _j0.load(open(oj))['job'], who
 
 
-# A. フックが2回とも別人の顔・喋りは正しい → 静止画を動かし、声はクリップから
+# A. フックが2回とも別人の顔 → 静止画で埋めず、フックのカットを外す（#246・オーナー「1シーン目の静止画いらない」）
 jA, wA = _run(lambda k, n: True, lambda k, n: tp[k]['line'], lambda k, n: '本人ではない顔' if k == 0 else None)
 expect(jA is not None, 'A: 顔が2回落ちても止めずに描画の依頼を作る')
-cA = jA['clips'][0] if jA else {}
-expect(cA.get('url') == tp[0]['still_url'] and cA.get('audio_url', '').startswith('u') and 'must_say' not in cA,
-       'A: 映像は承認済みの静止画、声は顔が落ちたクリップから（喋りは合っていた）')
-expect(jA and any('カット1' in n and '静止画' in n for n in jA['review']['notes']), 'A: 差し替えたことを LINE の承認依頼に書く')
+expect(jA and len(jA['clips']) == len(tp) - 1 and all(c['url'].startswith('u') for c in jA['clips']),
+       'A: 映像の使えないカットは外す・静止画では埋めない（#246）')
+expect(jA and any('カット1 を外しました' in n for n in jA['review']['notes']), 'A: 外したことを LINE の承認依頼に書く')
+expect(jA and jA['product_panel']['cut_index'] == len(jA['clips']) - 1, 'A: まとめは残った最後のカットに付く')
 # B. 吸引のカットが2回とも「ね」を足しすぎ → 映像も声もクリップを使い、問題を書く
 kB = next(k for k, c in enumerate(tp) if c['feature'] == '強力吸引')
 jB, wB = _run(lambda k, n: True, lambda k, n: 'ね、細かいゴミもね、どんどん吸い込むね' if k == kB else tp[k]['line'], lambda k, n: None)
 expect(jB and jB['clips'][kB]['url'].startswith('u') and jB['clips'][kB].get('must_say'),
        'B: 喋りだけの問題は、そのクリップをそのまま使う（検査も掛ける）')
 expect(jB and any('「ね」' in n for n in jB['review']['notes']), 'B: 喋りの問題を LINE に書く')
-# C. ステーションのカットは2回とも起動できない（429）→ 静止画だけ・声なし
+# C. ステーションのカットは2回とも起動できない（429）→ そのカットを外す
 kC = next(k for k, c in enumerate(tp) if c['still'] == 'station')
 jC, wC = _run(lambda k, n: k != kC, lambda k, n: tp[k]['line'], lambda k, n: None)
-expect(jC and jC['clips'][kC]['url'] == tp[kC]['still_url'] and 'audio_url' not in jC['clips'][kC],
-       'C: 起動できないカットは承認済みの静止画だけで埋める（止めない）')
-expect(jC and len(jC['clips']) == len(tp) and jC['review']['clip_ids'], 'C: 他のカットはそのまま・承認ボタン用の素材番号もある')
-# D. 全部起動できない（枠切れ）→ 静止画だけの動画でも依頼は作る
+expect(jC and len(jC['clips']) == len(tp) - 1 and tp[kC]['still_url'] not in [c['url'] for c in jC['clips']],
+       'C: 起動できないカットは外す（静止画で埋めない・#246）')
+expect(jC and jC['review']['clip_ids'], 'C: 承認ボタン用の素材番号もある')
+# C2. 台本と違うことを言ったカット → 別の声に替えず、外す（#246・オーナー「マリーじゃないのが喋ってる」）
+jC2, _w = _run(lambda k, n: True, lambda k, n: 'ご視聴ありがとうございました' if k == kB else tp[k]['line'], lambda k, n: None)
+expect(jC2 and len(jC2['clips']) == len(tp) - 1 and jC2['keep_voice'] is True, 'C2: 台本と違うカットは外し、声の差し替えはしない')
+# D. 全部起動できない（枠切れ）→ 静止画だけの動画は作らない
 jD, wD = _run(lambda k, n: False, lambda k, n: '', lambda k, n: None)
-expect(jD and all(c['url'] == tp[k]['still_url'] for k, c in enumerate(jD['clips'])), 'D: 全部起動できなくても止めない')
+expect(jD is None, 'D: 使える映像が1つも無ければ、静止画だけの動画は作らない（#246）')
 # E. 1回目が顔NG・作り直しで合格 → 合格の方を使い、問題は書かない
 jE, wE = _run(lambda k, n: True, lambda k, n: tp[k]['line'], lambda k, n: '顔NG' if (k == 0 and n == 1) else None)
 expect(jE and wE[int(jE['clips'][0]['url'][1:])] == (0, 2) and not jE.get('review', {}).get('notes'),
@@ -694,7 +697,11 @@ expect('slowly' not in _dc['action'] and 'steady stroke' in _dc['action'], '吸�
 _nh = dict(RR35, layout='long', stills={k: v for k, v in RR35['stills'].items() if k != 'holding'})
 _nhp = shot_plan.plan_long(_nh)
 expect(not any(c['still'] == 'holding' for c in _nhp['cuts']), '手に持つ静止画が無ければ、そのカットは作らない')
-expect(_nhp['panel'].get('topics') == RR35['features'][:shot_plan.CTA_TOPICS_MAX], '最後のパネルに性能を全部（上限まで）並べる')
+_shown = {t for c in _nhp['cuts'] for t in (c.get('cards') or [])}
+_tp = _nhp['panel'].get('topics') or []
+expect(len(_tp) == shot_plan.CTA_TOPICS_MAX and set(_tp) <= set(RR35['features']), '最後のまとめは3つまで（#246・5行では字が小さすぎた）')
+expect(all(t not in _shown for t in _tp[:len(set(RR35['features']) - _shown)]), 'まとめは前の札で見せていない性能を先に（#246）')
+expect(shot_plan.summary_topics(['a', 'b', 'c', 'd'], [{'cards': ['a']}, {'card': 'c'}]) == ['b', 'd', 'a'], 'カットを外したら、外したカットの性能がまとめへ回る（#246）')
 expect(not _nhp['cuts'][-1].get('cards'), 'まとめがあるので、最後の札で繰り返さない')
 _nhj = shot_plan.render_job(_nh, _nhp, ['u'] * len(_nhp['cuts']), 'preview/x.mp4')['job']
 expect(_nhj['product_panel'].get('topics') == _nhp['panel']['topics'], 'まとめが描画の依頼に載る（捨てない）')
@@ -731,6 +738,13 @@ _lx = _rv.panel_split(1080)[2]
 expect(all(int(_re.search(r'\\pos\((\d+),', l).group(1)) >= _lx for l in _pl), 'まとめは写真の右（写真に重ならない）')
 _ix, _iw, _lx2, _lw = _rv.panel_split(1080)
 expect(_ix + _iw < _lx2 and _lx2 + _lw <= 1080 - int(_rv.SAFE_AREAS['tiktok']['right']), '写真とまとめが並び、右のアイコン列を避ける')
+# ★まとめが見にくい（#246・オーナー「ラストシーンの説明の文字も見にくい」）：長いトピックは2行に割り、字を大きくする
+expect(_rv.wrap_topic('最大約4〜5か月ゴミ捨て不要') == ['最大約4〜5か月', 'ゴミ捨て不要'], '数字＋単位の後で割る')
+expect(_rv.wrap_topic('自動ゴミ回収ステーション') == ['自動ゴミ回収', 'ステーション'], 'カタカナの出入りで割る')
+expect(_rv.wrap_topic('スマホサイズ・220g') == ['スマホサイズ', '220g'] and _rv.wrap_topic('軽量1.6kg') == ['軽量1.6kg'], '「・」は行頭・行末に残さない・短い物は割らない')
+expect(not any(len(x) > 9 for t in RR35['features'] for x in _rv.wrap_topic(t.split('\n')[0])), 'RR35 の性能はどれも1行9字以内に収まる')
+_fs = [int(m) for m in _re.findall(r'\\fs(\d+)', ''.join(l for l in _pl if '\\p1' not in l and '※' not in l))]
+expect(_fs and min(_fs) >= 54, 'まとめの字は 54px 以上（#246 前は約34px）: %s' % sorted(set(_fs)))
 # ★投稿文（#244）：#PR が先頭・※はフックのすぐ下・#AI生成・X は長さに収める・リンクは楽天だけ
 _pp = _nhj['post_pack']
 expect(_pp['tiktok'].startswith('#PR ') and _pp['x'].startswith('#PR '), '投稿文は #PR から始まる（ステマ規制）')

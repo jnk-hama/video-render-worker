@@ -405,7 +405,12 @@ def panel_boxes(w, n):
 
 
 # ★まとめ付きのパネル（#242）：左に商品写真、右に性能のトピック。写真が占める幅の割合
-PANEL_TOPICS_IMG_SHARE = 0.40
+#   ★0.32（#246・オーナー「ラストシーンの説明の文字も見にくい」：0.40 では文字側が狭く、字が約34pxまで縮んだ）
+PANEL_TOPICS_IMG_SHARE = 0.32
+# ★まとめの1行の字数。これより長いトピックは2行に割る（#246・1行に詰めると一番長い行に合わせて全部が小さくなる）
+TOPIC_WRAP_CHARS = 8
+# まとめの行送り（字の大きさに対する倍率）
+TOPIC_LINE_GAP = 1.2
 # ★数字と単位はアクセント色で「見せる」（#242・参考「読ませるより見せる」）
 _NUM_RE = re.compile(r'[0-9０-９][0-9０-９.,．〜~\-]*\s*(?:kg|ｋｇ|g|か月|ヶ月|カ月|分|時間|秒|W|mAh|L|ml|mm|cm|%|％|倍|円|段階)?')
 
@@ -415,6 +420,22 @@ def panel_split(w):
     left, gap, full = panel_boxes(w, 1)
     img_w = int(full * PANEL_TOPICS_IMG_SHARE)
     return left, img_w, left + img_w + gap, full - img_w - gap
+
+
+def wrap_topic(topic, n=TOPIC_WRAP_CHARS):
+    """
+    まとめのトピックを1〜2行に割る（#246）。割る所は真ん中に一番近い「切れ目」：数字＋単位の後・カタカナの出入り・「・」の後。
+    数字の途中では割らない。切れ目が無ければ真ん中
+    """
+    t = topic.strip()
+    if len(t) <= n:
+        return [t]
+    inside = {i for m in _NUM_RE.finditer(t) for i in range(m.start() + 1, m.end())}
+    kata = [bool(re.match(r'[ァ-ヶー]', ch)) for ch in t]
+    ok = [i for i in range(2, len(t) - 1) if i not in inside
+          and (kata[i] != kata[i - 1] or t[i - 1] == '・' or any(m.end() == i for m in _NUM_RE.finditer(t)))]
+    at = min(ok, key=lambda i: abs(i - len(t) / 2.0)) if ok else len(t) // 2
+    return [t[:at].rstrip('・'), t[at:].lstrip('・')]
 
 
 def highlight_numbers(escaped, accent):
@@ -1782,31 +1803,41 @@ def build_ass(captions, w, h, font_size, center=False,
         for raw in panel['topics']:
             parts = [x for x in str(raw).split('\n') if x.strip()]
             if parts:
-                items.append((parts[0], [x for x in parts[1:] if x.startswith('※')]))
+                items.append((wrap_topic(parts[0]), [x for x in parts[1:] if x.startswith('※')]))
         if items and pe > ps:
             list_x, list_w = panel_split(w)[2:]
             band_top = int(h * PANEL_TOP)
-            row_h = int(h * (PANEL_BOTTOM - PANEL_TOP)) // len(items)
-            tfs = card_font_size([it[0] for it in items], card_fs, ratio,
+            # ★行の高さは行数に比例して配る（2行のトピックに2倍・※は0.6）。均等割りだと1行の物の余白が空き、2行の物が詰まる
+            units = [len(ls) + 0.6 * len(ns) for ls, ns in items]
+            unit_h = int(h * (PANEL_BOTTOM - PANEL_TOP)) / (sum(units) + 0.4 * len(items))
+            tfs = card_font_size([l for ls, _n in items for l in ls], card_fs, ratio,
                                  list_w - int(card_fs * (CARD_CHECK + 0.25)) - 2 * CARD_OUTLINE,
                                  measure=lambda t: measure_char_ratio(t, font_name, font_dir))
-            tfs = min(tfs, int(row_h * 0.55))
+            tfs = min(tfs, int(unit_h / TOPIC_LINE_GAP))
             check_px, check_gap = int(tfs * CARD_CHECK), max(6, tfs // 4)
             pop = '\\fscx30\\fscy30\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)'
-            for row, (topic, notes) in enumerate(items):
-                row_y = band_top + row_h * row + row_h // 2 - (int(tfs * 0.3) if notes else 0)
+            row_top = band_top
+            for row, ((topic_lines, notes), u) in enumerate(zip(items, units)):
+                row_h = unit_h * (u + 0.4)
+                text_h = tfs * TOPIC_LINE_GAP * len(topic_lines)
+                note_px = max(NOTE_MIN_PX, int(tfs * 0.6))
+                block_h = text_h + (note_px * 1.3 * len(notes))
+                text_top = int(row_top + (row_h - block_h) / 2)
                 row_start = min(pe, ps + PANEL_FADE + row * CARD_STAGGER)
                 lines.append('Dialogue: 3,%s,%s,Card,,0,0,0,,{\\an5\\pos(%d,%d)%s\\bord3\\3c&H00FFFFFF&\\1c%s\\p1}%s{\\p0}'
-                             % (ass_time(row_start), ass_time(pe), list_x + check_px // 2, row_y, pop, acc,
-                                check_shape(check_px)))
-                lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an4\\pos(%d,%d)\\fs%d%s}%s'
-                             % (ass_time(row_start), ass_time(pe), list_x + check_px + check_gap, row_y, tfs, pop,
-                                highlight_numbers(ass_escape(topic), acc)))
+                             % (ass_time(row_start), ass_time(pe), list_x + check_px // 2,
+                                text_top + int(tfs * TOPIC_LINE_GAP / 2), pop, acc, check_shape(check_px)))
+                for li, tl in enumerate(topic_lines):
+                    lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an4\\pos(%d,%d)\\fs%d%s}%s'
+                                 % (ass_time(row_start), ass_time(pe), list_x + check_px + check_gap,
+                                    text_top + int(tfs * TOPIC_LINE_GAP * (li + 0.5)), tfs, pop,
+                                    highlight_numbers(ass_escape(tl), acc)))
                 if notes:
                     lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an7\\pos(%d,%d)\\fs%d\\bord3\\fad(120,150)}%s'
                                  % (ass_time(row_start), ass_time(pe), list_x + check_px + check_gap,
-                                    row_y + int(tfs * 0.62), max(NOTE_MIN_PX, int(tfs * 0.6)),
+                                    text_top + int(text_h + note_px * 0.15), note_px,
                                     '\\N'.join(ass_escape(x) for x in notes)))
+                row_top += row_h
     for c in captions:
         text = ass_escape(c.get('text', ''))
         if not text:
@@ -2550,6 +2581,11 @@ def main():
         clips_spec = job.get('clips') or []
         for k, why in speech_qa.bad_speech(by_part, clips_spec, market):
             line = clips_spec[k]['line']
+            if job.get('keep_voice'):
+                # ★マリーの声は別の声に替えない（#246・オーナー「マリーじゃないのが喋ってる」）。崩れた字幕だけ外す
+                by_part[k] = []
+                replaced.append('カット%d: %s → 声はそのまま・字幕を外しました' % (k + 1, why))
+                continue
             fixed = os.path.join(work, 'part_%02d_line.wav' % k)
             words = speak_line(line, fixed, probe_duration(part_audio[k]) or 0.0, market,
                                voice=job.get('fallback_voice'))

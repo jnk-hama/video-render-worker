@@ -247,8 +247,18 @@ def _no_repeat(cuts):
     return out
 
 
-# 最後のカットのまとめに並べる性能の数（#242）。商品写真の右の帯（PANEL_TOP〜PANEL_BOTTOM）に1行ずつ入る数
-CTA_TOPICS_MAX = 5
+# 最後のカットのまとめに並べる性能の数。★3つまで（#246・オーナー「ラストシーンの説明の文字も見にくい」：5行では字が小さすぎた）
+CTA_TOPICS_MAX = 3
+
+
+def summary_topics(features, cuts):
+    """
+    まとめに出す性能（#242・#246）。★前のカットの札で見せていない物を先に、残りは features の順で、3つまで。
+    カットを外した回（#246）は、外したカットの性能がここへ回る
+    """
+    shown = {t for c in cuts for t in (c.get('cards') or ([c['card']] if c.get('card') else []))}
+    rest = [f for f in features if f not in shown]
+    return (rest + [f for f in features if f in shown])[:CTA_TOPICS_MAX]
 
 
 def plan(product):
@@ -309,7 +319,7 @@ def plan(product):
             #   他の人が作ったアフィリエイト動画も参考に」）。絵にしなかった性能も含め、全部を1行1つで並べる（#240 の札はこれに置き換えた）。
             #   ★まとめなので前のカードと重なってよい（#184 は服のサイズを最後に繰り返した件）。色展開を出す回（panel_bits）は従来どおり
             if not panel_bits:
-                panel['topics'] = features[:CTA_TOPICS_MAX]
+                panel['topics'] = summary_topics(features, cuts)
     # ★★掃除機を手に持つ絵（holding）も握り方を見る（2026-09-30 RR35 本番：軽量1.6kg のカットで黒いパイプを握っていた・
     #   オーナー「静止画の説明も変」）。掃除機（category=cleaning）の回だけ。持っていない絵（station・selfie）は見ない
     if product.get('category') == 'cleaning':
@@ -515,6 +525,7 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
         'clip_audio': True, 'captions_from_speech': True, 'transition_seconds': 0,
         'speech_speed': SPEECH_SPEED,
         'auto_trim_polite': True,  # ★Veo が足す言い終わりの「です」を描画側で切る（#189）
+        'keep_voice': True,  # ★崩れた喋りを読み上げの別の声に替えない（#246・オーナー「マリーじゃないのが喋ってる」）
         # ★検査は止めずに記録する（#230・オーナー「停止という概念がおかしい」）。見つけた問題は LINE の承認依頼に書き、
         #   オーナーが見て承認か作り直しを選ぶ（#191）。block を付けた依頼だけ従来どおり止める
         'quality_gate': product.get('quality_gate') or 'warn',

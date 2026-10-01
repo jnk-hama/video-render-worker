@@ -352,6 +352,38 @@ def choose(cut, tried, got, verify, lang='ja', face=None):
     return None, None, ['静止画だけ・声なし（%s）' % (last[0] if last else 'Veo を起動できず')]
 
 
+# ★外すカットの喋りの問題（#246）。別の声に替えない（keep_voice）ので、台本と違うことを言ったカットは使わない。
+#   「ね」の足しすぎ・言い終わりの丁寧語は軽い（描画が切る・#189）ので残す
+SEVERE_SPEECH = ('台本と大きく違う', 'と言っていない', '言い淀み')
+# 外した後に残すカットの下限。これ未満なら喋りの問題があるカットも戻す（静止画では埋めない）
+MIN_KEEP_CUTS = 2
+
+
+def keep_cuts(plan, picks, features):
+    """
+    描画に使うカットを選ぶ（#246・オーナー「1シーン目の静止画いらない」「マリーじゃないのが喋ってる」）。
+    ★静止画で埋めない（#230 の埋め方をやめる）：映像の無いカットと、台本と違うことを言ったカットを外す。
+      外したカットの性能は最後のまとめへ回す（summary_topics）。パネルは残った最後のカットへ付け直す
+    @return (計画, picks, 外したカットの説明)。1つも残らなければ SystemExit
+    """
+    def severe(ns):
+        return any(w in n for n in ns for w in SEVERE_SPEECH)
+    keep = [k for k, (v, _a, ns) in enumerate(picks) if v is not None and not severe(ns)]
+    if len(keep) < MIN_KEEP_CUTS:
+        keep = [k for k, (v, _a, _n) in enumerate(picks) if v is not None]
+    if not keep:
+        raise SystemExit('使える映像が1カットもありません（静止画では埋めない・#246）')
+    dropped = ['カット%d を外しました（%s）' % (k + 1, '・'.join(picks[k][2]) or '映像なし')
+               for k in range(len(picks)) if k not in keep]
+    cuts = [plan['cuts'][k] for k in keep]
+    out = dict(plan, cuts=cuts)
+    if plan.get('panel'):
+        out['panel'] = dict(plan['panel'], cut_index=len(cuts) - 1)
+        if 'topics' in plan['panel']:
+            out['panel']['topics'] = shot_plan.summary_topics(features, cuts)
+    return out, [picks[k] for k in keep], dropped
+
+
 def still_look(base, key, url, parts=()):
     """静止画を video-scene の verify（Gemini）で1回見る → (手の本数, 握り方 dict か None)。
     parts（握る所の選択肢・先頭が正・#237）を渡すと、どこを・どう握っているかを選ばせる。見られなければ (None, None)。
@@ -567,25 +599,19 @@ def main():
     #   それでも「悪い動画を出さない」は崩れない：出来た動画は必ずオーナーが LINE で見て承認してから使う（#068・#191）。
     #   問題はカットごとに LINE へ書く
     picks = [choose(c, tried[k], got, verify, face=face) for k, c in enumerate(plan['cuts'])]
-    notes = ['カット%d %s' % (k + 1, n) for k, (_v, _a, ns) in enumerate(picks) for n in ns]
+    plan, picks, dropped = keep_cuts(plan, picks, product['features'])
+    notes = dropped + ['カット%d %s' % (k + 1, n) for k, (_v, _a, ns) in enumerate(picks) for n in ns]
     for n in notes:
         print('★' + n)
     path = 'preview/marie-%s-auto.mp4' % re.sub(r'[^a-z0-9-]', '-', product['product_key'].lower())
-    urls = [got[v]['video_url'] if v is not None else plan['cuts'][k]['still_url'] for k, (v, _a, _n) in enumerate(picks)]
+    urls = [got[v]['video_url'] for v, _a, _n in picks]
     used = [i for v, a, _n in picks for i in (v, a) if i is not None]
     ids_for_review = list(dict.fromkeys(used)) or [i for t in tried for i in t if i is not None]
     job = shot_plan.render_job(product, plan, urls, path, clip_ids=ids_for_review)
-    for k, (v, a, _n) in enumerate(picks):
-        if v is None:
-            clip = job['job']['clips'][k]
-            clip.pop('must_say', None)  # 静止画のカットは喋りの検査に掛けない（喋っていないので必ず外れる）
-            if a is not None:
-                clip['audio_url'] = got[a]['video_url']
     if notes:
         job['job'].setdefault('review', {})['notes'] = notes
     json.dump(job, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False)
-    print('描画の依頼を作りました: %s（%d カット・静止画で埋めた %d）' % (
-        path, len(ids), sum(1 for v, _a, _n in picks if v is None)))
+    print('描画の依頼を作りました: %s（%d カット・外した %d）' % (path, len(picks), len(dropped)))
 
 
 if __name__ == '__main__':

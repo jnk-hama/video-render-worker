@@ -64,6 +64,9 @@ expect(src.index('speech_qa.bad_speech(by_part') < src.index("audio_path = os.pa
        and 'if by_part is None:' in src and "log('⚠ 注意: ' + r_)" in src,
        '差し替えは音声を繋ぐ前・字幕はその結果から作る・差し替えたことは ⚠ 注意 で LINE の確認欄へ')
 
+expect("if job.get('keep_voice'):" in src and src.index("if job.get('keep_voice'):") < src.index('words = speak_line(line, fixed'),
+       'keep_voice の依頼（マリー）は別の声に替えず、崩れた字幕だけ外す（#246）')
+
 print()
 if fails:
     print('不合格 %d 件' % len(fails))
