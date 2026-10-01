@@ -677,10 +677,9 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     }
     if plan_.get('panel'):
         job['product_panel'] = plan_['panel']
-    # ★高級感のある冒頭（#258）。CM 型は既定で付け、型は日ごとに替える（#259・「毎回その描写だと飽きる」）。
-    #   intro: false で外す・intro: '型の名前' で固定。商品は ASP の実画像
-    want = product.get('intro', plan_.get('layout') == 'cm')
-    if want and product.get('image_url'):
+    # ★高級感のある冒頭（#258）。**既定では付けない**（#260・オーナー「1つのSKILLとして置いておいて 毎回使用しないように 視聴者が飽きる」）。
+    #   付けるのは商品に intro: true（型は日替わり・#259）か intro: '型の名前' を書いた回だけ。いつ使うかは cm-creator スキル。商品は ASP の実画像
+    if product.get('intro') and product.get('image_url'):
         job['intro'] = {'image': product['image_url'], 'style': intro_style(product)}
     # ★最後のカット（CTA）で画面下を指す矢印を弾ませる（#204）。秒は描画側がカット番号から解く
     if cuts and cuts[-1]['role'] == 'cta':

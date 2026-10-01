@@ -816,14 +816,13 @@ _cm0 = shot_plan.plan_cm(dict(RR35, stills={'selfie': 's', 'cleaning_pov': 'c', 
 expect(any(c['still'] == 'station' for c in _cm0['cuts']), '手元の静止画が無ければ、今までの絵で作る（止めない）')
 # ★高級感のある冒頭（#258）：intro: true の回だけ、ASP の実画像で作る
 import datetime as _dt9
-_ij = shot_plan.render_job(_cmp, _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job']
-expect(_ij['intro']['image'] == _cmp['image_url'] and _ij['intro']['style'] in shot_plan.INTRO_STYLES, 'CM 型は冒頭を付ける・商品は実画像（#259）')
-expect('intro' not in shot_plan.render_job(dict(_cmp, intro=False), _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job'], 'intro: false で外せる')
+expect('intro' not in shot_plan.render_job(_cmp, _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job'], '冒頭は既定では付けない（#260・毎回だと飽きる）')
+_ij = shot_plan.render_job(dict(_cmp, intro=True), _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job']
+expect(_ij['intro']['image'] == _cmp['image_url'] and _ij['intro']['style'] in shot_plan.INTRO_STYLES, 'intro: true の回だけ付ける・型は日替わり・商品は実画像')
 expect(shot_plan.intro_style(dict(_cmp, intro='shine')) == 'shine', '型の名前で固定できる')
 _days = [shot_plan.intro_style(_cmp, _dt9.date(2026, 10, 1) + _dt9.timedelta(days=i)) for i in range(4)]
 expect(len(set(_days)) == 4 and all(a != b for a, b in zip(_days, _days[1:])), '冒頭の型は日ごとに替わり、4日で全部の型を使う: %s' % _days)
 expect(set(shot_plan.INTRO_STYLES) == set(_rv.INTRO_STYLES), '冒頭の型の名前が依頼側と描画側で揃っている')
-expect('intro' not in shot_plan.render_job(RR35, shot_plan.plan(RR35), ['u'] * 6, 'preview/x.mp4')['job'], 'CM 型でない回は付けない')
 import tempfile as _tf9, subprocess as _sp9
 with _tf9.TemporaryDirectory() as _d9:
     _png = os.path.join(_d9, 'p.png')
