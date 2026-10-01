@@ -645,6 +645,7 @@ jobs:
           body = {'action': 'notify_review', 'clip_ids': ids, 'notes': notes[:12],
                   'post_texts': {k: str(pack[k]) for k in ('tiktok', 'x') if pack.get(k)},
                   'title': str(d.get('product_key') or '')[:60],
+                  'job_id': str(d.get('job_id') or '')[:90],
                   'video_url': 'https://%s/storage/v1/object/public/%s/%s' % (host, up['bucket'], up['path'])}
           req = urllib.request.Request('https://%s/functions/v1/video-scene' % host, data=json.dumps(body).encode(),
                                        headers={'Authorization': 'Bearer ' + key, 'apikey': key,
