@@ -1,0 +1,55 @@
+name: send-review
+# ★保留した承認依頼を LINE へ送る（jmas E-040・#246）。render-video が hold の回に Storage へ置いた
+#   <動画のパス>.review.json をそのまま video-scene の notify_review へ渡す。描き直さないので、点検した動画と同じ物が届く
+on:
+  workflow_dispatch:
+    inputs:
+      upload_path:
+        description: '動画の Storage のパス（例: preview/marie-orage-rr35-auto.mp4）'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # ★公開リポジトリなので、URL・素材番号・返りの本文はログへ出さない（件数と状態だけ）
+      - name: 保留した承認依頼を送る
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          UPLOAD_PATH: ${{ inputs.upload_path }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, re, sys, urllib.error, urllib.request
+          path = os.environ.get('UPLOAD_PATH') or ''
+          if not re.fullmatch(r'preview/marie-[a-z0-9-]{3,80}\.mp4', path):
+              sys.exit('upload_path の形が違います')
+          raw = re.sub(r'[^A-Za-z0-9:/._-]', '', os.environ.get('SUPABASE_URL') or '')
+          host = re.sub(r'^https?://', '', raw).split('/')[0]
+          host = host if '.' in host else host + '.supabase.co'
+          key = re.sub(r'[^A-Za-z0-9._-]', '', os.environ.get('SUPABASE_SERVICE_ROLE_KEY') or '')
+          if not host or not key:
+              sys.exit('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY がありません')
+          h = {'Authorization': 'Bearer ' + key, 'apikey': key}
+          try:
+              with urllib.request.urlopen(urllib.request.Request(
+                      'https://%s/storage/v1/object/videos/%s.review.json' % (host, path), headers=h), timeout=40) as r:
+                  body = json.loads(r.read().decode('utf-8'))
+          except urllib.error.HTTPError as e:
+              sys.exit('保留した承認依頼がありません（HTTP %d）' % e.code)
+          if body.get('action') != 'notify_review':
+              sys.exit('承認依頼の形ではありません')
+          req = urllib.request.Request('https://%s/functions/v1/video-scene' % host, data=json.dumps(body).encode(),
+                                       headers=dict(h, **{'Content-Type': 'application/json'}))
+          try:
+              with urllib.request.urlopen(req, timeout=40) as r:
+                  print('LINE へ承認依頼を送りました（HTTP %d・素材 %d 本）' % (r.status, len(body.get('clip_ids') or [])))
+          except urllib.error.HTTPError as e:
+              sys.exit('送れません（HTTP %d）' % e.code)
+          PY

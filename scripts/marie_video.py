@@ -610,6 +610,9 @@ def main():
     job = shot_plan.render_job(product, plan, urls, path, clip_ids=ids_for_review)
     if notes:
         job['job'].setdefault('review', {})['notes'] = notes
+    if product.get('hold_review'):
+        # ★LINE へ送る前に完成動画を点検する（jmas E-040・#246）。送るのは点検した後の send-review.yml
+        job['job'].setdefault('review', {})['hold'] = True
     json.dump(job, open(out_path, 'w', encoding='utf-8'), ensure_ascii=False)
     print('描画の依頼を作りました: %s（%d カット・外した %d）' % (path, len(picks), len(dropped)))
 

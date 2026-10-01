@@ -647,6 +647,16 @@ jobs:
                   'title': str(d.get('product_key') or '')[:60],
                   'job_id': str(d.get('job_id') or '')[:90],
                   'video_url': 'https://%s/storage/v1/object/public/%s/%s' % (host, up['bucket'], up['path'])}
+          # ★保留（jmas E-040・#246）：完成動画を送る前に人の目線で点検する回は、承認依頼の本文を動画の隣（Storage）に置いて送らない。
+          #   点検して良ければ send-review.yml がそれを読んで送る（描き直さない＝点検した動画と同じ物が届く）
+          if (d.get('review') or {}).get('hold'):
+              hreq = urllib.request.Request('https://%s/storage/v1/object/%s/%s.review.json' % (host, up['bucket'], up['path']),
+                                            data=json.dumps(body, ensure_ascii=False).encode(), method='POST',
+                                            headers={'Authorization': 'Bearer ' + key, 'apikey': key, 'x-upsert': 'true',
+                                                     'Content-Type': 'application/json'})
+              with urllib.request.urlopen(hreq, timeout=40) as r:
+                  print('承認依頼を保留しました（HTTP %d）。点検後に send-review で送ります' % r.status)
+              sys.exit(0)
           req = urllib.request.Request('https://%s/functions/v1/video-scene' % host, data=json.dumps(body).encode(),
                                        headers={'Authorization': 'Bearer ' + key, 'apikey': key,
                                                 'Content-Type': 'application/json'})
