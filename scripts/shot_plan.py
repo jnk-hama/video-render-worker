@@ -165,7 +165,9 @@ RULES = [
                          "to the side so it comes into full view, sweeps her free hand toward it, then leans toward the camera "
                          "with a surprised, excited look and talks like she is telling a friend a secret."},
      # ★冒頭の大見出し（#250・バズる型）：声（最大約5か月）を繰り返さず、見る人を絞る3〜7語。数字は作らない
-     'hook_text': 'ゴミ捨てが面倒な人へ',
+     # ★問いかけの形（#251・vidIQ で伸びた日本の掃除動画は「洗濯機掃除してる？？」等の悩みの問いかけが多い）。
+     #   「〜やめた」は架空の体験談になるので使わない。？は画面の文字だけ（声では Veo が読み違える・#169）
+     'hook_text': 'ゴミ捨て、毎回めんどくない？',
      'line': '最大約5か月、ゴミ捨て不要', 'must_say': 'ゴミ捨て不要'},
     # ★オーナー「ゴミ捨てってではなく、ゴミ捨て不要で のほうがわかりやすい」（2026-09-27）。説明文の語をそのまま言わせる
     # ★★掃除機の肝は吸い込む所（オーナー「一番肝心な掃除機のパワーや吸い込み描写は絶対いる。何に使うかを考えて」）。

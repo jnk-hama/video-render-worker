@@ -767,9 +767,10 @@ expect('steps one pace' in _rr49[0]['action'] and 'lifts it a few centimetres' i
 expect('{handle}' not in ''.join(c['action'] for c in _rr49), '握る部分の差し込みが埋まっている')
 # ★冒頭の大見出し（#250・バズる型：最初の1〜2秒に、声を一段強める3〜7語）
 _hj = shot_plan.render_job(RR35, {'cuts': _rr49, 'cards_only': [], 'panel': None}, ['u'] * len(_rr49), 'preview/x.mp4')['job']['info_cards']
-expect(_hj[0] == {'text': 'ゴミ捨てが面倒な人へ', 'cut_index': 0, 'part': [0, 2], 'style': 'hook'} and _hj[1]['part'] == [1, 2] and '※' in _hj[1]['text'],
+expect(_hj[0] == {'text': 'ゴミ捨て、毎回めんどくない？', 'cut_index': 0, 'part': [0, 2], 'style': 'hook'} and _hj[1]['part'] == [1, 2] and '※' in _hj[1]['text'],
        '大見出しはフックの前半、性能の札（※の条件つき）は後半')
 expect(not any(ch.isdigit() for ch in _rr49[0]['hook_text']) and 'ゴミ捨て不要' not in _rr49[0]['hook_text'], '大見出しは数字を作らず、声を繰り返さない')
+expect('？' not in _rr49[0]['line'] and not any(w in _rr49[0]['hook_text'] for w in ('やめた', '使ってる', '買った')), '？は画面だけ・体験談の形（やめた等）にしない（#251）')
 _ha = _rv.build_ass([], 1080, 1920, 108, cards=[{'text': 'ゴミ捨てが面倒な人へ', 'start': 0, 'end': 1, 'style': 'hook'},
                                                {'text': '強力吸引', 'start': 1, 'end': 2}])
 expect('POINT 1' in _ha and 'POINT 2' not in _ha and _ha.count('\\p1') == 1, '大見出しには POINT もチェックも付けない（次の札が POINT 1）')
