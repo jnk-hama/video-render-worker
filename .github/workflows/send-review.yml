@@ -1,11 +1,11 @@
 name: send-review
 # ★保留した承認依頼を LINE へ送る（jmas E-040・#246）。render-video が hold の回に Storage へ置いた
-#   <動画のパス>.review.json をそのまま video-scene の notify_review へ渡す。描き直さないので、点検した動画と同じ物が届く
+#   Release render-<job_id> の review.json をそのまま video-scene の notify_review へ渡す。描き直さないので、点検した動画と同じ物が届く
 on:
   workflow_dispatch:
     inputs:
-      upload_path:
-        description: '動画の Storage のパス（例: preview/marie-orage-rr35-auto.mp4）'
+      job_id:
+        description: '描画の job_id（例: marie-orage-rr35-auto）'
         required: true
         type: string
 
@@ -22,14 +22,14 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          UPLOAD_PATH: ${{ inputs.upload_path }}
+          JOB_ID: ${{ inputs.job_id }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
           import json, os, re, sys, urllib.error, urllib.request
-          path = os.environ.get('UPLOAD_PATH') or ''
-          if not re.fullmatch(r'preview/marie-[a-z0-9-]{3,80}\.mp4', path):
-              sys.exit('upload_path の形が違います')
+          job = os.environ.get('JOB_ID') or ''
+          if not re.fullmatch(r'marie-[a-z0-9-]{3,80}', job):
+              sys.exit('job_id の形が違います')
           raw = re.sub(r'[^A-Za-z0-9:/._-]', '', os.environ.get('SUPABASE_URL') or '')
           host = re.sub(r'^https?://', '', raw).split('/')[0]
           host = host if '.' in host else host + '.supabase.co'
@@ -38,8 +38,8 @@ jobs:
               sys.exit('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY がありません')
           h = {'Authorization': 'Bearer ' + key, 'apikey': key}
           try:
-              with urllib.request.urlopen(urllib.request.Request(
-                      'https://%s/storage/v1/object/videos/%s.review.json' % (host, path), headers=h), timeout=40) as r:
+              with urllib.request.urlopen('https://github.com/%s/releases/download/render-%s/review.json'
+                                          % (os.environ['GITHUB_REPOSITORY'], job), timeout=40) as r:
                   body = json.loads(r.read().decode('utf-8'))
           except urllib.error.HTTPError as e:
               sys.exit('保留した承認依頼がありません（HTTP %d）' % e.code)

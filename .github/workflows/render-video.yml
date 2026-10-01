@@ -647,15 +647,12 @@ jobs:
                   'title': str(d.get('product_key') or '')[:60],
                   'job_id': str(d.get('job_id') or '')[:90],
                   'video_url': 'https://%s/storage/v1/object/public/%s/%s' % (host, up['bucket'], up['path'])}
-          # ★保留（jmas E-040・#246）：完成動画を送る前に人の目線で点検する回は、承認依頼の本文を動画の隣（Storage）に置いて送らない。
-          #   点検して良ければ send-review.yml がそれを読んで送る（描き直さない＝点検した動画と同じ物が届く）
+          # ★保留（jmas E-040・#246）：完成動画を送る前に人の目線で点検する回は、承認依頼の本文を Release（review.json・post.json の隣）に置いて送らない。
+          #   点検して良ければ send-review.yml がそれを読んで送る（描き直さない＝点検した動画と同じ物が届く）。
+          #   ★Storage の videos は動画しか受け付けない（JSON は HTTP 400・2026-10-01 実測）ので Release に置く
           if (d.get('review') or {}).get('hold'):
-              hreq = urllib.request.Request('https://%s/storage/v1/object/%s/%s.review.json' % (host, up['bucket'], up['path']),
-                                            data=json.dumps(body, ensure_ascii=False).encode(), method='POST',
-                                            headers={'Authorization': 'Bearer ' + key, 'apikey': key, 'x-upsert': 'true',
-                                                     'Content-Type': 'application/json'})
-              with urllib.request.urlopen(hreq, timeout=40) as r:
-                  print('承認依頼を保留しました（HTTP %d）。点検後に send-review で送ります' % r.status)
+              json.dump(body, open('review.json', 'w', encoding='utf-8'), ensure_ascii=False)
+              print('承認依頼を保留しました。点検後に send-review で送ります')
               sys.exit(0)
           req = urllib.request.Request('https://%s/functions/v1/video-scene' % host, data=json.dumps(body).encode(),
                                        headers={'Authorization': 'Bearer ' + key, 'apikey': key,
@@ -691,7 +688,9 @@ jobs:
           #   ★描き直しは**設計された動作**である。依頼側は「25分待っても
           #     動画が来なければ再依頼」する作りなので、混雑した回は必ずここを通る。
           #   タグがあれば資産だけ差し替える（--clobber）。
-          if gh release create "$TAG" out.mp4 post.json \
+          ASSETS="out.mp4 post.json"
+          [ -f review.json ] && ASSETS="$ASSETS review.json"   # 保留した承認依頼（#246）
+          if gh release create "$TAG" $ASSETS \
                --title "$TAG" \
                --notes "bytes=$(stat -c%s out.mp4)" \
                --repo "$GH_REPO"; then
@@ -702,7 +701,7 @@ jobs:
             #   → 作り直して作成日時を今にする
             echo "Release が既にあるので、作り直します（古い作成日時のままだと片づけで消えるため）: $TAG"
             gh release delete "$TAG" --yes --cleanup-tag --repo "$GH_REPO" || true
-            gh release create "$TAG" out.mp4 post.json --title "$TAG" --notes "bytes=$(stat -c%s out.mp4)" --repo "$GH_REPO"
+            gh release create "$TAG" $ASSETS --title "$TAG" --notes "bytes=$(stat -c%s out.mp4)" --repo "$GH_REPO"
             echo "作り直し完了: $TAG"
           fi
 
