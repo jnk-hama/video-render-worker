@@ -167,9 +167,10 @@ def demo_problem(d):
     if not d:
         return []
     out = []
-    if d.get('travel') in ('short', 'none'):
+    # ★short は通す（#247・大げさにしない＝往復で約30cm。最初と最後を比べる問いでは short と返る）
+    if d.get('travel') == 'none':
         out.append('実演でヘッドがほとんど動いていない（travel=%s）' % d['travel'])
-    if d.get('debris') in ('some_left', 'unchanged', 'no_debris'):
+    if d.get('debris') in ('unchanged', 'no_debris'):
         out.append('ゴミが吸い込まれて消えていない（debris=%s）' % d['debris'])
     return out
 

@@ -682,7 +682,8 @@ expect(_old['still'] == 'cleaning' and not marie_video.is_pov(_old), '顔の出�
 # ★実演（#239）：must_show が 1 でも、ヘッドが動かない・ゴミが残るなら映像は使えない（RR35 本番で 1 と通した実物）
 expect(not marie_video.demo_problem(None), '実演でないカットは見ない')
 expect(not marie_video.demo_problem({'travel': 'far', 'debris': 'gone'}), 'ヘッドが進み、通った所がきれいなら通す')
-expect(len(marie_video.demo_problem({'travel': 'short', 'debris': 'unchanged'})) == 2, 'RR35 本番（ほぼ動かず・全部残る）は2つとも落とす')
+expect(len(marie_video.demo_problem({'travel': 'none', 'debris': 'unchanged'})) == 2, '動かず・全部残るは2つとも落とす')
+expect(not marie_video.demo_problem({'travel': 'short', 'debris': 'some_left'}), '往復の普段の掃除（short・少し残る）は通す（#247・大げさにしない）')
 expect(marie_video.demo_problem({'travel': 'far', 'debris': 'no_debris'}), 'ゴミが最初から無いのは実演になっていない')
 expect(not marie_video.demo_problem({'travel': None, 'debris': None}), '選択肢の外（None）は判定しない')
 _dc = next(c for c in _rr['cuts'] if c.get('feature') == '強力吸引')
@@ -692,7 +693,8 @@ def _dv(url, ms, demo=False):
     return 1, 'The vacuum head moves over the crumbs, sucking them up.', _dc['line'], 1, {'travel': 'short', 'debris': 'unchanged'}
 _vis, _sp = marie_video.issues_of(_dc, {'video_url': 'v1'}, _dv)
 expect(_dcalls == [True] and any('ゴミ' in v for v in _vis), '実演のカットは demo で照合し、吸い込めていなければ映像を使えない側へ')
-expect('slowly' not in _dc['action'] and 'steady stroke' in _dc['action'], '吸引のカットは「ゆっくり」と言わない（4秒で進まない）')
+expect('slowly' not in _dc['action'] and 'normal pace' in _dc['action'], '吸引のカットは「ゆっくり」と言わない（4秒で進まない）')
+expect(not any(w in _dc['action'] for w in ('half a metre', 'clearly clean stripe', 'impressed')), '吸引は大げさにしない（#247・普段の掃除の量で言う）')
 # ★最後は「商品写真＋性能のまとめ」（#242）。手に持つ絵をやめた RR35（#240）でも、全部の性能が並ぶ
 _nh = dict(RR35, layout='long', stills={k: v for k, v in RR35['stills'].items() if k != 'holding'})
 _nhp = shot_plan.plan_long(_nh)

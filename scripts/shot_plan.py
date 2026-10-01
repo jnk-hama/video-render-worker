@@ -167,15 +167,17 @@ RULES = [
     # ★★掃除機の肝は吸い込む所（オーナー「一番肝心な掃除機のパワーや吸い込み描写は絶対いる。何に使うかを考えて」）。
     #   説明文「強力吸引で細かい粉じんもどんどん吸い込みます」から。数値（Pa）は言わない（説明文自身が「使い方で異なる」と打ち消している）
     # ★「slowly」をやめた（#239）。4秒でヘッドがほぼ動かず、パン屑が全部残った（RR35 本番・オーナー「吸い込みも悪そう」）
+    # ★★大げさにしない（#247・オーナー「吸い込みも描写もこんなくらいでいい 君のは大げさすぎ」・参考の TikTok）。
+    #   #239 の「一押しで50cm以上・はっきりした筋」をやめ、普段の掃除の量（往復・約30cm・少しのパン屑）で言う
     # ★手だけの静止画（cleaning_pov）を先に見る。顔の無い絵に「カメラを見る」を渡すと Veo が顔を足し、顔の判定で落ちる（#229）
     {'genres': ('gadget',), 'match': r'吸引|吸い込',
      'still': {'cleaning_pov': "First-person view from her own eyes, looking down and forward; her body is not in the frame. "
-                               "One hand in her sleeve pushes the stick vacuum forward across the rug in one long, steady stroke." + STICK_GRIP
-                               + " The floor head travels well over half a metre through scattered crumbs and dust, which vanish into it"
-                               " and leave a clearly clean stripe behind." + ONE_HAND_POV,
-               'cleaning': "She pushes the vacuum forward across the rug in one long, steady stroke." + STICK_GRIP + " The floor head travels "
-                           "well over half a metre through scattered crumbs and dust, which vanish into it and leave a clearly clean stripe behind. "
-                           "She glances at the camera, impressed."},
+                               "One hand in her sleeve moves the stick vacuum back and forth over the rug in a few relaxed strokes at a normal pace." + STICK_GRIP
+                               + " The floor head moves about 30 cm each way over a few small crumbs, which quietly disappear into it."
+                               + ONE_HAND_POV,
+               'cleaning': "She moves the vacuum back and forth over the rug in a few relaxed strokes at a normal pace." + STICK_GRIP + " The floor head "
+                           "moves about 30 cm each way over a few small crumbs, which quietly disappear into it. "
+                           "She glances at the camera with a small smile."},
      'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True, 'grip_parts': STICK_PARTS,
      'must_show': 'The floor head passes over visible crumbs or dust on the floor and they disappear.'},
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
