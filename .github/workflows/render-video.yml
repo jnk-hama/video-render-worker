@@ -200,7 +200,7 @@ jobs:
           #   要らないので、cutout:false と明示された回は重い依存を積まない。
           fg = d.get('foreground') or {}
           need_fg = bool(fg.get('url')) and fg.get('cutout') is not False
-          need = bool(d.get('product') or d.get('hold') or d.get('cutout') or d.get('product_panel')
+          need = bool(d.get('product') or d.get('hold') or d.get('cutout') or d.get('product_panel') or d.get('intro')
                       or need_fg)
           print('compose=%s' % ('true' if need else 'false'))
           PY

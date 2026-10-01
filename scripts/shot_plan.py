@@ -659,6 +659,9 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     }
     if plan_.get('panel'):
         job['product_panel'] = plan_['panel']
+    # ★高級感のある冒頭（#258・毎回ではない＝商品に intro: true を付けた回だけ）。商品は ASP の実画像
+    if product.get('intro') and product.get('image_url'):
+        job['intro'] = {'image': product['image_url']}
     # ★最後のカット（CTA）で画面下を指す矢印を弾ませる（#204）。秒は描画側がカット番号から解く
     if cuts and cuts[-1]['role'] == 'cta':
         job['cta_arrow'] = {'cut_index': len(cuts) - 1}

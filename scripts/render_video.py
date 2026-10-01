@@ -721,6 +721,52 @@ def speak_line(line, dest, duration, market, voice=None, synth=None):
             for w in (r.get('words') or []) if w['start'] / tempo < duration]
 
 
+# ★高級感のある冒頭（#258・オーナー「@harmony.ilife の1シーン目すごい高級感と作り込まれた感じ。毎回しなくてもいいが真似はしたい」）。
+#   参考：暗い中に光のラインが走り、掃除機の輪郭が浮かぶ。Veo は使わず ffmpeg で作る（0円・毎回同じ・商品は ASP の実画像＝#068）
+INTRO_SECONDS = 1.6
+INTRO_LINE_RGB = (127, 216, 255)   # 光のラインと商品のまわりの光（青白）
+INTRO_SFX = 'assets/shared/sfx/neon.mp3'
+
+
+def make_intro(png, dest, w, h, fps, seconds=INTRO_SECONDS, sfx=INTRO_SFX):
+    """
+    黒い背景・上から下へ走る光のライン・青白い光をまとって浮かぶ商品（透過 PNG）の冒頭を作る（音は効果音1つ）。
+    ★最初のコマから光のラインを出す（真っ黒のコマを作らない＝黒画面の検査に掛からない）
+    """
+    r, g, b = INTRO_LINE_RGB
+    ph = int(h * 0.62)
+    line_h = 48
+    fc = ';'.join([
+        '[1:v]scale=-1:%d,format=rgba,split[p][g]' % ph,
+        # 商品の形をぼかして青白く塗る＝まわりの光
+        '[g]colorchannelmixer=rr=0:rg=0:rb=0:gr=0:gg=0:gb=0:br=0:bg=0:bb=0:ra=0:ga=0:ba=0:aa=1,'
+        'lutrgb=r=%d:g=%d:b=%d,pad=iw+240:ih+240:120:120:color=black@0,gblur=sigma=45,colorchannelmixer=aa=2,'
+        'fade=t=in:st=0.15:d=0.9:alpha=1[glow]' % (r, g, b),
+        '[p]fade=t=in:st=0.35:d=0.8:alpha=1[pf]',
+        # 光のライン：縦にガウスで減衰する帯
+        'color=c=0x%02X%02X%02X:s=%dx%d:r=%d,format=rgba,geq=r=\'r(X,Y)\':g=\'g(X,Y)\':b=\'b(X,Y)\':'
+        'a=\'255*exp(-pow((Y-%d)/7,2))\'[line]' % (r, g, b, w, line_h, fps, line_h // 2),
+        '[0:v][glow]overlay=x=(W-w)/2:y=(H-h)/2:format=auto[a1]',
+        '[a1][pf]overlay=x=(W-w)/2:y=(H-h)/2:format=auto[a2]',
+        "[a2][line]overlay=x=0:y='min(t/%.3f,1)*H*1.08-%d':shortest=1:format=auto,format=yuv420p[v]"
+        % (seconds, line_h // 2),
+    ])
+    cmd = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
+           '-f', 'lavfi', '-i', 'color=c=black:s=%dx%d:r=%d:d=%.3f' % (w, h, fps, seconds),
+           '-loop', '1', '-t', '%.3f' % seconds, '-i', png]
+    if sfx and os.path.exists(sfx):
+        cmd += ['-i', sfx]
+        afc = '[2:a]atrim=0:%.3f,apad,atrim=0:%.3f,volume=0.6,aresample=44100,aformat=channel_layouts=stereo[a]' % (seconds, seconds)
+    else:
+        cmd += ['-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100']
+        afc = '[2:a]atrim=0:%.3f[a]' % seconds
+    cmd += ['-filter_complex', fc + ';' + afc, '-map', '[v]', '-map', '[a]', '-t', '%.3f' % seconds,
+            '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p', '-r', str(fps),
+            '-c:a', 'aac', '-b:a', '96k', '-ar', '44100', '-ac', '2', dest]
+    run(cmd)
+    return dest
+
+
 def drop_added_ne(by_part, clips):
     """
     字幕から、台本に無い「ね」を外す（#248・E-040：「置くだけでねあとは」）。声はそのまま（マリーの声を替えない・#246）。
@@ -3181,6 +3227,28 @@ def main():
     dur = probe_duration(args.out)
     if dur < 1.0:
         raise SystemExit('出力が短すぎます（%.2f秒）。' % dur)
+
+    # ★高級感のある冒頭を頭につなぐ（#258・依頼に intro がある回だけ）。作れなければ冒頭なしで出す（1つの部品の失敗で動画を落とさない）
+    intro = job.get('intro') or {}
+    if intro.get('image'):
+        try:
+            raw, ipng = os.path.join(work, 'intro_raw'), os.path.join(work, 'intro.png')
+            if download(str(intro['image']), raw, market=job.get('target_market')) and prepare_foreground(raw, ipng):
+                ivid = make_intro(ipng, os.path.join(work, 'intro.mp4'), w, h, fps,
+                                  float(intro.get('seconds') or INTRO_SECONDS))
+                tmp = args.out + '.intro.mp4'
+                run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-i', ivid, '-i', args.out,
+                     '-filter_complex', '[1:a]aresample=44100,aformat=channel_layouts=stereo[ma];'
+                     '[0:v][0:a][1:v][ma]concat=n=2:v=1:a=1[v][a]', '-map', '[v]', '-map', '[a]',
+                     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p',
+                     '-movflags', '+faststart', '-c:a', 'aac', '-b:a', '96k', tmp])
+                os.replace(tmp, args.out)
+                size, dur = os.path.getsize(args.out), probe_duration(args.out)
+                log('高級感のある冒頭をつなぎました（%.1f秒）' % float(intro.get('seconds') or INTRO_SECONDS))
+            else:
+                log('冒頭の商品画像を用意できないので、冒頭なしで出します')
+        except Exception as e:  # noqa: BLE001 — 冒頭は飾り。失敗しても本編は出す
+            log('冒頭を作れないので、冒頭なしで出します: %s' % str(e)[:200])
 
     """
     ★仕上げの音量（決定#177）。全モード共通。音声が無い回は何もしない。
