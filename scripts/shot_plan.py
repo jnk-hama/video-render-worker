@@ -432,6 +432,13 @@ def fit_shape(cuts, cards_only):
 #   Veo は1本＝1場面（最短4秒）なので、1機能1カット（4秒で作り、喋った所だけ使う）で 6〜7カット・約20秒にする。
 #   ★声は全カットでマリー本人（顔のカットは本人が、手元のカットは画面の外から喋る）。読み上げの別の声は使わない（#246）
 CM_CUTS_MAX = 7
+# ★CM の見た目を Veo へ毎回渡す（#256・オーナー「Gemini にも URL 渡して理解させて」→ Gemini は TikTok の URL を読めないので、
+#   vidIQ で分析した参考の見た目を言葉にして指示へ足す）。参考：明るく柔らかい自然光・整った部屋・商品が主役のアップ・ゆっくり滑らかなカメラ。
+#   ★顔のカットはカメラを動かさない（顔が動くと別人になる・#253）。吸い込みの量は #247 のまま（大げさにしない）
+CM_LOOK_POV = (" Shot like a polished TV commercial: bright, soft natural light, a clean modern room, a slow and smooth camera"
+               " move that stays close to the product, the product sharp and the background softly blurred.")
+CM_LOOK_FACE = " Lit like a polished TV commercial: bright, soft natural light and a clean modern room; the camera stays steady."
+
 CM_TAIL = 0.8          # 喋り終わりの後に残す秒（手元の動きを見せる分。長いとテンポが落ちる）
 JA_CHARS_PER_SEC = JA_CHARS_4S / CUT_SECONDS
 
@@ -446,6 +453,7 @@ def plan_cm(product):
         cards_only.append(cuts.pop(k).get('feature'))
     for c in cuts:
         c['min_keep'] = min(c['seconds'], round(len(c['line']) / JA_CHARS_PER_SEC + CM_TAIL, 2))
+        c['action'] += CM_LOOK_POV if is_pov_action(c['action']) else CM_LOOK_FACE
     panel = base.get('panel')
     if panel:
         panel = dict(panel, cut_index=len(cuts) - 1)

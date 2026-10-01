@@ -803,6 +803,8 @@ expect(_cmc[0]['still'] == 'selfie' and _cmc[-1]['still'] == 'selfie' and all(sh
        '顔はフックと最後だけ・機能は手元のアップ（顔なし）')
 expect(all(c['min_keep'] <= c['seconds'] for c in _cmc) and _cm['panel']['cut_index'] == len(_cmc) - 1, '喋った所＋少しだけ使う・まとめは最後のカット')
 expect(all(c.get('grip_parts') for c in _cmc if c['still'] in ('holding_pov', 'station_pov')), '手元で掃除機を持つ絵は握り方を点検する')
+expect(all(shot_plan.CM_LOOK_POV in c['action'] for c in _cmc[1:-1]) and shot_plan.CM_LOOK_FACE in _cmc[0]['action']
+       and 'camera move' not in _cmc[0]['action'], 'CM の見た目を Veo へ渡す（顔のカットはカメラを動かさない・#256）')
 _cmj = shot_plan.render_job(_cmp, _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job']
 expect([c['min_keep'] for c in _cmj['clips']] == [c['min_keep'] for c in _cmc], 'CM 型の min_keep が描画の依頼に載る')
 _cm0 = shot_plan.plan_cm(dict(RR35, stills={'selfie': 's', 'cleaning_pov': 'c', 'station': 't'}))
