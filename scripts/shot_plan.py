@@ -611,6 +611,24 @@ def post_pack(product, cuts):
     return {'tiktok': tiktok, 'x': x}
 
 
+# 冒頭の型（render_video.INTRO_STYLES と同じ名前。照合は check_shot_plan が見る）
+INTRO_STYLES = ('light_sweep', 'spotlight', 'shine', 'silhouette')
+
+
+def intro_style(product, day=None):
+    """
+    冒頭の型（#259）。intro に型の名前があればそれ。無ければ日ごとに順番に替える（同じ商品で前の日と同じ型にならない）。
+    商品ごとに出だしをずらす（同じ日の別の商品が同じ型に揃わない）。乱数は使わない（同じ日・同じ商品なら同じ型）
+    """
+    import datetime
+    import zlib
+    forced = product.get('intro')
+    if isinstance(forced, str) and forced in INTRO_STYLES:
+        return forced
+    day = day or datetime.date.today()
+    return INTRO_STYLES[(day.toordinal() + zlib.crc32(str(product.get('product_key') or '').encode())) % len(INTRO_STYLES)]
+
+
 def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     """描画の依頼（{"job":{...}}）を組む。clip_urls は cuts と同じ並び"""
     cuts = plan_['cuts']
@@ -659,9 +677,11 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     }
     if plan_.get('panel'):
         job['product_panel'] = plan_['panel']
-    # ★高級感のある冒頭（#258・毎回ではない＝商品に intro: true を付けた回だけ）。商品は ASP の実画像
-    if product.get('intro') and product.get('image_url'):
-        job['intro'] = {'image': product['image_url']}
+    # ★高級感のある冒頭（#258）。CM 型は既定で付け、型は日ごとに替える（#259・「毎回その描写だと飽きる」）。
+    #   intro: false で外す・intro: '型の名前' で固定。商品は ASP の実画像
+    want = product.get('intro', plan_.get('layout') == 'cm')
+    if want and product.get('image_url'):
+        job['intro'] = {'image': product['image_url'], 'style': intro_style(product)}
     # ★最後のカット（CTA）で画面下を指す矢印を弾ませる（#204）。秒は描画側がカット番号から解く
     if cuts and cuts[-1]['role'] == 'cta':
         job['cta_arrow'] = {'cut_index': len(cuts) - 1}

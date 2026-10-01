@@ -722,35 +722,94 @@ def speak_line(line, dest, duration, market, voice=None, synth=None):
 
 
 # ★高級感のある冒頭（#258・オーナー「@harmony.ilife の1シーン目すごい高級感と作り込まれた感じ。毎回しなくてもいいが真似はしたい」）。
-#   参考：暗い中に光のラインが走り、掃除機の輪郭が浮かぶ。Veo は使わず ffmpeg で作る（0円・毎回同じ・商品は ASP の実画像＝#068）
+#   Veo は使わず ffmpeg で作る（0円・毎回同じ品質・商品は ASP の実画像＝#068）。
+# ★型を4つ持ち、回ごとに替える（#259・オーナー「毎回その描写だと飽きるから変化していって欲しい」）。選ぶのは依頼側（shot_plan.intro_style）
 INTRO_SECONDS = 1.6
-INTRO_LINE_RGB = (127, 216, 255)   # 光のラインと商品のまわりの光（青白）
-INTRO_SFX = 'assets/shared/sfx/neon.mp3'
+INTRO_STYLES = {
+    # 型: (光の色 RGB, 効果音)
+    'light_sweep': ((127, 216, 255), 'assets/shared/sfx/neon.mp3'),   # 暗い中を青白い光のラインが走り、商品が光をまとう（参考そのもの）
+    'spotlight':   ((255, 214, 160), 'assets/shared/sfx/chord.mp3'),  # 暗い舞台に暖かいスポットライトが灯り、商品がせり上がる
+    'shine':       ((255, 255, 255), 'assets/shared/sfx/clean.mp3'),  # 映画の黒帯が開き、商品の上を斜めの光がすべる
+    'silhouette':  ((255, 255, 255), 'assets/shared/sfx/boom.mp3'),   # 逆光の黒い影が、縁の光から色づいて現れる
+}
 
 
-def make_intro(png, dest, w, h, fps, seconds=INTRO_SECONDS, sfx=INTRO_SFX):
-    """
-    黒い背景・上から下へ走る光のライン・青白い光をまとって浮かぶ商品（透過 PNG）の冒頭を作る（音は効果音1つ）。
-    ★最初のコマから光のラインを出す（真っ黒のコマを作らない＝黒画面の検査に掛からない）
-    """
-    r, g, b = INTRO_LINE_RGB
+def _glow(label_in, label_out, rgb, sigma, start, dur):
+    """商品の形をぼかして光の色に塗る（まわりの光）"""
+    r, g, b = rgb
+    return ('[%s]colorchannelmixer=rr=0:rg=0:rb=0:gr=0:gg=0:gb=0:br=0:bg=0:bb=0:ra=0:ga=0:ba=0:aa=1,'
+            'lutrgb=r=%d:g=%d:b=%d,pad=iw+240:ih+240:120:120:color=black@0,gblur=sigma=%d,colorchannelmixer=aa=2,'
+            'fade=t=in:st=%.2f:d=%.2f:alpha=1[%s]' % (label_in, r, g, b, sigma, start, dur, label_out))
+
+
+def intro_filter(style, w, h, fps, seconds):
+    """冒頭の型ごとの filter_complex（入力 0＝黒い下地・1＝商品の透過 PNG）。出力は [v]"""
+    rgb = INTRO_STYLES[style][0]
     ph = int(h * 0.62)
+    center = 'x=(W-w)/2:y=(H-h)/2:format=auto'
+    if style == 'spotlight':
+        r, g, b = rgb
+        return ';'.join([
+            '[1:v]scale=-1:%d,format=rgba,split[p][g]' % ph,
+            _glow('g', 'glow', rgb, 30, 0.3, 0.8),
+            '[p]fade=t=in:st=0.25:d=0.6:alpha=1[pf]',
+            # 楕円のスポットライト（1枚作って灯す）
+            'color=c=0x%02X%02X%02X:s=%dx%d:r=%d,format=rgba,geq=r=\'r(X,Y)\':g=\'g(X,Y)\':b=\'b(X,Y)\':'
+            'a=\'110*exp(-(pow((X-W/2)/(W*0.32),2)+pow((Y-H*0.55)/(H*0.30),2)))\',fade=t=in:st=0:d=0.7:alpha=1[spot]'
+            % (r, g, b, w, h, fps),
+            '[0:v][spot]overlay=0:0:format=auto[a0]',
+            '[a0][glow]overlay=%s[a1]' % center,
+            # せり上がる（下から 6% 上がって止まる）
+            "[a1][pf]overlay=x=(W-w)/2:y='(H-h)/2+H*0.06*max(0,1-t/0.9)':shortest=1:format=auto,format=yuv420p[v]",
+        ])
+    if style == 'shine':
+        band_w = w // 3
+        return ';'.join([
+            '[0:v]vignette=PI/3.2,lutyuv=y=val+18[bg]',
+            '[1:v]scale=-1:%d,format=rgba,fade=t=in:st=0.1:d=0.5:alpha=1[pf]' % ph,
+            # 斜めの光の帯
+            'color=c=white:s=%dx%d:r=%d,format=rgba,geq=r=255:g=255:b=255:a=\'70*exp(-pow((X-%d)/(%d),2))\','
+            'rotate=0.35:c=none:ow=rotw(0.35):oh=roth(0.35)[band]' % (band_w, int(h * 1.4), fps, band_w // 2, band_w // 6),
+            # 映画の黒帯（上下 12%）が開く
+            'color=c=black:s=%dx%d:r=%d[bar]' % (w, int(h * 0.12), fps),
+            '[bar]split[bt][bb]',
+            '[bg][pf]overlay=%s[a1]' % center,
+            "[a1][band]overlay=x='-w+(W+w)*min(max((t-0.45)/0.85,0),1)':y=(H-h)/2:format=auto[a2]",
+            "[a2][bt]overlay=x=0:y='-h*min(t/0.6,1)'[a3]",
+            "[a3][bb]overlay=x=0:y='H-h+h*min(t/0.6,1)':shortest=1:format=auto,format=yuv420p[v]",
+        ])
+    if style == 'silhouette':
+        return ';'.join([
+            '[0:v]lutyuv=y=val+14,vignette=PI/3[bg]',
+            '[1:v]scale=-1:%d,format=rgba,split=3[p][s][g]' % ph,
+            _glow('g', 'glow', rgb, 22, 0.0, 0.5),
+            '[s]lutrgb=r=0:g=0:b=0[sil]',
+            '[p]fade=t=in:st=0.7:d=0.6:alpha=1[pf]',
+            '[bg][glow]overlay=%s[a1]' % center,
+            '[a1][sil]overlay=%s[a2]' % center,
+            '[a2][pf]overlay=%s:shortest=1,format=yuv420p[v]' % center,
+        ])
+    # light_sweep（既定）
+    r, g, b = rgb
     line_h = 48
-    fc = ';'.join([
+    return ';'.join([
         '[1:v]scale=-1:%d,format=rgba,split[p][g]' % ph,
-        # 商品の形をぼかして青白く塗る＝まわりの光
-        '[g]colorchannelmixer=rr=0:rg=0:rb=0:gr=0:gg=0:gb=0:br=0:bg=0:bb=0:ra=0:ga=0:ba=0:aa=1,'
-        'lutrgb=r=%d:g=%d:b=%d,pad=iw+240:ih+240:120:120:color=black@0,gblur=sigma=45,colorchannelmixer=aa=2,'
-        'fade=t=in:st=0.15:d=0.9:alpha=1[glow]' % (r, g, b),
+        _glow('g', 'glow', rgb, 45, 0.15, 0.9),
         '[p]fade=t=in:st=0.35:d=0.8:alpha=1[pf]',
-        # 光のライン：縦にガウスで減衰する帯
+        # 光のライン：縦にガウスで減衰する帯。最初のコマから出す（真っ黒のコマを作らない＝黒画面の検査に掛からない）
         'color=c=0x%02X%02X%02X:s=%dx%d:r=%d,format=rgba,geq=r=\'r(X,Y)\':g=\'g(X,Y)\':b=\'b(X,Y)\':'
         'a=\'255*exp(-pow((Y-%d)/7,2))\'[line]' % (r, g, b, w, line_h, fps, line_h // 2),
-        '[0:v][glow]overlay=x=(W-w)/2:y=(H-h)/2:format=auto[a1]',
-        '[a1][pf]overlay=x=(W-w)/2:y=(H-h)/2:format=auto[a2]',
+        '[0:v][glow]overlay=%s[a1]' % center,
+        '[a1][pf]overlay=%s[a2]' % center,
         "[a2][line]overlay=x=0:y='min(t/%.3f,1)*H*1.08-%d':shortest=1:format=auto,format=yuv420p[v]"
         % (seconds, line_h // 2),
     ])
+
+
+def make_intro(png, dest, w, h, fps, seconds=INTRO_SECONDS, style='light_sweep'):
+    """冒頭（商品の透過 PNG から・音は型ごとの効果音1つ）を作る。知らない型は light_sweep"""
+    style = style if style in INTRO_STYLES else 'light_sweep'
+    sfx = INTRO_STYLES[style][1]
     cmd = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error',
            '-f', 'lavfi', '-i', 'color=c=black:s=%dx%d:r=%d:d=%.3f' % (w, h, fps, seconds),
            '-loop', '1', '-t', '%.3f' % seconds, '-i', png]
@@ -760,7 +819,8 @@ def make_intro(png, dest, w, h, fps, seconds=INTRO_SECONDS, sfx=INTRO_SFX):
     else:
         cmd += ['-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100']
         afc = '[2:a]atrim=0:%.3f[a]' % seconds
-    cmd += ['-filter_complex', fc + ';' + afc, '-map', '[v]', '-map', '[a]', '-t', '%.3f' % seconds,
+    cmd += ['-filter_complex', intro_filter(style, w, h, fps, seconds) + ';' + afc, '-map', '[v]', '-map', '[a]',
+            '-t', '%.3f' % seconds,
             '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p', '-r', str(fps),
             '-c:a', 'aac', '-b:a', '96k', '-ar', '44100', '-ac', '2', dest]
     run(cmd)
@@ -3235,7 +3295,7 @@ def main():
             raw, ipng = os.path.join(work, 'intro_raw'), os.path.join(work, 'intro.png')
             if download(str(intro['image']), raw, market=job.get('target_market')) and prepare_foreground(raw, ipng):
                 ivid = make_intro(ipng, os.path.join(work, 'intro.mp4'), w, h, fps,
-                                  float(intro.get('seconds') or INTRO_SECONDS))
+                                  float(intro.get('seconds') or INTRO_SECONDS), style=str(intro.get('style') or 'light_sweep'))
                 tmp = args.out + '.intro.mp4'
                 run(['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error', '-i', ivid, '-i', args.out,
                      '-filter_complex', '[1:a]aresample=44100,aformat=channel_layouts=stereo[ma];'
@@ -3244,7 +3304,7 @@ def main():
                      '-movflags', '+faststart', '-c:a', 'aac', '-b:a', '96k', tmp])
                 os.replace(tmp, args.out)
                 size, dur = os.path.getsize(args.out), probe_duration(args.out)
-                log('高級感のある冒頭をつなぎました（%.1f秒）' % float(intro.get('seconds') or INTRO_SECONDS))
+                log('高級感のある冒頭をつなぎました（%s・%.1f秒）' % (intro.get('style') or 'light_sweep', float(intro.get('seconds') or INTRO_SECONDS)))
             else:
                 log('冒頭の商品画像を用意できないので、冒頭なしで出します')
         except Exception as e:  # noqa: BLE001 — 冒頭は飾り。失敗しても本編は出す

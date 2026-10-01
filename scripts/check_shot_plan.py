@@ -815,12 +815,22 @@ expect([c['min_keep'] for c in _cmj['clips']] == [c['min_keep'] for c in _cmc], 
 _cm0 = shot_plan.plan_cm(dict(RR35, stills={'selfie': 's', 'cleaning_pov': 'c', 'station': 't'}))
 expect(any(c['still'] == 'station' for c in _cm0['cuts']), '手元の静止画が無ければ、今までの絵で作る（止めない）')
 # ★高級感のある冒頭（#258）：intro: true の回だけ、ASP の実画像で作る
-expect('intro' not in _cmj and shot_plan.render_job(dict(_cmp, intro=True), _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job']['intro'] == {'image': _cmp['image_url']},
-       '冒頭は intro: true の回だけ（毎回ではない）・商品は実画像')
+import datetime as _dt9
+_ij = shot_plan.render_job(_cmp, _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job']
+expect(_ij['intro']['image'] == _cmp['image_url'] and _ij['intro']['style'] in shot_plan.INTRO_STYLES, 'CM 型は冒頭を付ける・商品は実画像（#259）')
+expect('intro' not in shot_plan.render_job(dict(_cmp, intro=False), _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job'], 'intro: false で外せる')
+expect(shot_plan.intro_style(dict(_cmp, intro='shine')) == 'shine', '型の名前で固定できる')
+_days = [shot_plan.intro_style(_cmp, _dt9.date(2026, 10, 1) + _dt9.timedelta(days=i)) for i in range(4)]
+expect(len(set(_days)) == 4 and all(a != b for a, b in zip(_days, _days[1:])), '冒頭の型は日ごとに替わり、4日で全部の型を使う: %s' % _days)
+expect(set(shot_plan.INTRO_STYLES) == set(_rv.INTRO_STYLES), '冒頭の型の名前が依頼側と描画側で揃っている')
+expect('intro' not in shot_plan.render_job(RR35, shot_plan.plan(RR35), ['u'] * 6, 'preview/x.mp4')['job'], 'CM 型でない回は付けない')
 import tempfile as _tf9, subprocess as _sp9
 with _tf9.TemporaryDirectory() as _d9:
     _png = os.path.join(_d9, 'p.png')
     _sp9.run(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'lavfi', '-i', 'color=c=0xC8B49A:s=60x200', '-vf', 'format=rgba', '-frames:v', '1', _png], check=True)
+    for _st in _rv.INTRO_STYLES:
+        _rv.make_intro(_png, os.path.join(_d9, _st + '.mp4'), 360, 640, 30, style=_st)
+    expect(all(os.path.getsize(os.path.join(_d9, _st + '.mp4')) > 1000 for _st in _rv.INTRO_STYLES), '冒頭の4つの型が全部作れる')
     _rv.make_intro(_png, os.path.join(_d9, 'i.mp4'), 360, 640, 30)
     _pr = _sp9.run(['ffprobe', '-v', 'error', '-show_entries', 'stream=codec_type,duration', '-of', 'csv=p=0', os.path.join(_d9, 'i.mp4')],
                    capture_output=True, text=True).stdout.split()
