@@ -805,6 +805,11 @@ expect(all(c['min_keep'] <= c['seconds'] for c in _cmc) and _cm['panel']['cut_in
 expect(all(c.get('grip_parts') for c in _cmc if c['still'] in ('holding_pov', 'station_pov')), '手元で掃除機を持つ絵は握り方を点検する')
 expect(all(shot_plan.CM_LOOK_POV in c['action'] for c in _cmc[1:-1]) and shot_plan.CM_LOOK_FACE in _cmc[0]['action']
        and 'camera move' not in _cmc[0]['action'], 'CM の見た目を Veo へ渡す（顔のカットはカメラを動かさない・#256）')
+expect(_cmc[1].get('demo') and not any(a['still'] == b['still'] for a, b in zip(_cmc, _cmc[1:])),
+       '吸い込みはフックの直後・同じ絵を続けない（#257）')
+_cm3 = shot_plan.plan_cm(dict(RR35, category='cleaning', features=['最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測', '自動ゴミ回収ステーション', '強力吸引', 'コードレス'],
+                              stills={'selfie': 's', 'cleaning_pov': 'c', 'station_pov': 'sp', 'holding_pov': 'hp'}))['cuts']
+expect(_cm3[-2]['still'] == 'station_pov', '締めの直前は「置くだけ」（#257・同じ絵が続かない時）')
 _cmj = shot_plan.render_job(_cmp, _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job']
 expect([c['min_keep'] for c in _cmj['clips']] == [c['min_keep'] for c in _cmc], 'CM 型の min_keep が描画の依頼に載る')
 _cm0 = shot_plan.plan_cm(dict(RR35, stills={'selfie': 's', 'cleaning_pov': 'c', 'station': 't'}))

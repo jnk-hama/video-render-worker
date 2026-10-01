@@ -451,6 +451,13 @@ def plan_cm(product):
     while len(cuts) > CM_CUTS_MAX:
         k = next((k for k in range(len(cuts) - 2, 0, -1) if not cuts[k].get('must_show')), len(cuts) - 2)
         cards_only.append(cuts.pop(k).get('feature'))
+    # ★「置くだけ・戻すだけ」の楽さは締めの直前へ（#257・参考3本のうち harmony 2本がスタンドに戻す絵で締めていた）。
+    #   吸い込みはフックの直後のまま（#197・オーナー「一番肝心」）
+    #   ★同じ絵が続く並びになるなら動かさない（_no_repeat と同じ考え）
+    dock = [c for c in cuts[1:-1] if c['still'] in ('station_pov', 'station')]
+    moved = [cuts[0]] + [c for c in cuts[1:-1] if c not in dock] + dock + [cuts[-1]]
+    if dock and not any(a['still'] == b['still'] for a, b in zip(moved[1:-1], moved[2:-1])):
+        cuts = moved
     for c in cuts:
         c['min_keep'] = min(c['seconds'], round(len(c['line']) / JA_CHARS_PER_SEC + CM_TAIL, 2))
         c['action'] += CM_LOOK_POV if is_pov_action(c['action']) else CM_LOOK_FACE
