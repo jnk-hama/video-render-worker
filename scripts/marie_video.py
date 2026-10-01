@@ -99,8 +99,17 @@ def start_cut(base, key, product, cut):
         #   起動できないカットは「動画なし」として扱い、最後に承認済みの静止画で埋める（Veo は起動していないので費用は出ていない）
         print('  Veo を起動できません（%s・%s・HTTP %s）: %s' % (
             cut['role'], (cut.get('feature') or '').split('\n')[0], code, why))
+        # ★★枠切れ（429）・残高切れ（402）は、その場で全部止める（#254・オーナー「ずっと無駄遣いしてる」）。
+        #   続けると他のカットだけ課金されて、3カットに届かず捨てることになる（2026-10-01 の 11:00 の回）。
+        #   ここまでに作れたクリップは video_library に残り、次の回で使い回せる（#198）
+        if any(str(e.get('status')) in QUOTA_STATUS for e in errs) or any(f'HTTP {q}' in why for q in QUOTA_STATUS):
+            raise SystemExit('Veo の枠・残高切れ（HTTP 429/402）。これ以上カットを起動せずに止めます（費用を増やさない・#254）')
         return None
     return started[0]['id']
+
+
+# 待っても直らない失敗（429＝1日の枠・E-031／402＝前払い残高・E-028）。見たら全部止める（#254）
+QUOTA_STATUS = ('429', '402')
 
 
 # 静止画のファイル名の頭は作った時刻（ミリ秒）。product-scene の保存名（例: 1790490103321-293fa7e9.jpg）
@@ -539,6 +548,21 @@ def main():
     base, key = _base_and_key()
     preflight_stills(plan['cuts'], lambda u, parts: still_look(base, key, u, parts), still_face(persona))
     if dry:
+        return
+    trial = product.get('try_cuts')
+    if trial:
+        # ★試しの回（#254）：Veo の指示を変えたカットだけを1回作って照合し、描かずに終わる。全カットで流す前に必ずこれで確かめる
+        #   （2026-10-01：動きの指示を試さずに全カットへ入れ、顔が崩れて4本ぶん無駄になった）
+        picked = [plan['cuts'][int(i)] for i in trial if 0 <= int(i) < len(plan['cuts'])]
+        if not picked:
+            raise SystemExit('try_cuts の番号がカットの範囲外です（0〜%d）' % (len(plan['cuts']) - 1))
+        ids = [start_cut(base, key, dict(product, reuse=False), c) for c in picked]
+        got = wait_all(base, key, ids)
+        face = make_face_check(persona)
+        bad = redo_targets(picked, got, ids, lambda u, ms, demo=False: verify_cut(base, key, u, ms, demo), face=face)
+        for n, c in enumerate(picked):
+            print('試し %s: %s' % (c['role'] + '/' + (c.get('feature') or '').split('\n')[0], bad.get(n) or '合格'))
+        print('試しの回なので描画しません（合格したクリップは本番で使い回す）')
         return
     reuse = product.get('reuse_ids')
     reused = set()  # 前のクリップを使い回したカットの番号（#198）

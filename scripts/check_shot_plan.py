@@ -613,8 +613,34 @@ jE, wE = _run(lambda k, n: True, lambda k, n: tp[k]['line'], lambda k, n: '顔NG
 expect(jE and wE[int(jE['clips'][0]['url'][1:])] == (0, 2) and not jE.get('review', {}).get('notes'),
        'E: 作り直して合格した物を使う（いつもの流れは変わらない）')
 expect(jE and jE['quality_gate'] == 'warn' and jE['video_qc'] == 'warn', '描画の検査も止めずに記録する（問題は LINE へ）')
+# ★試しの回（#254）：指定したカットだけ作って照合し、描画の依頼は作らない
+_started = []
+def _st1(b, kk, pr, c):
+    _started.append(c['line'])
+    return 3000 + len(_started)
+marie_video.start_cut = _st1
+marie_video.wait_all = lambda b, kk, ids: {i: {'video_url': 'u%d' % i} for i in ids if i is not None}
+marie_video.verify_cut = lambda b, kk, url, ms, demo=False: (1, 'ok', tp[0]['line'], 1, None) if demo else (1, 'ok', tp[0]['line'])
+marie_video.make_face_check = lambda persona=None: (lambda u, pov: None)
+with _t0.TemporaryDirectory() as td:
+    pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
+    _j0.dump(dict(RR_T, try_cuts=[0]), open(pj, 'w'))
+    sys.argv = ['marie_video.py', pj, oj]
+    marie_video.main()
+    expect(_started == [tp[0]['line']] and not os.path.exists(oj), '試しの回は指定したカットだけ Veo に出し、描画の依頼を作らない（#254）')
 for n, v in _keep2.items():
     setattr(marie_video, n, v)
+# ★枠切れ・残高切れは、その場で全部止める（#254）
+_oreq = marie_video._req
+marie_video._req = lambda url, key, body=None, method=None: (502, {'errors': [{'status': 402, 'body': 'Your prepayment credits are depleted'}]})
+try:
+    marie_video.start_cut('https://x.supabase.co', 'k', RR35, dict(tp[0]))
+    expect(False, '402 を見たら止める')
+except SystemExit as e:
+    expect('402' in str(e) or '残高' in str(e), '402（残高切れ）を見たら、他のカットを起動せずに止める（#254）')
+marie_video._req = lambda url, key, body=None, method=None: (502, {'errors': [{'status': 500, 'body': 'x'}]})
+expect(marie_video.start_cut('https://x.supabase.co', 'k', RR35, dict(tp[0])) is None, 'それ以外の失敗は、そのカットだけ動画なし（従来どおり）')
+marie_video._req = _oreq
 
 marie_video.preflight_stills = _real_preflight
 print('=== カット番号 → 秒 ===')

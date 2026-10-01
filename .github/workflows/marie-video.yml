@@ -63,6 +63,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          # 試しの回（try_cuts・#254）は描画の依頼を作らない
+          [ -f job.json ] || { echo "試しの回なので描画しません"; exit 0; }
           gh workflow run render-video.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" \
             -f payload_json="$(cat job.json)"
           echo "render-video を起動しました"
