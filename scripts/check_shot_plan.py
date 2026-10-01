@@ -765,6 +765,14 @@ _rr49 = shot_plan.plan_long(dict(RR35, layout='long', stills={k: 'u' for k in ('
 expect('steps one pace' in _rr49[0]['action'] and 'lifts it a few centimetres' in next(c['action'] for c in _rr49 if c['still'] == 'station')
        and 'step closer' in _rr49[-1]['action'], '話すだけのカットにしない：フック・置くだけ・最後に動きを入れる（#249）')
 expect('{handle}' not in ''.join(c['action'] for c in _rr49), '握る部分の差し込みが埋まっている')
+# ★冒頭の大見出し（#250・バズる型：最初の1〜2秒に、声を一段強める3〜7語）
+_hj = shot_plan.render_job(RR35, {'cuts': _rr49, 'cards_only': [], 'panel': None}, ['u'] * len(_rr49), 'preview/x.mp4')['job']['info_cards']
+expect(_hj[0] == {'text': 'ゴミ捨てが面倒な人へ', 'cut_index': 0, 'part': [0, 2], 'style': 'hook'} and _hj[1]['part'] == [1, 2] and '※' in _hj[1]['text'],
+       '大見出しはフックの前半、性能の札（※の条件つき）は後半')
+expect(not any(ch.isdigit() for ch in _rr49[0]['hook_text']) and 'ゴミ捨て不要' not in _rr49[0]['hook_text'], '大見出しは数字を作らず、声を繰り返さない')
+_ha = _rv.build_ass([], 1080, 1920, 108, cards=[{'text': 'ゴミ捨てが面倒な人へ', 'start': 0, 'end': 1, 'style': 'hook'},
+                                               {'text': '強力吸引', 'start': 1, 'end': 2}])
+expect('POINT 1' in _ha and 'POINT 2' not in _ha and _ha.count('\\p1') == 1, '大見出しには POINT もチェックも付けない（次の札が POINT 1）')
 expect(_fs and min(_fs) >= 54, 'まとめの字は 54px 以上（#246 前は約34px）: %s' % sorted(set(_fs)))
 # ★投稿文（#244）：#PR が先頭・※はフックのすぐ下・#AI生成・X は長さに収める・リンクは楽天だけ
 _pp = _nhj['post_pack']

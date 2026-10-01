@@ -164,6 +164,8 @@ RULES = [
      'still': {'selfie': "She is filming herself at arm's length. The product stands in its station behind her. She steps one pace "
                          "to the side so it comes into full view, sweeps her free hand toward it, then leans toward the camera "
                          "with a surprised, excited look and talks like she is telling a friend a secret."},
+     # ★冒頭の大見出し（#250・バズる型）：声（最大約5か月）を繰り返さず、見る人を絞る3〜7語。数字は作らない
+     'hook_text': 'ゴミ捨てが面倒な人へ',
      'line': '最大約5か月、ゴミ捨て不要', 'must_say': 'ゴミ捨て不要'},
     # ★オーナー「ゴミ捨てってではなく、ゴミ捨て不要で のほうがわかりやすい」（2026-09-27）。説明文の語をそのまま言わせる
     # ★★掃除機の肝は吸い込む所（オーナー「一番肝心な掃除機のパワーや吸い込み描写は絶対いる。何に使うかを考えて」）。
@@ -239,6 +241,8 @@ def _cut(role, rule, stills, feature, seconds):
         cut['must_show'] = rule['must_show']  # 映っているべき物。出来た動画を video-scene の verify で照合する（#185）
     if rule.get('grip_parts'):
         cut['grip_parts'] = list(rule['grip_parts'])  # 握る所の選択肢（先頭が正）。本番の前に verify で見る（#235・#237）
+    if rule.get('hook_text') and role == 'hook':
+        cut['hook_text'] = rule['hook_text']  # 冒頭の大見出し（#250）
     if rule.get('demo'):
         cut['demo'] = True  # 商品を使う所の絵。長回しでも一人称でも相乗りさせず単独のシーンに残す（#197・#229）
     return cut
@@ -556,6 +560,12 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
         clips.append(clip)
     cards = []
     for i, c in enumerate(cuts):
+        if i == 0 and c.get('hook_text'):
+            # ★冒頭の大見出し（#250）はフックの前半、性能の札は後半へ。同時に出すと最初の画面が文字で埋まる
+            hc = c.get('cards') or ([c['card']] if c.get('card') else [])
+            cards.append({'text': c['hook_text'], 'cut_index': 0, 'part': [0, 2], 'style': 'hook'})
+            cards += [{'text': txt, 'cut_index': 0, 'part': [1, 2]} for txt in hc[:1]]
+            continue
         if c.get('cards'):
             # ★長回しは機能ごとにカードを出し分ける（前半・後半）。秒は描画側がカット番号と part から解く（#216）
             n = len(c['cards'])
