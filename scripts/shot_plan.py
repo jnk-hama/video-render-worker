@@ -66,6 +66,10 @@ STICK_GRIP = (" Her hand is wrapped around the middle of {handle} like a bag han
               " the product photo.")
 # ★点検は「はい／いいえ」の1問にしない（決定#237）。はい／いいえは「はい」に寄り、言い回しで正しい絵も落とした。
 #   verify に部品名の選択肢を渡し、どこを・どう握っているかを選ばせる。先頭が握るべき所。合否は marie_video.ergo_problem
+# ★顔が出るカットで体を動かさない（#253）。2026-10-01 本番：脇へ一歩よける・商品を持ち上げる指示で、Veo が顔を保てず別人になった
+#   （類似度 0.16・0.18）。動きは腕と手元で見せる（参考動画も手元で見せていた・#252）
+FACE_STEADY = (" She stays in the same spot the whole time; her head and face stay steady and keep facing the camera,"
+               " and only her arm and hand move.")
 STICK_PARTS = ("{handle}", "the motor body", "the battery pack", "the dust cup", "the pipe", "the floor head")
 
 
@@ -161,9 +165,10 @@ RULES = [
     #   数字は Veo が読み崩しやすいので「4〜5」を言わせず「最大約5か月」に留め、条件（※1日1回の掃除で計測）はカードに書く
     {'genres': ('gadget',), 'match': r'ゴミ捨て不要', 'hook': True,
      # ★動きで見せる（#249・オーナー「動きのある説明をAI動画で心がけて」）：脇へ一歩よけて、後ろの商品を見せてから話す
-     'still': {'selfie': "She is filming herself at arm's length. The product stands in its station behind her. She steps one pace "
-                         "to the side so it comes into full view, sweeps her free hand toward it, then leans toward the camera "
-                         "with a surprised, excited look and talks like she is telling a friend a secret."},
+     # ★★体は動かさない（#253・2026-10-01 本番：「一歩よける」で顔が別人になった＝類似度 0.16）。動くのは腕だけ
+     'still': {'selfie': "She is filming herself at arm's length. The product stands in its station behind her. She sweeps her free "
+                         "hand toward it to show it off, then talks to the camera with a surprised, excited look like she is telling "
+                         "a friend a secret." + FACE_STEADY},
      # ★冒頭の大見出し（#250・バズる型）：声（最大約5か月）を繰り返さず、見る人を絞る3〜7語。数字は作らない
      # ★問いかけの形（#251・vidIQ で伸びた日本の掃除動画は「洗濯機掃除してる？？」等の悩みの問いかけが多い）。
      #   「〜やめた」は架空の体験談になるので使わない。？は画面の文字だけ（声では Veo が読み違える・#169）
@@ -206,7 +211,7 @@ RULES = [
      'still': {'station': "The product is docked in its station next to her. She lifts it a few centimetres out of the station "
                           "by {handle}, sets it straight back down so it settles into place, lets go so it stands on its own, "
                           "and gestures at it with an open hand while talking to the camera like a friend. "
-                          "The product and the station keep exactly the shape and colours of the product photo.",
+                          "The product and the station keep exactly the shape and colours of the product photo." + FACE_STEADY,
                'holding': "She sets the product on its station and steps back, pointing at it with a relaxed smile "
                           "while talking to the camera like a friend."},
      'line': '置くだけで、あとは勝手にやってくれる', 'must_say': '置くだけ',

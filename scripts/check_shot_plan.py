@@ -762,9 +762,11 @@ expect(not any(len(x) > 9 for t in RR35['features'] for x in _rv.wrap_topic(t.sp
 _fs = [int(m) for m in _re.findall(r'\\fs(\d+)', ''.join(l for l in _pl if '\\p1' not in l and '※' not in l))]
 expect(any('\\blur%d' % _rv.TOPIC_SHADE_BLUR in l and l.startswith('Dialogue: 1,') for l in _pl_all), 'まとめの後ろにぼかした影を敷く（#249・文字の下層・枠に見えない）')
 _rr49 = shot_plan.plan_long(dict(RR35, layout='long', stills={k: 'u' for k in ('selfie', 'cleaning_pov', 'station')}))['cuts']
-expect('steps one pace' in _rr49[0]['action'] and 'lifts it a few centimetres' in next(c['action'] for c in _rr49 if c['still'] == 'station')
+expect('sweeps her free hand' in _rr49[0]['action'] and 'lifts it a few centimetres' in next(c['action'] for c in _rr49 if c['still'] == 'station')
        and 'step closer' in _rr49[-1]['action'], '話すだけのカットにしない：フック・置くだけ・最後に動きを入れる（#249）')
 expect('{handle}' not in ''.join(c['action'] for c in _rr49), '握る部分の差し込みが埋まっている')
+expect(all(shot_plan.FACE_STEADY in c['action'] for c in _rr49 if c['still'] in ('selfie', 'station') and c['role'] != 'cta')
+       and 'steps one pace' not in _rr49[0]['action'], '顔が出るカットは体を動かさず腕だけ（#253・一歩よけると顔が別人になった）')
 # ★冒頭の大見出し（#250・バズる型：最初の1〜2秒に、声を一段強める3〜7語）
 _hj = shot_plan.render_job(RR35, {'cuts': _rr49, 'cards_only': [], 'panel': None}, ['u'] * len(_rr49), 'preview/x.mp4')['job']['info_cards']
 expect(_hj[0] == {'text': 'ゴミ捨てが嫌いな人\n全員見て!!', 'cut_index': 0, 'part': [0, 2], 'style': 'hook'} and _hj[1]['part'] == [1, 2] and '※' in _hj[1]['text'],
