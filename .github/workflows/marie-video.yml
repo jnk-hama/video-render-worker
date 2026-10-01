@@ -37,10 +37,12 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
       # ★予行でも入れる（#232）。予行は静止画の点検（顔の点・手の本数・絵の問い）を本番と同じに回す＝#227 の点検そのもの
       - name: 顔の判定に要る物を入れる
+        # ★上限を付ける（2026-10-01：pip が何も出さずに20分止まり、ジョブの40分まで待たされた）。詰まったら早く落として流し直す
+        timeout-minutes: 10
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1 libgles2
-          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt insightface onnxruntime mediapipe
+          python3 -m pip install --quiet --disable-pip-version-check --timeout 60 --retries 3 -c constraints.txt insightface onnxruntime mediapipe
       - name: 計画 → Veo → 回収
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
