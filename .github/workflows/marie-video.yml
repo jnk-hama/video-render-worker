@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg libegl1 libgl1 libgles2
-          python3 -m pip install --quiet --disable-pip-version-check --timeout 60 --retries 3 -c constraints.txt insightface onnxruntime mediapipe
+          PIP_DEFAULT_TIMEOUT=60 PIP_RETRIES=3 python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt insightface onnxruntime mediapipe
       - name: 計画 → Veo → 回収
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
