@@ -160,8 +160,10 @@ RULES = [
     # ★フック（#196）。orage RR35 の説明文「大容量抗菌紙パックで、最大約4－5か月ゴミ捨て不要。※1」から。
     #   数字は Veo が読み崩しやすいので「4〜5」を言わせず「最大約5か月」に留め、条件（※1日1回の掃除で計測）はカードに書く
     {'genres': ('gadget',), 'match': r'ゴミ捨て不要', 'hook': True,
-     'still': {'selfie': "She is filming herself at arm's length, leans toward the camera with a surprised, excited look "
-                         "and talks like she is telling a friend a secret. The product stands in its station behind her."},
+     # ★動きで見せる（#249・オーナー「動きのある説明をAI動画で心がけて」）：脇へ一歩よけて、後ろの商品を見せてから話す
+     'still': {'selfie': "She is filming herself at arm's length. The product stands in its station behind her. She steps one pace "
+                         "to the side so it comes into full view, sweeps her free hand toward it, then leans toward the camera "
+                         "with a surprised, excited look and talks like she is telling a friend a secret."},
      'line': '最大約5か月、ゴミ捨て不要', 'must_say': 'ゴミ捨て不要'},
     # ★オーナー「ゴミ捨てってではなく、ゴミ捨て不要で のほうがわかりやすい」（2026-09-27）。説明文の語をそのまま言わせる
     # ★★掃除機の肝は吸い込む所（オーナー「一番肝心な掃除機のパワーや吸い込み描写は絶対いる。何に使うかを考えて」）。
@@ -195,8 +197,11 @@ RULES = [
      'line': '片手で持てる軽さ、ガチで楽', 'must_say': '片手',
      'must_show': 'She holds the product up with one hand.'},
     {'genres': ('gadget',), 'match': r'自動|ステーション|オート',
-     'still': {'station': "The product is docked in its station next to her. She points at it with an open hand, "
-                          "gives a relaxed smile and talks to the camera like a friend.",
+     # ★「置くだけ」を動きで見せる（#249）：少し持ち上げて戻し、手を離すと自立して収まる
+     'still': {'station': "The product is docked in its station next to her. She lifts it a few centimetres out of the station "
+                          "by {handle}, sets it straight back down so it settles into place, lets go so it stands on its own, "
+                          "and gestures at it with an open hand while talking to the camera like a friend. "
+                          "The product and the station keep exactly the shape and colours of the product photo.",
                'holding': "She sets the product on its station and steps back, pointing at it with a relaxed smile "
                           "while talking to the camera like a friend."},
      'line': '置くだけで、あとは勝手にやってくれる', 'must_say': '置くだけ',
@@ -207,8 +212,8 @@ RULES = [
 FALLBACK_HOOK = {'still': {'selfie': "She is filming herself at arm's length, leans toward the camera with an "
                                      "excited look and talks like she is telling a friend a secret."},
                  'line': 'ちょっと見て、これかなりいい'}
-CTA = {'still': {'selfie': "She is filming herself at arm's length, smiles, points down toward the bottom of the "
-                           "frame with her free index finger and talks casually to the camera like a friend."},
+CTA = {'still': {'selfie': "She is filming herself at arm's length, takes one step closer to the camera, smiles, points down "
+                           "toward the bottom of the frame with her free index finger and talks casually to the camera like a friend."},
        'line': '気になったら、リンクから見てみて', 'must_say': 'リンク'}
 # 色・サイズ展開は動画で見せる物ではない。最後のカットの POINT カードへ回す（#193）
 PANEL_MATCH = r'[0-9一二三四五]色|カラー|展開|[SML]〜|[0-9]?XL'
@@ -346,7 +351,7 @@ def fit_seconds(line):
     return next(s for s in LONG_STEPS if len(line) <= JA_CHARS_4S * s // CUT_SECONDS)
 # ★長回しは動きを小さくする（オーナー「手が4本あったり意味のない描写なら1シーン長くして色んな紹介したらいい」#216）。
 #   カットが多いほど Veo の破綻（手の数・別人・商品の変形）が入る機会が増える
-LONG_CALM = (" Keep it calm and continuous: she talks to the camera the whole time with small natural gestures, "
+LONG_CALM = (" Keep it continuous: she keeps talking to the camera while she shows the product in action, "
              "the product stays the same shape and color and stays in view, and no other person appears.")
 
 

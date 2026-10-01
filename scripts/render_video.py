@@ -411,6 +411,9 @@ PANEL_TOPICS_IMG_SHARE = 0.32
 TOPIC_WRAP_CHARS = 8
 # まとめの行送り（字の大きさに対する倍率）
 TOPIC_LINE_GAP = 1.2
+# まとめの後ろの影（#249）：透明度（00＝不透明・FF＝透明）と縁のぼかし（px）
+TOPIC_SHADE_ALPHA = 0x70
+TOPIC_SHADE_BLUR = 40
 # ★数字と単位はアクセント色で「見せる」（#242・参考「読ませるより見せる」）
 _NUM_RE = re.compile(r'[0-9０-９][0-9０-９.,．〜~\-]*\s*(?:kg|ｋｇ|g|か月|ヶ月|カ月|分|時間|秒|W|mAh|L|ml|mm|cm|%|％|倍|円|段階)?')
 
@@ -1831,6 +1834,14 @@ def build_ass(captions, w, h, font_size, center=False,
             tfs = min(tfs, int(unit_h / TOPIC_LINE_GAP))
             check_px, check_gap = int(tfs * CARD_CHECK), max(6, tfs // 4)
             pop = '\\fscx30\\fscy30\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)'
+            # ★文字の後ろに、ぼかした薄い影を敷く（#249・オーナー「ラストシーンの説明の文字も見にくい」3回目）。
+            #   まとめはマリーの体の上に重なり、明るい服の上で白い字が沈んでいた。枠に見えないよう縁は大きくぼかす（#241「枠いらない」）
+            shade_x, shade_w = list_x - check_gap, list_w + 2 * check_gap
+            shade_h = int(h * (PANEL_BOTTOM - PANEL_TOP))
+            lines.append('Dialogue: 1,%s,%s,Card,,0,0,0,,{\\an7\\pos(%d,%d)\\bord0\\shad0\\1c&H000000&\\1a&H%02X&'
+                         '\\blur%d\\fad(200,150)\\p1}m 0 0 l %d 0 %d %d 0 %d{\\p0}'
+                         % (ass_time(ps), ass_time(pe), shade_x, band_top, TOPIC_SHADE_ALPHA, TOPIC_SHADE_BLUR,
+                            shade_w, shade_w, shade_h, shade_h))
             row_top = band_top
             for row, ((topic_lines, notes), u) in enumerate(zip(items, units)):
                 row_h = unit_h * (u + 0.4)

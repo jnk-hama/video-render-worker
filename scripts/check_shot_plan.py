@@ -745,7 +745,8 @@ _cap = [l for l in _events('コードレス\n軽量1.6kg', [{'text': 'テスト'
 expect(_cap and _ys(_cap, '')[0] == int(1920 * _rv.SAFE_AREAS['none']['caption_y']), '札があっても字幕は元の高さ')
 _pan = _rv.build_ass([], 1080, 1920, 108, panel={'images': ['x'], 'start': 0, 'end': 3,
                      'topics': ['最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測', '強力吸引', '軽量1.6kg']})
-_pl = [l for l in _pan.split('\n') if l.startswith('Dialogue:')]
+_pl_all = [l for l in _pan.split('\n') if l.startswith('Dialogue:')]
+_pl = [l for l in _pl_all if not l.startswith('Dialogue: 1,')]   # 影（#249）は下層。文字とチェックだけを見る
 expect(len([l for l in _pl if '\\p1' in l]) == 3, 'まとめは1行ごとにチェック')
 expect(any('1.6kg' in l and '\\1c&H005C3BFF' in l for l in _pl), '数字と単位はアクセント色')
 expect(any('※1日1回' in l for l in _pl), 'まとめでも※の条件を残す')
@@ -759,6 +760,11 @@ expect(_rv.wrap_topic('自動ゴミ回収ステーション') == ['自動ゴミ�
 expect(_rv.wrap_topic('スマホサイズ・220g') == ['スマホサイズ', '220g'] and _rv.wrap_topic('軽量1.6kg') == ['軽量1.6kg'], '「・」は行頭・行末に残さない・短い物は割らない')
 expect(not any(len(x) > 9 for t in RR35['features'] for x in _rv.wrap_topic(t.split('\n')[0])), 'RR35 の性能はどれも1行9字以内に収まる')
 _fs = [int(m) for m in _re.findall(r'\\fs(\d+)', ''.join(l for l in _pl if '\\p1' not in l and '※' not in l))]
+expect(any('\\blur%d' % _rv.TOPIC_SHADE_BLUR in l and l.startswith('Dialogue: 1,') for l in _pl_all), 'まとめの後ろにぼかした影を敷く（#249・文字の下層・枠に見えない）')
+_rr49 = shot_plan.plan_long(dict(RR35, layout='long', stills={k: 'u' for k in ('selfie', 'cleaning_pov', 'station')}))['cuts']
+expect('steps one pace' in _rr49[0]['action'] and 'lifts it a few centimetres' in next(c['action'] for c in _rr49 if c['still'] == 'station')
+       and 'step closer' in _rr49[-1]['action'], '話すだけのカットにしない：フック・置くだけ・最後に動きを入れる（#249）')
+expect('{handle}' not in ''.join(c['action'] for c in _rr49), '握る部分の差し込みが埋まっている')
 expect(_fs and min(_fs) >= 54, 'まとめの字は 54px 以上（#246 前は約34px）: %s' % sorted(set(_fs)))
 # ★投稿文（#244）：#PR が先頭・※はフックのすぐ下・#AI生成・X は長さに収める・リンクは楽天だけ
 _pp = _nhj['post_pack']
