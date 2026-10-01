@@ -167,7 +167,8 @@ RULES = [
      # ★冒頭の大見出し（#250・バズる型）：声（最大約5か月）を繰り返さず、見る人を絞る3〜7語。数字は作らない
      # ★問いかけの形（#251・vidIQ で伸びた日本の掃除動画は「洗濯機掃除してる？？」等の悩みの問いかけが多い）。
      #   「〜やめた」は架空の体験談になるので使わない。？は画面の文字だけ（声では Veo が読み違える・#169）
-     'hook_text': 'ゴミ捨て、毎回めんどくない？',
+     # ★#252：オーナー共有の参考（「掃除機のゴミ捨て嫌いな人 全員見て!!」）の型＝「〇〇な人」で絞り、2行目で呼びかける
+     'hook_text': 'ゴミ捨てが嫌いな人\n全員見て!!',
      'line': '最大約5か月、ゴミ捨て不要', 'must_say': 'ゴミ捨て不要'},
     # ★オーナー「ゴミ捨てってではなく、ゴミ捨て不要で のほうがわかりやすい」（2026-09-27）。説明文の語をそのまま言わせる
     # ★★掃除機の肝は吸い込む所（オーナー「一番肝心な掃除機のパワーや吸い込み描写は絶対いる。何に使うかを考えて」）。
@@ -566,14 +567,15 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
             # ★冒頭の大見出し（#250）はフックの前半、性能の札は後半へ。同時に出すと最初の画面が文字で埋まる
             hc = c.get('cards') or ([c['card']] if c.get('card') else [])
             cards.append({'text': c['hook_text'], 'cut_index': 0, 'part': [0, 2], 'style': 'hook'})
-            cards += [{'text': txt, 'cut_index': 0, 'part': [1, 2]} for txt in hc[:1]]
+            cards += [{'text': txt, 'cut_index': 0, 'part': [1, 2], 'style': 'center'} for txt in hc[:1]]
             continue
+        # ★札は画面の真ん中に白い大きな字で1機能1行（#252・参考の「V字ローラーで絡みにくい」）
         if c.get('cards'):
             # ★長回しは機能ごとにカードを出し分ける（前半・後半）。秒は描画側がカット番号と part から解く（#216）
             n = len(c['cards'])
-            cards += [{'text': txt, 'cut_index': i, 'part': [k, n]} for k, txt in enumerate(c['cards'])]
+            cards += [{'text': txt, 'cut_index': i, 'part': [k, n], 'style': 'center'} for k, txt in enumerate(c['cards'])]
         elif c.get('card'):
-            cards.append({'text': c['card'], 'cut_index': i})
+            cards.append({'text': c['card'], 'cut_index': i, 'style': 'center'})
     job = {
         'job_id': upload_path.rsplit('/', 1)[-1].rsplit('.', 1)[0],
         'mode': 'A', 'width': 1080, 'height': 1920, 'fps': 30,

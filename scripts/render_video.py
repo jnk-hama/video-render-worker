@@ -1041,6 +1041,10 @@ CTA_ARROW_BOUNCE_SEC = 0.5
 CTA_ARROW_BOUNCE_PX = 24
 CARD_TAG_Y = 0.088   # 「POINT n」の小札
 HOOK_TEXT_SCALE = 1.35   # 冒頭の大見出しは札の何倍の字か（#250）
+HOOK_CALL_SCALE = 1.25   # 大見出しの2行目（「全員見て!!」の呼びかけ）は1行目の何倍か（#252）
+HOOK_CALL_COLOR = '&H004DE1FF'   # 呼びかけの黄色（ASS は BGR＝#FFE14D）
+CENTER_TEXT_SCALE = 1.15 # 真ん中の1行の字（#252）
+CENTER_TEXT_Y = 0.40     # 真ん中の文字の中心（顔の下・字幕 0.74 の上）
 # 情報カードを字幕の**下**に置く距離（画面高に対する比）。上に置くと服を隠す
 CARD_BELOW_CAPTION = 0.08
 
@@ -1755,15 +1759,31 @@ def build_ass(captions, w, h, font_size, center=False,
         end = float(cd.get('end', start + 2.0))
         if not text or end <= start:
             continue
-        if cd.get('style') == 'hook':
-            # ★冒頭の大見出し（#250・バズる型「最初の1〜2秒に、声を一段強める3〜7語の文字」）。POINT もチェックも付けない。
-            #   大きく・アクセント色・弾んで出る。位置は札と同じ頭の上
-            hfs = card_font_size(raw_lines, int(card_fs * HOOK_TEXT_SCALE), ratio, usable_w - 2 * CARD_OUTLINE,
+        if cd.get('style') in ('hook', 'center'):
+            # ★参考の型（#252・オーナー共有の TikTok「掃除機のゴミ捨て嫌いな人 全員見て!!」「V字ローラーで絡みにくい」）：
+            #   画面の真ん中に、白い大きな字で短く。札・POINT・チェックは付けない。
+            #   hook は2行目（呼びかけ）を黄色で一回り大きく。center は1機能1行。「※」の行は下に小さく（打ち消し表示は消さない）
+            body = [t for t in raw_lines if not t.startswith('※')] or raw_lines[:1]
+            notes = [t for t in raw_lines if t.startswith('※') and t not in body]
+            if cd.get('style') == 'center':
+                body = [x for t in body for x in wrap_topic(t)]   # 長い機能は2行に割って大きく（まとめと同じ割り方・#246）
+            base = int(card_fs * (HOOK_TEXT_SCALE if cd.get('style') == 'hook' else CENTER_TEXT_SCALE))
+            cfs = card_font_size(body, base, ratio, usable_w - 2 * CARD_OUTLINE,
                                  measure=lambda t: measure_char_ratio(t, font_name, font_dir))
             pop = '\\fscx30\\fscy30\\t(0,130,\\fscx112\\fscy112)\\t(130,230,\\fscx100\\fscy100)\\fad(60,150)'
-            lines.append('Dialogue: 3,%s,%s,Card,,0,0,0,,{\\an8\\pos(%d,%d)\\fs%d\\1c%s%s}%s'
-                         % (ass_time(start), ass_time(end), center_x, int(h * CARD_TAG_Y), hfs,
-                            accent or '&H005C3BFF', pop, text))
+            sizes = [int(cfs * HOOK_CALL_SCALE) if (cd.get('style') == 'hook' and k == len(body) - 1 and len(body) > 1) else cfs
+                     for k in range(len(body))]
+            cy = int(h * CENTER_TEXT_Y) - sum(int(z * CARD_LINE_GAP) for z in sizes) // 2
+            for k, (t, z) in enumerate(zip(body, sizes)):
+                col = '\\1c%s' % HOOK_CALL_COLOR if z != cfs else ''
+                lines.append('Dialogue: 3,%s,%s,Card,,0,0,0,,{\\an8\\pos(%d,%d)\\fs%d\\bord%d\\shad%d%s%s}%s'
+                             % (ass_time(min(end, start + k * CARD_STAGGER)), ass_time(end), center_x, cy, z,
+                                CARD_OUTLINE, CARD_SHADOW, col, pop, ass_escape(t)))
+                cy += int(z * CARD_LINE_GAP)
+            if notes:
+                lines.append('Dialogue: 2,%s,%s,Card,,0,0,0,,{\\an8\\pos(%d,%d)\\fs%d\\bord3\\fad(120,150)}%s'
+                             % (ass_time(start), ass_time(end), center_x, cy, max(NOTE_MIN_PX, int(cfs * CARD_NOTE_RATIO)),
+                                '\\N'.join(ass_escape(t) for t in notes)))
             continue
         if center:
             cy = int(h * 0.50)

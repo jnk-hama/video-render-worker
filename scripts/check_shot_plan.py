@@ -767,13 +767,24 @@ expect('steps one pace' in _rr49[0]['action'] and 'lifts it a few centimetres' i
 expect('{handle}' not in ''.join(c['action'] for c in _rr49), '握る部分の差し込みが埋まっている')
 # ★冒頭の大見出し（#250・バズる型：最初の1〜2秒に、声を一段強める3〜7語）
 _hj = shot_plan.render_job(RR35, {'cuts': _rr49, 'cards_only': [], 'panel': None}, ['u'] * len(_rr49), 'preview/x.mp4')['job']['info_cards']
-expect(_hj[0] == {'text': 'ゴミ捨て、毎回めんどくない？', 'cut_index': 0, 'part': [0, 2], 'style': 'hook'} and _hj[1]['part'] == [1, 2] and '※' in _hj[1]['text'],
+expect(_hj[0] == {'text': 'ゴミ捨てが嫌いな人\n全員見て!!', 'cut_index': 0, 'part': [0, 2], 'style': 'hook'} and _hj[1]['part'] == [1, 2] and '※' in _hj[1]['text'],
        '大見出しはフックの前半、性能の札（※の条件つき）は後半')
 expect(not any(ch.isdigit() for ch in _rr49[0]['hook_text']) and 'ゴミ捨て不要' not in _rr49[0]['hook_text'], '大見出しは数字を作らず、声を繰り返さない')
 expect('？' not in _rr49[0]['line'] and not any(w in _rr49[0]['hook_text'] for w in ('やめた', '使ってる', '買った')), '？は画面だけ・体験談の形（やめた等）にしない（#251）')
 _ha = _rv.build_ass([], 1080, 1920, 108, cards=[{'text': 'ゴミ捨てが面倒な人へ', 'start': 0, 'end': 1, 'style': 'hook'},
                                                {'text': '強力吸引', 'start': 1, 'end': 2}])
 expect('POINT 1' in _ha and 'POINT 2' not in _ha and _ha.count('\\p1') == 1, '大見出しには POINT もチェックも付けない（次の札が POINT 1）')
+# ★参考の型（#252）：札は真ん中に白い大きな字で1行。POINT もチェックも無し。大見出しの2行目は黄色で大きく
+expect(all(c.get('style') in ('hook', 'center') for c in _hj), 'マリーの札は全部、真ん中の大きな字（#252）')
+_hc = _rv.build_ass([], 1080, 1920, 108, cards=[{'text': 'ゴミ捨てが嫌いな人\n全員見て!!', 'start': 0, 'end': 1, 'style': 'hook'},
+                                               {'text': '最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測', 'start': 1, 'end': 2, 'style': 'center'}])
+_hl = [l for l in _hc.split('\n') if l.startswith('Dialogue:')]
+expect('POINT' not in _hc and '\\p1' not in _hc, '真ん中の文字には POINT もチェックも付けない')
+expect(any('全員見て' in l and _rv.HOOK_CALL_COLOR in l for l in _hl) and not any('ゴミ捨てが嫌いな人' in l and _rv.HOOK_CALL_COLOR in l for l in _hl),
+       '大見出しは2行目（呼びかけ）だけ黄色')
+expect(any('※1日1回' in l for l in _hl), '真ん中の札でも※の条件を残す')
+_ys = [int(_re.search(r'\\pos\(\d+,(\d+)\)', l).group(1)) for l in _hl]
+expect(all(int(1920 * 0.25) < y < int(1920 * _rv.SAFE_AREAS['none']['caption_y']) for y in _ys), '真ん中の文字は顔より下・字幕より上')
 expect(_fs and min(_fs) >= 54, 'まとめの字は 54px 以上（#246 前は約34px）: %s' % sorted(set(_fs)))
 # ★投稿文（#244）：#PR が先頭・※はフックのすぐ下・#AI生成・X は長さに収める・リンクは楽天だけ
 _pp = _nhj['post_pack']
