@@ -36,15 +36,21 @@ def main():
     except OSError:
         text = ''
     reason = reason_from(text)
-    base = (os.environ.get('SUPABASE_URL') or '').strip().rstrip('/')
-    key = (os.environ.get('SUPABASE_SERVICE_ROLE_KEY') or '').strip()
     print('止まった理由（LINE へ送る内容）:\n' + reason)
+    # ★URL と鍵は marie_video と同じ読み方にする（2026-10-01：strip だけでは秘密の値の前の見えない文字が残り、
+    #   「unknown url type」で LINE へ届かなかった。Veo を呼ぶ側は文字を選んで読むので通っていた）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from marie_video import _base_and_key
+        base, key = _base_and_key()
+    except SystemExit:
+        base, key = '', ''
     if not base or not key:
         print('::warning::SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY が無いので LINE へ送れません')
         return 0
     req = urllib.request.Request(base + '/functions/v1/video-scene',
                                  data=json.dumps({'action': 'notify_stop', 'title': title, 'reason': reason}).encode(),
-                                 headers={'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'})
+                                 headers={'Authorization': 'Bearer ' + key, 'apikey': key, 'Content-Type': 'application/json'})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             print('LINE へ送りました: %s' % r.read().decode()[:200])

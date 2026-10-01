@@ -40,6 +40,12 @@ expect('marie-video は本番のログを run.log に残す', 'tee run.log' in m
 expect('render-video は止まったら notify_stop を呼ぶ（マリーの依頼だけ）', 'failure()' in rv and 'scripts/notify_stop.py "描画で停止"' in rv and "j.get('review')" in rv)
 expect('render-video は描画と品質検査のログを render.log に残す', 'tee render.log' in rv and 'tee -a render.log' in rv)
 
+# ★秘密の値の前に見えない文字があっても送れる（2026-10-01 本番：「unknown url type: ***https」で LINE へ届かなかった）
+import subprocess as _sp
+_out = _sp.run([sys.executable, os.path.join(ROOT, 'scripts/notify_stop.py'), 'テスト', os.devnull], capture_output=True, text=True,
+               env=dict(os.environ, SUPABASE_URL='\ufeffhttps://127.0.0.1.supabase.invalid\n', SUPABASE_SERVICE_ROLE_KEY='k')).stdout
+expect('URL の前の見えない文字で「unknown url type」にならない', 'unknown url type' not in _out and 'LINE へ送れませんでした' in _out)
+
 print()
 if ran < 10 or fails:
     print('不合格 %d 件（%d 件中）' % (fails, ran))
