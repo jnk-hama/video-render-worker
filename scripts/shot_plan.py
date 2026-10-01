@@ -364,6 +364,42 @@ def says(cut):
     return [v] if isinstance(v, str) else list(v or [])
 
 
+# ★完成の形（#248・オーナー「3〜4カット構成で」「もう少しシーンを長くして16〜18秒に」「全てAI動画で構築」「全編インフルエンサーの声で」）
+TARGET_SECONDS = (16, 18)
+CUTS_MAX = 4
+# 頭の無音を詰める分の見積り（描画は喋り始めの少し前から使う・尾は min_keep で残す）
+HEAD_TRIM = 0.3
+
+
+def est_seconds(cuts):
+    """完成の長さの見積り（秒）。各カットは頭の無音だけ詰め、喋りの速さ（SPEECH_SPEED）で縮む"""
+    return sum(c['seconds'] - HEAD_TRIM for c in cuts) / SPEECH_SPEED
+
+
+def fit_shape(cuts, cards_only):
+    """
+    3〜4カット・16〜18秒に合わせる（#248）。
+      1. 4カットを超えたら、絵で見せる主張（must_show）の無い機能のカットから外す（性能は最後のまとめへ回る）
+      2. 16秒に届くまで、短いカットから Veo の長さを一段ずつ伸ばす（4→6→8秒）。実演・フックを先に。18秒は超えない
+    """
+    cuts = list(cuts)
+    while len(cuts) > CUTS_MAX:
+        k = next((k for k in range(len(cuts) - 2, 0, -1) if not cuts[k].get('must_show')), len(cuts) - 2)
+        cards_only.append(cuts.pop(k).get('feature'))
+    steps = (CUT_SECONDS,) + LONG_STEPS
+    cuts = [dict(c) for c in cuts]
+    while est_seconds(cuts) < TARGET_SECONDS[0]:
+        order = sorted(range(len(cuts)), key=lambda k: (cuts[k]['seconds'], not cuts[k].get('demo'), cuts[k]['role'] != 'hook', k))
+        for k in order:
+            nxt = next((x for x in steps if x > cuts[k]['seconds']), None)
+            if nxt and est_seconds(cuts[:k] + [dict(cuts[k], seconds=nxt)] + cuts[k + 1:]) <= TARGET_SECONDS[1]:
+                cuts[k]['seconds'] = nxt
+                break
+        else:
+            break
+    return cuts
+
+
 def plan_long(product):
     """
     長回しの計画（#216）。通常の計画を作り、同じ静止画の機能を1シーンにまとめる。
@@ -436,7 +472,7 @@ def plan_long(product):
                 base['cards_only'].append(c['feature'])
     # ★本編は元の計画の並び順を保つ（吸い込む所をフックの直後に出す等・規則表の優先を崩さない）
     scenes.sort(key=lambda s: min((k for k, c in enumerate(body) if c['feature'] == s['feature']), default=99))
-    out = [first] + scenes + [last]
+    out = fit_shape([first] + scenes + [last], base['cards_only'])
     if base.get('panel'):
         base['panel'] = dict(base['panel'], cut_index=len(out) - 1)
     if cta.get('card') and not last.get('cards'):
@@ -507,7 +543,9 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     clips = []
     for c, url in zip(cuts, clip_urls):
         # ★台本（line）も渡す。描画側が字幕（文字起こし）と比べ、大きくずれたら止める（#199）
-        clip = {'url': url, 'start': 0, 'duration': c['seconds'], 'product_key': product['product_key'], 'line': c['line']}
+        clip = {'url': url, 'start': 0, 'duration': c['seconds'], 'product_key': product['product_key'], 'line': c['line'],
+                # ★尾の無音は詰めずに残す（#248・16〜18秒）。頭だけ詰める
+                'min_keep': c['seconds']}
         if says(c):
             clip['must_say'] = says(c)
         clips.append(clip)

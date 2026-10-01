@@ -67,6 +67,14 @@ expect(src.index('speech_qa.bad_speech(by_part') < src.index("audio_path = os.pa
 expect("if job.get('keep_voice'):" in src and src.index("if job.get('keep_voice'):") < src.index('words = speak_line(line, fixed'),
        'keep_voice の依頼（マリー）は別の声に替えず、崩れた字幕だけ外す（#246）')
 
+_bp = [[{'text': '置くだけで'}, {'text': 'ね'}, {'text': 'あとは'}], [{'text': '見てね'}], [{'text': 'ね'}]]
+_cl = [{'line': '置くだけで、あとは勝手にやってくれる'}, {'line': '見てね'}, {}]
+_dn = rv.drop_added_ne(_bp, _cl)
+expect([w['text'] for w in _dn[0]] == ['置くだけで', 'あとは'], '台本に無い「ね」は字幕から外す（#248・E-040「置くだけでねあとは」）')
+expect(_dn[1] == _bp[1] and _dn[2] == _bp[2], '台本に「ね」があるカット・台本の無いカットは触らない')
+expect("keep = float(c.get('min_keep') or 0)" in src and 'if keep and tail is None:' in src,
+       '尾の無音は min_keep まで残す・丁寧語を切った回は伸ばさない（#248）')
+
 print()
 if fails:
     print('不合格 %d 件' % len(fails))

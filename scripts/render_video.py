@@ -718,6 +718,21 @@ def speak_line(line, dest, duration, market, voice=None, synth=None):
             for w in (r.get('words') or []) if w['start'] / tempo < duration]
 
 
+def drop_added_ne(by_part, clips):
+    """
+    字幕から、台本に無い「ね」を外す（#248・E-040：「置くだけでねあとは」）。声はそのまま（マリーの声を替えない・#246）。
+    台本（clips[i]['line']）に「ね」がある カット・台本の無いカットは触らない。検査（check_speech）には元の語を渡す
+    """
+    out = []
+    for i, ws in enumerate(by_part):
+        line = (clips[i].get('line') if i < len(clips) else None) or ''
+        if not line or 'ね' in line:
+            out.append(ws)
+            continue
+        out.append([dict(w, text=w['text'].replace('ね', '')) for w in ws if w['text'].replace('ね', '').strip()])
+    return out
+
+
 def inset_filter(inset):
     """
     素材の上下左右を割合で切り落とす crop（決定#171）。
@@ -2435,6 +2450,11 @@ def main():
                           else:
                               log('  丁寧語を切り切れませんでした（検査に任せます）')
                   st2, each2 = speech_qa.speech_window(ws, st, each, tail=tail)
+                  # ★尾の無音は min_keep 秒までは残す（#248・オーナー「もう少しシーンを長くして16〜18秒に」）。
+                  #   喋り終わった後のマリーの表情・動きも Veo の動画なので、詰めすぎない。丁寧語を切った回（tail）は伸ばさない
+                  keep = float(c.get('min_keep') or 0)
+                  if keep and tail is None:
+                      each2 = max(each2, min(st + each, st2 + keep) - st2)
                   if (st2, each2) != (st, each):
                       log('  無音を詰めます: %.2f〜%.2f秒 → %.2f〜%.2f秒'
                           % (st, st + each, st2, st2 + each2))
@@ -2658,7 +2678,8 @@ def main():
                 by_part = speech_qa.transcribe_parts(part_audio, windows, market)
             for i, ws in enumerate(by_part):
                 log('  カット%d の喋り: %s' % (i + 1, speech_qa.part_text(ws, market) or '（無音）'))
-            captions = speech_qa.captions_from_words(by_part, market, tts_mod.group_words)
+            captions = speech_qa.captions_from_words(drop_added_ne(by_part, job.get('clips') or []), market,
+                                                     tts_mod.group_words)
             log('喋った内容から字幕を %d 枚作りました（%s）' % (len(captions), speech_qa.WHISPER_MODEL))
             issues += speech_qa.check_speech(by_part, job.get('clips') or [], market,
                                              forbid=job.get('forbid_phrases'))

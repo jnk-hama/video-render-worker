@@ -356,8 +356,9 @@ def choose(cut, tried, got, verify, lang='ja', face=None):
 # ★外すカットの喋りの問題（#246）。別の声に替えない（keep_voice）ので、台本と違うことを言ったカットは使わない。
 #   「ね」の足しすぎ・言い終わりの丁寧語は軽い（描画が切る・#189）ので残す
 SEVERE_SPEECH = ('台本と大きく違う', 'と言っていない', '言い淀み')
-# 外した後に残すカットの下限。これ未満なら喋りの問題があるカットも戻す（静止画では埋めない）
-MIN_KEEP_CUTS = 2
+# 外した後に残すカットの下限（#248・オーナー「3〜4カット構成で」）。これ未満なら喋りの問題があるカットも戻し、
+#   それでも足りなければ描かない（静止画でも別の声でも埋めない）
+MIN_KEEP_CUTS = 3
 
 
 def keep_cuts(plan, picks, features):
@@ -372,8 +373,8 @@ def keep_cuts(plan, picks, features):
     keep = [k for k, (v, _a, ns) in enumerate(picks) if v is not None and not severe(ns)]
     if len(keep) < MIN_KEEP_CUTS:
         keep = [k for k, (v, _a, _n) in enumerate(picks) if v is not None]
-    if not keep:
-        raise SystemExit('使える映像が1カットもありません（静止画では埋めない・#246）')
+    if len(keep) < MIN_KEEP_CUTS:
+        raise SystemExit('使える映像が %d カットしかありません（3カット未満は描かない・静止画や別の声で埋めない・#246 #248）' % len(keep))
     dropped = ['カット%d を外しました（%s）' % (k + 1, '・'.join(picks[k][2]) or '映像なし')
                for k in range(len(picks)) if k not in keep]
     cuts = [plan['cuts'][k] for k in keep]
@@ -515,7 +516,8 @@ def main():
     product = json.load(open(sys.argv[1], encoding='utf-8'))
     out_path = sys.argv[2]
     dry = '--dry-run' in sys.argv
-    plan = shot_plan.plan_long(product) if product.get('layout') == 'long' else shot_plan.plan(product)
+    # ★既定は長回し＝3〜4カット・16〜18秒（#248・オーナーの完成条件）。細かいカット割りは layout: cuts を明示した時だけ
+    plan = shot_plan.plan(product) if product.get('layout') == 'cuts' else shot_plan.plan_long(product)
     persona = persona_of(product)
     phone = product.get('look') == 'phone'
     for c in plan['cuts']:

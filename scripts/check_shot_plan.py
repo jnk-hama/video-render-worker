@@ -328,7 +328,7 @@ marie_video._req = _orig_req
 import json as _j0  # noqa: E402
 import tempfile as _t0  # noqa: E402
 _keep = {n: getattr(marie_video, n) for n in ('_base_and_key', 'find_reusable', 'start_cut', 'wait_all', 'verify_cut', 'START_GAP_SEC')}
-RR35_S = dict(RR35, stills={kk: 'https://x/scene/gadget/1790490103321-293fa7e9.jpg' for kk in RR35['stills']})
+RR35_S = dict(RR35, layout='cuts', stills={kk: 'https://x/scene/gadget/1790490103321-293fa7e9.jpg' for kk in RR35['stills']})
 kp = shot_plan.plan(RR35_S)['cuts']
 old = {0: 900, 2: 902, 3: 903, 5: 905}          # フック・コードレス・ステーション・CTA に前のクリップがある
 said_of = {900: 'ゴミ捨てって最大約5ヶ月いらないって'}  # 前のフックは古い言い方
@@ -381,7 +381,7 @@ marie_video.wait_all = lambda base, key, ids: {i: {'video_url': 'u%d' % i} for i
 marie_video.verify_cut = lambda base, key, url, ms, demo=False: (1, 'ok', p['cuts'][int(url[1:]) - 100]['line'])
 with tempfile.TemporaryDirectory() as td:
     pj, oj = os.path.join(td, 'p.json'), os.path.join(td, 'j.json')
-    _json.dump(dict(REDIAL, reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))
+    _json.dump(dict(REDIAL, layout='cuts', reuse_ids=list(range(100, 100 + len(p['cuts'])))), open(pj, 'w'))
     sys.argv = ['marie_video.py', pj, oj]
     marie_video.main()
     job = _json.load(open(oj))['job']
@@ -389,7 +389,7 @@ with tempfile.TemporaryDirectory() as td:
     expect(len(job['clips']) == len(p['cuts']), '描画の依頼まで作る（カット数ぶんのクリップ）')
     expect(job.get('review', {}).get('clip_ids') == list(range(100, 100 + len(p['cuts']))),
            '完成後に LINE で承認を求める素材番号を依頼に載せる（#191）')
-    _json.dump(dict(REDIAL, reuse_ids=[1, 2]), open(pj, 'w'))
+    _json.dump(dict(REDIAL, layout='cuts', reuse_ids=[1, 2]), open(pj, 'w'))
     try:
         marie_video.main()
         expect(False, '本数が合わない reuse_ids は止める')
@@ -421,7 +421,7 @@ expect(marie_video.hand_problem(1, True) is None and marie_video.hand_problem(2,
 expect(marie_video.hand_problem(3, False) and marie_video.hand_problem(None, True) is None,
        '3本は落とす・数えられない時は判定しない')
 _pc2 = shot_plan.plan_long({"product_key": "orage-rr35", "genre": "gadget", "layout": "long", "image_url": "x",
-    "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "コードレス", "自動ゴミ回収ステーション"],
+    "features": ["最大約4〜5か月ゴミ捨て不要", "強力吸引", "自動ゴミ回収ステーション"],
     "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "station", "selfie", "cleaning_pov"])}})['cuts']
 print('=== 本番の前の静止画の点検（#227 の自動化・#232）===')
 _OKE = lambda u, parts: {'held_part': parts[0], 'grip': 'power', 'wrist': 'neutral', 'anatomy': 'normal'}
@@ -448,7 +448,7 @@ expect(_e and '一人称の静止画に顔' in _e, '一人称の絵に顔が映�
 _e = _pf(_pc2, lambda u: 3, _good_f)
 expect(_e and '手が3本' in _e, '一人称でない絵も手3本は止める')
 _mix = [dict(c) for c in _pc2]
-_mix[-2]['must_show'] = next(c['must_show'] for c in _pc2 if c['still'] == 'holding')   # ステーションの絵に「持つ」の問い
+_mix[-2]['must_show'] = next(c['must_show'] for c in _pc2 if c['still'] == 'cleaning_pov')   # ステーションの絵に「吸い込む」の問い
 _e = _pf(_mix, _good_h, _good_f)
 expect(_e and 'E-037' in _e, '絵の問いが別の絵の物なら止める（E-037）')
 _hi = [dict(c, persona='hiro', must_show=shot_plan.gendered(c.get('must_show'), 'hiro'),
@@ -546,8 +546,8 @@ expect(_steps_mp >= 2, 'mediapipe を入れる手順を読めている（%d件�
 print('=== 止めない：作り直しても合格しないカットは埋めて描く（#230）===')
 _keep2 = {n: getattr(marie_video, n) for n in ('_base_and_key', 'find_reusable', 'start_cut', 'wait_all', 'verify_cut',
                                                'START_GAP_SEC', 'make_face_check')}
-RR_T = dict(RR35_S, reuse=False)
-tp = shot_plan.plan(RR_T)['cuts']
+RR_T = dict(RR35_S, reuse=False, layout='long')
+tp = shot_plan.plan_long(RR_T)['cuts']
 marie_video._base_and_key = lambda: ('https://x.supabase.co', 'k')
 marie_video.START_GAP_SEC = 0
 marie_video.find_reusable = lambda *a: None
@@ -596,8 +596,8 @@ jB, wB = _run(lambda k, n: True, lambda k, n: 'ね、細かいゴミもね、ど
 expect(jB and jB['clips'][kB]['url'].startswith('u') and jB['clips'][kB].get('must_say'),
        'B: 喋りだけの問題は、そのクリップをそのまま使う（検査も掛ける）')
 expect(jB and any('「ね」' in n for n in jB['review']['notes']), 'B: 喋りの問題を LINE に書く')
-# C. ステーションのカットは2回とも起動できない（429）→ そのカットを外す
-kC = next(k for k, c in enumerate(tp) if c['still'] == 'station')
+# C. 実演でない機能のカットが2回とも起動できない（429）→ そのカットを外す
+kC = next(k for k, c in enumerate(tp) if c['role'] == 'feature' and not c.get('demo'))
 jC, wC = _run(lambda k, n: k != kC, lambda k, n: tp[k]['line'], lambda k, n: None)
 expect(jC and len(jC['clips']) == len(tp) - 1 and tp[kC]['still_url'] not in [c['url'] for c in jC['clips']],
        'C: 起動できないカットは外す（静止画で埋めない・#246）')
@@ -637,8 +637,21 @@ _kb = shot_plan.plan_long({"product_key": "kabeni-projector", "genre": "gadget",
     "features": ["天井に投影できる\n※投影サイズ 6〜130インチ", "スマホサイズ・220g", "アプリ内蔵（YouTube・Netflix・プライムビデオ）",
                  "バッテリー内蔵・連続2.5時間再生", "Switch・PS4をHDMIでつないでゲーム"],
     "stills": {k: "https://x/%d-a.jpg" % i for i, k in enumerate(["holding", "selfie", "ceiling", "wall", "gaming"])}})
-expect([c['seconds'] for c in _kb['cuts']] == [6, 6, 6] and all(len(c['line']) <= 27 for c in _kb['cuts']),
-       'カベーニは3シーンとも27文字以内・6秒（#224）')
+expect(len(_kb['cuts']) == 3 and all(len(c['line']) <= 27 for c in _kb['cuts']), 'カベーニは3シーンとも27文字以内（#224）')
+expect(sorted(c['seconds'] for c in _kb['cuts']) == [6, 6, 8], 'カベーニは16秒に届くまでフックを8秒へ伸ばす（#248）')
+# ★完成の形（#248・オーナー「3〜4カット構成で」「16〜18秒に」）
+for _nm, _pl in (('RR35', shot_plan.plan_long(dict(RR35, layout='long'))), ('カベーニ', _kb),
+                 ('RR35 の本番の静止画', shot_plan.plan_long(dict(RR35, layout='long', stills={k: 'u' for k in ('selfie', 'cleaning_pov', 'station')})))):
+    _es = shot_plan.est_seconds(_pl['cuts'])
+    expect(3 <= len(_pl['cuts']) <= 4 and 16 <= _es <= 18, '%s は3〜4カット・16〜18秒（%dカット・%.1f秒）' % (_nm, len(_pl['cuts']), _es))
+_five = [{'role': 'hook', 'seconds': 6}] + [{'role': 'feature', 'seconds': 4, 'feature': 'f%d' % i} for i in range(3)] + [{'role': 'cta', 'seconds': 4}]
+_co = []
+_fit = shot_plan.fit_shape(_five, _co)
+expect(len(_fit) == 4 and _co == ['f2'], '5カットなら最後の機能を外し、まとめへ回す')
+expect(all(c['role'] != 'cta' or c['seconds'] for c in _fit) and _fit[0]['role'] == 'hook' and _fit[-1]['role'] == 'cta', 'フックと CTA は外さない')
+_rj = shot_plan.render_job(RR35, {'cuts': _fit[:1] and [dict(c, line='x', still='selfie') for c in _fit], 'cards_only': [], 'panel': None},
+                           ['u'] * 4, 'preview/x.mp4')['job']
+expect(all(c['min_keep'] == c['duration'] for c in _rj['clips']), '尾の無音は詰めない（min_keep＝カットの長さ・#248）')
 expect(sorted(w for c in _kb['cuts'] for w in shot_plan.says(c)) == sorted(['天井', 'アプリ', 'スマホ', '映画', 'ゲーム', 'リンク']),
        '詰めても言うべき語は全部残る')
 print('=== スマホで撮った日常の質感（#226）===')
