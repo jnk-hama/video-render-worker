@@ -634,8 +634,10 @@ function stockFootageUrl_(query) {
  *
  * @return {?string} media_id
  */
-function uploadVideoToX_(accountKey, asset) {
-  if (!videoUploadEnabled_() || !asset || !asset.blob) return null;
+function uploadVideoToX_(accountKey, asset, opts) {
+  // ★force はオーナーが LINE で明示的に頼んだ投稿（38_MariePost.gs）だけ。自動投稿の動画スイッチは変えない
+  const forced = !!(opts && opts.force);
+  if ((!forced && !videoUploadEnabled_()) || !asset || !asset.blob) return null;
 
   // ★Xが既に拒否しているなら、分割送信を始める前にやめる（2026-08-24）
   if (xCallsBlocked_(accountKey)) {

@@ -240,6 +240,9 @@ function handleLineEvent_(event) {
   }
 
   switch (command.type) {
+    case 'marie_post':
+      replyToLine_(replyToken, handleMariePost_(command.jobId));
+      break;
     case 'post':
       handlePostCommand_(replyToken, command.account, command.body);
       break;
@@ -554,7 +557,11 @@ function handleLineEvent_(event) {
 function parseCommand_(rawText) {
   const text = normalizeInput_(rawText);
 
-  let m = text.match(/^([AB])\s*に投稿\s*[:：]\s*([\s\S]+)$/i);
+  // 承認したマリー動画を X へ（38_MariePost.gs）。LINE の［Xに投稿］ボタンが送る文
+  let m = text.match(/^X\s*投稿\s+(marie-[a-z0-9-]{3,80})$/i);
+  if (m) return { type: 'marie_post', jobId: m[1].toLowerCase() };
+
+  m = text.match(/^([AB])\s*に投稿\s*[:：]\s*([\s\S]+)$/i);
   if (m) {
     return { type: 'post', account: m[1].toUpperCase(), body: m[2].trim() };
   }
