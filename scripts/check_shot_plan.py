@@ -793,6 +793,20 @@ expect('sweeps her free hand' in _rr49[0]['action'] and 'lifts it a few centimet
 expect('{handle}' not in ''.join(c['action'] for c in _rr49), '握る部分の差し込みが埋まっている')
 expect(all(shot_plan.FACE_STEADY in c['action'] for c in _rr49 if c['still'] in ('selfie', 'station') and c['role'] != 'cta')
        and 'steps one pace' not in _rr49[0]['action'], '顔が出るカットは体を動かさず腕だけ（#253・一歩よけると顔が別人になった）')
+# ★CM 型（#255・オーナー「本物のCMみたい 20秒くらいに AIインフルエンサーを使いながら」）
+_cmp = dict(RR35, category='cleaning', stills={'selfie': 's', 'cleaning_pov': 'c', 'station_pov': 'sp', 'holding_pov': 'hp', 'station': 't', 'holding': 'h'})
+_cm = shot_plan.plan_cm(_cmp)
+_cmc = _cm['cuts']
+_es = shot_plan.est_seconds_cm(_cmc)
+expect(len(_cmc) <= shot_plan.CM_CUTS_MAX and 18 <= _es <= 22, 'CM 型は7カットまで・約20秒（%dカット・%.1f秒）' % (len(_cmc), _es))
+expect(_cmc[0]['still'] == 'selfie' and _cmc[-1]['still'] == 'selfie' and all(shot_plan.is_pov_action(c['action']) for c in _cmc[1:-1]),
+       '顔はフックと最後だけ・機能は手元のアップ（顔なし）')
+expect(all(c['min_keep'] <= c['seconds'] for c in _cmc) and _cm['panel']['cut_index'] == len(_cmc) - 1, '喋った所＋少しだけ使う・まとめは最後のカット')
+expect(all(c.get('grip_parts') for c in _cmc if c['still'] in ('holding_pov', 'station_pov')), '手元で掃除機を持つ絵は握り方を点検する')
+_cmj = shot_plan.render_job(_cmp, _cm, ['u'] * len(_cmc), 'preview/x.mp4')['job']
+expect([c['min_keep'] for c in _cmj['clips']] == [c['min_keep'] for c in _cmc], 'CM 型の min_keep が描画の依頼に載る')
+_cm0 = shot_plan.plan_cm(dict(RR35, stills={'selfie': 's', 'cleaning_pov': 'c', 'station': 't'}))
+expect(any(c['still'] == 'station' for c in _cm0['cuts']), '手元の静止画が無ければ、今までの絵で作る（止めない）')
 # ★冒頭の大見出し（#250・バズる型：最初の1〜2秒に、声を一段強める3〜7語）
 _hj = shot_plan.render_job(RR35, {'cuts': _rr49, 'cards_only': [], 'panel': None}, ['u'] * len(_rr49), 'preview/x.mp4')['job']['info_cards']
 expect(_hj[0] == {'text': 'ゴミ捨てが嫌いな人\n全員見て!!', 'cut_index': 0, 'part': [0, 2], 'style': 'hook'} and _hj[1]['part'] == [1, 2] and '※' in _hj[1]['text'],

@@ -525,8 +525,9 @@ def main():
     product = json.load(open(sys.argv[1], encoding='utf-8'))
     out_path = sys.argv[2]
     dry = '--dry-run' in sys.argv
-    # ★既定は長回し＝3〜4カット・16〜18秒（#248・オーナーの完成条件）。細かいカット割りは layout: cuts を明示した時だけ
-    plan = shot_plan.plan(product) if product.get('layout') == 'cuts' else shot_plan.plan_long(product)
+    # ★既定は CM 型＝顔は冒頭と最後・機能は手元のアップ・約20秒（#255）。長回し（#248）は layout: long、細かい割りは layout: cuts
+    layout = product.get('layout') or 'cm'
+    plan = {'cuts': shot_plan.plan, 'long': shot_plan.plan_long}.get(layout, shot_plan.plan_cm)(product)
     persona = persona_of(product)
     phone = product.get('look') == 'phone'
     for c in plan['cuts']:

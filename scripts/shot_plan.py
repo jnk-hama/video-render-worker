@@ -193,7 +193,11 @@ RULES = [
      'line': '細かいゴミも、どんどん吸い込む', 'must_say': '吸い込む', 'demo': True, 'grip_parts': STICK_PARTS,
      'must_show': 'The floor head passes over visible crumbs or dust on the floor and they disappear.'},
     {'genres': ('gadget',), 'match': r'コードレス|ワイヤレス|充電式',
-     'still': {'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
+     # ★CM 型（#255）は顔の出ない手元の絵（*_pov）を先に使う。顔のカットが減るほど別人になる失敗も減る（#253）
+     'still': {'holding_pov': "First-person view from her own eyes; her body is not in the frame. Her hand picks the product up by "
+                              "{handle} and carries it freely across the room; no cord is attached anywhere. The camera follows "
+                              "smoothly, close to the product." + ONE_HAND_POV,
+               'holding': "She lifts the product with one hand to show there is no cord at all, then looks at the "
                           "camera and talks like she is telling a friend."},
      'line': 'コードないから、サッと使える', 'must_say': 'コード',
      'must_show': 'She holds the product and no cable is attached to it.'},
@@ -202,13 +206,19 @@ RULES = [
                           "and talks softly to the camera like a friend."},
      'line': '動いてても、ほぼ音しない', 'must_say': '音'},
     {'genres': ('gadget',), 'match': r'軽量|軽い|[0-9.]+ ?(g|kg)',
-     'still': {'holding': "She holds the product up easily with one hand and bounces it slightly to show how light "
+     'still': {'holding_pov': "First-person view from her own eyes; her body is not in the frame. Her hand lifts the product by "
+                              "{handle} easily with one hand and raises it a little to show how light it is. Close-up on her hand "
+                              "and the product." + ONE_HAND_POV,
+               'holding': "She holds the product up easily with one hand and bounces it slightly to show how light "
                           "it is, then talks to the camera like a friend."},
      'line': '片手で持てる軽さ、ガチで楽', 'must_say': '片手',
      'must_show': 'She holds the product up with one hand.'},
     {'genres': ('gadget',), 'match': r'自動|ステーション|オート',
      # ★「置くだけ」を動きで見せる（#249）：少し持ち上げて戻し、手を離すと自立して収まる
-     'still': {'station': "The product is docked in its station next to her. She lifts it a few centimetres out of the station "
+     'still': {'station_pov': "First-person close-up from her own eyes; her body is not in the frame. Her hand lowers the product "
+                              "into its station by {handle}; it settles into place and stands on its own when she lets go. "
+                              "The product and the station keep exactly the shape and colours of the product photo." + ONE_HAND_POV,
+               'station': "The product is docked in its station next to her. She lifts it a few centimetres out of the station "
                           "by {handle}, sets it straight back down so it settles into place, lets go so it stands on its own, "
                           "and gestures at it with an open hand while talking to the camera like a friend. "
                           "The product and the station keep exactly the shape and colours of the product photo." + FACE_STEADY,
@@ -343,7 +353,7 @@ def plan(product):
     #   オーナー「静止画の説明も変」）。掃除機（category=cleaning）の回だけ。持っていない絵（station・selfie）は見ない
     if product.get('category') == 'cleaning':
         for c in cuts:
-            if c['still'] == 'holding' and not c.get('grip_parts'):
+            if c['still'] in ('holding', 'holding_pov', 'station_pov') and not c.get('grip_parts'):
                 c['grip_parts'] = list(STICK_PARTS)
     for c in cuts:  # ★握る部分を埋める（#235）。{handle} のまま外へ出さない
         c['action'] = with_handle(c['action'], product.get('handle'))
@@ -415,6 +425,38 @@ def fit_shape(cuts, cards_only):
         else:
             break
     return cuts
+
+
+# ★CM 型（#255・オーナー「これすごいぞ！本物のCMみたいだ！20秒くらいに短縮して、AIインフルエンサーを使いながら」）。
+#   参考（@harmony.ilife）は約36秒・23カット・1カット1〜2秒・顔は冒頭だけ・残りは手元と部品のアップ。
+#   Veo は1本＝1場面（最短4秒）なので、1機能1カット（4秒で作り、喋った所だけ使う）で 6〜7カット・約20秒にする。
+#   ★声は全カットでマリー本人（顔のカットは本人が、手元のカットは画面の外から喋る）。読み上げの別の声は使わない（#246）
+CM_CUTS_MAX = 7
+CM_TAIL = 0.8          # 喋り終わりの後に残す秒（手元の動きを見せる分。長いとテンポが落ちる）
+JA_CHARS_PER_SEC = JA_CHARS_4S / CUT_SECONDS
+
+
+def plan_cm(product):
+    """CM 型の計画（#255）。フック（顔）→ 機能ごとの手元・アップ → CTA（顔）。1機能1カット・喋った所＋CM_TAIL だけ使う"""
+    base = plan(product)
+    cuts = [dict(c) for c in base['cuts']]
+    cards_only = list(base['cards_only'])
+    while len(cuts) > CM_CUTS_MAX:
+        k = next((k for k in range(len(cuts) - 2, 0, -1) if not cuts[k].get('must_show')), len(cuts) - 2)
+        cards_only.append(cuts.pop(k).get('feature'))
+    for c in cuts:
+        c['min_keep'] = min(c['seconds'], round(len(c['line']) / JA_CHARS_PER_SEC + CM_TAIL, 2))
+    panel = base.get('panel')
+    if panel:
+        panel = dict(panel, cut_index=len(cuts) - 1)
+        if 'topics' in panel:
+            panel['topics'] = summary_topics([str(f).strip() for f in product.get('features') or [] if str(f).strip()], cuts)
+    return {'cuts': cuts, 'cards_only': cards_only, 'panel': panel, 'layout': 'cm'}
+
+
+def est_seconds_cm(cuts):
+    """CM 型の完成の長さの見積り（喋った所＋CM_TAIL を喋りの速さで縮める）"""
+    return sum(c.get('min_keep', c['seconds']) for c in cuts) / SPEECH_SPEED
 
 
 def plan_long(product):
@@ -561,8 +603,8 @@ def render_job(product, plan_, clip_urls, upload_path, clip_ids=None):
     for c, url in zip(cuts, clip_urls):
         # ★台本（line）も渡す。描画側が字幕（文字起こし）と比べ、大きくずれたら止める（#199）
         clip = {'url': url, 'start': 0, 'duration': c['seconds'], 'product_key': product['product_key'], 'line': c['line'],
-                # ★尾の無音は詰めずに残す（#248・16〜18秒）。頭だけ詰める
-                'min_keep': c['seconds']}
+                # ★尾の無音は詰めずに残す（#248・16〜18秒）。頭だけ詰める。CM 型は喋った所＋少しだけ（#255）
+                'min_keep': c.get('min_keep', c['seconds'])}
         if says(c):
             clip['must_say'] = says(c)
         clips.append(clip)
