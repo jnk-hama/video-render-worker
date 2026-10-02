@@ -1,17 +1,8 @@
 {
- "generated_at": "2026-10-01T10:21:06+00:00",
+ "generated_at": "2026-10-02T09:58:00+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
-   {
-    "id": "t3_1wpbmh5",
-    "title": "Snake catcher in India calmly handles two massive cobras with his bare hands and a stick",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wpbmh5/snake_catcher_in_india_calmly_handles_two_massive/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1wq7k2n",
     "title": "Octopus Expertly Executes His Camouflage To Hide From Sea Eel",
@@ -40,6 +31,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wuozi5",
+    "title": "I didn't even know the human body could move like that",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wuozi5/i_didnt_even_know_the_human_body_could_move_like/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wtgjjl",
     "title": "Scientists have captured the first ever high-speed, full-colour footage of fusion plasma swirling inside a working reactor.",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wtgjjl/scientists_have_captured_the_first_ever_highspeed/",
@@ -49,97 +49,106 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wq7927",
-    "title": "A 392 year old Greenland Shark that was located in Arctic Ocean. He’s been wandering the ocean since 1627",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wq7927/a_392_year_old_greenland_shark_that_was_located/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wu60ir",
+    "title": "In Southeast Asia, thousands of ducks are deployed into rice fields to act as natural pest control and weeders",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wu60ir/in_southeast_asia_thousands_of_ducks_are_deployed/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqxsyp",
-    "title": "In this restaurant you have to follow the cat and it leads you to the empty table",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wqxsyp/in_this_restaurant_you_have_to_follow_the_cat_and/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wqra5q",
+    "title": "Two galaxies are colliding 60 million light-years away - and this is what it looks like",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wqra5q/two_galaxies_are_colliding_60_million_lightyears/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1ws1ypc",
-    "title": "A 13-year-old boy swam 4 kilometers through rough ocean for four hours after his mother and two siblings were swept out to sea near Dunsborough, Western Australia. He ran 2 kilometers barefoot to call for help. Rescuers found them clinging to paddleboards 14 km offshore after 10 hours.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1ws1ypc/a_13yearold_boy_swam_4_kilometers_through_rough/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wrl6yy",
+    "title": "Great demonstration of Tyndall effect in a wooded area. This effect is characterised by scattering of beams of light by finely suspended particles of fog in the air.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wrl6yy/great_demonstration_of_tyndall_effect_in_a_wooded/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wu70t2",
-    "title": "Nice to see some good news ❤️",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wu70t2/nice_to_see_some_good_news/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wspd93",
+    "title": "British sculptor Willard wagan creates a sculpture of the last supper inside the eye of an needle",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wspd93/british_sculptor_willard_wagan_creates_a/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wti2jg",
-    "title": "Hungary to impose wealth tax on the richest people starting next year",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wti2jg/hungary_to_impose_wealth_tax_on_the_richest/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wr3saw",
+    "title": "tiny eco car Suzuki Swift glides through floodwaters in Bangkok, earning itself the nickname “Suzuki Swim”",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wr3saw/tiny_eco_car_suzuki_swift_glides_through/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wp6gz3",
-    "title": "he might actually be the best",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wp6gz3/he_might_actually_be_the_best/",
-    "subreddit": "Unexpected",
+    "id": "t3_1wtjy0t",
+    "title": "Man messes with horse and gets KO’d",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wtjy0t/man_messes_with_horse_and_gets_kod/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrh4ka",
-    "title": "After 6 years of failed attempts, a photographer finally captured this rare alignment of the Moon, a mountain, and a basilica.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wrh4ka/after_6_years_of_failed_attempts_a_photographer/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wsh7md",
+    "title": "Man drives his Tesla into floodwaters",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wsh7md/man_drives_his_tesla_into_floodwaters/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqwevc",
-    "title": "A man in Mexico risks his life to save someone, then casually goes back to work",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wqwevc/a_man_in_mexico_risks_his_life_to_save_someone/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wsffs4",
+    "title": "What was she thinking",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wsffs4/what_was_she_thinking/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wp8vni",
-    "title": "a starfish born square due to a birth defect",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wp8vni/a_starfish_born_square_due_to_a_birth_defect/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wuk9ad",
+    "title": "Two guys driving recklessly finally ran out of luck",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wuk9ad/two_guys_driving_recklessly_finally_ran_out_of/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrpa1r",
-    "title": "Earthquake frequencies affects buildings of different heights",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wrpa1r/earthquake_frequencies_affects_buildings_of/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1wrcik2",
+    "title": "Guy tried to mess with a King Cobra",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wrcik2/guy_tried_to_mess_with_a_king_cobra/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    }
   ],
   "B": [
+   {
+    "id": "t3_1wucbca",
+    "title": "Perfect in every aspect",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wucbca/perfect_in_every_aspect/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
    {
     "id": "t3_1wrpkmx",
     "title": "People paying for sex",
@@ -159,64 +168,82 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wucbca",
-    "title": "Perfect in every aspect",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wucbca/perfect_in_every_aspect/",
+    "id": "t3_1wunytw",
+    "title": "Forget to upgrade her intelligence",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wunytw/forget_to_upgrade_her_intelligence/",
     "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqouz9",
-    "title": "Succubus swimsuit reveal",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wqouz9/succubus_swimsuit_reveal/",
-    "subreddit": "animegifs",
+    "id": "t3_1wrytl4",
+    "title": "Domi Reversi - [FULL SEQUENCE] One Piece #1180",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wrytl4/domi_reversi_full_sequence_one_piece_1180/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrgi7o",
-    "title": "Those Bloomers Are TIGHT",
-    "url": "https://www.reddit.com/r/animegifs/comments/1wrgi7o/those_bloomers_are_tight/",
-    "subreddit": "animegifs",
+    "id": "t3_1wt88b8",
+    "title": "Gintama action scene",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wt88b8/gintama_action_scene/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wtaasr",
-    "title": "Lalatina was besmirched [Kono Subarashii Sekai ni Shukufuku o!]",
-    "url": "https://www.reddit.com/r/anime/comments/1wtaasr/lalatina_was_besmirched_kono_subarashii_sekai_ni/",
-    "subreddit": "anime",
+    "id": "t3_1wv7a2t",
+    "title": "[Clevatess] Episode 13",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wv7a2t/clevatess_episode_13/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqve4z",
-    "title": "No more filler characters, bad pacing, and unnecessary padding! [BLEACH]",
-    "url": "https://www.reddit.com/r/anime/comments/1wqve4z/no_more_filler_characters_bad_pacing_and/",
-    "subreddit": "anime",
+    "id": "t3_1wrya4a",
+    "title": "Witch Bunny | Clip — “The Day We Met”",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wrya4a/witch_bunny_clip_the_day_we_met/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wq502q",
-    "title": "We still don't have the second season of the actual peak isekai.. (Isekai Ojisan)",
-    "url": "https://www.reddit.com/r/anime/comments/1wq502q/we_still_dont_have_the_second_season_of_the/",
-    "subreddit": "anime",
+    "id": "t3_1wu7v1l",
+    "title": "Witch on the Holy Night | Final Trailer",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1wu7v1l/witch_on_the_holy_night_final_trailer/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqd69j",
-    "title": "‘Frieren: Beyond Journey’s End’ 3rd Anniversary Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1wqd69j/frieren_beyond_journeys_end_3rd_anniversary_visual/",
-    "subreddit": "anime",
+    "id": "t3_1wqh6i4",
+    "title": "Haven’t seen any girliesssss on here in a min 🤎",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wqh6i4/havent_seen_any_girliesssss_on_here_in_a_min/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wrmjg6",
+    "title": "Japan finds for the day.",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wrmjg6/japan_finds_for_the_day/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wqrdn2",
+    "title": "Work fit (went to poconos after, it’s raining 😭)",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wqrdn2/work_fit_went_to_poconos_after_its_raining/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -240,30 +267,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wprqi5",
-    "title": "“I want you to draw me like one of those Fontainian girls!”",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wprqi5/i_want_you_to_draw_me_like_one_of_those/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wpt2lw",
     "title": "Am i allowed to make genshin dolls?",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wpt2lw/am_i_allowed_to_make_genshin_dolls/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wrmf28",
-    "title": "Mushoku Tensei: Jobless Reincarnation Season 3 • Mushoku Tensei III: Isekai Ittara Honki Dasu - Episode 14 discussion - FINAL",
-    "url": "https://www.reddit.com/r/anime/comments/1wrmf28/mushoku_tensei_jobless_reincarnation_season_3/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
     "source": "rss"
    }
   ]
