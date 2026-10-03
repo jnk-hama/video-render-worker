@@ -1,30 +1,21 @@
 {
- "generated_at": "2026-10-02T09:58:00+00:00",
+ "generated_at": "2026-10-03T09:20:29+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1wq7k2n",
-    "title": "Octopus Expertly Executes His Camouflage To Hide From Sea Eel",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wq7k2n/octopus_expertly_executes_his_camouflage_to_hide/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wqifcz",
-    "title": "2024 Aerospace Engineering junior world champion launching his “F-1D” prototype: Total flight time 22 minutes",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wqifcz/2024_aerospace_engineering_junior_world_champion/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wrcpyq",
     "title": "Photographer Mark Smith captured this incredible shot of an eagle catching a fish with his Sony 300mm.",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wrcpyq/photographer_mark_smith_captured_this_incredible/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wv90y5",
+    "title": "Standing Double Backflip",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wv90y5/standing_double_backflip/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -49,46 +40,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wu60ir",
-    "title": "In Southeast Asia, thousands of ducks are deployed into rice fields to act as natural pest control and weeders",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wu60ir/in_southeast_asia_thousands_of_ducks_are_deployed/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wqra5q",
-    "title": "Two galaxies are colliding 60 million light-years away - and this is what it looks like",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wqra5q/two_galaxies_are_colliding_60_million_lightyears/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wrl6yy",
-    "title": "Great demonstration of Tyndall effect in a wooded area. This effect is characterised by scattering of beams of light by finely suspended particles of fog in the air.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wrl6yy/great_demonstration_of_tyndall_effect_in_a_wooded/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wspd93",
-    "title": "British sculptor Willard wagan creates a sculpture of the last supper inside the eye of an needle",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wspd93/british_sculptor_willard_wagan_creates_a/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wr3saw",
-    "title": "tiny eco car Suzuki Swift glides through floodwaters in Bangkok, earning itself the nickname “Suzuki Swim”",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wr3saw/tiny_eco_car_suzuki_swift_glides_through/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wsn07t",
+    "title": "Popping onto the pod",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wsn07t/popping_onto_the_pod/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -137,45 +92,54 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
+   },
+   {
+    "id": "t3_1wszc37",
+    "title": "Life is Art and Art is Love (Source Link in Description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wszc37/life_is_art_and_art_is_love_source_link_in/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wr8hb4",
+    "title": "First ever inverted butterfly performed in a gymnastic competition (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wr8hb4/first_ever_inverted_butterfly_performed_in_a/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wss0gj",
+    "title": "It only took 200 hours (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wss0gj/it_only_took_200_hours_source_link_in_description/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wvkmxp",
+    "title": "A very extended drum break (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wvkmxp/a_very_extended_drum_break_source_link_in/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wrsizz",
+    "title": "He's very skilled with the stick (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wrsizz/hes_very_skilled_with_the_stick_source_link_in/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1wucbca",
-    "title": "Perfect in every aspect",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wucbca/perfect_in_every_aspect/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wrpkmx",
-    "title": "People paying for sex",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wrpkmx/people_paying_for_sex/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wpsc4o",
-    "title": "The aura loss is crazy",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wpsc4o/the_aura_loss_is_crazy/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wunytw",
-    "title": "Forget to upgrade her intelligence",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wunytw/forget_to_upgrade_her_intelligence/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1wrytl4",
     "title": "Domi Reversi - [FULL SEQUENCE] One Piece #1180",
@@ -222,57 +186,66 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wqh6i4",
-    "title": "Haven’t seen any girliesssss on here in a min 🤎",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wqh6i4/havent_seen_any_girliesssss_on_here_in_a_min/",
-    "subreddit": "streetwear",
+    "id": "t3_1wvnf7w",
+    "title": "Nikki cosplay from Obsession",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wvnf7w/nikki_cosplay_from_obsession/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrmjg6",
-    "title": "Japan finds for the day.",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wrmjg6/japan_finds_for_the_day/",
-    "subreddit": "streetwear",
+    "id": "t3_1ww5p8q",
+    "title": "Ben Tennyson (Ben 10) Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1ww5p8q/ben_tennyson_ben_10_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wqrdn2",
-    "title": "Work fit (went to poconos after, it’s raining 😭)",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wqrdn2/work_fit_went_to_poconos_after_its_raining/",
-    "subreddit": "streetwear",
+    "id": "t3_1wvtnhm",
+    "title": "[ART] Female Malfoy (Harry Potter) drawn by Souichirou Yamamoto (Author of Mane Mane Nichi Nichi)",
+    "url": "https://www.reddit.com/r/manga/comments/1wvtnhm/art_female_malfoy_harry_potter_drawn_by/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wptjz2",
-    "title": "Odette and Escoffier namecard looks like a pregnant swan when placed next to each other",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wptjz2/odette_and_escoffier_namecard_looks_like_a/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wr7olq",
+    "title": "[DISC] My Childhood Friend Is Always Down Whenever I Make a Move - Ch1",
+    "url": "https://www.reddit.com/r/manga/comments/1wr7olq/disc_my_childhood_friend_is_always_down_whenever/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrp7cr",
-    "title": "Caught a glimpse of a random player’s account… that ain’t no whale 🐋, that’s a fucking Megalodon 🦈 😭🙏",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wrp7cr/caught_a_glimpse_of_a_random_players_account_that/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wrke86",
+    "title": "[ART] \"Until It Becomes a Drawing\" by Kaba Yuuji - \"Kakunaru Ue Wa\" (Now That We Draw)",
+    "url": "https://www.reddit.com/r/manga/comments/1wrke86/art_until_it_becomes_a_drawing_by_kaba_yuuji/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wpt2lw",
-    "title": "Am i allowed to make genshin dolls?",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1wpt2lw/am_i_allowed_to_make_genshin_dolls/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1wtllgw",
+    "title": "[DISC] I’m the Only One Streaming Uncensored Dungeons on an Overseas Adult Site~ After I Became the No. 1 in Super Chats, I Received Abusive DMs From Female Performers All Over the World~ -Ch1",
+    "url": "https://www.reddit.com/r/manga/comments/1wtllgw/disc_im_the_only_one_streaming_uncensored/",
+    "subreddit": "manga",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wvunnp",
+    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 8",
+    "url": "https://www.reddit.com/r/manga/comments/1wvunnp/disc_the_story_of_a_girl_who_can_read_minds_ch_8/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
