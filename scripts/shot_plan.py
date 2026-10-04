@@ -438,6 +438,15 @@ CM_CUTS_MAX = 7
 CM_LOOK_POV = (" Shot like a polished TV commercial: bright, soft natural light, a clean modern room, a slow and smooth camera"
                " move that stays close to the product, the product sharp and the background softly blurred.")
 CM_LOOK_FACE = " Lit like a polished TV commercial: bright, soft natural light and a clean modern room; the camera stays steady."
+# ★手元のカットごとにカメラの動きを1つだけ決める（オーナー「プロのカメラワークを学んで AI動画にも効かして」）。
+#   全カット同じ「ゆっくり動く」だと単調になる。静止画（最初のコマ）の構図から続けられる動きだけ使う
+#   （寄る・追う・止める）。Veo は最初のコマから始まるので、低いアングルへ移る等の別の構図へは飛べない。
+#   締めの「置くだけ」は寄ってから止める＝動きが収まって終わる（CM の締めの型）。大げさにしない（#247）
+CM_CAMERA = {
+    'cleaning_pov': " The camera eases in slightly toward the floor head as it moves and keeps it in sharp focus.",
+    'holding_pov': " The camera glides with the product, keeping it the same size in the frame.",
+    'station_pov': " The camera pushes in slowly as the product settles into the station, then holds still for the last second.",
+}
 
 CM_TAIL = 0.8          # 喋り終わりの後に残す秒（手元の動きを見せる分。長いとテンポが落ちる）
 JA_CHARS_PER_SEC = JA_CHARS_4S / CUT_SECONDS
@@ -460,7 +469,7 @@ def plan_cm(product):
         cuts = moved
     for c in cuts:
         c['min_keep'] = min(c['seconds'], round(len(c['line']) / JA_CHARS_PER_SEC + CM_TAIL, 2))
-        c['action'] += CM_LOOK_POV if is_pov_action(c['action']) else CM_LOOK_FACE
+        c['action'] += (CM_LOOK_POV + CM_CAMERA.get(c['still'], '')) if is_pov_action(c['action']) else CM_LOOK_FACE
     panel = base.get('panel')
     if panel:
         panel = dict(panel, cut_index=len(cuts) - 1)

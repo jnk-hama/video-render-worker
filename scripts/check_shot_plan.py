@@ -805,6 +805,10 @@ expect(all(c['min_keep'] <= c['seconds'] for c in _cmc) and _cm['panel']['cut_in
 expect(all(c.get('grip_parts') for c in _cmc if c['still'] in ('holding_pov', 'station_pov')), '手元で掃除機を持つ絵は握り方を点検する')
 expect(all(shot_plan.CM_LOOK_POV in c['action'] for c in _cmc[1:-1]) and shot_plan.CM_LOOK_FACE in _cmc[0]['action']
        and 'camera move' not in _cmc[0]['action'], 'CM の見た目を Veo へ渡す（顔のカットはカメラを動かさない・#256）')
+expect(all(shot_plan.CM_CAMERA[c['still']] in c['action'] for c in _cmc[1:-1] if c['still'] in shot_plan.CM_CAMERA)
+       and len({c['still'] for c in _cmc[1:-1] if c['still'] in shot_plan.CM_CAMERA}) >= 2
+       and not any(v in _cmc[i]['action'] for i in (0, -1) for v in shot_plan.CM_CAMERA.values()),
+       '手元のカットは役割ごとにカメラの動きを変える・顔のカットには付けない（#253）')
 expect(_cmc[1].get('demo') and not any(a['still'] == b['still'] for a, b in zip(_cmc, _cmc[1:])),
        '吸い込みはフックの直後・同じ絵を続けない（#257）')
 _cm3 = shot_plan.plan_cm(dict(RR35, category='cleaning', features=['最大約4〜5か月ゴミ捨て不要\n※1日1回の掃除で計測', '自動ゴミ回収ステーション', '強力吸引', 'コードレス'],
