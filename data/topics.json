@@ -1,17 +1,8 @@
 {
- "generated_at": "2026-10-03T09:20:29+00:00",
+ "generated_at": "2026-10-04T09:59:37+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
-   {
-    "id": "t3_1wrcpyq",
-    "title": "Photographer Mark Smith captured this incredible shot of an eagle catching a fish with his Sony 300mm.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wrcpyq/photographer_mark_smith_captured_this_incredible/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1wv90y5",
     "title": "Standing Double Backflip",
@@ -49,46 +40,82 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wtjy0t",
-    "title": "Man messes with horse and gets KO’d",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wtjy0t/man_messes_with_horse_and_gets_kod/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wrt32o",
+    "title": "Talk about a skilled tradesman",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wrt32o/talk_about_a_skilled_tradesman/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wsh7md",
-    "title": "Man drives his Tesla into floodwaters",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wsh7md/man_drives_his_tesla_into_floodwaters/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wu60ir",
+    "title": "In Southeast Asia, thousands of ducks are deployed into rice fields to act as natural pest control and weeders",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wu60ir/in_southeast_asia_thousands_of_ducks_are_deployed/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wsffs4",
-    "title": "What was she thinking",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wsffs4/what_was_she_thinking/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wrl6yy",
+    "title": "Great demonstration of Tyndall effect in a wooded area. This effect is characterised by scattering of beams of light by finely suspended particles of fog in the air.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wrl6yy/great_demonstration_of_tyndall_effect_in_a_wooded/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wuk9ad",
-    "title": "Two guys driving recklessly finally ran out of luck",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wuk9ad/two_guys_driving_recklessly_finally_ran_out_of/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wvoqwk",
+    "title": "Firefighter bodycam showing just how much oxygen a fire pulls",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wvoqwk/firefighter_bodycam_showing_just_how_much_oxygen/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrcik2",
-    "title": "Guy tried to mess with a King Cobra",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wrcik2/guy_tried_to_mess_with_a_king_cobra/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1wspd93",
+    "title": "British sculptor Willard wagan creates a sculpture of the last supper inside the eye of an needle",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wspd93/british_sculptor_willard_wagan_creates_a/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wwivek",
+    "title": "This is a baby flamingo. Flamingos are not pink. They are born with grey feathers, which gradually turn pink in the wild because of a dye called canthaxanthin obtained from their diet of brine shrimp and blue-green algae",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wwivek/this_is_a_baby_flamingo_flamingos_are_not_pink/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wuzrhi",
+    "title": "Dude got the vintage special",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wuzrhi/dude_got_the_vintage_special/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wv09q7",
+    "title": "I have so many questions",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wv09q7/i_have_so_many_questions/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wwnwqo",
+    "title": "Remember your training",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wwnwqo/remember_your_training/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -103,36 +130,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wr8hb4",
-    "title": "First ever inverted butterfly performed in a gymnastic competition (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1wr8hb4/first_ever_inverted_butterfly_performed_in_a/",
-    "subreddit": "toptalent",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wss0gj",
-    "title": "It only took 200 hours (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1wss0gj/it_only_took_200_hours_source_link_in_description/",
-    "subreddit": "toptalent",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wvkmxp",
-    "title": "A very extended drum break (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1wvkmxp/a_very_extended_drum_break_source_link_in/",
-    "subreddit": "toptalent",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wrsizz",
-    "title": "He's very skilled with the stick (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1wrsizz/hes_very_skilled_with_the_stick_source_link_in/",
+    "id": "t3_1wx0qvi",
+    "title": "Nice swing (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wx0qvi/nice_swing_source_link_in_description/",
     "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
@@ -140,6 +140,42 @@
    }
   ],
   "B": [
+   {
+    "id": "t3_1wucbca",
+    "title": "Perfect in every aspect",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wucbca/perfect_in_every_aspect/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wrpkmx",
+    "title": "People paying for sex",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wrpkmx/people_paying_for_sex/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wv8mio",
+    "title": "3 of them are virgins btw",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wv8mio/3_of_them_are_virgins_btw/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wviok2",
+    "title": "these last days, i've learned about methods of torture i didn't even know existed. Oh, and Malfoid.",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wviok2/these_last_days_ive_learned_about_methods_of/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
    {
     "id": "t3_1wrytl4",
     "title": "Domi Reversi - [FULL SEQUENCE] One Piece #1180",
@@ -186,18 +222,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wvnf7w",
-    "title": "Nikki cosplay from Obsession",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wvnf7w/nikki_cosplay_from_obsession/",
+    "id": "t3_1ww5p8q",
+    "title": "Ben Tennyson (Ben 10) Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1ww5p8q/ben_tennyson_ben_10_cosplay/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1ww5p8q",
-    "title": "Ben Tennyson (Ben 10) Cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1ww5p8q/ben_tennyson_ben_10_cosplay/",
+    "id": "t3_1wvnf7w",
+    "title": "Nikki cosplay from Obsession",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wvnf7w/nikki_cosplay_from_obsession/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
@@ -213,18 +249,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wr7olq",
-    "title": "[DISC] My Childhood Friend Is Always Down Whenever I Make a Move - Ch1",
-    "url": "https://www.reddit.com/r/manga/comments/1wr7olq/disc_my_childhood_friend_is_always_down_whenever/",
+    "id": "t3_1wx3f3b",
+    "title": "[ART] Shun Saeki (Food Wars: Shokugeki no Soma) is the latest mangaka to jump on the genderbent Draco Malfoy trend",
+    "url": "https://www.reddit.com/r/manga/comments/1wx3f3b/art_shun_saeki_food_wars_shokugeki_no_soma_is_the/",
     "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wrke86",
-    "title": "[ART] \"Until It Becomes a Drawing\" by Kaba Yuuji - \"Kakunaru Ue Wa\" (Now That We Draw)",
-    "url": "https://www.reddit.com/r/manga/comments/1wrke86/art_until_it_becomes_a_drawing_by_kaba_yuuji/",
+    "id": "t3_1wwngtk",
+    "title": "[DISC] The Trolley Problem and Mom - Oneshot by @kou88450",
+    "url": "https://www.reddit.com/r/manga/comments/1wwngtk/disc_the_trolley_problem_and_mom_oneshot_by/",
     "subreddit": "manga",
     "views": 0,
     "has_media": true,
@@ -234,15 +270,6 @@
     "id": "t3_1wtllgw",
     "title": "[DISC] I’m the Only One Streaming Uncensored Dungeons on an Overseas Adult Site~ After I Became the No. 1 in Super Chats, I Received Abusive DMs From Female Performers All Over the World~ -Ch1",
     "url": "https://www.reddit.com/r/manga/comments/1wtllgw/disc_im_the_only_one_streaming_uncensored/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wvunnp",
-    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 8",
-    "url": "https://www.reddit.com/r/manga/comments/1wvunnp/disc_the_story_of_a_girl_who_can_read_minds_ch_8/",
     "subreddit": "manga",
     "views": 0,
     "has_media": false,
