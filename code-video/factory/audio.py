@@ -82,7 +82,7 @@ for i, b in enumerate(Bs):
         put(sfx, g["tick"](1800), t0 + 0.12, 0.10)
         for k2, fq in enumerate([1318.5, 1568.0, 1975.5][: len(bp["chips"])]): put(sfx, g["bell"](fq, 1.0, 1.2), t0 + 0.75 + k2 * 0.5, 0.2, -0.25 + 0.25 * k2); put(sfx, g["tick"](2200 + 300 * k2), t0 + 1.9 + k2 * 0.16, 0.12, 0.3)
     if kind == "cells":
-        n, r0, r1 = bp.get("cells", 5), t0 + 0.85, t1 - 0.75
+        n, r0 = bp.get("cells", 5), t0 + 0.85; r1 = min(t1 - 0.75, r0 + 1.4)   # paper.html と同じ
         for k2 in range(n):
             ti = r0 + k2 * ((r1 - r0) / (n - 0.4))
             if k2 < n - 1: put(sfx, g["tock"](300 + 40 * k2), ti, 0.3, -0.4 + 0.2 * k2)

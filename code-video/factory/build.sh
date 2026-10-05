@@ -18,5 +18,6 @@ node render.mjs segment 60 8 $((Q*3)) $FRAMES "$OUT/seg3.mp4" &
 wait
 printf "file 'seg0.mp4'\nfile 'seg1.mp4'\nfile 'seg2.mp4'\nfile 'seg3.mp4'\n" > "$OUT/list.txt"
 $FFMPEG -loglevel error -y -f concat -safe 0 -i "$OUT/list.txt" -i "$OUT/audio.m4a" -map 0:v -map 1:a -c:v copy -c:a copy -shortest -movflags +faststart "$OUT/final.mp4"
+python3 factory/post.py "$PJ" > "$OUT/post.json"   # 投稿文も点検（文字化け）に通す
 python3 factory/qc.py "$PJ" "$OUT" | tee "$OUT/qc.json"
 echo built "$OUT/final.mp4"

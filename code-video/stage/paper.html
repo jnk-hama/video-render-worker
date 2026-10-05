@@ -12,7 +12,7 @@
   .abs { position:absolute; }
   .dela { font-family:"Dela Gothic One",sans-serif; font-weight:400; letter-spacing:-.01em; }
   .noto { font-family:"Noto Sans JP",sans-serif; font-weight:900; }
-  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.10em .22em .26em .06em; margin:-.10em -.22em -.26em -.06em; visibility:hidden; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.10em .22em .26em .06em; margin:-.10em -.22em -.26em -.06em; visibility:hidden; box-sizing:content-box; }   /* 高さに余白を含めない（含めると字の下端が3px切れていた・#270） */
   .ln > .in { display:block; will-change:transform; }
   #stage { position:absolute; inset:-30px; width:1140px; height:1980px; transform-origin:570px 990px; }
   #stage > .frame { position:absolute; left:30px; top:30px; width:1080px; height:1920px; overflow:visible; }
@@ -132,7 +132,7 @@ const KINDS = {
   },
   // 数＋升目：升目が拍に合わせて1つずつ埋まり、最後だけ金
   cells(b, i, s) {
-    const t0 = s.t0, out = OUT(i) - 0.08, r0 = t0 + 0.85, r1 = s.t1 - 0.75, n = b.cells || 5;
+    const t0 = s.t0, out = OUT(i) - 0.08, r0 = t0 + 0.85, r1 = Math.min(s.t1 - 0.75, r0 + 1.4), n = b.cells || 5;   // 「1回」の札は1秒以上読めるように（#270）
     const la = ln("noto", "left:60px;top:250px;height:70px;font-size:56px", b.label);
     const nm = ln("dela", "left:50px;top:326px;height:310px;font-size:236px", `<span class="digits"></span>`);
     const un = ln("noto", "left:60px;top:600px;height:130px;font-size:104px", `${b.unit}${b.mark ? `<span style="font-size:50px;vertical-align:top;margin-left:6px">${b.mark}</span>` : ""}`);
