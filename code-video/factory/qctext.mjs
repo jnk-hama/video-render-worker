@@ -10,7 +10,7 @@ const TL = JSON.parse(fs.readFileSync(path.resolve(root, process.env.TL), "utf8"
 const PR = JSON.parse(fs.readFileSync(process.env.PRODUCT, "utf8"));
 const MOJI = /�|[ÃÂ][\u0080-¿]|[縺繧繝譁蜿]|ã[\u0080-¿]/;
 // 画面に出ない項目（読み上げ・出典・素材の指定など）
-const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect", "pair"]);
+const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect", "pair", "anchor", "angle", "box", "at"]);
 const expected = [];
 const walk = (v, key) => {
   if (SKIP.has(key)) return;
@@ -20,6 +20,7 @@ const walk = (v, key) => {
   else if (v && typeof v === "object") Object.entries(v).forEach(([k, x]) => walk(x, k));
 };
 PR.beats.forEach((b) => walk(b, ""));
+if (PR.name) expected.push(PR.name);   // 商品名は必ず画面に出す（#276）
 const norm = (s) => s.replace(/[\s,~〜]/g, "");
 const out = { mojibake: [], tofu: [], missing: [], prRatio: 0 };
 // 1) 設計書の文字化け（読み上げの文も見る）
@@ -34,7 +35,7 @@ await p.goto("file://" + path.join(root, process.env.PAGE)); await p.evaluate(()
 // 画面のその時刻に「欠けずに見えている」字を DOM の順に並べる（1字ずつ動く見出しも1行として読める）
 const sample = () => {
   const roots = [...document.querySelectorAll("#ui, #behind")];
-  const texts = []; let pr = false;
+  const texts = [], vb = []; let pr = false;
   const g = (window.__qg ||= document.createElement("canvas").getContext("2d"));
   const effOpacity = (e) => { let o = 1; for (let x = e; x && x !== document.body; x = x.parentElement) { const cs = getComputedStyle(x); if (cs.display === "none" || cs.visibility === "hidden") return 0; o *= +cs.opacity; } return o; };
   // 字面（インクの箱）：行の箱は字面より上下に広い（Dela Gothic は約3割）ので、canvas で実際の字面を測って画面の大きさに合わせる
@@ -49,9 +50,11 @@ const sample = () => {
   roots.forEach((rt) => { const w = document.createTreeWalker(rt, NodeFilter.SHOW_TEXT); let n;
     while ((n = w.nextNode())) { const s = n.textContent; if (!s.trim()) continue; const e = n.parentElement, boxes = inkBoxes(e, n);
       const ok = boxes.length > 0 && effOpacity(e) >= 0.9 && boxes.every((r) => r.left >= 8 && r.right <= 1072 && r.top >= 8 && r.bottom <= 1912 && !clipped(e, r));
+      if (ok) { const m = getComputedStyle(e).color.match(/[\d.]+/g).map(Number), u = boxes.reduce((q, r) => ({ x0: Math.min(q.x0, r.left), y0: Math.min(q.y0, r.top), x1: Math.max(q.x1, r.right), y1: Math.max(q.y1, r.bottom) }), { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 });
+        vb.push({ text: s.trim().slice(0, 14), c: m.slice(0, 3), x0: Math.max(0, u.x0), y0: Math.max(0, u.y0), x1: Math.min(1080, u.x1), y1: Math.min(1920, u.y1) }); }
       if (e.closest("#pr")) { pr = pr || ok; continue; }
       if (ok) texts.push(s); } });
-  return { line: texts.join(""), pr };
+  return { line: texts.join(""), pr, vb };
 };
 // 2) 豆腐：画面に出る全ての字（全時刻）× その字のフォント指定で、同梱フォントが受け持つか＋インクが出るか
 const glyphs = await p.evaluate(async (end) => {
@@ -80,5 +83,26 @@ for (let t = 0.05; t < TL.end; t += 0.1) {
   for (const [s, v] of run) { if (L.includes(norm(s))) { v.cur += 0.1; v.best = Math.max(v.best, v.cur); } else v.cur = 0; }
 }
 for (const [s, v] of run) if (v.best < 0.5 - 1e-6) out.missing.push(`${s}（最長 ${v.best.toFixed(1)}秒）`);
+// 4) 文字と背景の明るさの差（#277）：0.5秒ごとに、見えている文字の色と、その文字の下の背景（文字を消して撮った画面）の明るさを比べる。3:1 未満は読めない
+const lowc = [];
+for (let t = 0.25; t < TL.end; t += 0.5) {
+  await p.evaluate((t) => window.seek(t), t);
+  const boxes = (await p.evaluate(sample)).vb;   // 欠けずに見えている文字だけ（動いて消える途中の字は見ない）
+  if (!boxes.length) continue;
+  // 文字だけ消す（札・ボタン・暗幕の地の色は残す＝文字のすぐ下の本当の背景）
+  await p.evaluate(() => { const st = document.createElement("style"); st.id = "__noText"; st.textContent = "#ui *, #behind * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }"; document.head.appendChild(st); });
+  const png = (await p.screenshot({ type: "png" })).toString("base64");
+  await p.evaluate(() => document.getElementById("__noText").remove());
+  const bad = await p.evaluate(async ([b64, boxes]) => {
+    const im = new Image(); im.src = "data:image/png;base64," + b64; await im.decode();
+    const cv = document.createElement("canvas"); cv.width = 1080; cv.height = 1920; const g = cv.getContext("2d"); g.drawImage(im, 0, 0);
+    const L = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+    return boxes.flatMap((b) => { const w = Math.max(1, Math.round(b.x1 - b.x0)), h = Math.max(1, Math.round(b.y1 - b.y0)); const d = g.getImageData(Math.round(b.x0), Math.round(b.y0), w, h).data, ls = [];
+      for (let i = 0; i < d.length; i += 16) ls.push(L([d[i], d[i + 1], d[i + 2]])); ls.sort((a, c) => a - c); const bg = ls[Math.floor(ls.length / 2)], fg = L(b.c);
+      const cr = (Math.max(bg, fg) + 0.05) / (Math.min(bg, fg) + 0.05); return cr < 3 ? [`${b.text}（${cr.toFixed(1)}:1）`] : []; });
+  }, [png, boxes]);
+  bad.forEach((x) => { if (!lowc.some((y) => y.startsWith(x.split("（")[0]))) lowc.push(`${x} ${t.toFixed(1)}秒`); });
+}
+out.lowContrast = lowc;
 out.prRatio = Math.round((prN / n) * 100) / 100; out.expected = expected.length;
 console.log(JSON.stringify(out)); await b.close();

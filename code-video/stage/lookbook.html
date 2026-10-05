@@ -27,7 +27,7 @@
   #world .m, #world img { position:absolute; display:block; }
   .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(40,32,24,.42) 0%, rgba(40,32,24,.16) 45%, rgba(40,32,24,0) 72%); }
   .sweep { position:absolute; inset:0; mix-blend-mode:soft-light; opacity:0; background:linear-gradient(105deg, rgba(255,255,255,0) 42%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 58%); background-size:340% 100%; background-position:100% 0; background-repeat:no-repeat; }
-  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mut); border:2px solid var(--mut); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:#3E3A33; border:2px solid #3E3A33; background:rgba(255,253,248,.92); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }   /* どの背景でも読める札（#277） */
   .rule { position:absolute; height:2px; background:var(--ink); transform-origin:0 50%; transform:scaleX(0); }
   .pg { position:absolute; right:64px; top:180px; font:700 24px/1 "Noto Sans JP"; letter-spacing:.2em; color:var(--mut); opacity:0; }
   .pill { position:absolute; height:96px; min-width:150px; padding:0 30px; border-radius:48px; border:3px solid var(--ink); display:flex; align-items:center; justify-content:center; font:500 52px/1 "Cormorant Garamond"; font-feature-settings:"lnum" 1; opacity:0; }
@@ -50,6 +50,17 @@ const ln = (cls, style, html, parent) => el("div", { class: `ln ${cls}`, style }
 const fadeIO = (e, tin, tout, d = 0.3) => { e.style.opacity = outC((T - tin) / d) * (1 - outC((T - tout) / 0.28)); };
 const ruleAt = (e, tin, tout) => { e.style.transform = `scaleX(${inOutC((T - tin) / 0.5) * (1 - inOutC((T - tout) / 0.3))})`; };
 const page = (i, n, label) => el("div", { class: "pg" }, `${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}　${label}`);
+
+// 服の輪郭：切り抜きの透明度を中心から放射状に調べ、外周の点を世界の単位で返す（なぞる線に使う）
+function contour(n = 120) {
+  const im = $("heroG").querySelector("img"), cv = document.createElement("canvas"); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+  const g = cv.getContext("2d"); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, cv.width, cv.height).data, k = cv.width / HERO.w, cx = F0.body[0] * k, cy = F0.body[1] * k, out = [];
+  for (let j = 0; j < n; j++) { const a = (j / n) * Math.PI * 2, dx = Math.cos(a), dy = Math.sin(a); let last = 0;
+    for (let r = 0; r < Math.max(cv.width, cv.height); r += 2) { const x = Math.round(cx + dx * r), y = Math.round(cy + dy * r); if (x < 0 || y < 0 || x >= cv.width || y >= cv.height) break; if (d[(y * cv.width + x) * 4 + 3] > 128) last = r; }
+    out.push([(cx + dx * (last + 10)) / k, (cy + dy * (last + 10)) / k]); }
+  return out;
+}
+const TOUCH = [];
 const NB = P.beats.length;
 const SH = [];   // カットごとの構え（ゆっくり寄る＝静かな雑誌のページ）
 function hold(i, s, F, A, w0, w1, show = 1) { K.push({ t: s.t0 + (i ? 0.28 : 0), F, A, z: fitZ(w0), r: 0, show, ease: "lin" }, { t: s.t1 - 0.28, F, A, z: fitZ(w1), r: 0, show, ease: "in" }); }
@@ -64,9 +75,9 @@ const KINDS = {
     const r = el("div", { class: "rule", style: "left:64px;top:1532px;width:280px;height:4px" });   // 服の影と重ならない短い罫
     const h1 = ln("jp", "left:60px;top:1562px;font-size:84px;line-height:1.15", b.head[0]);
     const h2 = ln("jp", "left:60px;top:1670px;font-size:84px;line-height:1.15", b.head[1]);
-    const pg = page(i, NB, "LOOK");
+    const pg = page(i, NB, "LOOK"), nm = el("div", { class: "abs", style: "left:64px;top:1780px;font:700 34px/1 'Noto Sans JP';letter-spacing:.06em;color:var(--mut);opacity:0" }, P.name);   // 商品名（#276）
     hold(i, s, F0.body, [560, 1090], 720, 760);
-    U.push((t) => { lineIn(e1, t0 - 0.7, out, 12); lineIn(e2, t0 - 0.6, out, 12); lineIn(h1, t0 - 0.6, out); lineIn(h2, t0 - 0.55, out); ruleAt(r, t0 - 0.6, out); fadeIO(pg, t0 - 0.5, out);
+    U.push((t) => { lineIn(e1, t0 - 0.7, out, 12); lineIn(e2, t0 - 0.6, out, 12); lineIn(h1, t0 - 0.6, out); lineIn(h2, t0 - 0.55, out); ruleAt(r, t0 - 0.6, out); fadeIO(pg, t0 - 0.5, out); fadeIO(nm, t0 - 0.5, out);
       $("behind").style.transform = `translateX(${-(t - t0) * 6}px)`; });
   },
   // 重さ：数え上げ＋半円のゲージ。服は右へ
@@ -110,18 +121,85 @@ const KINDS = {
       pills.forEach((p, k) => { const a = sp(t - (t0 + 0.55 + k * 0.11), 14, 0.7), o = outC((t - out) / 0.3); p.style.opacity = clamp(a * 1.4) * (1 - o); p.style.transform = `scale(${lerp(0.6, 1, clamp(a, 0, 1.2))})`;
         p.style.background = k === b.sizes.length - 1 && a > 0.5 ? "var(--ink)" : "transparent"; p.style.color = k === b.sizes.length - 1 && a > 0.5 ? "#F2EFEA" : "var(--ink)"; }); });
   },
+  // 肌ざわり：生地へぐっと寄る（触れる距離）。言葉は大きく・短く
+  touch(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08;
+    // 寄り切った生地は画面いっぱいの「質感の背景」。文字は白・上に暗いグラデーション（読めることを最優先）
+    const scrim = el("div", { id: `scrim${i}`, class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;opacity:0;background:linear-gradient(180deg, rgba(14,13,12,.78) 0%, rgba(14,13,12,.45) 42%, rgba(14,13,12,0) 62%, rgba(14,13,12,0) 82%, rgba(14,13,12,.6) 100%)" }, "", $("world").parentElement);
+    $("world").after(scrim);
+    const W = "color:#F4F1EC;text-shadow:0 2px 18px rgba(0,0,0,.45)";
+    const cap = el("div", { class: "abs cap", style: `left:64px;top:260px;opacity:0;${W}` }, b.label);
+    const w = ln("en", `left:52px;top:300px;font-size:170px;line-height:1;${W}`, b.en);
+    const h = ln("jp", `left:60px;top:500px;font-size:110px;line-height:1.15;${W}`, b.head);
+    const sub = el("div", { class: "abs", style: `left:64px;top:650px;font:900 44px/1.4 'Noto Sans JP';opacity:0;${W}` }, b.sub);
+    const nt = el("div", { class: "note", style: `left:64px;top:1700px;width:952px;${W}` }, b.note || ""), pg = page(i, NB, "TOUCH");
+    pg.style.color = "#F4F1EC";
+    const F = b.at || [F0.body[0] + 20, F0.body[1] + 30];   // 胸〜お腹の平らな所（生地がよく見える）
+    K.push({ t: s.t0 + 0.28, F, A: [620, 1280], z: fitZ(1500), r: -2, ease: "lin" }, { t: s.t1 - 0.28, F: [F[0] + 6, F[1] - 4], A: [620, 1280], z: fitZ(1650), r: -1, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(w, t0 + 0.2, out, 12); lineIn(h, t0 + 0.45, out); fadeIO(sub, t0 + 0.9, out); fadeIO(nt, t0 + 1.1, out); fadeIO(pg, t0 + 0.1, out);
+      const so = outC((t - (t0 - 0.1)) / 0.4) * (1 - outC((t - out) / 0.35)); scrim.style.opacity = so;
+      $("heroG").dataset.backdrop = t > t0 - 0.2 && t < s.t1 ? "1" : "";   // 重なりの点検で背景として扱う（画面いっぱいの質感）
+    });
+    TOUCH.push([t0 + 0.5, 1.3]);
+  },
+  // デザイン：服の輪郭を線でなぞり（大きなシルエット）、指し示しで見所を言う
+  callouts(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:100px;line-height:1.15", b.head), pg = page(i, NB, "DESIGN");
+    // 輪郭の線は服の飾り（商品の側の層）。指し示しの線と札は文字の側
+    const ol = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><path class="o" d="" fill="none" stroke="#8C6F5A" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`, $("prodlayer"));
+    const svg = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920">${b.points.map(() => '<path class="l" d="" fill="none" stroke="#1C1B19" stroke-width="3"/><circle class="c" r="10" fill="#1C1B19"/>').join("")}</svg>`);
+    const O = ol.querySelector(".o"), Ls = svg.querySelectorAll(".l"), Cs = svg.querySelectorAll(".c");
+    const boxes = b.points.map((p, k) => el("div", { class: "abs", style: `left:${p.box[0]}px;top:${p.box[1]}px;width:${p.box[2] || 400}px;opacity:0` }, `<div style="font:900 44px/1.25 'Noto Sans JP'">${p.text}</div>${p.sub ? `<div style="font:500 26px/1.5 'Noto Sans JP';color:var(--mut);margin-top:6px">${p.sub}</div>` : ""}`));
+    const nt = el("div", { class: "note", style: "left:64px;top:1700px;width:952px" }, b.note || "");
+    const cam = { F: F0.body, A: [540, 1100], w0: 640, w1: 670 };
+    K.push({ t: s.t0 + 0.28, F: cam.F, A: cam.A, z: fitZ(cam.w0), r: 0, ease: "lin" }, { t: s.t1 - 0.28, F: cam.F, A: cam.A, z: fitZ(cam.w1), r: 0, ease: "in" });
+    let ring = null;
+    U.push((t, c) => {
+      if (!ring) ring = contour();
+      fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
+      const on = t >= t0 - 0.3 && t < s.t1, o = outC((t - out) / 0.3), fl = FLOAT(t);
+      const pts = ring.map((p) => { const q = toScreen(c, p); return [q[0], q[1] + fl]; });
+      O.setAttribute("d", on ? "M" + pts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join(" L") + " Z" : "");
+      const g = inOutC((t - (t0 + 0.4)) / 1.0); O.setAttribute("stroke-dashoffset", String(1 - g)); O.style.opacity = (1 - o) * (g > 0 ? 1 : 0);   // 輪郭を一筆でなぞる
+      b.points.forEach((p, k) => { const ang = p.angle * Math.PI / 180, tgt = pts[Math.round(((p.angle + 360) % 360) / 360 * pts.length) % pts.length];
+        const tin = t0 + 0.9 + k * 0.45, a = outC((t - tin) / 0.4), bx = boxes[k], bh = bx.offsetHeight || 100, x0 = p.box[0] + (p.anchor === "right" ? (p.box[2] || 400) - 30 : 30), y0 = p.box[1] + bh + 12;   // 札の下の角から（服を横切らない）
+        Ls[k].setAttribute("d", `M${x0},${y0} L${lerp(x0, tgt[0], a)},${lerp(y0, tgt[1], a)}`); Cs[k].setAttribute("cx", lerp(x0, tgt[0], a)); Cs[k].setAttribute("cy", lerp(y0, tgt[1], a));
+        const op = (a > 0 ? 1 : 0) * (1 - o); Ls[k].style.opacity = op; Cs[k].style.opacity = op; fadeIO(bx, tin - 0.1, out); });
+    });
+  },
+  // 選べる：色の一覧＋サイズの札をひと画面に
+  choose(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, n = b.items.length, cw = 316;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:96px;line-height:1.15", b.head), pg = page(i, NB, "CHOICE");
+    const cells = b.items.map(([img, name], k) => { const x = 66 + (k % 3) * cw, y = 470 + Math.floor(k / 3) * 400;
+      const im = el("img", { src: `${DIR}${img}`, class: "abs", style: `left:${x + 20}px;top:${y}px;width:${cw - 70}px;opacity:0` }, "", $("prodlayer"));
+      const nm = el("div", { class: "abs en", style: `left:${x}px;top:${y + 306}px;width:${cw - 30}px;text-align:center;font-size:38px;opacity:0` }, name);
+      return { im, nm, tin: t0 + 0.35 + k * 0.12 }; });
+    const pills = b.sizes.map((z, k) => el("div", { class: "pill", style: `left:${64 + k * 120}px;top:1300px;height:76px;min-width:104px;padding:0 10px;font-size:38px;border-width:2px` }, z));
+    const sub = el("div", { class: "abs", style: "left:64px;top:1410px;font:900 40px/1 'Noto Sans JP';opacity:0" }, b.sub || "");
+    const nt = el("div", { class: "note", style: "left:64px;top:1700px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out); fadeIO(pg, t0 + 0.1, out); fadeIO(sub, t0 + 1.6, out); fadeIO(nt, t0 + 1.6, out);
+      cells.forEach((c, k) => { const a = sp(t - c.tin, 11, 0.8), o = outC((t - out) / 0.3); c.im.style.opacity = clamp(a * 1.3) * (1 - o);
+        c.im.style.transform = `translateY(${(1 - clamp(a)) * 40 + FLOAT(t + k) - o * 20}px)`; c.nm.style.opacity = clamp(sp(t - c.tin - 0.15, 12, 1) * 1.3) * (1 - o); });
+      pills.forEach((p, k) => { const a = sp(t - (t0 + 1.1 + k * 0.07), 14, 0.7), o = outC((t - out) / 0.3); p.style.opacity = clamp(a * 1.4) * (1 - o); p.style.transform = `scale(${lerp(0.6, 1, clamp(a, 0, 1.2))})`; }); });
+  },
   // 締め：3色を並べて、評価・レビュー・集計日・リンク
   finale(b, i, s) {
     const t0 = s.t0, s0 = t0 + 0.25, r0 = t0 + 0.6, r1 = t0 + 1.6, cta = t0 + 1.9;
     const st = el("div", { class: "abs", style: "left:60px;top:250px;opacity:0;display:flex;align-items:flex-end;gap:14px" }, `<svg width="84" height="84" viewBox="0 0 24 24" style="margin-bottom:34px"><path d="M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.9 6.2 20.1l1.4-6.4L2.7 9.3l6.5-.7z" fill="#1C1B19"/></svg><span class="ennum" style="font-size:230px;line-height:1">${b.rating.toFixed(2)}</span>`);
     const rv = el("div", { class: "abs", style: "left:66px;top:500px;font:900 50px/1 'Noto Sans JP';letter-spacing:.04em;opacity:0" }, `レビュー <span class="ennum" style="font-size:84px">0</span> 件`);
     const dt = el("div", { class: "note", style: "left:66px;top:580px" }, b.date);
+    const nm = el("div", { class: "abs", style: "left:62px;top:660px;width:960px;opacity:0" }, `<div class="en" style="font-size:64px;line-height:1">${P.en_name || ""}</div><div class="jp" style="font-size:44px;margin-top:10px">${P.name}</div>`);   // 商品名（#276）
     const ct = el("div", { class: "cta", style: "left:60px;top:1600px" }, `<span style="position:relative">${b.cta}</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#F2EFEA" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sw"></div>`);
     const cn = el("div", { class: "note", style: "left:66px;top:1740px" }, b.cta_note || "");
     const trio = (b.pair || []).map((img, k) => el("img", { src: `${DIR}${img}`, class: "abs", style: `left:${k ? 700 : 40}px;top:860px;width:340px;opacity:0` }, "", $("prodlayer")));
     hold(i, s, F0.body, [540, 1080], 400, 420);
     U.push((t) => { fadeUp(st, s0, 999, 22, 12, 0.8); fadeUp(rv, r0, 999, 22, 12, 0.8); setText(rv.querySelector("span"), Math.round(b.reviews * outC((t - r0) / (r1 - r0))).toLocaleString("en-US"));
-      fadeIO(dt, r1, 999); fadeUp(ct, cta, 999, 34, 12, 0.8); fadeIO(cn, cta + 0.3, 999);
+      fadeIO(dt, r1, 999); fadeUp(nm, t0 + 0.4, 999, 22, 12, 0.8); fadeUp(ct, cta, 999, 34, 12, 0.8); fadeIO(cn, cta + 0.3, 999);
       const cs = clamp((t - (cta + 0.35)) / 0.9), sw = ct.querySelector(".sw"); sw.style.backgroundPosition = `${lerp(100, 0, inOutC(cs))}% 0`; sw.style.opacity = (cs > 0 && cs < 1) ? 1 : 0;
       trio.forEach((im, k) => { const a = sp(t - (t0 + 0.5 + k * 0.15), 10, 0.85); im.style.opacity = clamp(a * 1.3); im.style.transform = `translate(${(1 - clamp(a)) * (k ? 120 : -120)}px, ${FLOAT(t + k * 2)}px)`; }); });
   },
@@ -131,6 +209,7 @@ CORE.start({ grain: [214, 42], wipe: false, refl: false, motionBlur: true,
     const base = toScreen(cam, [F0.body[0], F0.base_y]); $("floor").style.top = (base[1] - 120) + "px";
     $("heroG").style.transform = `translateY(${FLOAT(t)}px)`; $("sh").style.opacity = 1;
     const last = B[B.length - 1]; sweepAt($("sw"), t < last.t0 ? 0.9 : last.t0 + 0.4, 1.1, 0.7);
+    TOUCH.forEach(([a, d]) => { if (t > a && t < a + d) sweepAt($("sw"), a, d, 0.9); });
   } }, KINDS);
 </script>
 </body>

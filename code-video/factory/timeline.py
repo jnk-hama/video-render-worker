@@ -6,8 +6,8 @@ LEAD = 0.25           # カットの頭から喋り始めまで
 TAIL = {"cover": 0.55, "counter": 0.6, "macro_broll": 0.6, "ring": 0.7, "compare": 0.7, "chips": 0.55, "finale": 1.6,
         "problem": 0.75, "airflow": 0.7, "slash": 0.8, "colors": 0.7,
         "hook": 0.55, "chips": 0.6, "cells": 0.75, "bars": 0.7, "explode": 1.0,
-        "gauge": 0.8, "swatch": 1.0, "sizes": 0.75}
-MIN = {"explode": 6.2, "swatch": 2.9}   # 分解は動きの段取りが決まっている（最後の文字が1秒以上読める長さ）
+        "gauge": 0.5, "swatch": 1.0, "sizes": 0.75, "touch": 0.5, "callouts": 0.6, "choose": 0.8}
+MIN = {"explode": 6.2, "swatch": 2.9, "callouts": 3.0, "choose": 2.7}   # 分解は動きの段取りが決まっている（最後の文字が1秒以上読める長さ）
 
 def speech_end(path):
     """喋りの終わり（最後の無音の始まり）。末尾に無音が無ければ全体の長さ"""

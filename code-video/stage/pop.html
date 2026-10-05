@@ -23,7 +23,7 @@
   #world .m, #world img { position:absolute; display:block; }
   .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(90,40,35,.30) 0%, rgba(90,40,35,.12) 45%, rgba(90,40,35,0) 72%); }
   .sweep { position:absolute; inset:0; mix-blend-mode:screen; opacity:0; background:linear-gradient(105deg, rgba(255,255,255,0) 42%, rgba(255,245,240,.8) 50%, rgba(255,255,255,0) 58%); background-size:340% 100%; background-position:100% 0; background-repeat:no-repeat; }
-  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mut); border:2px solid var(--mut); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:#3E3A33; border:2px solid #3E3A33; background:rgba(255,253,248,.92); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }   /* どの背景でも読める札（#277） */
   #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:multiply; opacity:.08; pointer-events:none; }
   .tagr { display:inline-block; font:900 36px/1 "Noto Sans JP"; padding:14px 22px; border-radius:14px; background:var(--red); color:#fff; letter-spacing:.06em; }
   .cta { position:absolute; display:flex; align-items:center; gap:16px; height:116px; padding:0 46px; border-radius:58px; background:var(--red); color:#fff; font:900 42px/1 "Noto Sans JP"; letter-spacing:.05em; white-space:nowrap; overflow:hidden; box-shadow:0 14px 30px rgba(200,52,63,.3); }
@@ -83,11 +83,13 @@ const KINDS = {
     const big = kinWrap(el("div", { class: "kin bk", style: "left:58px;top:240px;font-size:190px;letter-spacing:-.04em" }, b.big));
     const f2 = el("div", { class: "abs bk", style: "left:58px;top:520px;font-size:210px;letter-spacing:-.04em;color:#C8343F;line-height:1;opacity:0" },
       `<span class="abs" style="left:0;top:0;opacity:.18">${b.fast}</span><span class="abs" style="left:0;top:0;opacity:.35">${b.fast}</span><span style="position:relative">${b.fast}</span><span style="font:900 54px/1 'Noto Sans JP';vertical-align:top;margin-left:6px;color:var(--ink)">${b.mark || ""}</span>`);
-    const nt = el("div", { class: "note", style: "left:64px;top:1420px;opacity:0" }, b.note || "");
+    const nt = el("div", { class: "note", style: "left:64px;top:1420px;opacity:0;background:rgba(248,234,229,.9);padding:8px 14px;border-radius:10px" }, b.note || "");   // 実写の上でも読める（#277）
     let wrap = null, ctx = null, fr = [];
     if (b.broll) { wrap = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;clip-path:circle(0px at 0 0)" },
         `<canvas class="abs" style="left:0;top:0" width="1080" height="1920"></canvas><div class="abs" style="left:0;top:0;width:1080px;height:1920px;background:linear-gradient(180deg, rgba(248,234,229,.86) 0%, rgba(248,234,229,.55) 24%, rgba(248,234,229,0) 42%, rgba(248,234,229,0) 66%, rgba(238,214,206,.7) 86%, rgba(238,214,206,.9) 100%)"></div><div class="abs" style="left:0;top:0;width:1080px;height:1920px;background:rgba(232,170,160,.12);mix-blend-mode:soft-light"></div>`, $("over"));
-      ctx = wrap.firstChild.getContext("2d"); fr = loadBroll(b.broll, b.frames); }
+      ctx = wrap.firstChild.getContext("2d"); fr = loadBroll(b.broll, b.frames);
+      // 見出しの下だけ実写を淡く覆う（赤い「速乾」が髪の上で沈まないように・#277）
+      wrap.insertAdjacentHTML("beforeend", `<div class="abs" style="left:0;top:180px;width:1080px;height:640px;background:linear-gradient(180deg, rgba(248,234,229,.92) 0%, rgba(248,234,229,.88) 80%, rgba(248,234,229,0) 100%)"></div>`); }
     K.push({ t: t0 + 0.15, F: NZ(), A: [820, 1000], z: fitZ(891), r: 6 }, { t: s.t1 - 0.25, F: [NZ()[0] + 4, NZ()[1] + 2], A: [830, 1000], z: fitZ(943), r: 5 });
     SILKP.push([t0, s.t1, 1]);
     U.push((t, cam) => {
@@ -142,10 +144,11 @@ const KINDS = {
     const dt = el("div", { class: "note", style: "left:66px;top:580px;opacity:0" }, b.date);
     const ct = el("div", { class: "cta", style: "left:60px;top:660px;opacity:0" }, `<span style="position:relative">${b.cta}</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sweep" style="mix-blend-mode:plus-lighter"></div>`);
     const cn = el("div", { class: "note", style: "left:66px;top:800px;opacity:0" }, b.cta_note || "");
+    const nm = el("div", { class: "abs", style: "left:60px;top:1640px;width:960px;font:900 46px/1.3 'Noto Sans JP';opacity:0" }, P.name);   // 商品名（#276）
     const span = P.hero.alt_at[0] + P.hero.alt_size[0];
     K.push({ t: t0 + 0.35, F: mid, A: [540, 1230], z: fitZ(361 * HERO.w / 262 * (617 / span)), r: 0 }, { t: END, F: mid, A: [540, 1230], z: fitZ(382 * HERO.w / 262 * (617 / span)), r: 0 });
     U.push((t) => { fadeUp(st, t0 + 0.15, 999, 22, 12, 0.8); fadeUp(rv, t0 + 0.5, 999, 22, 12, 0.8); setText(rv.querySelector("span"), Math.round(b.reviews * outC((t - t0 - 0.5) / 0.9)).toLocaleString("en-US"));
-      fadeUp(dt, t0 + 1.0, 999, 22, 12, 0.8); fadeUp(ct, t0 + 1.6, 999, 34, 12, 0.8); fadeUp(cn, t0 + 1.9, 999, 22, 12, 0.8); sweepAt(ct.querySelector(".sweep"), t0 + 2.1, 0.9, 1);
+      fadeUp(dt, t0 + 1.0, 999, 22, 12, 0.8); fadeUp(ct, t0 + 1.6, 999, 34, 12, 0.8); fadeUp(cn, t0 + 1.9, 999, 22, 12, 0.8); fadeUp(nm, t0 + 0.6, 999, 22, 12, 0.8); sweepAt(ct.querySelector(".sweep"), t0 + 2.1, 0.9, 1);
       if ($("altG") && t >= t0) $("altG").style.opacity = 1; });
   },
 };

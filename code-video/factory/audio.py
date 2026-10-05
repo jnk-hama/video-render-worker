@@ -110,6 +110,13 @@ for i, b in enumerate(Bs):
             for k2 in range(len(bp["items"])): put(sfx, g["whoosh"](0.25, 600, 3800, 0.5, 0.6), t0 + 0.4 + k2 * 0.16, 0.14, -0.5 + 0.2 * k2)
         if kind == "sizes":
             for k2 in range(len(bp["sizes"])): put(sfx, g["tock"](320 + 30 * k2, 0.6), t0 + 0.55 + k2 * 0.11, 0.26, -0.4 + 0.1 * k2)
+        if kind == "touch": put(sfx, g["shimmer"](1.3, 0.5), t0 + 0.5, 0.2); put(sfx, g["whoosh"](0.9, 200, 1800, 0.4, 0.7), t0 + 0.1, 0.18)
+        if kind == "callouts":
+            put(sfx, g["glide"](1.0, 400, 900, 0.5), t0 + 0.4, 0.12)
+            for k2 in range(len(bp["points"])): put(sfx, g["tick"](2400 + 300 * k2, 0.6), t0 + 0.9 + k2 * 0.45, 0.14, -0.3 + 0.6 * k2)
+        if kind == "choose":
+            for k2 in range(len(bp["items"])): put(sfx, g["whoosh"](0.22, 600, 3800, 0.5, 0.6), t0 + 0.3 + k2 * 0.12, 0.12, -0.5 + 0.2 * k2)
+            for k2 in range(len(bp["sizes"])): put(sfx, g["tock"](320 + 30 * k2, 0.5), t0 + 1.1 + k2 * 0.07, 0.18, -0.4 + 0.1 * k2)
         if kind == "finale": put(sfx, g["tock"](300, 0.7), t0 + 0.25, 0.35); put(sfx, g["bell"](1567.98, 0.6, 1.8), t0 + 1.9, 0.26); put(sfx, g["shimmer"](1.0, 0.6), t0 + 2.2, 0.2)
     if kind == "finale" and P["template"] == "paper":
         put(sfx, g["riser"](1.0, 1.0), t0 - 1.0, 0.24); put(sfx, g["impact"](0.8, 1.6), t0, 0.5); put(sfx, g["bell"](1568, 1.0, 1.6), t0 + 0.35, 0.18, -0.3)

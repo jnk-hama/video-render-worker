@@ -26,6 +26,7 @@ pp = os.path.join(outdir, "post.json"); post = json.load(open(pp)) if os.path.ex
 tx["mojibake"] += [f"投稿文({k})" for k in ("tiktok", "x") if MOJI.search(post.get(k, ""))]
 R["文字化け"] = {"ok": not tx["mojibake"], "見つけた所": tx["mojibake"][:10]}
 R["豆腐（字の欠け）"] = {"ok": not tx["tofu"], "字": tx["tofu"][:10]}
+R["文字と背景の明るさの差"] = {"ok": not tx.get("lowContrast"), "読みにくい文字": tx.get("lowContrast", [])[:10]}   # 3:1 未満（#277）
 R["出るべき文字が見える"] = {"ok": not tx["missing"] and tx["prRatio"] >= 0.95, "見えない文字": tx["missing"][:10], "PRが見える割合": tx["prRatio"], "調べた文字列": tx["expected"]}
 # 3) 黒いコマ・止まったコマ
 e = subprocess.run([FF, "-hide_banner", "-i", V, "-vf", "blackdetect=d=0.05:pix_th=0.03,freezedetect=n=0.0005:d=0.5", "-an", "-f", "null", "-"], capture_output=True, text=True).stderr

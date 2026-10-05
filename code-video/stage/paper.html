@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
   /* 型：紙（家電・日用品）。自然光の紙の部屋・太いゴシック・金の差し色。カメラの振りでカットをつなぐ */
-  :root { --paper:#F2EDE4; --ink:#17150F; --gold:#B2842F; --gold2:#D9B872; --mute:#6A645A; }
+  :root { --paper:#F2EDE4; --ink:#17150F; --gold:#B2842F; --gold2:#D9B872; --gold-ink:#8A6421; /* 紙の上の小さい金文字用（#B2842F は紙に 2.9:1 で読みにくい・#277） */ --mute:#6A645A; }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:1080px; height:1920px; overflow:hidden; background:var(--paper); }
   body { position:relative; font-family:"Noto Sans JP",sans-serif; color:var(--ink); }
@@ -34,7 +34,7 @@
   .tag { display:inline-block; font:900 34px/1 "Noto Sans JP"; padding:12px 20px; border-radius:12px; background:var(--ink); color:var(--paper); }
   .note { position:absolute; font:500 26px/1.5 "Noto Sans JP"; color:var(--mute); letter-spacing:.01em; opacity:0; }
   .digits { white-space:nowrap; }
-  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mute); border:2px solid var(--mute); padding:5px 13px; border-radius:7px; letter-spacing:.06em; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:#3E3A33; border:2px solid #3E3A33; background:rgba(255,253,248,.92); padding:5px 13px; border-radius:7px; letter-spacing:.06em; }   /* どの背景でも読める札（#277） */
   .chip { position:absolute; left:56px; height:112px; width:350px; border-radius:24px; background:var(--ink); color:var(--paper); opacity:0;
           display:flex; align-items:center; gap:20px; padding-left:28px; font:900 54px/1 "Noto Sans JP"; }
   .chip .ck { width:54px; height:54px; border-radius:50%; background:var(--gold2); display:grid; place-items:center; flex:none; }
@@ -146,7 +146,7 @@ const KINDS = {
       rail.style.opacity = 1 - outC((t - out) / 0.28);
       cells.forEach((e, k) => { const ti = r0 + k * ((r1 - r0) / (n - 0.4)), on = clamp(sp(t - ti, 15, 0.8)), last = k === n - 1, c = last ? "178,132,47" : "23,21,15";
         e.style.opacity = clamp(sp(t - (r0 - 0.35 + k * 0.05), 14, 1) * 1.4); e.style.background = `rgba(${c},${on})`; e.style.borderColor = `rgba(${c},${0.28 + 0.72 * on})`;
-        e.style.color = on > 0.5 ? "#F2EDE4" : "rgba(23,21,15,.32)"; e.style.transform = `scale(${lerp(1, last ? 1.06 : 1, on)})`; });
+        e.style.color = on > 0.5 ? (last ? "#17150F" : "#F2EDE4") : "rgba(23,21,15,.32)"; /* 金の升目は濃い字（明るい字は 2.6:1 で読みにくい・#277） */ e.style.transform = `scale(${lerp(1, last ? 1.06 : 1, on)})`; });
       const eg = sp(t - r1, 11, 0.7); badge.style.opacity = clamp(eg * 1.4); badge.style.transform = `translateY(${(1 - clamp(eg)) * 18}px)`;
       rl.style.opacity = clamp(sp(t - (r0 - 0.2), 12, 1)); fadeIO(nt, t0 + 0.9, out); });
   },
@@ -190,7 +190,7 @@ const KINDS = {
     const oCap = el("div", { class: "abs", style: "left:60px;top:1080px;width:330px;font:700 30px/1.4 'Noto Sans JP';color:var(--mute);opacity:0" }, b.old.cap.join("<br>"));
     const arr = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><path d="M300,905 L452,905" pathLength="1" stroke="#B2842F" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="1" stroke-dashoffset="1"/><path d="M428,880 L456,905 L428,930" stroke="#B2842F" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0"/></svg>`);
     const [arP, arH] = arr.querySelectorAll("path");
-    const nTag = el("div", { class: "abs", style: "left:610px;top:606px;opacity:0" }, `<span class="tag" style="background:var(--gold)">${b.new_label}</span>`);
+    const nTag = el("div", { class: "abs", style: "left:610px;top:606px;opacity:0" }, `<span class="tag" style="background:var(--gold-ink)">${b.new_label}</span>`);
     const h1 = ln("noto", "left:60px;top:330px;height:84px;font:900 66px/1.2 'Noto Sans JP'", b.head[0]);
     const h2 = ln("dela", "left:56px;top:420px;height:150px;font-size:128px;line-height:1.15", b.head[1]);
     const s1 = ln("noto", "left:60px;top:1290px;height:64px;font:900 46px/1.3 'Noto Sans JP'", b.sub[0]);
@@ -232,12 +232,13 @@ const KINDS = {
     const rv = ln("dela", "left:56px;top:566px;height:180px;font-size:124px", `<span class="digits">0</span><span style="font-family:'Noto Sans JP';font-weight:900;font-size:62px;margin-left:8px">件</span>`);
     const n7 = el("div", { class: "note", style: "left:60px;top:740px;width:520px" }, b.date);
     const n8 = el("div", { class: "note", style: "left:62px;top:1256px;width:520px;font-weight:700" }, b.cta_note || "");
+    const pname = el("div", { class: "abs", style: "left:60px;top:880px;width:520px;font:900 40px/1.35 'Noto Sans JP';opacity:0" }, P.name);   // 商品名（#276）
     const ct = el("div", { class: "cta" }, `<span style="position:relative">${b.cta}</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sw"></div>`);
     const [d1, d2] = [nm.querySelector(".digits"), rv.querySelector(".digits")]; shot(i, s, b.cam); FIN.t = t0;
     U.push((t) => { const so = sp(t - s0, 12, 0.8); st.style.opacity = clamp(so * 1.3); st.style.transform = `translateY(${(1 - so) * 30}px) scale(${lerp(0.9, 1, clamp(so))})`;
       setDigits(d1, (b.rating * outC((t - s0) / (s1 - s0))).toFixed(2)); lineIn(nm, s0, 999, 12); lineIn(ra, r0 - 0.15, 999, 13);
       setDigits(d2, Math.round(b.reviews * outC((t - r0) / (r1 - r0))).toLocaleString("en-US")); lineIn(rv, r0, 999, 12);
-      n7.style.opacity = outC((t - r1) / 0.4);
+      n7.style.opacity = outC((t - r1) / 0.4); pname.style.opacity = outC((t - (s0 + 0.3)) / 0.4);
       const c = sp(t - cta, 14, 0.8); ct.style.opacity = clamp(c * 1.3); ct.style.transform = `translateY(${(1 - c) * 50}px) scale(${lerp(0.94, 1, clamp(c))})`;
       n8.style.opacity = outC((t - (cta + 0.30)) / 0.4);
       const cs = clamp((t - (cta + 0.35)) / 0.9), sw = ct.querySelector(".sw"); sw.style.backgroundPosition = `${lerp(100, 0, inOutC(cs))}% 0`; sw.style.opacity = (cs > 0 && cs < 1) ? 1 : 0; });
