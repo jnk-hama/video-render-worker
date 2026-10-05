@@ -146,7 +146,8 @@ const KINDS = {
   callouts(b, i, s) {
     const t0 = s.t0, out = OUT(i) - 0.08;
     const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
-    const h = ln("jp", "left:60px;top:300px;font-size:100px;line-height:1.15", b.head), pg = page(i, NB, "DESIGN");
+    // 見出しは英字1語（肌ざわりの「Smooth」と同じ誌面の作法）。日本語は札が言うので説明調の見出しは置かない（オーナー「ここがおしゃれ表記はダサい」）
+    const h = b.en ? ln("en", "left:52px;top:290px;font-size:170px;line-height:1", b.en) : ln("jp", "left:60px;top:300px;font-size:100px;line-height:1.15", b.head), pg = page(i, NB, "DESIGN");
     // 輪郭の線は服の飾り（商品の側の層）。指し示しの線と札は文字の側
     const ol = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><path class="o" d="" fill="none" stroke="#8C6F5A" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`, $("prodlayer"));
     const svg = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920">${b.points.map(() => '<path class="l" d="" fill="none" stroke="#1C1B19" stroke-width="3"/><circle class="c" r="10" fill="#1C1B19"/>').join("")}</svg>`);
@@ -158,7 +159,7 @@ const KINDS = {
     let ring = null;
     U.push((t, c) => {
       if (!ring) ring = contour();
-      fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
+      fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out, b.en ? 12 : undefined); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
       const on = t >= t0 - 0.3 && t < s.t1, o = outC((t - out) / 0.3), fl = FLOAT(t);
       const pts = ring.map((p) => { const q = toScreen(c, p); return [q[0], q[1] + fl]; });
       O.setAttribute("d", on ? "M" + pts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join(" L") + " Z" : "");
