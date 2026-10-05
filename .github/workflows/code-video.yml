@@ -50,7 +50,7 @@ jobs:
           set -euo pipefail
           (cd code-video && npm ci --no-audit --no-fund && npx playwright install --with-deps chromium)
           echo "CHROME=$(cd code-video && node -e "import('playwright-core').then(m=>console.log(m.chromium.executablePath()))")" >> "$GITHUB_ENV"
-          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt numpy scipy pillow imageio-ffmpeg edge-tts rembg onnxruntime
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt numpy scipy pillow imageio-ffmpeg edge-tts rembg onnxruntime opencv-python-headless
           # EDSR は opencv-contrib が要る。rembg の opencv と同じ場所に入れると壊れるので別の環境に分ける
           python3 -m venv /tmp/cv
           /tmp/cv/bin/pip install --quiet --disable-pip-version-check -c constraints.txt opencv-contrib-python-headless
