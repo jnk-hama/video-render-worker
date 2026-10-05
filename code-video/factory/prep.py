@@ -67,16 +67,16 @@ def unpack(P):
 
 def fetch(P):
     """Actions 用：motion-sample-fetch と同じ物を、暗号化せずに作業場所へ直接取る（公開リポジトリには置かない）"""
-    import re, urllib.request
+    import re
     pr = P["prep"]; D, S = dirs(P)
     raw = re.sub(r"[^A-Za-z0-9:/._-]", "", os.environ.get("SUPABASE_URL", "")); host = re.sub(r"^https?://", "", raw).split("/")[0]
     host = host if "." in host else host + ".supabase.co"
     for i, p in enumerate(pr["images"]):
         if not re.fullmatch(r"product/[a-z0-9-]+\.jpg", p): sys.exit(f"bad image path: {p}")
-        urllib.request.urlretrieve(f"https://{host}/storage/v1/object/public/images/{p}", os.path.join(S, f"img{i}.jpg"))
+        subprocess.run(["curl", "-fsSL", "-o", os.path.join(S, f"img{i}.jpg"), f"https://{host}/storage/v1/object/public/images/{p}"], check=True)
     for i, u in enumerate(pr.get("videos", [])):
         if not re.fullmatch(r"https://videos\.pexels\.com/video-files/\d+/[\w-]+\.mp4", u): sys.exit(f"bad video url: {u}")
-        urllib.request.urlretrieve(u, os.path.join(S, f"vid{i}.mp4"))
+        subprocess.run(["curl", "-fsSL", "-o", os.path.join(S, f"vid{i}.mp4"), u], check=True)   # Pexels は Python の urllib を 403 で断る（curl は通る・2026-10-05 実測）
     for i, (say, _) in enumerate(voices(P)):
         subprocess.run(["edge-tts", "--voice", pr.get("voice", "ja-JP-NanamiNeural"), f"--rate={pr.get('rate', '+8%')}", "--text", say, "--write-media", os.path.join(S, f"line{i}.mp3")], check=True)
     print("取得:", len(pr["images"]), "画像", len(pr.get("videos", [])), "動画", len(voices(P)), "声")
