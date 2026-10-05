@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="fonts2/fonts.css">
 <style>
   /* 型：ルックブック（アパレル）。コンクリートのスタジオ・大きな英字のイタリック・細い罫線とページ番号。服は平置きの実画像だけ（人の顔は使わない #158） */
-  :root { --c1:#DEDAD4; --c2:#C8C3BC; --ink:#1C1B19; --mut:#5E5A54; --acc:#8C6F5A; }
+  :root { --nf-ink:#1C1B19; --nf-acc:#8C6F5A; --nf-acc-ink:#5F4A3B; --nf-mut:#5E5A54; --nf-bg:#E9E5DF; --nf-num:"Cormorant Garamond","Shippori Mincho"; --nf-num-w:500; /* 数字の見せ方 numfx.js（#279） */ --c1:#DEDAD4; --c2:#C8C3BC; --ink:#1C1B19; --mut:#5E5A54; --acc:#8C6F5A; }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:1080px; height:1920px; overflow:hidden; background:var(--c1); }
   body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; }
@@ -43,6 +43,7 @@
   <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px"><div id="pr" class="abs">PR</div></div>
   <canvas id="grain" width="540" height="960"></canvas>
 <script src="core.js"></script>
+<script src="numfx.js"></script>
 <script>
 function lineIn(e, tin, tout, w = 13) { const a = sp(T - tin, w, 1), o = outC((T - tout) / 0.30);
   e.firstElementChild.style.transform = `translateY(${(1 - a) * 140 - o * 140}%)`; e.style.visibility = (a <= 0.001 || o >= 0.999) ? "hidden" : "visible"; }
@@ -67,6 +68,7 @@ function hold(i, s, F, A, w0, w1, show = 1) { K.push({ t: s.t0 + (i ? 0.28 : 0),
 const FLOAT = (t) => Math.sin(t * 1.1) * 4;   // 服がわずかに浮いて揺れる（平置きの写真を「置いてある物」に見せる）
 
 const KINDS = {
+  num: NUM_KIND,   // 数字の見せ方（numfx.js・#279）
   // 表紙：大きな英字の後ろに服。1コマ目に見出しと服と PR（#267-7）
   cover(b, i, s) {
     const t0 = s.t0, out = OUT(i) - 0.08, words = b.en.split(" "), last = words.pop();

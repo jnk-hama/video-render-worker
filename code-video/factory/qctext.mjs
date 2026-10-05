@@ -10,7 +10,7 @@ const TL = JSON.parse(fs.readFileSync(path.resolve(root, process.env.TL), "utf8"
 const PR = JSON.parse(fs.readFileSync(process.env.PRODUCT, "utf8"));
 const MOJI = /�|[ÃÂ][\u0080-¿]|[縺繧繝譁蜿]|ã[\u0080-¿]/;
 // 画面に出ない項目（読み上げ・出典・素材の指定など）
-const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect", "pair", "anchor", "angle", "box", "at"]);
+const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect", "pair", "anchor", "angle", "box", "at", "motif", "native"]);
 const expected = [];
 const walk = (v, key) => {
   if (SKIP.has(key)) return;
@@ -49,7 +49,7 @@ const sample = () => {
       if (cs.overflow !== "visible" || cs.clipPath !== "none") { const q = x.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1 || r.top < q.top - 1 || r.bottom > q.bottom + 1) return true; } } return false; };
   roots.forEach((rt) => { const w = document.createTreeWalker(rt, NodeFilter.SHOW_TEXT); let n;
     while ((n = w.nextNode())) { const s = n.textContent; if (!s.trim()) continue; const e = n.parentElement, boxes = inkBoxes(e, n);
-      const ok = boxes.length > 0 && effOpacity(e) >= 0.9 && boxes.every((r) => r.left >= 8 && r.right <= 1072 && r.top >= 8 && r.bottom <= 1912 && !clipped(e, r));
+      const ca = getComputedStyle(e).color.match(/[\d.]+/g).map(Number), ok = boxes.length > 0 && effOpacity(e) >= 0.9 && (ca.length < 4 || ca[3] >= 0.9) && boxes.every((r) => r.left >= 8 && r.right <= 1072 && r.top >= 8 && r.bottom <= 1912 && !clipped(e, r));
       if (ok) { const m = getComputedStyle(e).color.match(/[\d.]+/g).map(Number), u = boxes.reduce((q, r) => ({ x0: Math.min(q.x0, r.left), y0: Math.min(q.y0, r.top), x1: Math.max(q.x1, r.right), y1: Math.max(q.y1, r.bottom) }), { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 });
         vb.push({ text: s.trim().slice(0, 14), c: m.slice(0, 3), x0: Math.max(0, u.x0), y0: Math.max(0, u.y0), x1: Math.min(1080, u.x1), y1: Math.min(1920, u.y1) }); }
       if (e.closest("#pr")) { pr = pr || ok; continue; }

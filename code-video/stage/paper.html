@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
   /* 型：紙（家電・日用品）。自然光の紙の部屋・太いゴシック・金の差し色。カメラの振りでカットをつなぐ */
-  :root { --paper:#F2EDE4; --ink:#17150F; --gold:#B2842F; --gold2:#D9B872; --gold-ink:#8A6421; /* 紙の上の小さい金文字用（#B2842F は紙に 2.9:1 で読みにくい・#277） */ --mute:#6A645A; }
+  :root { --nf-ink:#17150F; --nf-acc:#B2842F; --nf-acc-ink:#8A6421; --nf-mut:#6A645A; --nf-bg:#F2EDE4; --nf-num:"Dela Gothic One"; /* 数字の見せ方 numfx.js（#279） */ --paper:#F2EDE4; --ink:#17150F; --gold:#B2842F; --gold2:#D9B872; --gold-ink:#8A6421; /* 紙の上の小さい金文字用（#B2842F は紙に 2.9:1 で読みにくい・#277） */ --mute:#6A645A; }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:1080px; height:1920px; overflow:hidden; background:var(--paper); }
   body { position:relative; font-family:"Noto Sans JP",sans-serif; color:var(--ink); }
@@ -42,7 +42,7 @@
   .bar { position:absolute; border-radius:20px; overflow:hidden; opacity:0; }
   .bar > i { position:absolute; left:0; top:0; height:100%; width:100%; border-radius:20px; display:block; transform-origin:0 50%; transform:scaleX(0); }
   .cell { position:absolute; top:118px; width:92px; height:92px; border-radius:20px; border:5px solid rgba(23,21,15,.28); display:grid; place-items:center; font-size:50px; color:rgba(23,21,15,.32); opacity:0; }
-  .cta { position:absolute; left:60px; top:1110px; width:540px; height:124px; border-radius:62px; background:var(--gold); color:#fff; overflow:hidden; opacity:0;
+  .cta { position:absolute; left:60px; top:1110px; width:540px; height:124px; border-radius:62px; background:var(--gold-ink); color:#fff;   /* 白字に 5.3:1（光が横切っても読める・#277） */ overflow:hidden; opacity:0;
          display:flex; align-items:center; justify-content:center; gap:12px; font:900 40px/1 "Noto Sans JP"; letter-spacing:.02em; white-space:nowrap; }
   .cta .sw { position:absolute; inset:0; mix-blend-mode:plus-lighter; background:linear-gradient(103deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 65%); background-size:300% 100%; background-position:100% 0; opacity:0; }
 </style>
@@ -61,6 +61,7 @@
   <div id="vig"></div>
 </div></div>
 <script src="core.js"></script>
+<script src="numfx.js"></script>
 <script>
 // ---- 固定幅の数字（「,」「〜」は字形の差で幅がぶれるので図形で描く） ----
 const COMMA = '<svg viewBox="0 0 10 20" style="display:inline-block;width:.30em;height:.60em;margin:0 .03em;vertical-align:baseline;position:relative;top:.12em" fill="currentColor"><circle cx="5.2" cy="5" r="4.4"/><path d="M8.6 6 C8.6 12.5 5.8 17 0.6 19.6 L-0.2 16.8 C3 15 4.4 12.4 4 8 Z"/></svg>';
@@ -90,6 +91,7 @@ const OPEN = {}, PUNCH = { at: 1e9 }, SLIDE = { i: -1, dx: 0 };
 const CHECK = '<span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#17150F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 
 const KINDS = {
+  num(b, i, s) { shot(i, s, { F: F0.body, A: [540, 2900], z: 1.2, mv: { dur: 0.6, kind: "pull" } }); NUM_KIND(b, i, s, { cam: false }); },   // 数字の見せ方（numfx.js・#279）。紙の型はカメラをカットごとに持つ（商品は画面の下へ抜ける）
   // 冒頭：商品の後ろに大見出し。手元のアップから一気に引く（1コマ目＝サムネイルに見出しの2行と PR が出ている・#267-7）
   hook(b, i, s) {
     const t0 = s.t0, wA = t0, wB = t0 + 0.22, wC = s.voice.start + s.voice.len * 0.5, out = OUT(i) - 0.08;

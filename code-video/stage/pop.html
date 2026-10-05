@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="fonts2/fonts.css">
 <style>
   /* 型：ポップ（美容など）。ブラッシュの背景にブランド色。太い字・シルクの風・円で切り替わる */
-  :root { --bg1:#F8EAE5; --bg2:#EED6CE; --ink:#2A1F1E; --red:#C8343F; --mut:#6B5450; }
+  :root { --nf-ink:#2A1F1E; --nf-acc:#C8343F; --nf-acc-ink:#A82731; --nf-mut:#6B5450; --nf-bg:#F8EAE5; --nf-num:"Dela Gothic One"; /* 数字の見せ方 numfx.js（#279） */ --bg1:#F8EAE5; --bg2:#EED6CE; --ink:#2A1F1E; --red:#C8343F; --mut:#6B5450; }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:1080px; height:1920px; overflow:hidden; background:var(--bg1); }
   body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; }
@@ -41,6 +41,7 @@
   <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px"><div id="pr" class="abs">PR</div></div>
   <canvas id="grain" width="540" height="960"></canvas>
 <script src="core.js"></script>
+<script src="numfx.js"></script>
 <script>
 // ---- 風：吹き出し口から流れるシルクのリボン（1本ずつ不透明で描いて溶かす＝継ぎ目の縞を出さない） ----
 const SILK = [
@@ -69,6 +70,7 @@ const SILKP = [];   // [t0, t1, power]
 const NZ = () => [F0.nozzle[0] + 56, F0.nozzle[1] + 16];   // 吹き出し口へ寄る時の注視点
 const kinP = (e, a, b, s = 0.04) => kin(e, a, b, s, "pop");
 const KINDS = {
+  num: NUM_KIND,   // 数字の見せ方（numfx.js・#279）
   problem(b, i, s) {
     const t0 = s.t0, n = b.accent || 0, h1 = [...b.head[1]].map((c, k) => `<span${k < n ? ' style="color:#C8343F"' : ""}>${c}</span>`).join("");
     const a1 = kinWrap(el("div", { class: "kin bk", style: "left:62px;top:250px;font-size:118px;letter-spacing:-.02em" }, b.head[0]));

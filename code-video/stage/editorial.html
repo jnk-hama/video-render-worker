@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="fonts2/fonts.css">
 <style>
   /* 型：エディトリアル（誌面）。設計書（window.PRODUCT）と時刻表（window.TIMELINE）だけで絵が決まる */
-  :root { --bg:#F3EFE8; --stone:#E4DDD2; --ink:#1C1A17; --mut:#5E574D; --cu:#9A6438; --gold:#B88A3E; }
+  :root { --nf-ink:#1C1A17; --nf-acc:#9A6438; --nf-acc-ink:#7A4E2B; --nf-mut:#5E574D; --nf-bg:#F3EFE8; --nf-num:"Cormorant Garamond","Shippori Mincho"; --nf-num-w:500; /* 数字の見せ方 numfx.js（#279） */ --bg:#F3EFE8; --stone:#E4DDD2; --ink:#1C1A17; --mut:#5E574D; --cu:#9A6438; --gold:#B88A3E; }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:1080px; height:1920px; overflow:hidden; background:var(--bg); }
   body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; }
@@ -47,8 +47,10 @@
   <div id="wipe"></div>
   <canvas id="grain" width="540" height="960"></canvas>
 <script src="core.js"></script>
+<script src="numfx.js"></script>
 <script>
 const KINDS = {
+  num: NUM_KIND,   // 数字の見せ方（numfx.js・#279）
   cover(b, i, s) {
     const t0 = s.t0;
     let card = null, img = null;

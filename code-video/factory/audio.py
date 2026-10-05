@@ -100,6 +100,24 @@ for i, b in enumerate(Bs):
                               (g["whoosh"](0.8, 400, 5200, 0.6), 2.0, 0.45, 0.2), (g["impact"](0.7, 1.4), 2.8, 0.55, 0), (g["shimmer"](0.9, 0.8), 2.75, 0.4, 0), (g["bell"](1318.5, 0.6, 1.4), 3.1, 0.3, 0),
                               (g["tock"](220, 0.8), 3.35, 0.6, 0), (g["whoosh"](0.35, 800, 6000, 0.5), 4.0, 0.35, -0.2), (g["bell"](1567.98, 0.7, 1.6), 4.3, 0.32, 0), (g["shimmer"](0.8, 0.7), 4.3, 0.3, 0)]:
             put(sfx, f, e + dt, gn, pan=pn)
+    if kind == "num":   # 数字の見せ方（numfx.js と同じ時刻・#279）
+        m = bp["motif"]
+        if m == "flap":
+            n = sum(c.isdigit() for c in str(bp["value"]))
+            for k2 in range(n):
+                for q in range(6 + k2 * 2): put(sfx, g["tick"](2600 + 80 * k2, 0.3), t0 + (0.6 + k2 * 0.28) * q / (6 + k2 * 2), 0.05, -0.3 + 0.15 * k2)
+                put(sfx, g["tock"](380 + 30 * k2, 0.5), t0 + 0.6 + k2 * 0.28, 0.22, -0.3 + 0.15 * k2)
+        if m == "magnify":
+            put(sfx, g["riser"](0.9, 0.6), t0 + 0.6, 0.2); put(sfx, g["impact"](0.8, 1.2), t0 + 1.7, 0.35); put(sfx, g["tock"](240, 0.9), t0 + 1.72, 0.4)
+        if m == "calendar":
+            n = bp["months"]; gap = min(0.3, 1.2 / max(n - 1, 1)); end = 0.35 + (n - 1) * gap + 0.3
+            for k2 in range(n - 1): put(sfx, g["whoosh"](0.25, 700, 4200, 0.5, 0.6), t0 + 0.35 + k2 * gap, 0.16, -0.3 + 0.15 * k2)
+            put(sfx, g["bell"](1568, 1.0, 1.4), t0 + end, 0.2)
+            if bp.get("badge"): put(sfx, g["impact"](0.7, 1.2), t0 + end + 0.25, 0.3); put(sfx, g["tock"](240, 0.9), t0 + end + 0.27, 0.35)
+        if m == "cup": put(sfx, g["glide"](1.6, 220, 520, 0.5), t0 + 0.3, 0.16); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.9, 0.22)
+        if m == "donut": put(sfx, g["glide"](1.0, 400, 900, 0.5), t0 + 0.3, 0.14); put(sfx, g["bell"](1568, 0.7, 1.4), t0 + 1.6, 0.2)
+        if m == "figures":
+            for k2 in range(len(bp["sizes"])): put(sfx, g["tock"](320 + 30 * k2, 0.6), t0 + 0.3 + k2 * 0.14, 0.24, -0.4 + 0.1 * k2)
     # ルックブックの型（lookbook.html と同じ時刻）。静かめ：紙をめくる音・柔らかい鈴
     if P["template"] == "lookbook":
         if kind == "cover": put(sfx, g["shimmer"](1.1, 0.6), 0.6, 0.22)
