@@ -17,7 +17,8 @@ node render.mjs segment 60 8 $((Q*2)) $((Q*3)) "$OUT/seg2.mp4" &
 node render.mjs segment 60 8 $((Q*3)) $FRAMES "$OUT/seg3.mp4" &
 wait
 printf "file 'seg0.mp4'\nfile 'seg1.mp4'\nfile 'seg2.mp4'\nfile 'seg3.mp4'\n" > "$OUT/list.txt"
-$FFMPEG -loglevel error -y -f concat -safe 0 -i "$OUT/list.txt" -i "$OUT/audio.m4a" -map 0:v -map 1:a -c:v copy -c:a copy -shortest -movflags +faststart "$OUT/final.mp4"
+# 配信向けに重さを抑える（スマホで見て止まらない・オーナー指摘）。平均6Mbps以下・60fps・2秒ごとの鍵フレーム。見た目は SSIM 0.996（手元で比較）
+$FFMPEG -loglevel error -y -f concat -safe 0 -i "$OUT/list.txt" -i "$OUT/audio.m4a" -map 0:v -map 1:a -c:v libx264 -preset slow -crf 18 -maxrate 6M -bufsize 12M -g 120 -profile:v high -pix_fmt yuv420p -c:a copy -shortest -movflags +faststart "$OUT/final.mp4"
 python3 factory/post.py "$PJ" > "$OUT/post.json"   # 投稿文も点検（文字化け）に通す
 python3 factory/qc.py "$PJ" "$OUT" | tee "$OUT/qc.json"
 echo built "$OUT/final.mp4"

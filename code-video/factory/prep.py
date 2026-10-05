@@ -14,6 +14,12 @@ GRADE = {   # 実写の色合わせ（型の背景に寄せる）
     "warm": "eq=contrast=1.06:saturation=0.9:gamma=0.97,colorbalance=rs=0.06:gs=0.02:bs=-0.06:rm=0.04:bm=-0.04",   # BALMUDA で決めた色
     "none": "null"}
 
+def tts_text(s, P):
+    """読み上げ用の文：読み違える言葉を読みに置き換える（factory/readings.json＋設計書の readings）。画面の文字は変えない"""
+    rd = {k: v for k, v in json.load(open(os.path.join(HERE, "readings.json"))).items() if k != "_"}; rd.update(P.get("readings", {}))
+    for k in sorted(rd, key=len, reverse=True): s = s.replace(k, rd[k])
+    return s
+
 def voices(P):
     """読み上げの一覧 [(文, 置く名前)]：各カット → 見出しの別案（hooks の2つ目以降）の順。line<i>.mp3 の i がこの並び"""
     vs = (P.get("variants") or P.get("hooks") or [])[1:]
@@ -26,7 +32,7 @@ def request(P):
     pr = P["prep"]; path = os.path.join(REPO, "samples/motion/request.json")
     old = json.load(open(path)) if os.path.exists(path) else {}
     req = {"images": pr["images"], "voice": pr.get("voice", "ja-JP-NanamiNeural"), "rate": pr.get("rate", "+8%"),
-           "lines": [s for s, _ in voices(P)], "videos": pr.get("videos", []), "nonce": old.get("nonce", 0) + 1}
+           "lines": [tts_text(s, P) for s, _ in voices(P)], "videos": pr.get("videos", []), "nonce": old.get("nonce", 0) + 1}
     json.dump(req, open(path, "w"), ensure_ascii=False, indent=2); print("書いた:", path, "nonce", req["nonce"]); print("次：commit・push → Actions の完了を待って unpack")
 
 def decrypt(dst):
@@ -148,7 +154,7 @@ def fetch(P):
     import time
     for i, (say, _) in enumerate(voices(P)):
         for k in range(3):   # edge-tts は相手側の 500 で時々落ちる（2026-10-05 実測）。間を空けて3回まで
-            if subprocess.run(["edge-tts", "--voice", pr.get("voice", "ja-JP-NanamiNeural"), f"--rate={pr.get('rate', '+8%')}", "--text", say, "--write-media", os.path.join(S, f"line{i}.mp3")]).returncode == 0: break
+            if subprocess.run(["edge-tts", "--voice", pr.get("voice", "ja-JP-NanamiNeural"), f"--rate={pr.get('rate', '+8%')}", "--text", tts_text(say, P), "--write-media", os.path.join(S, f"line{i}.mp3")]).returncode == 0: break
             if k == 2: sys.exit(f"edge-tts が3回とも失敗: line{i}")
             time.sleep(10 * (k + 1))
     print("取得:", len(pr["images"]), "画像", len(pr.get("videos", [])), "動画", len(voices(P)), "声")

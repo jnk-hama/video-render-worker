@@ -37,5 +37,6 @@ R["音量"] = {"ok": abs(I + 14) <= 1.0 and TP <= -1.0, "LUFS": I, "TP": TP}
 vb = json.load(open(os.path.join(outdir, "audio.json")))["voice_over_bed_db"]; R["声と背景の差"] = {"ok": vb >= 9, "dB": vb}
 d = float(re.search(r"Duration: (\d+):(\d+):([0-9.]+)", subprocess.run([FF, "-hide_banner", "-i", V], capture_output=True, text=True).stderr).group(3))
 R["長さ"] = {"ok": 15 <= d <= 21, "秒": d}
+kbps = os.path.getsize(V) * 8 / 1000 / d; R["配信の重さ"] = {"ok": kbps <= 8000, "kbps": round(kbps)}   # スマホで見て止まらない重さ（オーナー指摘）
 R["ok"] = all(v["ok"] for v in R.values() if isinstance(v, dict))
 print(json.dumps(R, ensure_ascii=False, indent=1))
