@@ -86,7 +86,7 @@ jobs:
         env:
           ONLY: ${{ inputs.only }}
         run: |
-          printf '%s' "$ONLY" | grep -qE '^[A-Za-z0-9,]*$' || { echo "::error::only の形が違います"; exit 1; }
+          [[ "$ONLY" =~ ^[A-Za-z0-9,]*$ ]] || { echo "::error::only の形が違います"; exit 1; }   # 空も通す（grep は空の入力を「一致なし」にする）
           set -euo pipefail
           bash factory/make.sh "products/$KEY.json"
           for d in stage/p/$KEY/out-*; do python3 -c "import json,sys;q=json.load(open(sys.argv[1]));print(sys.argv[1], 'ok' if q['ok'] else 'NG', [k for k,v in q.items() if isinstance(v,dict) and not v['ok']])" "$d/qc.json"; done
