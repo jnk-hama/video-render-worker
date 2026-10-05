@@ -30,12 +30,15 @@
   const M = {
     // パタパタ：駅の表示板のように桁がめくれて止まる（測った値）
     flap(b, box, t0) {
-      const s = fmt(b.value), digits = [...s].filter((c) => /\d/.test(c)).length, tw = Math.min(213, 740 / Math.max(digits, 1)), sc = tw / 142;   // 桁が少ないほど大きく
+      const s = fmt(b.value), digits = [...s].filter((c) => /\d/.test(c)).length, tw = Math.min(213, 740 / Math.max(digits, 1));   // 桁が少ないほど大きく（単位まで画面に収まる大きさに下で合わせる）
+      let sc = tw / 142, fit = false;
       const row = el("div", { class: "abs", style: `left:64px;top:${860 - 100 * sc}px;transform-origin:0 0;transform:scale(${sc})` }, "", box); let x = 0; const flaps = [];
       [...s].forEach((c) => { if (!/\d/.test(c)) { el("div", { class: "abs", style: `left:${x}px;top:40px;font:400 130px/1 'Dela Gothic One';color:var(--nf-ink)` }, c, row); x += 50; return; }
         flaps.push({ n: +c, e: el("div", { class: "nf-flap", style: `left:${x}px;top:0` }, `<div class="h t"><span></span></div><div class="h b"><span></span></div><div class="h t fl"><span></span></div>`, row) }); x += 142; });
       const unit = el("div", { class: "abs nf-num", style: `left:${64 + x * sc + 16}px;top:${860 + 100 * sc - 110}px;font-size:96px;line-height:1;color:var(--nf-ink);opacity:0` }, `${b.unit || ""}${mark(b)}`, box);
-      return (u) => { flaps.forEach((f, k) => { const stop = 0.6 + k * 0.28, spins = 6 + k * 2, [top, bot, flip] = f.e.children;
+      return (u) => { if (!fit) { fit = true; sc = Math.min(sc, (952 - 16 - unit.offsetWidth) / x);   // 単位が右へはみ出さない（「万個」で実際にはみ出した）
+          row.style.transform = `scale(${sc})`; row.style.top = `${860 - 100 * sc}px`; unit.style.left = `${64 + x * sc + 16}px`; unit.style.top = `${860 + 100 * sc - 110}px`; }
+        flaps.forEach((f, k) => { const stop = 0.6 + k * 0.28, spins = 6 + k * 2, [top, bot, flip] = f.e.children;
           if (u >= stop) { top.firstChild.textContent = f.n; bot.firstChild.textContent = f.n; flip.style.display = "none"; }
           else { const q = (Math.max(u, 0) / stop) * spins, idx = Math.floor(q), ph = q - idx, cur = (f.n - spins + idx + 100) % 10;
             top.firstChild.textContent = (cur + 1) % 10; bot.firstChild.textContent = cur; flip.firstChild.textContent = cur; flip.style.display = "block"; flip.style.transform = `rotateX(${-ph * 90}deg)`; }
