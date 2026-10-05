@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  /* 型：紙（家電・日用品）。自然光の紙の部屋・太いゴシック・金の差し色。カメラの振りでカットをつなぐ */
+  :root { --paper:#F2EDE4; --ink:#17150F; --gold:#B2842F; --gold2:#D9B872; --mute:#6A645A; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--paper); }
+  body { position:relative; font-family:"Noto Sans JP",sans-serif; color:var(--ink); }
+  .abs { position:absolute; }
+  .dela { font-family:"Dela Gothic One",sans-serif; font-weight:400; letter-spacing:-.01em; }
+  .noto { font-family:"Noto Sans JP",sans-serif; font-weight:900; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.10em .22em .26em .06em; margin:-.10em -.22em -.26em -.06em; visibility:hidden; }
+  .ln > .in { display:block; will-change:transform; }
+  #stage { position:absolute; inset:-30px; width:1140px; height:1980px; transform-origin:570px 990px; }
+  #stage > .frame { position:absolute; left:30px; top:30px; width:1080px; height:1920px; overflow:visible; }
+  #bg { position:absolute; left:-60px; top:-60px; width:1200px; height:2040px;
+        background:
+          radial-gradient(ellipse 1500px 1800px at 38% 20%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 38%, rgba(255,255,255,.18) 66%, rgba(255,255,255,0) 100%),
+          linear-gradient(180deg, #FAF7F1 0%, #F4EFE5 55%, #EBE3D5 100%); }
+  .wl { position:absolute; top:-200px; height:2500px; background:linear-gradient(90deg, rgba(255,251,242,0), rgba(255,251,242,.62) 50%, rgba(255,251,242,0)); transform-origin:50% 0; }
+  #floorshade { position:absolute; left:-60px; top:1180px; width:1200px; height:860px; background:linear-gradient(180deg, rgba(120,98,60,0) 0%, rgba(120,98,60,.06) 40%, rgba(120,98,60,.11) 100%); }
+  #vig { position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply; background:radial-gradient(ellipse 1100px 1700px at 50% 44%, rgba(255,255,255,0) 40%, rgba(70,52,22,.05) 70%, rgba(70,52,22,.14) 100%); }
+  #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:multiply; opacity:.30; pointer-events:none; }
+  #world { position:absolute; left:0; top:0; width:720px; height:720px; transform-origin:0 0; }
+  #world img, #world .m { position:absolute; display:block; }
+  .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(28,20,8,.62) 0%, rgba(28,20,8,.30) 38%, rgba(28,20,8,0) 72%); }
+  .refl { opacity:.16; -webkit-mask-image:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,0) 22%); mask-image:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,0) 22%); transform:scaleY(-1); transform-origin:50% 50%; }
+  .sweep { position:absolute; left:0; top:0; width:100%; height:100%; mix-blend-mode:plus-lighter; opacity:0;
+        background:linear-gradient(103deg, rgba(255,255,255,0) 42%, rgba(255,246,222,.55) 50%, rgba(255,255,255,0) 58%); background-size:320% 100%; background-position:100% 0; background-repeat:no-repeat; }
+  .gold { color:var(--gold); }
+  .tag { display:inline-block; font:900 34px/1 "Noto Sans JP"; padding:12px 20px; border-radius:12px; background:var(--ink); color:var(--paper); }
+  .note { position:absolute; font:500 26px/1.5 "Noto Sans JP"; color:var(--mute); letter-spacing:.01em; opacity:0; }
+  .digits { white-space:nowrap; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mute); border:2px solid var(--mute); padding:5px 13px; border-radius:7px; letter-spacing:.06em; }
+  .chip { position:absolute; left:56px; height:112px; width:350px; border-radius:24px; background:var(--ink); color:var(--paper); opacity:0;
+          display:flex; align-items:center; gap:20px; padding-left:28px; font:900 54px/1 "Noto Sans JP"; }
+  .chip .ck { width:54px; height:54px; border-radius:50%; background:var(--gold2); display:grid; place-items:center; flex:none; }
+  .chip .ck svg { width:30px; height:30px; }
+  .bar { position:absolute; border-radius:20px; overflow:hidden; opacity:0; }
+  .bar > i { position:absolute; left:0; top:0; height:100%; width:100%; border-radius:20px; display:block; transform-origin:0 50%; transform:scaleX(0); }
+  .cell { position:absolute; top:118px; width:92px; height:92px; border-radius:20px; border:5px solid rgba(23,21,15,.28); display:grid; place-items:center; font-size:50px; color:rgba(23,21,15,.32); opacity:0; }
+  .cta { position:absolute; left:60px; top:1110px; width:540px; height:124px; border-radius:62px; background:var(--gold); color:#fff; overflow:hidden; opacity:0;
+         display:flex; align-items:center; justify-content:center; gap:12px; font:900 40px/1 "Noto Sans JP"; letter-spacing:.02em; white-space:nowrap; }
+  .cta .sw { position:absolute; inset:0; mix-blend-mode:plus-lighter; background:linear-gradient(103deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 65%); background-size:300% 100%; background-position:100% 0; opacity:0; }
+</style>
+</head>
+<body>
+<div id="stage"><div class="frame">
+  <div id="bg">
+    <div class="wl" id="wl1" style="left:120px;width:420px;transform:skewX(-13deg)"></div>
+    <div class="wl" id="wl2" style="left:610px;width:250px;transform:skewX(-13deg);opacity:.7"></div>
+    <div id="floorshade"></div>
+  </div>
+  <div id="behind" class="abs" style="left:0;top:0;width:1080px;height:1920px"></div>
+  <div id="world"></div>
+  <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px"><div id="pr" class="abs">PR</div></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="vig"></div>
+</div></div>
+<script src="core.js"></script>
+<script>
+// ---- 固定幅の数字（「,」「〜」は字形の差で幅がぶれるので図形で描く） ----
+const COMMA = '<svg viewBox="0 0 10 20" style="display:inline-block;width:.30em;height:.60em;margin:0 .03em;vertical-align:baseline;position:relative;top:.12em" fill="currentColor"><circle cx="5.2" cy="5" r="4.4"/><path d="M8.6 6 C8.6 12.5 5.8 17 0.6 19.6 L-0.2 16.8 C3 15 4.4 12.4 4 8 Z"/></svg>';
+const DASH = '<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="display:inline-block;width:.46em;height:.14em;margin:0 .10em;vertical-align:baseline;position:relative;top:-.30em" fill="currentColor"><rect x="0" y="0" width="10" height="10" rx="2"/></svg>';
+function setDigits(e, str) { if (e.dataset.v === str) return; e.dataset.v = str;
+  e.innerHTML = [...str].map((ch) => ch === "," ? COMMA : (ch === "." ? `<span style="font-family:'Noto Sans JP';font-weight:900;margin:0 .02em">.</span>` : (ch === "~" ? DASH : ch))).join(""); }
+// マスクの中から文字が立ち上がる
+function lineIn(e, tin, tout, w = 13) { const a = sp(T - tin, w, 1), o = outC((T - tout) / 0.30);
+  e.firstElementChild.style.transform = `translateY(${(1 - a) * 140 - o * 140}%)`; e.style.visibility = (a <= 0.001 || o >= 0.999) ? "hidden" : "visible"; }
+function pop(e, tin, tout, dy = 16, s0 = 0.98) { const a = sp(T - tin, 13, 1), o = outC((T - tout) / 0.28);
+  e.style.opacity = clamp(a * 1.2) * (1 - o); e.style.transform = `translate(0px, ${(1 - a) * dy - o * 20}px) scale(${lerp(s0, 1, clamp(a))})`; }
+const ln = (cls, style, html, parent) => el("div", { class: `ln ${cls}`, style }, `<span class="in">${html}</span>`, parent);
+const fadeIO = (e, tin, tout, d = 0.3) => { e.style.opacity = outC((T - tin) / d) * (1 - outC((T - tout) / 0.28)); };
+
+// ---- カメラ：各カットの構え（cam）と、前のカットからの入り方（mv）。境目の前後 dur/2 で振る ----
+const SHOT = [];
+function shot(i, s, c) {
+  const z1 = c.z * (1 + (c.drift || 0)), tr = c.tr || [0, 0], mv = c.mv || { dur: 0.6 };
+  const k0 = { t: i ? s.t0 + mv.dur / 2 : s.t0, F: c.F, A: c.A, z: c.z, r: 0, ease: "lin" };
+  const k1 = { t: s.t1 - 0.3, F: [c.F[0] + tr[0], c.F[1] + tr[1]], A: c.A, z: z1, r: 0, ease: "in" };
+  if (i) { const p = SHOT[i - 1]; p.k1.t = s.t0 - mv.dur / 2; p.k1.mv = mv; }
+  K.push(k0, k1); SHOT[i] = { c, k0, k1, s, mv, blur: c.blur || [0, 0] };
+}
+// カメラの振りの進み（0..1）：カット i に入る振り
+const moveIn = (i, t) => i ? inOutC((t - SHOT[i - 1].k1.t) / SHOT[i].mv.dur) : 1;
+const OPEN = {}, PUNCH = { at: 1e9 }, SLIDE = { i: -1, dx: 0 };
+const CHECK = '<span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#17150F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+const KINDS = {
+  // 冒頭：商品の後ろに大見出し。手元のアップから一気に引く（1コマ目＝サムネイルに見出しの2行と PR が出ている・#267-7）
+  hook(b, i, s) {
+    const t0 = s.t0, wA = t0, wB = t0 + 0.22, wC = s.voice.start + s.voice.len * 0.5, out = OUT(i) - 0.08;
+    const L = b.head.map((h, k) => ln(`dela${k === b.gold ? " gold" : ""}`, `left:60px;top:${250 + k * 150}px;font-size:120px`, h, $("behind")));
+    const bar = el("div", { class: "abs", style: "left:64px;top:742px;height:14px;width:540px;background:var(--ink);transform-origin:0 50%;transform:scaleX(0)" }, "", $("behind"));
+    shot(i, s, b.cam); Object.assign(OPEN, b.open, { t1: t0 + b.open.dur });
+    K.push({ t: t0, F: b.open.F, A: b.cam.A, z: b.open.z, r: b.open.roll, ease: "in" }); SHOT[i].k0.t = OPEN.t1;
+    PUNCH.at = wC; PUNCH.base = b.cam;
+    let fitted = false;
+    U.push((t) => {
+      if (!fitted) { fitted = true; let y = 262;   // 見出しの幅を実測でそろえ、行を積む
+        L.forEach((e, k) => { const w = b.widths ? b.widths[k] : (k === L.length - 1 ? 560 : 540); e.style.fontSize = "100px"; const cur = e.firstElementChild.getBoundingClientRect().width;
+          const fs = 100 * w / cur; e.style.fontSize = fs + "px"; e.style.top = y + "px"; e.style.height = fs * 1.12 + "px"; y += fs * 1.12 + 6; }); bar.style.top = (y + 4) + "px"; }
+      [wA - 0.6, wB - 0.62, wC].forEach((tin, k) => L[k] && lineIn(L[k], tin, out, k === 2 ? 15 : 14));
+      const hb = sp(t - (wC + 0.18), 12, 1) * (1 - outC((t - out) / 0.3)); bar.style.transform = `scaleX(${hb})`; bar.style.visibility = hb < 0.02 ? "hidden" : "visible";
+      const zr = t < OPEN.t1 ? 1 : 1 + (b.cam.drift || 0) * clamp((t - t0) / (s.t1 - t0)) * 0.35;   // 引きの間は見出しを動かさない
+      $("behind").style.transformOrigin = `${b.cam.A[0]}px ${b.cam.A[1]}px`; $("behind").style.transform = `scale(${zr})`;
+    });
+  },
+  // 置くだけ：札を3枚。もう一方（ステーション）の輪郭まで線を引く。主役は横へよける
+  chips(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, ys = [560, 700, 840];
+    const h = ln("dela", "left:56px;top:252px;height:170px;font-size:134px", b.head);
+    const C = b.chips.map((c, k) => el("div", { class: "chip", style: `top:${ys[k]}px` }, CHECK + c));
+    const lead = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><g stroke="#B2842F" stroke-width="4" stroke-linecap="round" fill="none">${C.map(() => '<path d=""/>').join("")}</g><g fill="#B2842F">${C.map(() => '<circle r="9"/>').join("")}</g></svg>`);
+    const P2 = lead.querySelectorAll("path"), C2 = lead.querySelectorAll("circle");
+    shot(i, s, b.cam); SLIDE.i = i; SLIDE.dx = b.slide_hero || 0;
+    let tgt = null;
+    U.push((t) => {
+      if (!tgt && b.leader !== false && P.hero.alt) {   // もう一方の左の輪郭（透明度で探す）に線の先を合わせる
+        const im = $("altG").querySelector("img:not(.refl)"), cv = document.createElement("canvas"); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+        const cx = cv.getContext("2d"); cx.drawImage(im, 0, 0); const px = cx.getImageData(0, 0, cv.width, cv.height).data, k = cv.width / P.hero.alt_size[0], c = b.cam;
+        tgt = [650, 770, 900].map((ysS) => { const ySrc = c.F[1] + (ysS - c.A[1]) / c.z, row = clamp(Math.round((ySrc - P.hero.alt_at[1]) * k), 0, cv.height - 1);
+          let x = 0; for (; x < cv.width; x++) if (px[(row * cv.width + x) * 4 + 3] > 140) break; return [c.A[0] + c.z * (P.hero.alt_at[0] + x / k - c.F[0]) - 2, ysS]; }); }
+      lineIn(h, t0 + 0.12, out, 13);
+      C.forEach((e, k) => { const a = sp(t - (t0 + 0.75 + k * 0.5), 15, 0.78), o = outC((t - out) / 0.28); e.style.opacity = clamp(a * 1.4) * (1 - o); e.style.transform = `translate(${(1 - a) * -70 - o * 40}px, 0px)`; });
+      if (tgt) C.forEach((e, k) => { const g = outC((t - (t0 + 1.9 + k * 0.16)) / 0.4), o = outC((t - out) / 0.25), x0 = 406, y0 = ys[k] + 56, x = lerp(x0, tgt[k][0], g), y = lerp(y0, tgt[k][1], g);
+        P2[k].setAttribute("d", `M${x0},${y0} L${x},${y}`); C2[k].setAttribute("cx", x); C2[k].setAttribute("cy", y); const op = (g > 0 ? 1 : 0) * (1 - o); P2[k].style.opacity = op; C2[k].style.opacity = op; });
+    });
+  },
+  // 数＋升目：升目が拍に合わせて1つずつ埋まり、最後だけ金
+  cells(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, r0 = t0 + 0.85, r1 = s.t1 - 0.75, n = b.cells || 5;
+    const la = ln("noto", "left:60px;top:250px;height:70px;font-size:56px", b.label);
+    const nm = ln("dela", "left:50px;top:326px;height:310px;font-size:236px", `<span class="digits"></span>`);
+    const un = ln("noto", "left:60px;top:600px;height:130px;font-size:104px", `${b.unit}${b.mark ? `<span style="font-size:50px;vertical-align:top;margin-left:6px">${b.mark}</span>` : ""}`);
+    const rail = el("div", { class: "abs", style: "left:60px;top:860px;width:540px;height:340px" },
+      Array.from({ length: n }, (_, k) => `<div class="dela cell" style="left:${k * 104}px">${k + 1}</div>`).join("") +
+      `<div class="abs noto" style="left:0;top:232px;font-size:36px;color:var(--mute);font-weight:700;opacity:0">${b.cell_label || ""}</div><div class="abs noto" style="left:0;top:-4px;width:${n * 104 - 12}px;text-align:right;font-size:58px;line-height:1;opacity:0">${b.badge || ""}</div>`);
+    const cells = [...rail.querySelectorAll(".cell")], [rl, badge] = [...rail.children].slice(n);
+    const nt = el("div", { class: "note", style: "left:60px;top:1290px;width:462px" }, b.note || "");
+    setDigits(nm.querySelector(".digits"), b.num); shot(i, s, b.cam);
+    U.push((t) => { lineIn(la, t0 + 0.12, out, 13); lineIn(nm, t0 + 0.3, out, 12); lineIn(un, t0 + 0.44, out, 12);
+      rail.style.opacity = 1 - outC((t - out) / 0.28);
+      cells.forEach((e, k) => { const ti = r0 + k * ((r1 - r0) / (n - 0.4)), on = clamp(sp(t - ti, 15, 0.8)), last = k === n - 1, c = last ? "178,132,47" : "23,21,15";
+        e.style.opacity = clamp(sp(t - (r0 - 0.35 + k * 0.05), 14, 1) * 1.4); e.style.background = `rgba(${c},${on})`; e.style.borderColor = `rgba(${c},${0.28 + 0.72 * on})`;
+        e.style.color = on > 0.5 ? "#F2EDE4" : "rgba(23,21,15,.32)"; e.style.transform = `scale(${lerp(1, last ? 1.06 : 1, on)})`; });
+      const eg = sp(t - r1, 11, 0.7); badge.style.opacity = clamp(eg * 1.4); badge.style.transform = `translateY(${(1 - clamp(eg)) * 18}px)`;
+      rl.style.opacity = clamp(sp(t - (r0 - 0.2), 12, 1)); fadeIO(nt, t0 + 0.9, out); });
+  },
+  // 数え上げ＋棒：通常と最大を棒で比べる
+  bars(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, c0 = t0 + 0.35, c1 = t0 + 1.55, max = Math.max(...b.bars.map((x) => x[1]));
+    const tg = el("div", { class: "abs", style: "left:60px;top:246px;opacity:0" }, `<span class="tag">${b.tag}</span>`);
+    const la = ln("noto", "left:60px;top:326px;height:80px;font-size:62px", b.label);
+    const nm = ln("dela", "left:50px;top:408px;height:220px;font-size:158px", `<span class="digits">0</span>`);
+    const un = ln("dela", "left:58px;top:600px;height:120px;font-size:92px", `${b.unit}${b.mark ? `<span class="noto" style="font-size:44px;vertical-align:top;margin-left:8px">${b.mark}</span>` : ""}`);
+    const R = b.bars.map(([name, v, col], k) => { const gold = col === "gold";
+      const l = el("div", { class: "abs noto", style: `left:60px;top:${772 + k * 134}px;font-size:38px;line-height:1;opacity:0` }, `${name} <span class="dela${gold ? " gold" : ""}" style="font-size:40px">${v.toLocaleString("en-US")}</span><span style="font-size:30px"${gold ? ' class="gold"' : ""}>${b.unit}</span>`);
+      const bar = el("div", { class: "bar", style: `left:60px;top:${828 + k * 134}px;width:520px;height:46px;background:rgba(23,21,15,.10)` }, `<i style="background:var(--${gold ? "gold" : "ink"})"></i>`);
+      return { l, bar, v, t: t0 + 1.7 + k * 0.5 }; });
+    const nt = el("div", { class: "note", style: "left:60px;top:1290px;width:462px" }, b.note || "");
+    const dg = nm.querySelector(".digits"); shot(i, s, b.cam);
+    U.push((t) => { pop(tg, t0 + 0.12, out); lineIn(la, t0 + 0.22, out, 13); lineIn(nm, c0 - 0.05, out, 12); lineIn(un, c0 + 0.05, out, 12);
+      setDigits(dg, (Math.round((b.value * outC((t - c0) / (c1 - c0))) / (b.step || 100)) * (b.step || 100)).toLocaleString("en-US"));
+      const bo = outC((t - out) / 0.28);
+      R.forEach((r, k) => { const o = clamp(sp(t - r.t, 14, 1) * 1.3) * (1 - bo); r.l.style.opacity = o; r.bar.style.opacity = o; r.bar.firstChild.style.transform = `scaleX(${inOutC((t - r.t) / (0.5 + 0.1 * k)) * r.v / max})`; });
+      fadeIO(nt, c1, out); });
+    if (b.glint) GLINT.push([t0 + 0.3, b.glint]);
+  },
+  // 締め：評価・レビュー数（数え上げ）・集計日・リンク
+  finale(b, i, s) {
+    const t0 = s.t0, s0 = t0 + 0.25, s1 = t0 + 1.15, r0 = t0 + 0.8, r1 = t0 + 1.9, cta = t0 + 2.1;
+    const st = el("div", { class: "abs dela gold", style: "left:46px;top:236px;font-size:150px;line-height:1;opacity:0" }, "★");
+    const nm = ln("dela", "left:218px;top:222px;height:280px;font-size:196px", `<span class="digits">0.00</span>`);
+    const ra = ln("noto", "left:60px;top:494px;height:80px;font-size:62px", "レビュー");
+    const rv = ln("dela", "left:56px;top:566px;height:180px;font-size:124px", `<span class="digits">0</span><span style="font-family:'Noto Sans JP';font-weight:900;font-size:62px;margin-left:8px">件</span>`);
+    const n7 = el("div", { class: "note", style: "left:60px;top:740px;width:520px" }, b.date);
+    const n8 = el("div", { class: "note", style: "left:62px;top:1256px;width:520px;font-weight:700" }, b.cta_note || "");
+    const ct = el("div", { class: "cta" }, `<span style="position:relative">${b.cta}</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sw"></div>`);
+    const [d1, d2] = [nm.querySelector(".digits"), rv.querySelector(".digits")]; shot(i, s, b.cam); FIN.t = t0;
+    U.push((t) => { const so = sp(t - s0, 12, 0.8); st.style.opacity = clamp(so * 1.3); st.style.transform = `translateY(${(1 - so) * 30}px) scale(${lerp(0.9, 1, clamp(so))})`;
+      setDigits(d1, (b.rating * outC((t - s0) / (s1 - s0))).toFixed(2)); lineIn(nm, s0, 999, 12); lineIn(ra, r0 - 0.15, 999, 13);
+      setDigits(d2, Math.round(b.reviews * outC((t - r0) / (r1 - r0))).toLocaleString("en-US")); lineIn(rv, r0, 999, 12);
+      n7.style.opacity = outC((t - r1) / 0.4);
+      const c = sp(t - cta, 14, 0.8); ct.style.opacity = clamp(c * 1.3); ct.style.transform = `translateY(${(1 - c) * 50}px) scale(${lerp(0.94, 1, clamp(c))})`;
+      n8.style.opacity = outC((t - (cta + 0.30)) / 0.4);
+      const cs = clamp((t - (cta + 0.35)) / 0.9), sw = ct.querySelector(".sw"); sw.style.backgroundPosition = `${lerp(100, 0, inOutC(cs))}% 0`; sw.style.opacity = (cs > 0 && cs < 1) ? 1 : 0; });
+  },
+};
+const GLINT = [], FIN = { t: 1e9 };
+CORE.start({ grain: [226, 29], wipe: false, refl: true, motionBlur: true,
+  // 「全員見て!!」の瞬間の一撃（速く入り、ゆっくり戻る）
+  cam(t, cam) { const d = t - PUNCH.at; if (d > 0) cam.z *= 1 + 0.045 * Math.exp(-9 * d) * (1 - Math.exp(-70 * d)); return cam; },
+  onSeek(t, cam) {
+    $("stage").style.transform = `rotate(${Math.sin(t * 1.7) * 0.18}deg) translate(${Math.sin(t * 1.3) * 2.2}px, ${Math.cos(t * 1.1) * 2.2}px)`;   // 手持ちのわずかな揺れ
+    const base = SHOT[0].c, dxF = (cam.F[0] - base.F[0]) * base.z, dyF = (cam.F[1] - base.F[1]) * base.z;   // 奥の光は少し遅れてついてくる
+    $("wl1").style.marginLeft = `${-dxF * 0.10 + Math.sin(t * 0.5) * 14}px`; $("wl2").style.marginLeft = `${-dxF * 0.18 + Math.cos(t * 0.4) * 10}px`;
+    $("bg").style.transform = `translate(${-dxF * 0.05}px, ${-dyF * 0.05}px) scale(${1 + (cam.z / base.z - 1) * 0.08})`;
+    // 登場は下から（主役が少し速い＝手前）。置くだけのカットでは主役が横へよける
+    const eIn = sp(t + 0.3, 10, 1), eIn2 = sp(t + 0.22, 10, 1), sl = SLIDE.i > 0 ? SLIDE.dx * (moveIn(SLIDE.i, t) - moveIn(SLIDE.i + 1, t)) : 0;
+    $("heroG").style.transform = `translate(${sl}px, ${(1 - eIn) * 300}px) rotate(${(1 - eIn) * -2.2}deg)`;
+    // ピント送り：カットごとの [もう一方, 主役] のぼけ（親の拡大に連動するので z で割る）
+    let bl = SHOT[0].blur; for (let k = 1; k < SHOT.length; k++) { const u = moveIn(k, t); if (u > 0) bl = [lerp(SHOT[k - 1].blur[0], SHOT[k].blur[0], u), lerp(SHOT[k - 1].blur[1], SHOT[k].blur[1], u)]; }
+    $("heroG").style.filter = bl[1] > 0.05 ? `blur(${bl[1] / cam.z}px)` : "none";
+    if ($("altG")) { const c0 = camAt(Math.max(0, t - 0.12)), PF = 0.22;   // 奥の層は動きに少し遅れる
+      $("altG").style.opacity = 1; $("altG").style.transform = `translate(${(cam.F[0] - c0.F[0]) * PF}px, ${(1 - eIn2) * 300 + (cam.F[1] - c0.F[1]) * PF}px)`;
+      $("altG").style.filter = bl[0] > 0.05 ? `blur(${bl[0] / cam.z}px)` : "none"; }
+    $("sh").style.opacity = clamp(eIn * 1.1); if ($("refl")) $("refl").style.opacity = 0.16 * clamp(eIn * 1.1);
+    // 光の走りは冒頭・見せ場・締めだけ
+    const sw = $("sw"), swa = $("swAlt"); sw.style.clipPath = "none";
+    if (t < FIN.t - 0.5) { sweepAt(sw, 0.85, 0.75, 0.85); if (swa) sweepAt(swa, 0.97, 0.75, 0.7); } else { sweepAt(sw, FIN.t + 0.1, 0.9, 0.8); if (swa) sweepAt(swa, FIN.t + 0.22, 0.9, 0.7); }
+    GLINT.forEach(([g0, clip]) => { if (t > g0 && t < g0 + 0.85) { sw.style.clipPath = `inset(${clip * 100}% 0 0 0)`; sweepAt(sw, g0, 0.85, 1.0); } });
+  } }, KINDS);
+</script>
+</body>
+</html>

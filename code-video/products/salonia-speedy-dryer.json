@@ -1,0 +1,31 @@
+{
+  "product_key": "salonia-speedy-dryer",
+  "template": "pop",
+  "palette": "blush-red",
+  "name": "SALONIA スピーディーイオンドライヤー",
+  "music": {"bpm": 104, "prog": [[64, 68, 71, 75, 78], [61, 64, 68, 71, 76], [57, 61, 64, 68, 73], [59, 63, 66, 69, 71]]},
+  "prep": {"images": ["product/salonia-speedy-dryer.jpg", "product/salonia-speedy-dryer-1.jpg"],
+           "videos": ["https://videos.pexels.com/video-files/13816194/13816194-hd_1080_1920_60fps.mp4"],
+           "cutouts": [{"out": "dryer_champ.png", "src": "img1", "crop": [100, 320, 450, 720]}, {"out": "dryer_red.png", "src": "img1", "crop": [270, 200, 600, 560]}],
+           "broll": [{"out": "broll", "src": "vid0", "ss": 0.25, "t": 1.35, "speed": 0.6, "grade": "blush", "why": "後ろ姿・顔と他社製品が映らない区間"}]},
+  "hero": {"cutout": "dryer_champ.png", "alt": "dryer_red.png", "alt_at": [380, 0], "alt_size": [237, 282],
+           "focus": {"body": [130, 140], "nozzle": [4, 44], "dir": -172, "base_y": 285}},
+  "beats": [
+    {"kind": "problem", "voice": "line0.mp3", "say": "髪を乾かす時間、長すぎない？", "head": ["髪を乾かす時間、", "長すぎない？"], "accent": 3, "bar": "ドライ中…",
+     "source": "悩みの提示（商品の主張ではない）"},
+    {"kind": "airflow", "voice": "line1.mp3", "say": "大風量で、すばやく乾く", "big": "大風量", "fast": "速乾", "mark": "※1", "broll": "broll", "frames": 56,
+     "note": "※1 乾燥時間短縮による（販売ページの記載）<br>※イメージ映像です。",
+     "source": "説明文：大風量・速乾（※乾燥時間短縮による）"},
+    {"kind": "slash", "voice": "line2.mp3", "say": "乾かす時間が短いから、ダメージカット", "word": "ダメージ", "reveal": "カット",
+     "sub": "乾かす時間が短いから<span style=\"font-size:26px;vertical-align:top\">※1</span>",
+     "note": "※1 乾燥時間短縮による（販売ページの記載）",
+     "source": "説明文：乾燥時間短縮によるダメージカット"},
+    {"kind": "colors", "voice": "line3.mp3", "say": "カラーは、定番色と秋冬の限定色", "label": "カラーは", "lines": ["定番色＋", "限定カラー"], "tags": ["シャンパン系", "レッド系"],
+     "alt_bg": ["#B92C37", "#8E1E28"],
+     "note": "※限定カラーは数量限定・無くなり次第終了（販売ページの記載）<br>※映像は限定カラーです。",
+     "source": "説明文：秋冬限定カラー・数量限定"},
+    {"kind": "finale", "voice": "line4.mp3", "say": "レビュー9000件超え、リンクはプロフィールへ", "rating": 4.18, "reviews": 9028, "date": "楽天市場 2026年10月5日時点",
+     "cta": "プロフィールのリンクへ", "cta_note": "価格・在庫・最新情報はリンク先でご確認ください"}
+  ],
+  "excluded": ["19冠（※原文はヘアアイロンのシリーズの受賞・ドライヤーではない）"]
+}

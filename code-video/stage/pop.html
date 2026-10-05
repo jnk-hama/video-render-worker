@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<style>
+  /* 型：ポップ（美容など）。ブラッシュの背景にブランド色。太い字・シルクの風・円で切り替わる */
+  :root { --bg1:#F8EAE5; --bg2:#EED6CE; --ink:#2A1F1E; --red:#C8343F; --mut:#6B5450; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--bg1); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; }
+  .abs { position:absolute; }
+  .bk { font-family:"Noto Sans JP",sans-serif; font-weight:900; }
+  .gar { font-family:"Cormorant Garamond",serif; font-weight:500; font-feature-settings:"lnum" 1; font-variant-numeric:lining-nums; }
+  .note { position:absolute; font:500 27px/1.5 "Noto Sans JP"; color:var(--mut); }
+  .kin { position:absolute; white-space:nowrap; }
+  .kin > span { display:inline-block; }
+  #bg { position:absolute; inset:0; background:linear-gradient(170deg, var(--bg1) 0%, var(--bg2) 100%); }
+  #altbg { position:absolute; inset:0; clip-path:circle(0px at 800px 900px); }
+  .blob { position:absolute; border-radius:50%; filter:blur(10px); }
+  #world { position:absolute; left:0; top:0; width:600px; height:400px; transform-origin:0 0; }
+  #world .m, #world img { position:absolute; display:block; }
+  .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(90,40,35,.30) 0%, rgba(90,40,35,.12) 45%, rgba(90,40,35,0) 72%); }
+  .sweep { position:absolute; inset:0; mix-blend-mode:screen; opacity:0; background:linear-gradient(105deg, rgba(255,255,255,0) 42%, rgba(255,245,240,.8) 50%, rgba(255,255,255,0) 58%); background-size:340% 100%; background-position:100% 0; background-repeat:no-repeat; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mut); border:2px solid var(--mut); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }
+  #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:multiply; opacity:.08; pointer-events:none; }
+  .tagr { display:inline-block; font:900 36px/1 "Noto Sans JP"; padding:14px 22px; border-radius:14px; background:var(--red); color:#fff; letter-spacing:.06em; }
+  .cta { position:absolute; display:flex; align-items:center; gap:16px; height:116px; padding:0 46px; border-radius:58px; background:var(--red); color:#fff; font:900 42px/1 "Noto Sans JP"; letter-spacing:.05em; white-space:nowrap; overflow:hidden; box-shadow:0 14px 30px rgba(200,52,63,.3); }
+</style>
+</head>
+<body>
+  <div id="bg"></div>
+  <div class="blob" id="bl0" style="width:760px;height:760px;background:radial-gradient(circle, rgba(255,255,255,.75) 0%, rgba(255,255,255,0) 70%)"></div>
+  <div class="blob" id="bl1" style="width:620px;height:620px;background:radial-gradient(circle, rgba(232,160,150,.45) 0%, rgba(232,160,150,0) 70%)"></div>
+  <div id="altbg"></div>
+  <canvas id="silk" class="abs" style="left:0;top:0" width="1080" height="1920"></canvas>
+  <div id="under"></div>
+  <div id="world"></div>
+  <div id="over"></div>
+  <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px"><div id="pr" class="abs">PR</div></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+<script src="core.js"></script>
+<script>
+// ---- 風：吹き出し口から流れるシルクのリボン（1本ずつ不透明で描いて溶かす＝継ぎ目の縞を出さない） ----
+const SILK = [
+  { c: [236, 222, 204], a: 0.95, W: 120, A: 95, lam: 900, om: 3.4, ph: 0.0, tw: 820, om2: 1.9, ph2: 0.6, off: -14, curl: -90 },
+  { c: [206, 70, 82], a: 0.88, W: 92, A: 120, lam: 1050, om: 2.9, ph: 2.1, tw: 700, om2: 1.6, ph2: 2.0, off: 10, curl: 70 },
+  { c: [252, 247, 242], a: 0.70, W: 64, A: 70, lam: 780, om: 3.9, ph: 4.0, tw: 600, om2: 2.3, ph2: 3.1, off: 0, curl: -30 },
+];
+const OFF = document.createElement("canvas"); OFF.width = 1080; OFF.height = 1920; const og = OFF.getContext("2d");
+function drawSilk(cam, power, t) {
+  const g = $("silk").getContext("2d"); g.clearRect(0, 0, 1080, 1920); if (power <= 0 || !F0.nozzle) return;
+  const n = toScreen(cam, F0.nozzle), ang = (cam.r + (F0.dir || 180)) * Math.PI / 180, dx = Math.cos(ang), dy = Math.sin(ang), px = -dy, py = dx;
+  const L = 900 + 300 * power, k = Math.min(cam.z / 2.7, 1.3);
+  SILK.forEach((r) => {
+    og.clearRect(0, 0, 1080, 1920); const pts = [];
+    for (let s = 0; s <= L; s += 6) { const u = s / L, env = Math.pow(u, 0.75);
+      const o = r.off * k + r.A * env * Math.sin((2 * Math.PI * s) / r.lam - r.om * t + r.ph) + r.curl * u * u, tw = Math.cos((2 * Math.PI * s) / r.tw - r.om2 * t + r.ph2);
+      const w = r.W * k * (0.3 + 0.7 * Math.min(1, s / 90)) * (0.12 + 0.88 * Math.abs(tw)) * (1 - 0.35 * u); pts.push({ x: n[0] + dx * s + px * o, y: n[1] + dy * s + py * o, w, tw }); }
+    for (let i = 0; i < pts.length - 1; i++) { const p = pts[i], q = pts[i + 1], sh = 0.6 + 0.4 * Math.abs(p.tw) + Math.pow(Math.abs(p.tw), 10) * 0.3, bk = p.tw < 0 ? 0.84 : 1;
+      og.fillStyle = `rgb(${Math.min(255, Math.round(r.c[0] * sh * bk))},${Math.min(255, Math.round(r.c[1] * sh * bk))},${Math.min(255, Math.round(r.c[2] * sh * bk))})`; og.strokeStyle = og.fillStyle; og.lineWidth = 1.2;
+      og.beginPath(); og.moveTo(p.x + px * p.w / 2, p.y + py * p.w / 2); og.lineTo(q.x + px * q.w / 2, q.y + py * q.w / 2); og.lineTo(q.x - px * q.w / 2, q.y - py * q.w / 2); og.lineTo(p.x - px * p.w / 2, p.y - py * p.w / 2); og.closePath(); og.fill(); og.stroke(); }
+    const gr = og.createLinearGradient(n[0], n[1], n[0] + dx * L, n[1] + dy * L); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(0.05, "rgba(0,0,0,1)"); gr.addColorStop(0.55, "rgba(0,0,0,.75)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    og.globalCompositeOperation = "destination-in"; og.fillStyle = gr; og.fillRect(0, 0, 1080, 1920); og.globalCompositeOperation = "source-over";
+    g.globalAlpha = r.a * power * 0.8; g.filter = "blur(2px)"; g.drawImage(OFF, 0, 0); g.filter = "none"; g.globalAlpha = 1; });
+}
+const SILKP = [];   // [t0, t1, power]
+const NZ = () => [F0.nozzle[0] + 56, F0.nozzle[1] + 16];   // 吹き出し口へ寄る時の注視点
+const kinP = (e, a, b, s = 0.04) => kin(e, a, b, s, "pop");
+const KINDS = {
+  problem(b, i, s) {
+    const t0 = s.t0, n = b.accent || 0, h1 = [...b.head[1]].map((c, k) => `<span${k < n ? ' style="color:#C8343F"' : ""}>${c}</span>`).join("");
+    const a1 = kinWrap(el("div", { class: "kin bk", style: "left:62px;top:250px;font-size:118px;letter-spacing:-.02em" }, b.head[0]));
+    const a2 = el("div", { class: "kin bk", style: "left:62px;top:396px;font-size:150px;letter-spacing:-.02em" }, h1);
+    const bar = el("div", { class: "abs", style: "left:66px;top:600px;width:560px;opacity:0" }, `<div style="font:700 30px/1 'Noto Sans JP';color:var(--mut);letter-spacing:.08em">${b.bar || ""}</div><div style="margin-top:16px;height:22px;border-radius:11px;background:rgba(42,31,30,.12);overflow:hidden"><div style="height:100%;width:0;background:var(--ink);border-radius:11px"></div></div>`);
+    K.push({ t: t0, F: F0.body, A: [880, 1230], z: fitZ(760), r: 10 }, { t: t0 + 0.55, F: F0.body, A: [700, 1200], z: fitZ(707), r: -4 }, { t: s.t1 - 0.25, F: F0.body, A: [690, 1190], z: fitZ(733), r: -3 });
+    SILKP.push([t0 + 0.6, s.t1, 0.45]);
+    U.push((t) => { kinP(a1, t0 - 0.35, OUT(i)); kinP(a2, t0 + 0.3, OUT(i), 0.06); if (b.bar) { fadeUp(bar, t0 + 0.3, OUT(i), 22, 12, 0.8); bar.lastChild.firstChild.style.width = (8 + 22 * outC((t - t0 - 0.3) / 2.6)) + "%"; } });
+  },
+  airflow(b, i, s) {
+    const t0 = s.t0, fast = t0 + 0.7, BR0 = t0 + 1.15;
+    const big = kinWrap(el("div", { class: "kin bk", style: "left:58px;top:240px;font-size:190px;letter-spacing:-.04em" }, b.big));
+    const f2 = el("div", { class: "abs bk", style: "left:58px;top:520px;font-size:210px;letter-spacing:-.04em;color:#C8343F;line-height:1;opacity:0" },
+      `<span class="abs" style="left:0;top:0;opacity:.18">${b.fast}</span><span class="abs" style="left:0;top:0;opacity:.35">${b.fast}</span><span style="position:relative">${b.fast}</span><span style="font:900 54px/1 'Noto Sans JP';vertical-align:top;margin-left:6px;color:var(--ink)">${b.mark || ""}</span>`);
+    const nt = el("div", { class: "note", style: "left:64px;top:1420px;opacity:0" }, b.note || "");
+    let wrap = null, ctx = null, fr = [];
+    if (b.broll) { wrap = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;clip-path:circle(0px at 0 0)" },
+        `<canvas class="abs" style="left:0;top:0" width="1080" height="1920"></canvas><div class="abs" style="left:0;top:0;width:1080px;height:1920px;background:linear-gradient(180deg, rgba(248,234,229,.86) 0%, rgba(248,234,229,.55) 24%, rgba(248,234,229,0) 42%, rgba(248,234,229,0) 66%, rgba(238,214,206,.7) 86%, rgba(238,214,206,.9) 100%)"></div><div class="abs" style="left:0;top:0;width:1080px;height:1920px;background:rgba(232,170,160,.12);mix-blend-mode:soft-light"></div>`, $("over"));
+      ctx = wrap.firstChild.getContext("2d"); fr = loadBroll(b.broll, b.frames); }
+    K.push({ t: t0 + 0.15, F: NZ(), A: [820, 1000], z: fitZ(891), r: 6 }, { t: s.t1 - 0.25, F: [NZ()[0] + 4, NZ()[1] + 2], A: [830, 1000], z: fitZ(943), r: 5 });
+    SILKP.push([t0, s.t1, 1]);
+    U.push((t, cam) => {
+      kinP(big, t0 + 0.2, OUT(i), 0.05);
+      const a = sp(t - fast, 16, 0.6), o = outC((t - OUT(i)) / 0.22); f2.style.opacity = clamp(a * 1.5) * (1 - o); f2.style.transform = `translateX(${(1 - clamp(a, -1, 2)) * 300}px) skewX(${(1 - clamp(a)) * -14}deg)`;
+      const sp3 = f2.querySelectorAll("span"); sp3[1].style.transform = `translateX(${(1 - clamp(a)) * 160 + 18}px)`; sp3[0].style.transform = `translateX(${(1 - clamp(a)) * 320 + 40}px)`;
+      fadeUp(nt, fast + 0.4, OUT(i), 22, 12, 0.8);
+      if (wrap) { const nz = toScreen(camAt(BR0 - 0.3), F0.nozzle), op = inOutC((t - (BR0 - 0.3)) / 0.5), cl = inOutC((t - (s.t1 - 0.45)) / 0.4), rad = 2300 * op * (1 - cl);
+        wrap.style.clipPath = `circle(${rad}px at ${nz[0]}px ${nz[1]}px)`; if (rad > 0) ctx.drawImage(fr[clamp(Math.floor((t - (BR0 - 0.3)) * 25), 0, fr.length - 1)], 0, 0, 1080, 1920); }
+    });
+    if (b.broll) SILKP.push([BR0, s.t1 - 0.25, -1]);   // 実写の間は風を止める
+  },
+  slash(b, i, s) {
+    const t0 = s.t0, sl = t0 + 1.25, cut = t0 + 1.55;
+    const w = el("div", { class: "abs bk", style: "left:58px;top:300px;font-size:186px;letter-spacing:-.04em;line-height:1;opacity:0;transform-origin:0 50%" },
+      `<div style="position:absolute;left:0;top:0;clip-path:polygon(0 0,100% 0,100% 46%,0 62%)">${b.word}</div><div style="position:absolute;left:0;top:0;clip-path:polygon(0 62%,100% 46%,100% 100%,0 100%)">${b.word}</div><div style="visibility:hidden">${b.word}</div>`);
+    const line = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><line x1="20" y1="440" x2="900" y2="350" stroke="#C8343F" stroke-width="10" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`);
+    const rv = kinWrap(el("div", { class: "kin bk", style: "left:58px;top:510px;font-size:186px;letter-spacing:-.04em;color:#C8343F" }, b.reveal));
+    const sub = el("div", { class: "abs", style: "left:64px;top:740px;font:700 40px/1.5 'Noto Sans JP';opacity:0" }, b.sub || "");
+    const nt = el("div", { class: "note", style: "left:64px;top:1440px;opacity:0" }, b.note || "");
+    K.push({ t: t0 + 0.2, F: [F0.body[0], F0.body[1] + 20], A: [700, 1300], z: fitZ(629), r: -8 }, { t: s.t1 - 0.25, F: [F0.body[0], F0.body[1] + 20], A: [700, 1290], z: fitZ(655), r: -6 });
+    SILKP.push([t0, s.t1, 0.55]);
+    const [top, bot] = w.children, ln = line.querySelector("line");
+    U.push((t) => { const a = sp(t - (t0 + 0.2), 12, 0.7), o = outC((t - OUT(i)) / 0.22), c2 = sp(t - cut, 9, 1);
+      w.style.opacity = clamp(a * 1.4) * (1 - o) * (1 - 0.65 * c2); w.style.transform = `scale(${lerp(0.8, 1, clamp(a))})`;
+      top.style.transform = `translate(${-40 * c2}px, ${-26 * c2}px) rotate(${-3 * c2}deg)`; bot.style.transform = `translate(${30 * c2}px, ${22 * c2}px) rotate(${2 * c2}deg)`;
+      const g = inOutC((t - sl) / 0.22), go = outC((t - (sl + 0.5)) / 0.4); ln.setAttribute("stroke-dashoffset", String(1 - g)); ln.style.opacity = (1 - go) * (1 - o);
+      kinP(rv, cut, OUT(i), 0.06); fadeUp(sub, cut + 0.35, OUT(i), 22, 12, 0.8); fadeUp(nt, cut + 0.5, OUT(i), 22, 12, 0.8); });
+  },
+  colors(b, i, s) {
+    const t0 = s.t0, swp = t0 + 1.65, A1 = [P.hero.alt_at[0] + P.hero.alt_size[0] * 0.5, F0.body[1]];
+    const d0 = el("div", { class: "abs", style: "left:64px;top:250px;opacity:0;font:700 40px/1 'Noto Sans JP';letter-spacing:.1em" }, b.label || "");
+    const d1 = kinWrap(el("div", { class: "kin bk", style: "left:60px;top:310px;font-size:120px;letter-spacing:-.02em" }, b.lines[0]));
+    const d2 = kinWrap(el("div", { class: "kin bk", style: "left:60px;top:456px;font-size:120px;letter-spacing:-.02em" }, b.lines[1]));
+    const tg = el("div", { class: "abs", style: "left:64px;top:1260px;opacity:0" }, `<span class="tagr">${b.tags[0]}</span>`);
+    const nt = el("div", { class: "note", style: "left:64px;top:1440px;opacity:0" }, b.note || "");
+    $("altbg").style.background = `linear-gradient(170deg, ${b.alt_bg[0]} 0%, ${b.alt_bg[1]} 100%)`;
+    K.push({ t: t0 + 0.2, F: F0.body, A: [580, 1050], z: fitZ(655), r: 0 }, { t: swp - 0.15, F: F0.body, A: [580, 1040], z: fitZ(668), r: 0 },
+           { t: swp + 0.3, F: A1, A: [580, 1040], z: fitZ(668), r: 0 }, { t: s.t1 - 0.25, F: A1, A: [580, 1030], z: fitZ(681), r: 0 });
+    U.push((t) => { fadeUp(d0, t0 + 0.1, OUT(i), 22, 12, 0.8); kinP(d1, t0 + 0.2, OUT(i)); kinP(d2, t0 + 0.5, OUT(i));
+      const rv = inOutC((t - (swp - 0.1)) / 0.55), ro = outC((t - (s.t1 - 0.25)) / 0.4); $("altbg").style.clipPath = `circle(${rv * 1500 * (1 - ro)}px at 760px 1050px)`;
+      const on = rv > 0.5 && ro < 0.5; [d0, d1, d2].forEach((e) => e.style.color = on ? "#fff" : "#2A1F1E"); nt.style.color = on ? "#F6DADA" : "#6B5450";
+      const sp2 = tg.firstChild; setText(sp2, rv > 0.5 ? b.tags[1] : b.tags[0]); sp2.style.background = on ? "#fff" : "#C8343F"; sp2.style.color = on ? "#C8343F" : "#fff";
+      fadeUp(tg, t0 + 0.8, OUT(i), 22, 12, 0.8); fadeUp(nt, t0 + 1.0, OUT(i), 22, 12, 0.8);
+      if ($("altG")) $("altG").style.opacity = t > swp - 0.2 ? 1 : 0; });
+    U.colorsSwap = swp;
+  },
+  finale(b, i, s) {
+    const t0 = s.t0, mid = [(P.hero.alt_at[0] + P.hero.alt_size[0]) / 2, F0.body[1] + 10];
+    const st = el("div", { class: "abs", style: "left:60px;top:250px;opacity:0;display:flex;align-items:flex-end;gap:12px" }, `<svg width="96" height="96" viewBox="0 0 24 24" style="margin-bottom:30px"><path d="M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.9 6.2 20.1l1.4-6.4L2.7 9.3l6.5-.7z" fill="#C8343F"/></svg><span class="gar" style="font-size:230px;line-height:1">${b.rating.toFixed(2)}</span>`);
+    const rv = el("div", { class: "abs", style: "left:66px;top:500px;font:900 50px/1 'Noto Sans JP';letter-spacing:.04em;opacity:0" }, `レビュー <span class="gar" style="font-size:80px;color:var(--red)">0</span> 件`);
+    const dt = el("div", { class: "note", style: "left:66px;top:580px;opacity:0" }, b.date);
+    const ct = el("div", { class: "cta", style: "left:60px;top:660px;opacity:0" }, `<span style="position:relative">${b.cta}</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sweep" style="mix-blend-mode:plus-lighter"></div>`);
+    const cn = el("div", { class: "note", style: "left:66px;top:800px;opacity:0" }, b.cta_note || "");
+    const span = P.hero.alt_at[0] + P.hero.alt_size[0];
+    K.push({ t: t0 + 0.35, F: mid, A: [540, 1230], z: fitZ(361 * HERO.w / 262 * (617 / span)), r: 0 }, { t: END, F: mid, A: [540, 1230], z: fitZ(382 * HERO.w / 262 * (617 / span)), r: 0 });
+    U.push((t) => { fadeUp(st, t0 + 0.15, 999, 22, 12, 0.8); fadeUp(rv, t0 + 0.5, 999, 22, 12, 0.8); setText(rv.querySelector("span"), Math.round(b.reviews * outC((t - t0 - 0.5) / 0.9)).toLocaleString("en-US"));
+      fadeUp(dt, t0 + 1.0, 999, 22, 12, 0.8); fadeUp(ct, t0 + 1.6, 999, 34, 12, 0.8); fadeUp(cn, t0 + 1.9, 999, 22, 12, 0.8); sweepAt(ct.querySelector(".sweep"), t0 + 2.1, 0.9, 1);
+      if ($("altG") && t >= t0) $("altG").style.opacity = 1; });
+  },
+};
+CORE.start({ grain: [220, 35], wipe: false, refl: false, motionBlur: true,
+  onSeek(t, cam) {
+    $("bl0").style.transform = `translate(${-120 + Math.sin(t * 0.6) * 80}px, ${200 + Math.cos(t * 0.5) * 60}px)`;
+    $("bl1").style.transform = `translate(${560 + Math.cos(t * 0.45) * 90}px, ${1150 + Math.sin(t * 0.55) * 70}px)`;
+    let p = 0; SILKP.forEach(([a, b2, pw]) => { if (t >= a && t < b2) p = pw < 0 ? -1 : (p < 0 ? -1 : Math.max(p, pw)); }); drawSilk(cam, Math.max(0, p), t);
+    const last = B[B.length - 1]; sweepAt($("sw"), t < (U.colorsSwap || 1e9) ? B[1].t0 + 0.3 : last.t0 + 0.8, 1.0, 0.8); if ($("swAlt")) sweepAt($("swAlt"), (U.colorsSwap || 0) + 0.4, 1.0, 0.7);
+  } }, KINDS);
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "code-video",
+  "private": true,
+  "description": "コード製のモーショングラフィック動画（jmas 決定#264・#267）",
+  "dependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

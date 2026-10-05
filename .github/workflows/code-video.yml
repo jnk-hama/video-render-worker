@@ -1,0 +1,120 @@
+name: code-video
+# コード製のモーショングラフィック動画（jmas 決定#264・#266・#267 量産 M6）。0円：Gemini も素材の購入も使わない。
+#   設計書 code-video/products/<key>.json → 素材（Storage の商品画像・Pexels・edge-tts）→ 見出し A/B を描く → 点検 9項目
+#   → 合格した物だけ Storage へ上げ、LINE へ承認依頼＋投稿文（video-scene の notify_review）・Release render-marie-code-<key>-<id>
+# ★公開リポジトリ：商品画像・切り抜きはコミットしない（実行時に取り、ジョブと一緒に消える）。URL・鍵・本文はログに出さない
+on:
+  workflow_dispatch:
+    inputs:
+      product_key:
+        description: '設計書の名前（code-video/products/<key>.json）'
+        required: true
+        type: string
+      deliver:
+        description: 'LINE へ届ける（外すと描いて点検するだけ・Actions の成果物に残す）'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write        # Release を作るため
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    concurrency:
+      group: code-video-${{ inputs.product_key }}
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: code-video
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+
+      - name: 設計書の名前を確かめる
+        env:
+          KEY: ${{ inputs.product_key }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$KEY" | grep -qE '^[a-z0-9][a-z0-9-]{2,60}$' || { echo "::error::product_key の形が違います"; exit 1; }
+          test -f "products/$KEY.json" || { echo "::error::設計書がありません"; exit 1; }
+          echo "KEY=$KEY" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        with:
+          node-version: '22'
+      # ★手元と同じ版にそろえる（版が変わると絵と音が黙って変わる）。Python の版は constraints.txt（#188）に従う
+      - name: 依存（Chromium・Python）
+        working-directory: .
+        run: |
+          set -euo pipefail
+          (cd code-video && npm ci --no-audit --no-fund && npx playwright install --with-deps chromium)
+          echo "CHROME=$(cd code-video && node -e "import('playwright-core').then(m=>console.log(m.chromium.executablePath()))")" >> "$GITHUB_ENV"
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt numpy scipy pillow imageio-ffmpeg edge-tts rembg onnxruntime
+          # EDSR は opencv-contrib が要る。rembg の opencv と同じ場所に入れると壊れるので別の環境に分ける
+          python3 -m venv /tmp/cv
+          /tmp/cv/bin/pip install --quiet --disable-pip-version-check -c constraints.txt opencv-contrib-python-headless
+          echo "CVPY=/tmp/cv/bin/python" >> "$GITHUB_ENV"
+
+      - name: モデルの置き場（キャッシュ）
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e57d0  # v4.2.4
+        with:
+          path: |
+            ~/.u2net
+            code-video/models
+          key: code-video-models-v1
+
+      - name: 素材を取る・下ごしらえ
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p models
+          if [ ! -f models/EDSR_x4.pb ]; then
+            curl -fsSL -o models/EDSR_x4.pb https://github.com/Saafke/EDSR_Tensorflow/raw/master/models/EDSR_x4.pb
+          fi
+          echo "dd35ce3cae53ecee2d16045e08a932c3e7242d641bb65cb971d123e06904347f  models/EDSR_x4.pb" | sha256sum -c -
+          python3 factory/prep.py fetch "products/$KEY.json"
+          python3 factory/prep.py assets "products/$KEY.json"
+
+      - name: 描く（見出しごと・60fps・8サブフレーム）と点検
+        run: |
+          set -euo pipefail
+          bash factory/make.sh "products/$KEY.json"
+          for d in stage/p/$KEY/out-*; do python3 -c "import json,sys;q=json.load(open(sys.argv[1]));print(sys.argv[1], 'ok' if q['ok'] else 'NG', [k for k,v in q.items() if isinstance(v,dict) and not v['ok']])" "$d/qc.json"; done
+
+      # ★届けない回の確認用。商品画像そのものは入れない（完成動画と点検結果だけ）
+      - name: 成果物（動画と点検結果）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: code-video-${{ inputs.product_key }}
+          path: |
+            code-video/stage/p/${{ inputs.product_key }}/out-*/final.mp4
+            code-video/stage/p/${{ inputs.product_key }}/out-*/qc.json
+            code-video/stage/p/${{ inputs.product_key }}/out-*/post.json
+            code-video/stage/p/${{ inputs.product_key }}/prep-sheet.png
+          retention-days: 7
+
+      - name: 届ける（Storage・LINE・Release）
+        if: inputs.deliver
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+          fail=0
+          for d in stage/p/$KEY/out-*; do
+            id=$(basename "$d" | sed 's/^out-//' | tr 'A-Z' 'a-z'); job="marie-code-$KEY-$id"
+            if python3 factory/deliver.py "stage/p/$KEY/v/${d##*/out-}/product.json" "$d" "$job"; then
+              cp "$d/final.mp4" out.mp4; python3 -c "import json,sys;p=json.load(open(sys.argv[1]));json.dump({k:p[k] for k in ('tiktok','x') if k in p},open('post.json','w'),ensure_ascii=False)" "$d/post.json"
+              # GAS の「X投稿 <job_id>」が動画と投稿文を取りに来る（jmas 決定#245）
+              gh release create "render-$job" out.mp4 post.json --title "render-$job" --notes "code-video" \
+                || gh release upload "render-$job" out.mp4 post.json --clobber
+            else
+              fail=1
+            fi
+          done
+          exit $fail
