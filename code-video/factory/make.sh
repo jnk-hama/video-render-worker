@@ -5,5 +5,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 PJ=$(realpath "$1"); KEY=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['product_key'])" "$PJ"); D=stage/p/$KEY
 for id in $(python3 factory/variants.py "$PJ" "$D/v"); do
+  [ -n "${ONLY:-}" ] && [[ ",$ONLY," != *",$id,"* ]] && continue   # ONLY=B のように一部だけ作る
   bash factory/build.sh "$D/v/$id/product.json" "$D/out-$id"
 done

@@ -20,13 +20,12 @@ try:
 except urllib.error.HTTPError as e: sys.exit("Storage へ上げられません（HTTP %d）" % e.code)
 q = {k: v for k, v in qc.items() if isinstance(v, dict)}
 notes = [f"コード動画・見出し{P.get('variant', 'A')}（{P['template']}の型）",
-         "点検 %d項目すべて合格（長さ %.1f秒・音量 %.1f LUFS・声と背景の差 %.1f dB）" % (len(q), q["長さ"]["秒"], q["音量"]["LUFS"], q["声と背景の差"]["dB"]),
-         f"X に出す時は LINE に「X投稿 {job}」と送る"]
+         "点検 %d項目すべて合格（長さ %.1f秒・音量 %.1f LUFS・声と背景の差 %.1f dB）" % (len(q), q["長さ"]["秒"], q["音量"]["LUFS"], q["声と背景の差"]["dB"])]
 if post.get("warn"): notes.append(post["warn"])
 body = {"action": "notify_review", "clip_ids": [], "notes": notes, "post_texts": {k: post[k] for k in ("tiktok", "x") if post.get(k)},
         "title": f"{P.get('name', P['product_key'])} {P.get('variant', 'A')}"[:60], "job_id": job,
         "video_url": f"https://{host}/storage/v1/object/public/videos/{path}"}
 req = urllib.request.Request(f"https://{host}/functions/v1/video-scene", data=json.dumps(body).encode(), headers=dict(H, **{"Content-Type": "application/json"}))
 try:
-    with urllib.request.urlopen(req, timeout=40) as r: print("LINE へ承認依頼を送りました（HTTP %d）" % r.status)
+    with urllib.request.urlopen(req, timeout=40) as r: print("LINE へ承認依頼を送りました（HTTP %d・1通の形: %s）" % (r.status, json.loads(r.read() or b"{}").get("single")))
 except urllib.error.HTTPError as e: sys.exit("LINE へ送れません（HTTP %d）" % e.code)

@@ -170,6 +170,59 @@ const KINDS = {
       fadeIO(nt, c1, out); });
     if (b.glint) GLINT.push([t0 + 0.3, b.glint]);
   },
+  // 分解（家電・ガジェットで出来る所だけ・#272）：部品へ寄る → 外れて手前へ → 中の部品が出て見せ場へ → 前モデル → 新モデル
+  //   部品（外れる所）は本体の切り抜きから切り出すので、別の画像は要らない。中の部品・前モデルは販売ページの実画像（#068）
+  explode(b, i, s) {
+    const [rx, ry, rw, rh] = b.part_rect, RC = [rx + rw / 2, ry + rh / 2], K0 = b.cam.from, K1 = b.cam.to;
+    shot(i, s, { F: K0.F, A: K0.A, z: K0.z, mv: b.cam.mv, blur: [10, 0] });
+    const sh = SHOT[i]; sh.k0.ease = "lin"; sh.k0.mv = { roll: 1.2 };
+    const kz = { t: 0, F: RC, A: K1.A, z: K1.z, r: 0, ease: "lin" }; K.push(kz); sh.k1.F = RC; sh.k1.A = K1.A; sh.k1.z = K1.z * 1.03;
+    const W = $("world"), hero = `${DIR}${P.hero.cutout}`;
+    const cup = el("div", { class: "m", style: `left:${rx}px;top:${ry}px;width:${rw}px;height:${rh}px;transform-origin:50% 50%;opacity:0` },
+      `<div class="shadow" style="left:${-rw * .25}px;top:${rh * .93}px;width:${rw * 1.5}px;height:${rh * .18}px;opacity:0"></div><div style="position:absolute;inset:0;overflow:hidden"><img src="${hero}" style="position:absolute;left:${-rx}px;top:${-ry}px;width:${HERO.w}px;height:${HERO.h}px;max-width:none"></div>`, W);
+    const socket = el("div", { class: "m", style: `left:${rx}px;top:${ry}px;width:${rw}px;height:${rh}px;opacity:0;background:#1d1a15;-webkit-mask:url(${hero}) ${-rx}px ${-ry}px/${HERO.w}px ${HERO.h}px no-repeat;mask:url(${hero}) ${-rx}px ${-ry}px/${HERO.w}px ${HERO.h}px no-repeat` }, "", $("heroG"));
+    const pw = b.part.size[0], ph = b.part.size[1];
+    const wrap = el("div", { class: "abs prod", style: "left:0;top:0;width:1080px;height:1920px;perspective:2400px;pointer-events:none" }, `<div class="abs" style="left:0;top:0;width:1080px;height:1920px"><div class="abs" style="left:0;top:0;transform-origin:50% 50%;opacity:0"><div class="shadow" style="opacity:0"></div><img src="${DIR}${b.part.cut}" style="position:absolute;left:0;top:0"><div class="sweep" style="-webkit-mask:url(${DIR}${b.part.cut}) center/100% 100% no-repeat;mask:url(${DIR}${b.part.cut}) center/100% 100% no-repeat"></div></div></div>`, W.parentElement);
+    W.after(wrap); const clip = wrap.firstChild, fg = clip.firstChild, [fSh, fImg, fSw] = fg.children;
+    const tg = el("div", { class: "abs", style: "left:60px;top:250px;opacity:0" }, `<span class="tag">${b.tag}</span>`);
+    const oTag = el("div", { class: "abs", style: "left:60px;top:690px;opacity:0" }, `<span class="tag" style="background:#8A847A;font-size:30px;padding:10px 16px">${b.old.label}</span>`);
+    const oImg = el("img", { class: "abs prod", src: `${DIR}${b.old.cut}`, style: "left:84px;top:760px;width:186px;opacity:0" });
+    const oCap = el("div", { class: "abs", style: "left:60px;top:1080px;width:330px;font:700 30px/1.4 'Noto Sans JP';color:var(--mute);opacity:0" }, b.old.cap.join("<br>"));
+    const arr = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><path d="M300,905 L452,905" pathLength="1" stroke="#B2842F" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="1" stroke-dashoffset="1"/><path d="M428,880 L456,905 L428,930" stroke="#B2842F" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0"/></svg>`);
+    const [arP, arH] = arr.querySelectorAll("path");
+    const nTag = el("div", { class: "abs", style: "left:610px;top:606px;opacity:0" }, `<span class="tag" style="background:var(--gold)">${b.new_label}</span>`);
+    const h1 = ln("noto", "left:60px;top:330px;height:84px;font:900 66px/1.2 'Noto Sans JP'", b.head[0]);
+    const h2 = ln("dela", "left:56px;top:420px;height:150px;font-size:128px;line-height:1.15", b.head[1]);
+    const s1 = ln("noto", "left:60px;top:1290px;height:64px;font:900 46px/1.3 'Noto Sans JP'", b.sub[0]);
+    const s2 = ln("noto", "left:60px;top:1356px;height:64px;font:900 46px/1.3 'Noto Sans JP'", b.sub[1]);
+    const nt = el("div", { class: "note", style: "left:60px;top:1446px;width:960px;font-size:23px" }, b.note || "");
+    let t0 = 0;
+    U.push((t, cam) => {
+      if (!t0) { t0 = sh.k0.t; kz.t = t0 + 1.05; K.sort((a, c) => a.t - c.t); }
+      const u = t - t0, out = OUT(i) - 0.08, on = t >= s.t0 - 0.3 && t < s.t1, o = outC((t - out) / 0.3);
+      cup.style.opacity = on && u > 0.95 ? 1 : 0; socket.style.opacity = on ? 0.85 * clamp(sp(u - 1.0, 9, 1) * 1.3) : 0;
+      wrap.style.display = on ? "block" : "none";   // 文字の退場はカットの外でも計算する（残らないように）
+      const sep = sp(u - 1.0, 9, 1), hand = sp(u - 2.0, 8, 1), z = cam.z;
+      cup.style.transform = `translate(${-14 * sep}px, ${38 * sep}px) scale(${1 + 0.16 * sep})`;   // 外れて手前へ（下へ抜けつつ大きく）
+      cup.firstChild.style.opacity = 0.8 * sep; cup.style.filter = `blur(${(5 * hand) / z}px) brightness(${1 - 0.15 * hand})`;
+      if (on) { $("heroG").style.filter = `blur(${(7 * sep + 1.5) / z}px) brightness(${1 - 0.18 * sep})`; if ($("altG")) $("altG").style.filter = `blur(${10 / z}px) brightness(.9)`; }
+      // 中の部品：外れた部品の縁から上へ出て、見せ場（右上）へ移る
+      const cs = toScreen(cam, [RC[0] - 14 * sep, RC[1] + 38 * sep]), rimY = cs[1] - 0.5 * rh * z * (1 + 0.16 * sep) + 20;
+      const rise = inOutC((u - 1.5) / 0.7), fly = inOutC((u - 2.05) / 0.85), w0 = rw * 0.63 * z, w1 = 480, fw = lerp(w0, w1, fly), fh = fw * ph / pw;
+      const fx = lerp(cs[0] - w0 / 2, 470, fly), fy = lerp(rimY - lerp(0, 0.9, rise) * w0 * ph / pw, 690, fly);
+      Object.assign(fg.style, { width: fw + "px", height: fh + "px", left: fx + "px", top: fy + "px", opacity: u < 1.5 ? 0 : 1 - o,
+        transform: `rotateY(${lerp(0, -9, fly) + Math.sin((u - 2.9) * 0.9) * 3 * clamp(u - 2.9)}deg) rotate(${lerp(-4, 0, fly)}deg)` });
+      Object.assign(fImg.style, { width: fw + "px", height: fh + "px" });
+      clip.style.clipPath = fly > 0.05 ? "none" : `inset(0 0 ${1920 - rimY}px 0)`;
+      Object.assign(fSh.style, { opacity: 0.55 * fly, width: fw * 0.75 + "px", left: fw * 0.12 + "px", top: fh * 0.95 + "px", height: fw * 0.13 + "px" });
+      sweepAt(fSw, t0 + 2.75, 0.9, 0.9);
+      pop(tg, t0 + 2.55, out); lineIn(h1, t0 + 2.65, out); lineIn(h2, t0 + 2.8, out, 12);
+      const ol = sp(u - 3.35, 11, 1); oImg.style.opacity = clamp(ol * 1.2) * 0.92 * (1 - o); oImg.style.transform = `translateX(${(1 - ol) * -60}px)`;
+      pop(oTag, t0 + 3.3, out); pop(oCap, t0 + 3.65, out);
+      const ar = inOutC((u - 4.0) / 0.4); arP.setAttribute("stroke-dashoffset", String(1 - ar)); arP.style.opacity = 1 - o; arH.setAttribute("opacity", ar > 0.9 ? 1 - o : 0);
+      pop(nTag, t0 + 4.3, out); lineIn(s1, t0 + 4.45, out); lineIn(s2, t0 + 4.6, out); fadeIO(nt, t0 + 4.8, out);
+    });
+  },
   // 締め：評価・レビュー数（数え上げ）・集計日・リンク
   finale(b, i, s) {
     const t0 = s.t0, s0 = t0 + 0.25, s1 = t0 + 1.15, r0 = t0 + 0.8, r1 = t0 + 1.9, cta = t0 + 2.1;

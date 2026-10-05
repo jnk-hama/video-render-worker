@@ -13,10 +13,15 @@ await p.addStyleTag({ content: "html,body{background:transparent!important} #bg,
 for (let t = t0; t <= t1 + 1e-6; t += st) {
   await p.evaluate((t) => { window.seek(t); (document.getElementById("stage")||{style:{}}).style.transform = "none"; document.getElementById("ui").style.display = ""; (document.getElementById("behind")||{style:{}}).style.display = ""; }, t);
   const tag = t.toFixed(2);
-  await p.evaluate(() => { window.__wd = document.getElementById("world").style.display; document.getElementById("world").style.display = "none"; });
+  await p.evaluate(() => { window.__wd = document.getElementById("world").style.display; document.getElementById("world").style.display = "none";
+    document.querySelectorAll(".prod").forEach((e) => { e.dataset.d = e.style.display; e.style.display = "none"; }); });   // 分解の部品画像は商品の側（#272）
   await p.screenshot({ path: path.join(out, `txt_${tag}.png`), omitBackground: true });
-  await p.evaluate(() => { document.getElementById("world").style.display = window.__wd || ""; document.getElementById("ui").style.display = "none"; (document.getElementById("behind")||{style:{}}).style.display = "none"; });
+  await p.evaluate(() => { document.getElementById("world").style.display = window.__wd || ""; document.getElementById("ui").style.display = "none"; (document.getElementById("behind")||{style:{}}).style.display = "none";
+    document.querySelectorAll(".prod").forEach((e) => { e.style.display = e.dataset.d || ""; });
+    // ピントを外した奥の商品（画面で3px以上ぼかした物）は背景として扱う（分解で寄った時の本体など）
+    const m = new DOMMatrix(getComputedStyle(document.getElementById("world")).transform), sc = Math.hypot(m.a, m.b);
+    document.querySelectorAll("#world > .m").forEach((e) => { const f = /blur\(([0-9.]+)px\)/.exec(e.style.filter || ""); e.dataset.v = e.style.visibility; if (f && +f[1] * sc >= 3) e.style.visibility = "hidden"; }); });
   await p.screenshot({ path: path.join(out, `prd_${tag}.png`), omitBackground: true });
-  await p.evaluate(() => { document.getElementById("ui").style.display = ""; (document.getElementById("behind")||{style:{}}).style.display = ""; });
+  await p.evaluate(() => { document.getElementById("ui").style.display = ""; (document.getElementById("behind")||{style:{}}).style.display = ""; document.querySelectorAll("#world > .m").forEach((e) => { e.style.visibility = e.dataset.v || ""; }); });
 }
 await b.close();

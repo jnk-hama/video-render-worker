@@ -5,7 +5,8 @@ TEMPO = 1.15          # 喋りの速さ（video-render-worker の SPEECH_SPEED �
 LEAD = 0.25           # カットの頭から喋り始めまで
 TAIL = {"cover": 0.55, "counter": 0.6, "macro_broll": 0.6, "ring": 0.7, "compare": 0.7, "chips": 0.55, "finale": 1.6,
         "problem": 0.75, "airflow": 0.7, "slash": 0.8, "colors": 0.7,
-        "hook": 0.55, "chips": 0.6, "cells": 0.75, "bars": 0.7}
+        "hook": 0.55, "chips": 0.6, "cells": 0.75, "bars": 0.7, "explode": 1.0}
+MIN = {"explode": 6.2}   # 分解は動きの段取りが決まっている（最後の文字が1秒以上読める長さ）
 
 def speech_end(path):
     """喋りの終わり（最後の無音の始まり）。末尾に無音が無ければ全体の長さ"""
@@ -18,7 +19,7 @@ def build(product_path, asset_dir, out):
     P = json.load(open(product_path)); t = 0.0; beats = []
     for b in P["beats"]:
         s = speech_end(os.path.join(asset_dir, "voice", b["voice"]))
-        d = LEAD + s / TEMPO + b.get("tail", TAIL[b["kind"]])
+        d = max(LEAD + s / TEMPO + b.get("tail", TAIL[b["kind"]]), MIN.get(b["kind"], 0))
         beats.append({"kind": b["kind"], "t0": round(t, 3), "t1": round(t + d, 3), "voice": {"file": b["voice"], "start": round(t + LEAD, 3), "tempo": TEMPO, "len": round(s / TEMPO, 3)}})
         t += d
     tl = {"cuts": [b["t0"] for b in beats], "end": round(t, 3), "beats": beats, "voice": [b["voice"] for b in beats], "bpm": P.get("music", {}).get("bpm", 96)}

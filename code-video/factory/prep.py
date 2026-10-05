@@ -16,7 +16,8 @@ GRADE = {   # 実写の色合わせ（型の背景に寄せる）
 
 def voices(P):
     """読み上げの一覧 [(文, 置く名前)]：各カット → 見出しの別案（hooks の2つ目以降）の順。line<i>.mp3 の i がこの並び"""
-    v = [(b.get("say"), b["voice"]) for b in P["beats"]] + [(h.get("say"), h.get("voice")) for h in (P.get("hooks") or [])[1:] if h.get("say")]
+    vs = (P.get("variants") or P.get("hooks") or [])[1:]
+    v = [(b.get("say"), b["voice"]) for b in P["beats"]] + [(h.get("say"), h.get("voice")) for h in vs if h.get("say")] + [(b.get("say"), b.get("voice")) for h in vs for b in (h.get("replace") or {}).values()]
     bad = [f for s, f in v if not s or not f]
     if bad: sys.exit(f"say（読み上げの文）か voice（置く名前）が無い: {bad}")
     return v
@@ -39,10 +40,12 @@ CUT = r'''
 import sys, numpy as np, cv2
 from PIL import Image
 from rembg import remove, new_session
-src, out = sys.argv[1:3]
+src, out = sys.argv[1:3]; keep_all = len(sys.argv) > 3 and sys.argv[3] == "1"
 o = remove(Image.open(src).convert("RGB"), session=new_session("birefnet-general", providers=["CPUExecutionProvider"]), post_process_mask=False)
-a = np.array(o); m = (a[:, :, 3] > 40).astype(np.uint8); _, lab, st, _ = cv2.connectedComponentsWithStats(m, 8)
-k = 1 + np.argmax(st[1:, cv2.CC_STAT_AREA]); a[:, :, 3] = np.where(lab == k, a[:, :, 3], 0)   # 一番大きい塊だけ（画像の文字を落とす）
+a = np.array(o)
+if not keep_all:   # 一番大きい塊だけ（画像の文字を落とす）。部品が離れて写っている物は keep_all
+    m = (a[:, :, 3] > 40).astype(np.uint8); _, lab, st, _ = cv2.connectedComponentsWithStats(m, 8)
+    k = 1 + np.argmax(st[1:, cv2.CC_STAT_AREA]); a[:, :, 3] = np.where(lab == k, a[:, :, 3], 0)
 o = Image.fromarray(a); o = o.crop(o.getbbox()); o.save(out); print(out, o.size)
 '''
 SR = r'''
@@ -92,6 +95,14 @@ def smoothstep(e0, e1, x): t = np.clip((x - e0) / (e1 - e0), 0, 1); return t * t
 a4 = smoothstep(0.30, 0.70, cv2.GaussianBlur(cv2.resize(a.astype(np.float32) / 255, (W, H), interpolation=cv2.INTER_CUBIC), (0, 0), 1.1))   # 輪郭をくっきり
 rgb = cv2.addWeighted(rgb, 1.35, cv2.GaussianBlur(rgb, (0, 0), 2.0), -0.35, 0)   # EDSR の甘さを少し戻す
 cv2.imwrite(out, np.dstack([rgb, (a4 * 255 + 0.5).astype(np.uint8)])); print(out, rgb.shape)
+"""
+
+# 説明図の赤い線（図の飾り）を消す。商品の形・色は変えない（RR35 のフィルターで決めた処理）
+DERED = r"""
+import sys, cv2, numpy as np
+c = cv2.imread(sys.argv[1]); hsv = cv2.cvtColor(c, cv2.COLOR_BGR2HSV)
+red = (((hsv[..., 0] < 12) | (hsv[..., 0] > 165)) & (hsv[..., 1] > 80) & (hsv[..., 2] > 80)).astype(np.uint8) * 255
+cv2.imwrite(sys.argv[1], cv2.inpaint(c, cv2.dilate(red, np.ones((5, 5), np.uint8)), 4, cv2.INPAINT_TELEA))
 """
 
 def fade_bottom(png, cut):
@@ -151,8 +162,9 @@ def assets(P):
     for c in pr.get("cutouts", []):   # 範囲を切る → EDSR で4倍 → BiRefNet（1枚ずつ別の処理＝メモリ不足を避ける）
         crop = os.path.join(S, f"{c['out']}_src.png"); sr = os.path.join(S, f"{c['out']}_sr.png")
         Image.open(os.path.join(S, c["src"] + ".jpg")).convert("RGB").crop(tuple(c["crop"])).save(crop)
+        if c.get("remove_red"): subprocess.run([CV, "-c", DERED, crop], check=True)
         subprocess.run([CV, "-c", SR, crop, sr, os.path.join(ROOT, "models/EDSR_x4.pb")], check=True)
-        subprocess.run(["python3", "-c", CUT, sr, os.path.join(D, c["out"])], check=True)
+        subprocess.run(["python3", "-c", CUT, sr, os.path.join(D, c["out"]), "1" if c.get("keep_all") else "0"], check=True)
         if c.get("fade_bottom"): fade_bottom(os.path.join(D, c["out"]), c["fade_bottom"])
         cand[c["out"]] = focus_candidates(os.path.join(D, c["out"]))
     for sp in pr.get("split", []):
