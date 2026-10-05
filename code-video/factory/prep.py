@@ -51,6 +51,12 @@ sr = cv2.dnn_superres.DnnSuperResImpl_create(); sr.readModel(sys.argv[3]); sr.se
 cv2.imwrite(sys.argv[2], sr.upsample(cv2.imread(sys.argv[1])))
 '''
 
+def fade_bottom(png, cut):
+    """下の端（画像の注記の切れ端が残る所）を高さの割合 cut から柔らかく消して詰め直す（SALONIA で決めた処理）"""
+    import numpy as np; from PIL import Image
+    a = np.array(Image.open(png)).astype(np.float32); y = np.arange(a.shape[0])[:, None] / a.shape[0]
+    a[:, :, 3] *= np.clip((cut + 0.06 - y) / 0.06, 0, 1); o = Image.fromarray(a.astype(np.uint8)); o = o.crop(o.getbbox()); o.save(png); print(png, "下を消した", o.size)
+
 def focus_candidates(png):
     """寄る点の候補（世界の単位＝画素/4）：重心・上端・下端・左端・右端。Claude が一覧で目で確かめて選ぶ"""
     import numpy as np; from PIL import Image
@@ -77,8 +83,12 @@ def fetch(P):
     for i, u in enumerate(pr.get("videos", [])):
         if not re.fullmatch(r"https://videos\.pexels\.com/video-files/\d+/[\w-]+\.mp4", u): sys.exit(f"bad video url: {u}")
         subprocess.run(["curl", "-fsSL", "-o", os.path.join(S, f"vid{i}.mp4"), u], check=True)   # Pexels は Python の urllib を 403 で断る（curl は通る・2026-10-05 実測）
+    import time
     for i, (say, _) in enumerate(voices(P)):
-        subprocess.run(["edge-tts", "--voice", pr.get("voice", "ja-JP-NanamiNeural"), f"--rate={pr.get('rate', '+8%')}", "--text", say, "--write-media", os.path.join(S, f"line{i}.mp3")], check=True)
+        for k in range(3):   # edge-tts は相手側の 500 で時々落ちる（2026-10-05 実測）。間を空けて3回まで
+            if subprocess.run(["edge-tts", "--voice", pr.get("voice", "ja-JP-NanamiNeural"), f"--rate={pr.get('rate', '+8%')}", "--text", say, "--write-media", os.path.join(S, f"line{i}.mp3")]).returncode == 0: break
+            if k == 2: sys.exit(f"edge-tts が3回とも失敗: line{i}")
+            time.sleep(10 * (k + 1))
     print("取得:", len(pr["images"]), "画像", len(pr.get("videos", [])), "動画", len(voices(P)), "声")
 
 def assets(P):
@@ -92,6 +102,7 @@ def assets(P):
         Image.open(os.path.join(S, c["src"] + ".jpg")).convert("RGB").crop(tuple(c["crop"])).save(crop)
         subprocess.run([CV, "-c", SR, crop, sr, os.path.join(ROOT, "models/EDSR_x4.pb")], check=True)
         subprocess.run(["python3", "-c", CUT, sr, os.path.join(D, c["out"])], check=True)
+        if c.get("fade_bottom"): fade_bottom(os.path.join(D, c["out"]), c["fade_bottom"])
         cand[c["out"]] = focus_candidates(os.path.join(D, c["out"]))
     for p in pr.get("plates", []):    # 板（暮らしの写真・ランキング画像など）：範囲を切って幅をそろえる
         im = Image.open(os.path.join(S, p["src"] + ".jpg")).convert("RGB")

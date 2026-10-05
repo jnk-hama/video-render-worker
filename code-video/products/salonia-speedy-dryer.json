@@ -6,7 +6,7 @@
   "music": {"bpm": 104, "prog": [[64, 68, 71, 75, 78], [61, 64, 68, 71, 76], [57, 61, 64, 68, 73], [59, 63, 66, 69, 71]]},
   "prep": {"images": ["product/salonia-speedy-dryer.jpg", "product/salonia-speedy-dryer-1.jpg"],
            "videos": ["https://videos.pexels.com/video-files/13816194/13816194-hd_1080_1920_60fps.mp4"],
-           "cutouts": [{"out": "dryer_champ.png", "src": "img1", "crop": [100, 320, 450, 720]}, {"out": "dryer_red.png", "src": "img1", "crop": [270, 200, 600, 560]}],
+           "cutouts": [{"out": "dryer_champ.png", "src": "img1", "crop": [100, 320, 450, 720], "fade_bottom": 0.80}, {"out": "dryer_red.png", "src": "img1", "crop": [270, 200, 600, 560], "fade_bottom": 0.86}],
            "broll": [{"out": "broll", "src": "vid0", "ss": 0.25, "t": 1.35, "speed": 0.6, "grade": "blush", "why": "後ろ姿・顔と他社製品が映らない区間"}]},
   "hero": {"cutout": "dryer_champ.png", "alt": "dryer_red.png", "alt_at": [380, 0], "alt_size": [237, 282],
            "focus": {"body": [130, 140], "nozzle": [4, 44], "dir": -172, "base_y": 285}},

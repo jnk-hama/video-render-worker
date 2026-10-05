@@ -48,7 +48,7 @@ jobs:
         working-directory: .
         run: |
           set -euo pipefail
-          (cd code-video && npm ci --no-audit --no-fund && npx playwright install --with-deps chromium)
+          (cd code-video && npm ci --no-audit --no-fund && npx --no-install playwright-core install --with-deps chromium)   # ★固定した playwright-core の版の Chromium を入れる（npx playwright は別の版を入れた・2026-10-05 実測）
           echo "CHROME=$(cd code-video && node -e "import('playwright-core').then(m=>console.log(m.chromium.executablePath()))")" >> "$GITHUB_ENV"
           python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt numpy scipy pillow imageio-ffmpeg edge-tts rembg onnxruntime opencv-python-headless
           # EDSR は opencv-contrib が要る。rembg の opencv と同じ場所に入れると壊れるので別の環境に分ける
