@@ -1,0 +1,31 @@
+{
+  "product_key": "muzistyle-parka",
+  "template": "lookbook",
+  "palette": "concrete-ink",
+  "name": "スーパーヘビー裏起毛パーカー",
+  "item_code": "muzistyle:10000537",
+  "music": {"bpm": 92, "prog": [[57, 60, 64, 67, 71], [53, 57, 60, 64, 69], [55, 59, 62, 65, 69], [52, 55, 59, 62, 67]]},
+  "prep": {"images": ["product/muzistyle-parka.jpg", "product/muzistyle-parka-1.jpg", "product/muzistyle-parka-2.jpg"],
+           "cutouts": [{"out": "c_beige.png", "src": "img2", "crop": [0, 0, 240, 216]}, {"out": "c_khaki.png", "src": "img2", "crop": [240, 0, 480, 216]},
+                       {"out": "c_pink.png", "src": "img2", "crop": [0, 240, 240, 456]}, {"out": "c_blue.png", "src": "img2", "crop": [240, 240, 480, 456]},
+                       {"out": "c_charcoal.png", "src": "img2", "crop": [0, 480, 240, 696]}, {"out": "c_navy.png", "src": "img2", "crop": [240, 480, 480, 696]}],
+           "why": "img0 は販売店のモデルの顔が写るので使わない（#158）。img2 のカラー別の平置き（人なし）だけを使う"},
+  "hero": {"cutout": "c_charcoal.png", "focus": {"body": [77, 100], "base_y": 186}},
+  "beats": [
+    {"kind": "cover", "voice": "line0.mp3", "say": "秋冬のパーカー、生地の重さで選んでる？", "en": "Super Heavy Hoodie", "head": ["生地の重さで", "選ぶパーカー"],
+     "source": "悩みの提示（商品の主張ではない）"},
+    {"kind": "gauge", "voice": "line1.mp3", "say": "生地は12.4オンスの裏起毛", "label": "生地の重さ", "value": 12.4, "unit": "oz", "sub": "裏起毛", "mark": "※",
+     "note": "※12.4オンス（販売ページの記載）。生産工場の変更で、以前の物より薄く感じる場合があります（販売ページの記載）",
+     "source": "説明文：12.4オンス（厚手 裏起毛）／画像：生産工場変更のお知らせ（オンスの変更なし・薄く感じる場合あり）"},
+    {"kind": "swatch", "voice": "line2.mp3", "say": "くすみカラーも選べる", "label": "COLOR", "head": "くすみカラーも",
+     "items": [["c_beige.png", "Sand Beige"], ["c_khaki.png", "Khaki"], ["c_pink.png", "Dusty Pink"], ["c_blue.png", "Dusty Blue"], ["c_charcoal.png", "Charcoal"], ["c_navy.png", "Navy"]],
+     "note": "※画像は一部のカラー。色味は以前の物と若干異なる場合があります（販売ページの記載）",
+     "source": "画像：カラー別の平置き（Sand Beige・Khaki・Dusty Pink・Dusty Blue・Charcoal・Navy）／生産工場変更のお知らせ（色味）"},
+    {"kind": "sizes", "voice": "line3.mp3", "say": "サイズはSから5XLまで8サイズ", "label": "SIZE", "head": "8サイズ", "sizes": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+     "sub": "メンズ・レディース", "source": "説明文：表記サイズ S,M,L,XL,2XL,3XL,4XL,5XLサイズ（8サイズ）／商品名：メンズ レディース"},
+    {"kind": "finale", "voice": "line4.mp3", "say": "レビュー1400件超え、リンクはプロフィールへ", "rating": 4.51, "reviews": 1485, "date": "楽天市場 2026年10月5日時点",
+     "cta": "プロフィールのリンクへ", "cta_note": "価格・在庫・最新情報はリンク先でご確認ください", "pair": ["c_pink.png", "c_navy.png"]}
+  ],
+  "post": {"tags": ["#パーカー", "#裏起毛", "#秋冬コーデ"], "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00qkuzn.sdgff351.g00qkuzn.sdgfg541/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmuzistyle%2Fcs2220%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmuzistyle%2Fi%2F10000537%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b"},
+  "excluded": ["分厚い・極厚・肉厚（説明文にはあるが、画像の『生産工場変更のお知らせ』に以前より薄く感じる場合ありとあるため使わない）", "カラーの数（タグの色名は検索用で、実在の色の証拠にならない）", "img0（モデルの顔）"]
+}

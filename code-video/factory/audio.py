@@ -100,6 +100,17 @@ for i, b in enumerate(Bs):
                               (g["whoosh"](0.8, 400, 5200, 0.6), 2.0, 0.45, 0.2), (g["impact"](0.7, 1.4), 2.8, 0.55, 0), (g["shimmer"](0.9, 0.8), 2.75, 0.4, 0), (g["bell"](1318.5, 0.6, 1.4), 3.1, 0.3, 0),
                               (g["tock"](220, 0.8), 3.35, 0.6, 0), (g["whoosh"](0.35, 800, 6000, 0.5), 4.0, 0.35, -0.2), (g["bell"](1567.98, 0.7, 1.6), 4.3, 0.32, 0), (g["shimmer"](0.8, 0.7), 4.3, 0.3, 0)]:
             put(sfx, f, e + dt, gn, pan=pn)
+    # ルックブックの型（lookbook.html と同じ時刻）。静かめ：紙をめくる音・柔らかい鈴
+    if P["template"] == "lookbook":
+        if kind == "cover": put(sfx, g["shimmer"](1.1, 0.6), 0.6, 0.22)
+        if kind == "gauge":
+            for k2 in range(1, 13): put(sfx, g["tick"](2100 + 70 * k2, 0.5), t0 + 0.4 + 1.1 * (1 - (1 - k2 / 13) ** (1 / 3)), 0.11, 0.2)
+            put(sfx, g["bell"](1318.5, 0.6, 1.6), t0 + 1.5, 0.22)
+        if kind == "swatch":
+            for k2 in range(len(bp["items"])): put(sfx, g["whoosh"](0.25, 600, 3800, 0.5, 0.6), t0 + 0.4 + k2 * 0.16, 0.14, -0.5 + 0.2 * k2)
+        if kind == "sizes":
+            for k2 in range(len(bp["sizes"])): put(sfx, g["tock"](320 + 30 * k2, 0.6), t0 + 0.55 + k2 * 0.11, 0.26, -0.4 + 0.1 * k2)
+        if kind == "finale": put(sfx, g["tock"](300, 0.7), t0 + 0.25, 0.35); put(sfx, g["bell"](1567.98, 0.6, 1.8), t0 + 1.9, 0.26); put(sfx, g["shimmer"](1.0, 0.6), t0 + 2.2, 0.2)
     if kind == "finale" and P["template"] == "paper":
         put(sfx, g["riser"](1.0, 1.0), t0 - 1.0, 0.24); put(sfx, g["impact"](0.8, 1.6), t0, 0.5); put(sfx, g["bell"](1568, 1.0, 1.6), t0 + 0.35, 0.18, -0.3)
         for k2 in range(1, 12): put(sfx, g["tick"](2300 + 60 * k2), t0 + 0.8 + 1.1 * (1 - (1 - k2 / 12) ** (1 / 3)), 0.10, 0.2)

@@ -10,10 +10,11 @@ const TL = JSON.parse(fs.readFileSync(path.resolve(root, process.env.TL), "utf8"
 const PR = JSON.parse(fs.readFileSync(process.env.PRODUCT, "utf8"));
 const MOJI = /�|[ÃÂ][\u0080-¿]|[縺繧繝譁蜿]|ã[\u0080-¿]/;
 // 画面に出ない項目（読み上げ・出典・素材の指定など）
-const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect"]);
+const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect", "pair"]);
 const expected = [];
 const walk = (v, key) => {
   if (SKIP.has(key)) return;
+  if (typeof v === "string" && /\.(png|jpe?g|mp3|mp4)$/i.test(v)) return;   // ファイル名は画面に出ない
   if (typeof v === "string") v.split(/<br\s*\/?>/i).forEach((s) => { s = s.replace(/<[^>]+>/g, ""); if (s.trim()) expected.push(s); });
   else if (Array.isArray(v)) (key === "bars" ? v.map((x) => x[0]) : v).forEach((x) => walk(x, key));   // 棒は名前だけ（色名は出ない）
   else if (v && typeof v === "object") Object.entries(v).forEach(([k, x]) => walk(x, k));
