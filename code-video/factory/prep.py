@@ -11,7 +11,7 @@ FF = os.environ.get("FFMPEG") or subprocess.check_output(["python3", "-c", "impo
 CV = os.environ.get("CVPY") or (os.path.join(ROOT, "venv-cv/bin/python") if os.path.exists(os.path.join(ROOT, "venv-cv")) else sys.executable)   # EDSR（opencv-contrib）
 GRADE = {   # 実写の色合わせ（型の背景に寄せる）
     "blush": "curves=all='0/0.20 0.5/0.62 1/0.98',colorchannelmixer=rr=1.0:rg=0.05:gg=0.92:bb=0.82:br=0.04,eq=saturation=0.72:contrast=0.92,colorbalance=rs=0.10:gs=0.0:bs=0.02:rm=0.06:gm=-0.02:bm=0.0:rh=0.04:gh=0.0:bh=0.02",   # SALONIA で決めた色
-    "warm": "eq=contrast=1.04:saturation=0.9:gamma=1.03,colorbalance=rs=0.04:bs=-0.04:rh=0.02:bh=-0.03",
+    "warm": "eq=contrast=1.06:saturation=0.9:gamma=0.97,colorbalance=rs=0.06:gs=0.02:bs=-0.06:rm=0.04:bm=-0.04",   # BALMUDA で決めた色
     "none": "null"}
 
 def voices(P):
@@ -51,11 +51,62 @@ sr = cv2.dnn_superres.DnnSuperResImpl_create(); sr.readModel(sys.argv[3]); sr.se
 cv2.imwrite(sys.argv[2], sr.upsample(cv2.imread(sys.argv[1])))
 '''
 
+# 1枚の写真に複数の商品が並ぶ時（RR35：掃除機・ステーション）。全体を切り抜いて塊に分け、色のにじみを除き、EDSR で4倍・輪郭を戻す
+SPLIT_CUT = r"""
+import sys
+from PIL import Image
+from rembg import remove, new_session
+remove(Image.open(sys.argv[1]).convert("RGB"), session=new_session("birefnet-general", providers=["CPUExecutionProvider"]), only_mask=False, post_process_mask=False).save(sys.argv[2])
+"""
+SPLIT_PARTS = r"""
+import sys, json, numpy as np, cv2
+from PIL import Image
+from pymatting import estimate_foreground_ml
+src_p, cut_p, parts, outdir, excl = sys.argv[1], sys.argv[2], json.loads(sys.argv[3]), sys.argv[4], json.loads(sys.argv[5])
+src = np.array(Image.open(src_p).convert("RGB")).astype(np.float64) / 255
+cut = np.array(Image.open(cut_p).convert("RGBA")); alpha = cut[..., 3].astype(np.float64) / 255; H, W = alpha.shape
+m = cv2.morphologyEx((alpha > 0.16).astype(np.uint8), cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
+n, lab, st, _ = cv2.connectedComponentsWithStats(m, connectivity=8)
+comps = sorted([i for i in range(1, n) if st[i][4] > 3000], key=lambda i: st[i][0]); pick = {}   # 左→右
+def choose(rule, left): return max(left, key=lambda i: st[i][3]) if rule == "tallest" else max(left, key=lambda i: st[i][0]) if rule == "rightmost" else min(left, key=lambda i: st[i][0]) if rule == "leftmost" else left[0]
+for rule in excl: comps.remove(choose(rule, comps))   # 使わない塊（RR35 の白い別製品など）を先に外す
+for name, rule in sorted(parts.items(), key=lambda kv: kv[1] == "rest"):
+    left = [i for i in comps if i not in pick.values()]
+    pick[name] = choose(rule, left)
+for name, i in pick.items():
+    x, y, w, h, _ = st[i]; pad = 6
+    x0, y0, x1, y1 = max(0, x - pad), max(0, y - pad), min(W, x + w + pad), min(H, y + h + pad)
+    keep = cv2.dilate((lab[y0:y1, x0:x1] == i).astype(np.uint8), np.ones((9, 9), np.uint8)).astype(bool)   # 隣の部品の画素は透明に
+    a = alpha[y0:y1, x0:x1] * keep; fg = estimate_foreground_ml(src[y0:y1, x0:x1], a)
+    Image.fromarray((np.dstack([np.clip(fg, 0, 1), a]) * 255 + 0.5).astype(np.uint8), "RGBA").save(f"{outdir}/comp_{name}")
+    print(name, (x0, y0, x1, y1))
+"""
+SPLIT_SR = r"""
+import sys, cv2, numpy as np
+comp_p, out, model = sys.argv[1:4]
+im = cv2.imread(comp_p, cv2.IMREAD_UNCHANGED); bgr = im[..., :3]; a = im[..., 3]
+sr = cv2.dnn_superres.DnnSuperResImpl_create(); sr.readModel(model); sr.setModel("edsr", 4)
+filled = cv2.inpaint(bgr, (a < 8).astype(np.uint8) * 255, 3, cv2.INPAINT_TELEA)   # 透明部をまわりの色で埋めてから拡大（黒いにじみを作らない）
+rgb = sr.upsample(filled); H, W = rgb.shape[:2]
+def smoothstep(e0, e1, x): t = np.clip((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t)
+a4 = smoothstep(0.30, 0.70, cv2.GaussianBlur(cv2.resize(a.astype(np.float32) / 255, (W, H), interpolation=cv2.INTER_CUBIC), (0, 0), 1.1))   # 輪郭をくっきり
+rgb = cv2.addWeighted(rgb, 1.35, cv2.GaussianBlur(rgb, (0, 0), 2.0), -0.35, 0)   # EDSR の甘さを少し戻す
+cv2.imwrite(out, np.dstack([rgb, (a4 * 255 + 0.5).astype(np.uint8)])); print(out, rgb.shape)
+"""
+
 def fade_bottom(png, cut):
     """下の端（画像の注記の切れ端が残る所）を高さの割合 cut から柔らかく消して詰め直す（SALONIA で決めた処理）"""
     import numpy as np; from PIL import Image
     a = np.array(Image.open(png)).astype(np.float32); y = np.arange(a.shape[0])[:, None] / a.shape[0]
     a[:, :, 3] *= np.clip((cut + 0.06 - y) / 0.06, 0, 1); o = Image.fromarray(a.astype(np.uint8)); o = o.crop(o.getbbox()); o.save(png); print(png, "下を消した", o.size)
+
+PLATE = r'''
+import sys, json, cv2
+src, out, model, sr, size = sys.argv[1:6]; a = cv2.imread(src); size = json.loads(size)
+if sr == "1": m = cv2.dnn_superres.DnnSuperResImpl_create(); m.readModel(model); m.setModel("edsr", 4); a = m.upsample(a)
+if size: a = cv2.resize(a, tuple(size), interpolation=cv2.INTER_AREA)
+cv2.imwrite(out, a, [cv2.IMWRITE_JPEG_QUALITY, 92])
+'''
 
 def focus_candidates(png):
     """寄る点の候補（世界の単位＝画素/4）：重心・上端・下端・左端・右端。Claude が一覧で目で確かめて選ぶ"""
@@ -104,11 +155,17 @@ def assets(P):
         subprocess.run(["python3", "-c", CUT, sr, os.path.join(D, c["out"])], check=True)
         if c.get("fade_bottom"): fade_bottom(os.path.join(D, c["out"]), c["fade_bottom"])
         cand[c["out"]] = focus_candidates(os.path.join(D, c["out"]))
+    for sp in pr.get("split", []):
+        cut = os.path.join(S, f"{sp['src']}_cut.png")
+        subprocess.run(["python3", "-c", SPLIT_CUT, os.path.join(S, sp["src"] + ".jpg"), cut], check=True)
+        subprocess.run(["python3", "-c", SPLIT_PARTS, os.path.join(S, sp["src"] + ".jpg"), cut, json.dumps(sp["parts"]), S, json.dumps(sp.get("exclude", []))], check=True)
+        for name in sp["parts"]:
+            subprocess.run([CV, "-c", SPLIT_SR, os.path.join(S, f"comp_{name}"), os.path.join(D, name), os.path.join(ROOT, "models/EDSR_x4.pb")], check=True)
+            cand[name] = focus_candidates(os.path.join(D, name))
     for p in pr.get("plates", []):    # 板（暮らしの写真・ランキング画像など）：範囲を切って幅をそろえる
-        im = Image.open(os.path.join(S, p["src"] + ".jpg")).convert("RGB")
-        if p.get("crop"): im = im.crop(tuple(p["crop"]))
-        if p.get("width"): im = im.resize((p["width"], round(im.height * p["width"] / im.width)), Image.LANCZOS)
-        im.save(os.path.join(D, p["out"]), quality=92)
+        im = Image.open(os.path.join(S, p["src"] + ".jpg")).convert("RGB"); src = os.path.join(S, f"{p['out']}_src.png")
+        (im.crop(tuple(p["crop"])) if p.get("crop") else im).save(src)
+        subprocess.run([CV, "-c", PLATE, src, os.path.join(D, p["out"]), os.path.join(ROOT, "models/EDSR_x4.pb"), "1" if p.get("sr") else "0", json.dumps(p.get("size"))], check=True)
     for r in pr.get("broll", []):     # 実写：区間・速さ・切り抜き・色合わせ → 25fps の駒
         out = os.path.join(D, r["out"]); shutil.rmtree(out, ignore_errors=True); os.makedirs(out)
         vf = ",".join(x for x in [r.get("crop") and f"crop={r['crop']}", f"setpts=PTS/{r.get('speed', 1)}", "fps=25", "scale=720:1280:flags=lanczos", GRADE[r.get("grade", "none")]] if x)
@@ -120,9 +177,9 @@ def sheet(D, pr):
     """確認用の一覧：切り抜き（寄る点の候補つき）・板・実写の頭/中/尻"""
     from PIL import Image, ImageDraw
     tiles = []
-    for c in pr.get("cutouts", []):
-        im = Image.open(os.path.join(D, c["out"])).convert("RGBA"); bg = Image.new("RGBA", im.size, (235, 228, 218, 255)); bg.alpha_composite(im)
-        f = focus_candidates(os.path.join(D, c["out"])); d = ImageDraw.Draw(bg)
+    for name in [c["out"] for c in pr.get("cutouts", [])] + [n for sp in pr.get("split", []) for n in sp["parts"]]:
+        im = Image.open(os.path.join(D, name)).convert("RGBA"); bg = Image.new("RGBA", im.size, (235, 228, 218, 255)); bg.alpha_composite(im)
+        f = focus_candidates(os.path.join(D, name)); d = ImageDraw.Draw(bg)
         for k, col in (("body", "red"), ("top", "blue"), ("left", "green"), ("right", "orange")):
             x, y = f[k][0] * 4, f[k][1] * 4; d.ellipse((x - 14, y - 14, x + 14, y + 14), outline=col, width=6)
         tiles.append(bg.convert("RGB"))
