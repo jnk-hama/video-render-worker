@@ -61,6 +61,12 @@ for i, b in enumerate(Bs):
     if kind == "ring": put(sfx, g["bell"](1174.66, 0.7, 2.2), min(t0 + 2.0, t1 - 0.6), 0.32)
     if kind == "compare":
         for k2 in range(len(bp["rows"]) + 1): put(sfx, g["tick"](2400 + 120 * k2, 0.4), t0 + 0.85 + k2 * 0.32, 0.22)
+    if kind == "points":   # editorial.html の points と同じ時刻
+        gp = min(0.5, (t1 - t0 - 1.6) / len(bp["items"]))
+        for k2 in range(len(bp["items"])): put(sfx, g["tick"](2200 + 200 * k2, 0.6), t0 + 0.35 + k2 * gp, 0.16, -0.2 + 0.2 * k2); put(sfx, g["tock"](380 + 40 * k2, 0.5), t0 + 0.38 + k2 * gp, 0.2)
+    if kind == "tour":   # 中身めぐり（editorial.html の tour と同じ時刻）
+        D = (t1 - t0 - 0.45) / len(bp["items"])
+        for k2 in range(len(bp["items"])): put(sfx, g["whoosh"](0.5, 300, 3200, 0.5), t0 + 0.3 + k2 * D - 0.1, 0.22, -0.3 + 0.3 * k2); put(sfx, g["shimmer"](0.7, 0.5), t0 + 0.3 + (k2 + 0.5) * D, 0.12)
     if kind == "finale" and P["template"] == "editorial":
         PB = t0 + 1.96 if bp.get("ranking") else t0
         if bp.get("ranking"): put(sfx, g["tock"](360, 0.7), t0 + 0.08, 0.4); put(sfx, g["shimmer"](1.0, 0.7), t0 + 0.25, 0.25); put(sfx, g["whoosh"](0.6, 260, 3600, 0.5), PB - 0.3, 0.3)
