@@ -169,6 +169,12 @@ def assets(P):
         crop = os.path.join(S, f"{c['out']}_src.png"); sr = os.path.join(S, f"{c['out']}_sr.png")
         Image.open(os.path.join(S, c["src"] + ".jpg")).convert("RGB").crop(tuple(c["crop"])).save(crop)
         if c.get("remove_red"): subprocess.run([CV, "-c", DERED, crop], check=True)
+        if c.get("poly"):   # 隣の物とくっついて写る品（ケーキの一切れ）：多角形の外を白で塗ってから切り抜く（座標は元画像）
+            from PIL import ImageDraw
+            im = Image.open(crop).convert("RGB"); m = Image.new("L", im.size, 0); x0, y0 = c["crop"][:2]
+            ImageDraw.Draw(m).polygon([(x - x0, y - y0) for x, y in c["poly"]], fill=255)
+            from PIL import ImageFilter; m = m.filter(ImageFilter.GaussianBlur(1.2))   # 多角形の縁がギザギザに見えないよう少しぼかす
+            Image.composite(im, Image.new("RGB", im.size, (244, 242, 238)), m).save(crop)
         subprocess.run([CV, "-c", SR, crop, sr, os.path.join(ROOT, "models/EDSR_x4.pb")], check=True)
         subprocess.run(["python3", "-c", CUT, sr, os.path.join(D, c["out"]), "1" if c.get("keep_all") else "0"], check=True)
         if c.get("fade_bottom"): fade_bottom(os.path.join(D, c["out"]), c["fade_bottom"])
