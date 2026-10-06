@@ -174,6 +174,30 @@ const KINDS = {
     const t0 = s.t0, Y = 1040;
     const h0 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:262px;font-size:104px;letter-spacing:.02em" }, b.head[0]));
     const h1 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:400px;font-size:104px;letter-spacing:.02em" }, b.head[1] || ""));
+    // 販売ページに使っている所の実写があればそれを主役に（オーナー「その描写があるのになぜ使わない」#288）。
+    // 温風の流れ（台→腕→靴の中）と上がる水の粒は図。座標は切り抜き画像の画素（b.flow / b.vents）
+    if (b.cut) {
+      const W = 800, L = 140, T = 600;
+      const ph = el("div", { class: "abs", style: `left:${L}px;top:${T}px;width:${W}px;opacity:0` }, "", $("under"));
+      el("img", { src: `${DIR}${b.cut}`, class: "prod", style: `display:block;width:${W}px;filter:drop-shadow(0 30px 40px rgba(60,45,30,.22))` }, "", ph);
+      const [cw, ch] = b.size, k = W / cw;
+      const flow = (b.flow || []).map((d) => `<path class="fl" d="${d}" fill="none" stroke="#F0A36E" stroke-width="${7 / k}" stroke-linecap="round" stroke-dasharray="${26 / k} ${22 / k}" opacity="0"/>`).join("");
+      const drops = (b.vents || []).flatMap(([x, y], v) => Array.from({ length: 7 }, (_, j) => `<circle class="dp" cx="${x + ((j * 29) % 60) - 30}" cy="${y}" r="${(11 + (j % 3) * 4) / k}" fill="#A9D3EA" stroke="#fff" stroke-width="${2.5 / k}" opacity="0"/>`)).join("");
+      el("div", { class: "abs", style: `left:0;top:0;width:${W}px;height:${ch * k}px` }, `<svg width="${W}" height="${ch * k}" viewBox="0 0 ${cw} ${ch}">${flow}${drops}</svg>`, ph);
+      const FL = ph.querySelectorAll(".fl"), DP = ph.querySelectorAll(".dp");
+      const lab = el("div", { class: "abs", style: `left:66px;top:${T + ch * k + 30}px;opacity:0` }, `<div style="font:900 52px/1.2 'Noto Sans JP'">${b.label}</div><div style="font:700 36px/1.5 'Noto Sans JP';color:var(--cu)">${b.sub || ""}</div>`);
+      const nt = el("div", { class: "note", style: `left:72px;top:${T + ch * k + 200}px;width:936px;opacity:0` }, b.note || "");
+      K.push({ t: t0, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 }, { t: s.t1 - 0.01, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 });
+      U.push((t) => {
+        const u = t - t0, o = outC((t - OUT(i)) / 0.25), a = sp(u - 0.1, 9, 0.85);
+        kin(h0, t0 + 0.05, OUT(i)); kin(h1, t0 + 0.25, OUT(i)); fadeUp(lab, t0 + 1.0, OUT(i)); fadeUp(nt, t0 + 1.3, OUT(i));
+        ph.style.opacity = clamp(a * 1.4) * (1 - o);
+        ph.style.transform = `translateY(${(1 - clamp(a)) * 80}px) scale(${0.94 + 0.06 * clamp(a) + 0.02 * clamp(u / 4)})`;   // ゆっくり寄る
+        FL.forEach((f) => { f.setAttribute("opacity", String(clamp((u - 0.8) / 0.3) * 0.95)); f.setAttribute("stroke-dashoffset", String(u * 90 / k)); });
+        DP.forEach((p, j) => { const tt = u - 1.2 - j * 0.11, q = clamp(tt / 1.3); p.setAttribute("opacity", String(tt > 0 && q < 1 ? Math.sin(Math.PI * q) * 0.85 : 0)); p.setAttribute("transform", `translate(${Math.sin(j + tt * 3) * 8} ${-q * 330})`); });
+      });
+      return;
+    }
     // 位置は外の g の属性、動きは内の g の style（CSS の transform は属性を上書きするので分ける）
     const shoe = (x, k) => `<g transform="translate(${x},${Y})"><g class="sh" data-k="${k}">
       <path d="M0,150 L0,70 Q0,40 32,40 L150,40 Q205,40 245,72 Q300,110 332,120 Q348,128 342,150 Z" fill="#FBFAF7" stroke="#1C1A17" stroke-width="5" stroke-linejoin="round"/>
