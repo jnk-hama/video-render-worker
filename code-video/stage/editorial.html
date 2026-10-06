@@ -168,8 +168,11 @@ const KINDS = {
     const rows = b.items.map((it, k) => el("div", { class: "abs", style: `left:64px;top:${350 + k * 170}px;width:952px;height:140px;border-radius:24px;background:rgba(255,253,248,.94);box-shadow:0 14px 30px rgba(60,45,30,.10);display:flex;align-items:center;gap:26px;padding:0 34px;opacity:0` },
       `<svg width="56" height="56" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="11" fill="#9A6438"/><path d="M6.5 12.5l3.6 3.6L17.5 8.6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div style="font:900 50px/1.2 'Noto Sans JP';color:var(--ink)">${it[0]}</div>${it[1] ? `<div style="font:500 28px/1.4 'Noto Sans JP';color:var(--mut)">${it[1]}</div>` : ""}</div>`));
     const nt = el("div", { class: "note", style: "left:72px;top:1700px;width:936px;opacity:0" }, b.note || "");
-    K.push({ t: t0, show: 1, F: F0.body, A: [540, 1420], z: fitZ(560), r: 0 }, { t: s.t1 - 0.01, show: 1, F: F0.body, A: [540, 1405], z: fitZ(600), r: 0 });
-    U.push((t) => { fadeUp(lab, t0 + 0.1, OUT(i)); fadeUp(nt, t0 + 0.8, OUT(i));
+    // 写真がある時は商品の切り抜きの代わりに使っている写真（家具など：切り抜き1つでは何の商品か伝わらない物）
+    const card = b.image ? el("div", { class: "card", style: "left:70px;top:1060px;width:940px;height:560px;opacity:0" }, `<img src="${DIR}${b.image}" style="width:940px;height:560px;object-fit:cover">`, $("under")) : null;
+    if (card) K.push({ t: t0, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 }, { t: s.t1 - 0.01, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 });
+    else K.push({ t: t0, show: 1, F: F0.body, A: [540, 1420], z: fitZ(560), r: 0 }, { t: s.t1 - 0.01, show: 1, F: F0.body, A: [540, 1405], z: fitZ(600), r: 0 });
+    U.push((t) => { fadeUp(lab, t0 + 0.1, OUT(i)); fadeUp(nt, t0 + 0.8, OUT(i)); if (card) { fadeUp(card, t0 + 0.05, OUT(i), 40); card.firstChild.style.transform = `scale(${1.03 + 0.05 * clamp((t - t0) / (s.t1 - t0))})`; }
       rows.forEach((r, k) => { const a = sp(t - (t0 + 0.35 + k * gap), 12, 0.8), o = outC((t - OUT(i)) / 0.25); r.style.opacity = clamp(a * 1.3) * (1 - o); r.style.transform = `translateX(${(1 - clamp(a)) * -80}px)`; }); });
   },
   // 中身めぐり（オーナー「商品ページから違うケーキの描写あれば色んな角度から」）：販売ページの写真から切り抜いた品を1つずつ、
