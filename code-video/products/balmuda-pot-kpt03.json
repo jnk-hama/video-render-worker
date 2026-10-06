@@ -1,29 +1,187 @@
 {
-  "product_key": "balmuda-pot-kpt03",
-  "template": "editorial",
-  "palette": "ivory-copper",
-  "name": "BALMUDA The Pot",
-  "sub": "電気ケトル　KPT03JP",
-  "prep": {"images": ["product/balmuda-pot-kpt03.jpg", "product/balmuda-pot-kpt03-1.jpg", "product/balmuda-pot-kpt03-2.jpg"],
-           "videos": ["https://videos.pexels.com/video-files/7118127/7118127-hd_1080_1920_25fps.mp4"],
-           "cutouts": [{"out": "kettle_b.png", "src": "img2", "crop": [0, 360, 720, 720]}, {"out": "kettle_w.png", "src": "img2", "crop": [0, 0, 720, 360]}],
-           "plates": [{"out": "life.jpg", "src": "img0", "crop": [40, 128, 470, 430], "sr": true}, {"out": "rank.jpg", "src": "img1", "sr": true, "size": [1400, 1400]}],
-           "broll": [{"out": "broll", "src": "vid0", "ss": 1.0, "t": 1.4, "crop": "788:1400:30:520", "speed": 0.6, "grade": "warm", "why": "手元のドリップ・顔と他社製品が映らない区間"}]},
-  "hero": {"cutout": "kettle_b.png", "alt": "kettle_w.png", "focus": {"body": [247, 155], "tip": [4, 26], "base_y": 300}},
-  "beats": [
-    {"kind": "cover", "voice": "line0.mp3", "say": "小さくて美しい電気ケトル、知ってる？", "head": ["小さくて、", "美しい。"], "image": "life.jpg",
-     "source": "説明文：小さくて美しい電気ケトル"},
-    {"kind": "counter", "voice": "line1.mp3", "say": "550ml、コーヒー3杯にちょうどいい", "value": 550, "unit": "ml", "sub": ["コーヒー", "3", "杯分"], "icons": "cups", "count": 3,
-     "source": "説明文：最大550ml・コーヒー3杯にちょうどいい"},
-    {"kind": "macro_broll", "voice": "line2.mp3", "say": "細口ノズルで、ハンドドリップに", "head": "細口ノズル", "en": "HAND DRIP", "broll": "broll", "frames": 58, "note": "※イメージ映像です。",
-     "source": "説明文：細口ノズル ハンドドリップ"},
-    {"kind": "compare", "voice": "line4.mp3", "say": "2026年モデルは、転倒時の湯漏れに配慮した構造に", "label": "2026 MODEL", "title": "前モデルからの変更点",
-     "cols": [["前モデル", "KPT01JP"], ["2026年モデル", "KPT03JP"]],
-     "rows": [["転倒時の湯漏れへの配慮", "―", "◯"], ["新しい安全基準<br><small>J60335-2-15（2024）</small>", "―", "適合"], ["容量", "0.6L", "0.55L"], ["コードの長さ", "1.3m", "1m"]],
-     "note": "※販売ページの「変更箇所」の記載より。",
-     "source": "説明文：変更箇所（転倒時の湯漏れ・J60335-2-15・電源長1.3m→1m・容量0.6L→0.55L）"},
-    {"kind": "finale", "voice": "line6.mp3", "say": "レビュー2000件超え、リンクはプロフィールへ", "rating": 4.76, "reviews": 2079, "date": "楽天市場 2026年10月5日時点",
-     "ranking": {"image": "rank.jpg", "note": "※楽天市場 デイリーランキング<br>家電＞キッチン家電＞電気ケトル（2026年6月2日集計）<br>販売ページの画像より"},
-     "colors": "WHITE ／ BLACK", "cta": "プロフィールのリンクへ", "cta_note": "価格・在庫・最新情報はリンク先でご確認ください"}
+ "product_key": "balmuda-pot-kpt03",
+ "template": "editorial",
+ "palette": "ivory-copper",
+ "name": "BALMUDA The Pot",
+ "sub": "電気ケトル　KPT03JP",
+ "prep": {
+  "images": [
+   "product/balmuda-pot-kpt03.jpg",
+   "product/balmuda-pot-kpt03-1.jpg",
+   "product/balmuda-pot-kpt03-2.jpg"
+  ],
+  "videos": [
+   "https://videos.pexels.com/video-files/7118127/7118127-hd_1080_1920_25fps.mp4"
+  ],
+  "cutouts": [
+   {
+    "out": "kettle_b.png",
+    "src": "img2",
+    "crop": [
+     0,
+     360,
+     720,
+     720
+    ]
+   },
+   {
+    "out": "kettle_w.png",
+    "src": "img2",
+    "crop": [
+     0,
+     0,
+     720,
+     360
+    ]
+   }
+  ],
+  "plates": [
+   {
+    "out": "life.jpg",
+    "src": "img0",
+    "crop": [
+     40,
+     128,
+     470,
+     430
+    ],
+    "sr": true
+   },
+   {
+    "out": "rank.jpg",
+    "src": "img1",
+    "sr": true,
+    "size": [
+     1400,
+     1400
+    ]
+   }
+  ],
+  "broll": [
+   {
+    "out": "broll",
+    "src": "vid0",
+    "ss": 1.0,
+    "t": 1.4,
+    "crop": "788:1400:30:520",
+    "speed": 0.6,
+    "grade": "warm",
+    "why": "手元のドリップ・顔と他社製品が映らない区間"
+   }
   ]
+ },
+ "hero": {
+  "cutout": "kettle_b.png",
+  "alt": "kettle_w.png",
+  "focus": {
+   "body": [
+    247,
+    155
+   ],
+   "tip": [
+    4,
+    26
+   ],
+   "base_y": 300
+  }
+ },
+ "beats": [
+  {
+   "kind": "cover",
+   "voice": "line0.mp3",
+   "say": "小さくて美しい電気ケトル、知ってる？",
+   "head": [
+    "小さくて、",
+    "美しい。"
+   ],
+   "image": "life.jpg",
+   "source": "説明文：小さくて美しい電気ケトル"
+  },
+  {
+   "kind": "counter",
+   "voice": "line1.mp3",
+   "say": "550ml、コーヒー3杯にちょうどいい",
+   "value": 550,
+   "unit": "ml",
+   "sub": [
+    "コーヒー",
+    "3",
+    "杯分"
+   ],
+   "icons": "cups",
+   "count": 3,
+   "source": "説明文：最大550ml・コーヒー3杯にちょうどいい"
+  },
+  {
+   "kind": "macro_broll",
+   "voice": "line2.mp3",
+   "say": "細口ノズルで、ハンドドリップに",
+   "head": "細口ノズル",
+   "en": "HAND DRIP",
+   "broll": "broll",
+   "frames": 58,
+   "note": "※イメージ映像です。",
+   "source": "説明文：細口ノズル ハンドドリップ"
+  },
+  {
+   "kind": "compare",
+   "voice": "line4.mp3",
+   "say": "2026年モデルは、転倒時の湯漏れに配慮した構造に",
+   "label": "2026 MODEL",
+   "title": "前モデルからの変更点",
+   "cols": [
+    [
+     "前モデル",
+     "KPT01JP"
+    ],
+    [
+     "2026年モデル",
+     "KPT03JP"
+    ]
+   ],
+   "rows": [
+    [
+     "転倒時の湯漏れへの配慮",
+     "―",
+     "◯"
+    ],
+    [
+     "新しい安全基準<br><small>J60335-2-15（2024）</small>",
+     "―",
+     "適合"
+    ],
+    [
+     "容量",
+     "0.6L",
+     "0.55L"
+    ],
+    [
+     "コードの長さ",
+     "1.3m",
+     "1m"
+    ]
+   ],
+   "note": "※販売ページの「変更箇所」の記載より。",
+   "source": "説明文：変更箇所（転倒時の湯漏れ・J60335-2-15・電源長1.3m→1m・容量0.6L→0.55L）"
+  },
+  {
+   "kind": "finale",
+   "voice": "line6.mp3",
+   "say": "レビュー2000件超え、リンクはプロフィールへ",
+   "rating": 4.76,
+   "reviews": 2079,
+   "date": "楽天市場 2026年10月5日時点",
+   "ranking": {
+    "image": "rank.jpg",
+    "note": "※楽天市場 デイリーランキング<br>家電＞キッチン家電＞電気ケトル（2026年6月2日集計）<br>販売ページの画像より"
+   },
+   "colors": "WHITE ／ BLACK",
+   "cta": "プロフィールのリンクへ",
+   "cta_note": "価格・在庫・最新情報はリンク先でご確認ください"
+  }
+ ],
+ "target": {
+  "who": "ハンドドリップでコーヒーを淹れる人に",
+  "source": "説明文：細口ノズル ハンドドリップ"
+ }
 }

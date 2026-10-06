@@ -44,6 +44,7 @@
   <canvas id="grain" width="540" height="960"></canvas>
 <script src="core.js"></script>
 <script src="numfx.js"></script>
+<script src="target.js"></script>
 <script>
 function lineIn(e, tin, tout, w = 13) { const a = sp(T - tin, w, 1), o = outC((T - tout) / 0.30);
   e.firstElementChild.style.transform = `translateY(${(1 - a) * 140 - o * 140}%)`; e.style.visibility = (a <= 0.001 || o >= 0.999) ? "hidden" : "visible"; }

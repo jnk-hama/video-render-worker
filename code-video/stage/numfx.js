@@ -95,6 +95,21 @@
         W.setAttribute("d", `M0,${y} Q150,${y - wv} 300,${y} T600,${y} L600,1000 L0,1000 Z`); svg.style.opacity = clamp(sp(u, 12, 1) * 1.4);
         num.firstChild.textContent = u >= 1.9 ? fmt(b.value) : fmt(Math.round(f * mx / 10) * 10); num.style.opacity = clamp(sp(u - 0.2, 12, 1) * 1.3); };
     },
+    // 寸法：天板を縮尺どおりの四角で描き、幅と奥行の寸法線が伸びる（サイズ感・オーナー「サイズ感があればわかりやすい」）
+    dims(b, box, t0) {
+      // 外側（掛布団など・あれば）も同じ縮尺で囲む＝部屋で場所をとる広さが分かる
+      const o = b.outer, S = o ? 880 / o.w : 640 / b.w, OW = o ? o.w * S : 0, OD = o ? o.d * S : 0, W = b.w * S, H = b.d * S;
+      const top = 540, ox = 540 - OW / 2, L = 540 - W / 2, T = o ? top + (OD - H) / 2 : top, r = b.round ? 30 : 6;
+      const svg = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px" }, `<svg width="1080" height="1920">
+        ${o ? `<rect class="ou" x="${ox}" y="${top}" width="${OW}" height="${OD}" rx="40" fill="rgba(90,80,70,.07)" stroke="var(--nf-mut)" stroke-width="5" stroke-dasharray="18 12" opacity="0"/>` : ""}
+        <rect class="tp" x="${L}" y="${T}" width="${W}" height="${H}" rx="${r}" fill="rgba(154,100,56,.16)" stroke="var(--nf-ink)" stroke-width="8" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`, box);
+      const tp = svg.querySelector(".tp"), ou = svg.querySelector(".ou");
+      const lt = el("div", { class: "abs", style: `left:${L}px;top:${T + H / 2 - 62}px;width:${W}px;text-align:center;opacity:0;color:var(--nf-ink);line-height:1` },
+        `<div style="font:900 34px/1 'Noto Sans JP';margin-bottom:8px">${b.name || ""}</div><span class="nf-num" style="font-size:84px">${b.w}×${b.d}</span><span style="font:900 36px/1 'Noto Sans JP'">${b.unit}${mark(b)}</span>`, box);
+      const lo = o ? el("div", { class: "abs", style: `left:${ox + 34}px;top:${top + 28}px;opacity:0;color:var(--nf-ink);font:900 36px/1.2 'Noto Sans JP'` }, `${o.label} <span class="nf-num" style="font-size:52px">${o.w}×${o.d}</span>${b.unit}`, box) : null;
+      return (u) => { tp.setAttribute("stroke-dashoffset", String(1 - inOutC((u - 0.15) / 0.8))); lt.style.opacity = clamp((u - 0.75) / 0.3);
+        if (ou) { const a = inOutC((u - 1.1) / 0.6); ou.setAttribute("opacity", a); ou.setAttribute("transform", `translate(540 ${top + OD / 2}) scale(${lerp(0.6, 1, a)}) translate(-540 ${-(top + OD / 2)})`); lo.style.opacity = clamp((u - 1.5) / 0.3); } };
+    },
     // ドーナツ：割合を面積で（一瞬で分かる）
     donut(b, box, t0) {
       const parts = b.parts, cols = ["var(--nf-ink)", "var(--nf-acc)", "var(--nf-mut)"];

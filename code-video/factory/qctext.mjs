@@ -21,6 +21,7 @@ const walk = (v, key) => {
 };
 PR.beats.forEach((b) => walk(b, ""));
 if (PR.name) expected.push(PR.name);   // 商品名は必ず画面に出す（#276）
+if (PR.target && PR.target.who) expected.push(PR.target.who);   // 誰に向けた動画かも画面に出す（#283）
 const norm = (s) => s.replace(/[\s,~〜]/g, "");
 const out = { mojibake: [], tofu: [], missing: [], prRatio: 0 };
 // 1) 設計書の文字化け（読み上げの文も見る）

@@ -7,7 +7,7 @@ TAIL = {"cover": 0.55, "counter": 0.6, "macro_broll": 0.6, "ring": 0.7, "compare
         "problem": 0.75, "airflow": 0.7, "slash": 0.8, "colors": 0.7,
         "hook": 0.55, "chips": 0.6, "cells": 0.75, "bars": 0.7, "explode": 1.0,
         "gauge": 0.5, "swatch": 1.0, "sizes": 0.75, "touch": 0.5, "callouts": 0.6, "choose": 0.8, "num": 0.7, "tour": 0.6, "points": 0.9, "slice": 0.6}
-MIN_NUM = {"calendar": 3.4, "magnify": 3.3, "flap": 3.1, "cup": 3.1}   # 数字の見せ方：最後の数字・判が1秒以上読める長さ（numfx.js の段取り）
+MIN_NUM = {"dims": 3.3, "calendar": 3.4, "magnify": 3.3, "flap": 3.1, "cup": 3.1}   # 数字の見せ方：最後の数字・判が1秒以上読める長さ（numfx.js の段取り）
 MIN = {"explode": 6.2, "swatch": 2.9, "callouts": 3.0, "choose": 2.7, "num": 2.9, "tour": 4.6, "points": 3.6, "slice": 4.2}   # 分解は動きの段取りが決まっている（最後の文字が1秒以上読める長さ）
 
 def speech_end(path):

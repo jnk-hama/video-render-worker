@@ -122,6 +122,7 @@ for i, b in enumerate(Bs):
             for k2 in range(n - 1): put(sfx, g["whoosh"](0.25, 700, 4200, 0.5, 0.6), t0 + 0.35 + k2 * gap, 0.16, -0.3 + 0.15 * k2)
             put(sfx, g["bell"](1568, 1.0, 1.4), t0 + end, 0.2)
             if bp.get("badge"): put(sfx, g["impact"](0.7, 1.2), t0 + end + 0.25, 0.3); put(sfx, g["tock"](240, 0.9), t0 + end + 0.27, 0.35)
+        if m == "dims": put(sfx, g["glide"](0.9, 300, 800, 0.5), t0 + 0.2, 0.12); put(sfx, g["tick"](2400, 0.5), t0 + 1.1, 0.16); put(sfx, g["tick"](2700, 0.5), t0 + 1.45, 0.16)
         if m == "cup": put(sfx, g["glide"](1.6, 220, 520, 0.5), t0 + 0.3, 0.16); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.9, 0.22)
         if m == "donut": put(sfx, g["glide"](1.0, 400, 900, 0.5), t0 + 0.3, 0.14); put(sfx, g["bell"](1568, 0.7, 1.4), t0 + 1.6, 0.2)
         if m == "figures":
