@@ -64,6 +64,9 @@ for i, b in enumerate(Bs):
     if kind == "warmup":   # editorial.html の warmup：差し込み（0.25〜0.95）→ 温風と色（0.9〜）→ 輪が満ちる
         put(sfx, g["whoosh"](0.7, 200, 2600, 0.5, 0.7), t0 + 0.25, 0.26); put(sfx, g["tock"](240, 0.8), t0 + 0.95, 0.3); put(sfx, g["glide"](1.8, 260, 620, 0.5), t0 + 0.9, 0.16)
         put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 2.5, 0.22)
+    if kind == "shoes":   # editorial.html の shoes：靴（0.1〜）→ 腕（0.45〜）→ 本体が立つ（0.85）→ 温風と水の粒（1.2〜）
+        put(sfx, g["whoosh"](0.5, 300, 2800, 0.5), t0 + 0.1, 0.2); put(sfx, g["tock"](260, 0.8), t0 + 0.95, 0.32); put(sfx, g["glide"](1.6, 280, 640, 0.5), t0 + 1.2, 0.14)
+        for k2 in range(6): put(sfx, g["tick"](2600 + 120 * k2, 0.3), t0 + 1.4 + k2 * 0.24, 0.07, -0.3 + 0.12 * k2)
     if kind == "spec":
         put(sfx, g["tick"](2300, 0.5), t0 + 0.45, 0.15); put(sfx, g["tick"](2600, 0.5), t0 + 0.85, 0.15)
         for k2 in range(1, 10): put(sfx, g["tick"](2000 + 80 * k2, 0.4), t0 + 0.9 + 0.9 * (1 - (1 - k2 / 10) ** (1 / 3)), 0.08)
