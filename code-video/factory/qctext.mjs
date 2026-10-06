@@ -10,7 +10,7 @@ const TL = JSON.parse(fs.readFileSync(path.resolve(root, process.env.TL), "utf8"
 const PR = JSON.parse(fs.readFileSync(process.env.PRODUCT, "utf8"));
 const MOJI = /�|[ÃÂ][\u0080-¿]|[縺繧繝譁蜿]|ã[\u0080-¿]/;
 // 画面に出ない項目（読み上げ・出典・素材の指定など）
-const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect", "pair", "anchor", "angle", "box", "at", "motif", "native", "flow", "vents"]);
+const SKIP = new Set(["kind", "voice", "say", "source", "broll", "frames", "alt_bg", "cam", "open", "mv", "why", "image", "icons", "glint", "slide_hero", "leader", "widths", "gold", "accent", "count", "value", "rating", "reviews", "cells", "tail", "step", "cut", "size", "part_rect", "pair", "anchor", "angle", "box", "at", "motif", "native", "flow", "vents", "image_fit"]);
 const expected = [];
 const walk = (v, key) => {
   if (SKIP.has(key)) return;

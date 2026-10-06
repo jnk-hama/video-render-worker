@@ -58,14 +58,15 @@ const KINDS = {
     if (b.image) { card = el("div", { class: "card", style: "left:70px;top:640px;width:940px;height:660px" }, `<img src="${DIR}${b.image}" style="position:absolute;left:0;top:0;width:940px;height:660px;object-fit:cover;transform-origin:60% 60%">`, $("under")); img = card.firstChild; }
     const h0 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:262px;font-size:132px;letter-spacing:.02em" }, b.head[0]));
     const h1 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:418px;font-size:132px;letter-spacing:.02em" }, b.head[1] || ""));
-    const nm = el("div", { class: "abs gar", style: "left:70px;top:1340px;font-size:58px;letter-spacing:.18em;opacity:0" }, P.name);
+    const nm = el("div", { class: "abs gar", style: `left:70px;top:1340px;font-size:${Math.min(58, Math.floor(940 / (P.name.length * 1.2)))}px;letter-spacing:.18em;white-space:nowrap;opacity:0` }, P.name);   // 長い商品名は1行に収まる大きさに（折り返すと下の行に重なる）
     const sb = el("div", { class: "abs", style: "left:72px;top:1420px;font:700 32px/1 'Noto Sans JP';letter-spacing:.1em;color:var(--mut);opacity:0" }, P.sub || "");
+    const cn = b.note ? el("div", { class: "note", style: "left:72px;top:1490px;width:936px;opacity:0" }, b.note) : null;   // 見出しが販売ページの言葉の引用の時の※
     if (b.image) { K.push({ t: t0, show: 0, F: F0.body, A: [540, 2600], z: 1.3, r: 0 }, { t: s.t1 - 0.01, show: 0, F: F0.body, A: [540, 2600], z: 1.3, r: 0 }); }
     else { K.push({ t: t0, show: 1, F: F0.body, A: [540, 1150], z: fitZ(820), r: 0 }, { t: s.t1 - 0.01, show: 1, F: F0.body, A: [540, 1140], z: fitZ(860), r: 0 }); }
     U.push((t) => {
       if (card) { const a = 0.45 + 0.55 * inOutC((t - t0) / 0.6); card.style.opacity = t > OUT(i) || t < t0 ? 0 : 1; card.style.clipPath = `inset(${(1 - a) * 100}% 0 0 0 round 22px)`;
         img.style.transform = `scale(${1.04 + 0.08 * clamp((t - t0) / (s.t1 - t0))}) translate(${-12 * clamp((t - t0) / (s.t1 - t0))}px, 0)`; }
-      kin(h0, t0 - 0.3, OUT(i)); kin(h1, t0 + 0.15, OUT(i)); fadeUp(nm, t0 + 1.0, OUT(i)); fadeUp(sb, t0 + 1.2, OUT(i));
+      kin(h0, t0 - 0.3, OUT(i)); kin(h1, t0 + 0.15, OUT(i)); fadeUp(nm, t0 + 1.0, OUT(i)); fadeUp(sb, t0 + 1.2, OUT(i)); if (cn) fadeUp(cn, t0 + 0.8, OUT(i));
     });
   },
   counter(b, i, s) {
@@ -227,6 +228,40 @@ const KINDS = {
       DP.forEach((p, k) => { const tt = u - 1.3 - k * 0.12, a = clamp(tt / 1.2); p.setAttribute("opacity", String(tt > 0 && a < 1 ? Math.sin(Math.PI * a) * 0.85 : 0)); p.setAttribute("transform", `translate(${Math.sin(k + tt * 3) * 10} ${-a * 260})`); });
     });
   },
+  // 手触り（モーショングラフィック・#286／作りにくいジャンル：手触り）：生地の寄りの写真を丸に入れ、指でなでた跡が光って残る。
+  // 周りに雲（ブランドの紹介文の言葉）。手触りは画面で確かめられないので、言葉は販売ページの物だけ・跡は※図・イメージ
+  texture(b, i, s) {
+    const t0 = s.t0, R = 360, CX = 540, CY = 1010;
+    const h0 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:262px;font-size:104px;letter-spacing:.02em" }, b.head[0]));
+    const h1 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:400px;font-size:104px;letter-spacing:.02em" }, b.head[1] || ""));
+    const lens = el("div", { class: "abs", style: `left:${CX - R}px;top:${CY - R}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;overflow:hidden;opacity:0;box-shadow:0 34px 60px rgba(60,45,30,.22), 0 0 0 10px rgba(255,253,248,.9)` },
+      `<img src="${DIR}${b.image}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`, $("under"));
+    const ph = lens.firstChild;
+    // なでた跡：S字の太い光の線を先から描く。指先＝輪の付いた白い丸
+    const D = `M${-40},${R * 1.25} C${R * 0.5},${R * 0.55} ${R * 0.9},${R * 1.55} ${R * 1.35},${R * 0.95} S${R * 1.9},${R * 0.5} ${2 * R + 40},${R * 0.8}`;
+    // 生地が白っぽいので、跡は「押さえた影（銅色・うすく）＋細い光」で描く（白く光らせるだけだと見えない）
+    const sv = el("div", { class: "abs", style: `left:0;top:0;width:${2 * R}px;height:${2 * R}px` }, `<svg width="${2 * R}" height="${2 * R}"><defs><filter id="tx-b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter><filter id="tx-s" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter></defs>
+      <path class="tr" d="${D}" fill="none" stroke="rgba(154,100,56,.34)" stroke-width="96" stroke-linecap="round" filter="url(#tx-b)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+      <path class="tr" d="${D}" fill="none" stroke="#FFFDF8" stroke-width="22" stroke-linecap="round" filter="url(#tx-s)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="translate(-6 -10)"/></svg>`, lens);
+    const TRS = sv.querySelectorAll(".tr"), PATH = sv.querySelector("path");
+    const tip = el("div", { class: "abs", style: "left:0;top:0;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,.98) 0%, rgba(255,255,255,.7) 55%, rgba(255,255,255,0) 72%);box-shadow:0 0 0 5px rgba(154,100,56,.7), 0 10px 24px rgba(60,45,30,.3);opacity:0" }, "", lens);
+    const cloud = (x, y, sc) => el("div", { class: "abs", style: `left:${x}px;top:${y}px;opacity:0;transform-origin:50% 50%` },
+      `<svg width="${200 * sc}" height="${110 * sc}" viewBox="0 0 200 110"><path d="M40,96 Q8,96 10,70 Q12,46 42,48 Q46,14 86,16 Q116,2 136,30 Q170,22 178,52 Q198,58 192,80 Q188,98 160,96 Z" fill="rgba(255,253,248,.92)" stroke="#9A6438" stroke-width="4" stroke-linejoin="round"/></svg>`, $("under"));
+    const CL = [cloud(70, 600, 1.0), cloud(800, 760, 0.8), cloud(760, 1300, 1.1)];
+    const lab = el("div", { class: "abs", style: `left:66px;top:${CY + R + 50}px;opacity:0` }, `<div class="lab" style="letter-spacing:.2em">${b.label || ""}</div><div style="font:700 36px/1.5 'Noto Sans JP';color:var(--mut);margin-top:12px">${b.sub || ""}</div>`);
+    const nt = el("div", { class: "note", style: `left:72px;top:${CY + R + 190}px;width:936px;opacity:0` }, b.note || "");
+    K.push({ t: t0, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 }, { t: s.t1 - 0.01, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 });
+    U.push((t) => {
+      const u = t - t0, o = outC((t - OUT(i)) / 0.25), a = sp(u - 0.05, 10, 0.8);
+      kin(h0, t0 + 0.05, OUT(i)); kin(h1, t0 + 0.25, OUT(i)); fadeUp(lab, t0 + 1.0, OUT(i)); fadeUp(nt, t0 + 1.3, OUT(i));
+      lens.style.opacity = clamp(a * 1.4) * (1 - o); lens.style.transform = `scale(${0.9 + 0.1 * clamp(a)})`;
+      ph.style.transform = `scale(${1.12 + 0.1 * clamp(u / 4)})`;   // ゆっくり寄る（生地の毛並みへ）
+      const d = inOutC((u - 0.6) / 1.4); TRS.forEach((r) => { r.setAttribute("stroke-dashoffset", String(1 - d)); r.setAttribute("opacity", String(1 - 0.4 * clamp((u - 2.2) / 1.2))); });
+      const L = PATH.getTotalLength(), p = PATH.getPointAtLength(L * d);
+      tip.style.left = p.x + "px"; tip.style.top = p.y + "px"; tip.style.opacity = String(u > 0.6 && d < 1 ? clamp((u - 0.6) / 0.2) : clamp(1 - (u - 2.0) / 0.3) * (d >= 1 ? 1 : 0));
+      CL.forEach((c, k) => { const q = sp(u - 0.4 - k * 0.18, 9, 0.8); c.style.opacity = clamp(q * 1.3) * (1 - o); c.style.transform = `translate(${Math.sin(u * 0.9 + k * 2) * 14}px, ${(1 - clamp(q)) * 40 + Math.cos(u * 0.7 + k) * 6}px)`; });
+    });
+  },
   // 本体の寸法（モーショングラフィック・#286）：販売ページの寸法図と同じ線を、本体の切り抜きの上に描いていく。重さを数え上げ、受賞の判を押す
   spec(b, i, s) {
     const t0 = s.t0, H = 860, W = H * HERO.w / HERO.h, L = 300, T = 680;
@@ -295,7 +330,7 @@ const KINDS = {
       `<svg width="56" height="56" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="11" fill="#9A6438"/><path d="M6.5 12.5l3.6 3.6L17.5 8.6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div style="font:900 50px/1.2 'Noto Sans JP';color:var(--ink)">${it[0]}</div>${it[1] ? `<div style="font:500 28px/1.4 'Noto Sans JP';color:var(--mut)">${it[1]}</div>` : ""}</div>`));
     const nt = el("div", { class: "note", style: "left:72px;top:1700px;width:936px;opacity:0" }, b.note || "");
     // 写真がある時は商品の切り抜きの代わりに使っている写真（家具など：切り抜き1つでは何の商品か伝わらない物）
-    const card = b.image ? el("div", { class: "card", style: "left:70px;top:1060px;width:940px;height:560px;opacity:0" }, `<img src="${DIR}${b.image}" style="width:940px;height:560px;object-fit:cover">`, $("under")) : null;
+    const card = b.image ? el("div", { class: "card", style: "left:70px;top:1060px;width:940px;height:560px;opacity:0" }, `<img src="${DIR}${b.image}" style="width:940px;height:560px;object-fit:${b.image_fit || "cover"}">`, $("under")) : null;   // 色の一覧など切れてはいけない写真は image_fit: contain（背景は白いカード）
     if (card) K.push({ t: t0, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 }, { t: s.t1 - 0.01, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 });
     else K.push({ t: t0, show: 1, F: F0.body, A: [540, 1420], z: fitZ(560), r: 0 }, { t: s.t1 - 0.01, show: 1, F: F0.body, A: [540, 1405], z: fitZ(600), r: 0 });
     U.push((t) => { fadeUp(lab, t0 + 0.1, OUT(i)); fadeUp(nt, t0 + 0.8, OUT(i)); if (card) { fadeUp(card, t0 + 0.05, OUT(i), 40); card.firstChild.style.transform = `scale(${1.03 + 0.05 * clamp((t - t0) / (s.t1 - t0))})`; }
@@ -334,7 +369,7 @@ const KINDS = {
     const dt = el("div", { class: "note", style: "left:72px;top:572px;opacity:0" }, b.date);
     const ct = el("div", { class: "cta", style: "left:64px;top:650px;opacity:0" }, `<span style="position:relative">${b.cta}</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sweep" style="mix-blend-mode:plus-lighter"></div>`);
     const cn = el("div", { class: "note", style: "left:72px;top:790px;opacity:0" }, b.cta_note || "");
-    const co = el("div", { class: "abs gar", style: "left:72px;top:1440px;font-size:40px;letter-spacing:.3em;color:var(--mut);opacity:0" }, b.colors || "");
+    const co = el("div", { class: "abs gar", style: `left:72px;top:${Math.max(1440, Math.round(1230 + HERO.h * fitZ(575) / 2 + 30))}px;font-size:40px;letter-spacing:.3em;color:var(--mut);opacity:0` }, b.colors || "");   // 縦長の商品は写真の下へ（1440 だと重なる・カシウェア）
     const cx = P.hero.alt ? HERO.w * 0.75 : HERO.w * 0.5;
     if (hasR) K.push({ t: t0, show: 0, F: [cx, 150], A: [500, 1260], z: fitZ(520), r: 0 }, { t: PB - 0.01, show: 0, F: [cx, 150], A: [500, 1260], z: fitZ(520), r: 0 });
     K.push({ t: PB, show: 1, F: [cx, HERO.h * 0.49], A: [500, 1230], z: fitZ(535), r: 0 }, { t: END, show: 1, F: [cx, HERO.h * 0.49], A: [500, 1230], z: fitZ(575), r: 0 });
