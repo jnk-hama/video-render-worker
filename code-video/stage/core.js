@@ -38,7 +38,7 @@ function buildHero(wid, hei) {
       <img src="${DIR}${P.hero.cutout}" style="left:0;top:0;width:${wid}px;height:${hei}px">
       <div class="sweep" id="sw" style="-webkit-mask:url(${DIR}${P.hero.cutout}) center/100% 100% no-repeat; mask:url(${DIR}${P.hero.cutout}) center/100% 100% no-repeat"></div></div>`;
 }
-const fitZ = (px) => px / HERO.w;
+const fitZ = (px) => px / Math.max(HERO.w, HERO.h * (P.hero.fit_h || 0));   // fit_h：縦長の商品（スティック等）は高さでも合わせる（設計書で指定した時だけ）
 const toScreen = (cam, Pt) => { const x = (Pt[0] - cam.F[0]) * cam.z, y = (Pt[1] - cam.F[1]) * cam.z, r = (cam.r || 0) * Math.PI / 180;
   return [cam.A[0] + x * Math.cos(r) - y * Math.sin(r), cam.A[1] + x * Math.sin(r) + y * Math.cos(r)]; };
 

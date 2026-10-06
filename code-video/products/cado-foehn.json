@@ -1,0 +1,152 @@
+{
+ "product_key": "cado-foehn",
+ "template": "editorial",
+ "palette": "ivory-copper",
+ "name": "cado ふとん乾燥機 FOEHN",
+ "sub": "スティック型ふとん乾燥機",
+ "item_code": "roomy:10015648",
+ "genre": "appliance",
+ "target": {
+  "who": "寝る前の布団が冷たい人に",
+  "source": "説明文：あたためコース 寝る前に素早く布団を温めたいときに"
+ },
+ "prep": {
+  "images": [
+   "product/cado-foehn.jpg",
+   "product/cado-foehn-1.jpg",
+   "product/cado-foehn-2.jpg"
+  ],
+  "cutouts": [
+   {
+    "out": "stick.png",
+    "src": "img2",
+    "crop": [
+     140,
+     150,
+     240,
+     640
+    ]
+   }
+  ],
+  "plates": [
+   {
+    "out": "use.jpg",
+    "src": "img0",
+    "crop": [
+     240,
+     60,
+     560,
+     285
+    ],
+    "sr": true,
+    "why": "布団に差して使っている写真（左上の赤い札・右下の付属品と文字・左下の丸い写真は入れない）"
+   }
+  ],
+  "why": "主役は画像3枚目（寸法図）の本体を切り抜く。画像2枚目はレビュー特典＝使わない"
+ },
+ "hero": {
+  "cutout": "stick.png",
+  "focus": {
+   "body": [
+    35,
+    228
+   ],
+   "tip": [
+    35,
+    420
+   ],
+   "base_y": 452
+  },
+  "fit_h": 0.82
+ },
+ "beats": [
+  {
+   "kind": "cover",
+   "voice": "line0.mp3",
+   "say": "寝る前の布団、冷たくない？",
+   "head": [
+    "寝る前の布団、",
+    "冷たくない？"
+   ],
+   "image": "use.jpg",
+   "source": "説明文：寝る前に素早く布団を温めたいときに（悩みの提示）"
+  },
+  {
+   "kind": "warmup",
+   "voice": "line1.mp3",
+   "say": "差して10分、あたためコースで布団がぬくぬく",
+   "head": [
+    "差して",
+    "10分。"
+   ],
+   "minutes": 10,
+   "label": "あたためコース",
+   "temp": "温風 約60℃",
+   "note": "※あたためコース：運転時間10分・温風温度約60℃（販売ページの記載）。色と風の動きはイメージです。",
+   "source": "説明文：あたためコース 運転時間10分、温風温度約60度。寝る前に素早く布団を温めたいときに"
+  },
+  {
+   "kind": "spec",
+   "voice": "line2.mp3",
+   "say": "直径49ミリ、約420グラム",
+   "head": [
+    "スリムな",
+    "スティック。"
+   ],
+   "h": 315,
+   "d": 49,
+   "weight": 420,
+   "award": "2024年 iFデザイン賞 受賞",
+   "note": "※サイズ・重さ（電源コードを除く）・受賞歴は販売ページの記載です。",
+   "source": "説明文：約直径49mm×高さ315mm・重さ約420g（電源コードを除く）・2024年 iFデザイン賞受賞"
+  },
+  {
+   "kind": "points",
+   "voice": "line3.mp3",
+   "say": "静音モード付き。シーツはそのまま、靴乾燥のセットも",
+   "label": "POINT",
+   "items": [
+    [
+     "静音モード",
+     "運転音が約33%静かに※"
+    ],
+    [
+     "シーツを付けたままOK",
+     "布団カバーもそのまま"
+    ],
+    [
+     "靴乾燥スタンド付きも",
+     "選べるセット"
+    ]
+   ],
+   "note": "※静音：SONE値の比較で約33%減（静音モードのON/OFF比較・販売ページの記載）。",
+   "source": "説明文：静音モード（SONE値比較約33%減）・シーツや布団カバーを付けたままでも乾燥、あたためができます・靴乾燥スタンド付きセット",
+   "image": "use.jpg"
+  },
+  {
+   "kind": "finale",
+   "voice": "line4.mp3",
+   "say": "レビュー900件超え、リンクはプロフィールへ",
+   "rating": 4.54,
+   "reviews": 938,
+   "date": "楽天市場 2026年10月6日時点",
+   "cta": "プロフィールのリンクへ",
+   "cta_note": "価格・在庫・最新情報はリンク先でご確認ください",
+   "tail": 1.0
+  }
+ ],
+ "post": {
+  "tags": [
+   "#布団乾燥機",
+   "#cado",
+   "#冬支度"
+  ],
+  "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00qb0ln.sdgfff32.g00qb0ln.sdgfgbc5/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Froomy%2Fecl23nov22h01%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Froomy%2Fi%2F10015648%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b"
+ },
+ "excluded": [
+  "除菌・消臭・ダニ・花粉・オゾン：効果の言葉は使わない（コース名に『ダニ対策』があっても触れない）",
+  "ポイント10倍・電気代：お金の話",
+  "楽天1位（商品名）・2025年2月のランキング：条件が古い／書いていない",
+  "画像2枚目：レビュー特典の案内"
+ ]
+}

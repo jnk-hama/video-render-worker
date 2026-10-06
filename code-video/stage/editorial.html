@@ -132,6 +132,72 @@ const KINDS = {
       trs.forEach((tr, k) => { const a = sp(t - (t0 + 0.85 + k * 0.32), 12, 1); tr.style.opacity = clamp(a * 1.3); tr.style.transform = `translateX(${(1 - a) * 40}px)`; });
       fadeUp(nt, s.t1 - 1.6, OUT(i)); });
   },
+  // あたため（モーショングラフィック・#286）：冷たい色の布団に本体が差し込まれ、温風が曲線で流れ、差した所から暖色に染まる。10分の輪が満ちる
+  // 布団と風と色は図（イメージ・※で明記）。本体は販売ページの写真の切り抜き
+  warmup(b, i, s) {
+    const t0 = s.t0, X0 = 90, Y0 = 640, FW = 900, FH = 560, ix = X0 + FW - 40, iy = Y0 + FH / 2;
+    const h0 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:262px;font-size:104px;letter-spacing:.02em" }, b.head[0]));
+    const h1 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:400px;font-size:150px;letter-spacing:.02em;color:var(--cu)" }, b.head[1] || ""));
+    const stitch = [1, 2, 3, 4].map((k) => { const y = Y0 + k * FH / 5; return `<path d="M${X0 + 20},${y} ${Array.from({ length: 9 }, (_, j) => `Q${X0 + 50 + j * 100},${y + (j % 2 ? 16 : -16)} ${X0 + 100 + j * 100},${y}`).join(" ")}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="4"/>`; }).join("");
+    const flows = [-200, -110, -30, 40, 120, 210].map((dy, k) => `<path class="fl" d="M${ix - 60},${iy} C${ix - 260},${iy + dy * 0.3} ${ix - 480},${iy + dy} ${X0 + 80},${iy + dy * 1.15}" fill="none" stroke="rgba(255,236,214,.95)" stroke-width="7" stroke-linecap="round" stroke-dasharray="40 46" opacity="0"/>`).join("");
+    const svg = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;opacity:0" }, `<svg width="1080" height="1920">
+      <defs><clipPath id="qc${i}"><rect x="${X0}" y="${Y0}" width="${FW}" height="${FH}" rx="90"/></clipPath>
+        <radialGradient id="wg${i}"><stop offset="0" stop-color="#F0A36E"/><stop offset=".55" stop-color="#F4BF94"/><stop offset="1" stop-color="#F4BF94" stop-opacity="0"/></radialGradient></defs>
+      <rect x="${X0}" y="${Y0 + 26}" width="${FW}" height="${FH}" rx="90" fill="rgba(60,45,30,.12)"/>
+      <g clip-path="url(#qc${i})"><rect x="${X0}" y="${Y0}" width="${FW}" height="${FH}" fill="#AFC2D2"/><circle class="wm" cx="${ix}" cy="${iy}" r="0" fill="url(#wg${i})"/>${stitch}${flows}</g>
+      <rect x="${X0}" y="${Y0}" width="${FW}" height="${FH}" rx="90" fill="none" stroke="rgba(28,26,23,.18)" stroke-width="3"/>
+      <circle cx="210" cy="1420" r="96" fill="none" stroke="#DCD3C6" stroke-width="14"/>
+      <circle class="tr" cx="210" cy="1420" r="96" fill="none" stroke="#9A6438" stroke-width="14" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 210 1420)"/></svg>`, $("under"));
+    const W = svg.querySelector(".wm"), FL = svg.querySelectorAll(".fl"), TR = svg.querySelector(".tr");
+    const stick = el("div", { class: "abs prod", style: `left:0;top:0;width:${HERO.w * 2.2}px;height:${HERO.h * 2.2}px;opacity:0;transform-origin:0 0` }, `<img src="${DIR}${P.hero.cutout}" style="width:100%;height:100%;filter:drop-shadow(0 18px 24px rgba(40,30,20,.3))">`, $("under"));
+    const num = el("div", { class: "abs", style: "left:150px;top:1366px;width:120px;text-align:center;line-height:1;opacity:0" }, `<span class="gar" style="font-size:96px">0</span><span class="min" style="font-size:34px">分</span>`);
+    const lab = el("div", { class: "abs", style: "left:350px;top:1360px;opacity:0" }, `<div style="font:900 52px/1.2 'Noto Sans JP'">${b.label}</div><div style="font:700 38px/1.5 'Noto Sans JP';color:var(--cu)">${b.temp || ""}</div>`);
+    const nt = el("div", { class: "note", style: "left:72px;top:1600px;width:936px;opacity:0" }, b.note || "");
+    K.push({ t: t0, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 }, { t: s.t1 - 0.01, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 });
+    const L = HERO.h * 2.2;   // 横に寝かせた本体の長さ（切り抜きは縦長）
+    U.push((t) => {
+      const u = t - t0, o = outC((t - OUT(i)) / 0.25);
+      kin(h0, t0 + 0.05, OUT(i)); kin(h1, t0 + 0.25, OUT(i)); fadeUp(lab, t0 + 1.0, OUT(i)); fadeUp(nt, t0 + 1.4, OUT(i));
+      svg.style.opacity = clamp(sp(u, 10, 1) * 1.3) * (1 - o);
+      const ins = inOutC((u - 0.25) / 0.7);   // 右から差し込まれる（吹き出し口が布団側）
+      stick.style.opacity = (u > 0.1 ? 1 : 0) * (1 - o);
+      stick.style.transform = `translate(${lerp(1180, ix - 70, ins)}px, ${iy + HERO.w * 1.1}px) rotate(-90deg)`;
+      const w = inOutC((u - 0.9) / Math.max(1.6, s.t1 - t0 - 1.6)); W.setAttribute("r", String(w * 1150));
+      FL.forEach((f, k) => { const a = clamp((u - 0.85 - k * 0.06) / 0.3); f.setAttribute("opacity", String(a * (1 - 0.4 * w))); f.setAttribute("stroke-dashoffset", String(-u * 260)); });
+      const tr = clamp((u - 0.9) / 1.6); TR.setAttribute("stroke-dashoffset", String(1 - inOutC(tr)));
+      num.style.opacity = clamp((u - 0.8) / 0.3) * (1 - o); setText(num.firstChild, String(Math.round(b.minutes * inOutC(tr))));
+    });
+  },
+  // 本体の寸法（モーショングラフィック・#286）：販売ページの寸法図と同じ線を、本体の切り抜きの上に描いていく。重さを数え上げ、受賞の判を押す
+  spec(b, i, s) {
+    const t0 = s.t0, H = 860, W = H * HERO.w / HERO.h, L = 300, T = 680;
+    const h0 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:262px;font-size:104px;letter-spacing:.02em" }, b.head[0]));
+    const h1 = kinWrap(el("div", { class: "kin min", style: "left:66px;top:400px;font-size:104px;letter-spacing:.02em" }, b.head[1] || ""));
+    const im = el("img", { src: `${DIR}${P.hero.cutout}`, class: "abs prod", style: `left:${L}px;top:${T}px;width:${W}px;height:${H}px;opacity:0;filter:drop-shadow(0 30px 40px rgba(60,45,30,.22))` }, "", $("under"));
+    const xr = L + W + 60, yt = T - 50;
+    const svg = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px" }, `<svg width="1080" height="1920"><g stroke="#9A6438" stroke-width="4" fill="#9A6438">
+      <path class="dh" d="M${xr},${T} V${T + H}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path class="th" d="M${xr - 22},${T} h44 M${xr - 22},${T + H} h44" opacity="0"/>
+      <path class="dd" d="M${L},${yt} H${L + W}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path class="td" d="M${L},${yt - 22} v44 M${L + W},${yt - 22} v44" opacity="0"/></g></svg>`, $("under"));
+    const q = (c) => svg.querySelector(c);
+    const lh = el("div", { class: "abs", style: `left:${xr + 24}px;top:${T + H / 2 - 40}px;opacity:0;line-height:1` }, `<div style="font:700 30px/1 'Noto Sans JP';color:var(--mut)">高さ</div><span class="gar" style="font-size:84px">${b.h}</span><span class="min" style="font-size:30px">mm</span>`);
+    const ld = el("div", { class: "abs", style: `left:${L + W + 24}px;top:${yt - 46}px;opacity:0;line-height:1;white-space:nowrap` }, `<span style="font:700 30px/1 'Noto Sans JP';color:var(--mut)">直径 </span><span class="gar" style="font-size:64px">${b.d}</span><span class="min" style="font-size:28px">mm</span>`);
+    const wt = el("div", { class: "abs", style: "left:66px;top:1000px;opacity:0;line-height:1" }, `<div style="font:700 32px/1 'Noto Sans JP';color:var(--mut)">重さ 約</div><span class="gar" style="font-size:150px">0</span><span class="min" style="font-size:52px">g</span>`);
+    const aw = b.award ? el("div", { class: "abs", style: "left:640px;top:1320px;width:330px;height:330px;border-radius:50%;border:6px solid #1C1A17;display:grid;place-items:center;text-align:center;opacity:0;background:rgba(255,253,248,.9)" },
+      `<div style="font:900 32px/1.45 'Noto Sans JP'">${b.award.replace(" 受賞", "<br>受賞")}</div>`) : null;
+    const nt = el("div", { class: "note", style: "left:72px;top:1700px;width:936px;opacity:0" }, b.note || "");
+    K.push({ t: t0, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 }, { t: s.t1 - 0.01, show: 0, F: F0.body, A: [540, 2600], z: 1.2, r: 0 });
+    U.push((t) => {
+      const u = t - t0, o = outC((t - OUT(i)) / 0.25);
+      kin(h0, t0 + 0.05, OUT(i)); kin(h1, t0 + 0.25, OUT(i)); fadeUp(nt, t0 + 1.2, OUT(i));
+      const a = sp(u - 0.05, 10, 0.9); im.style.opacity = clamp(a * 1.3) * (1 - o); im.style.transform = `translateY(${(1 - clamp(a)) * 60}px)`;
+      const g1 = inOutC((u - 0.45) / 0.7), g2 = inOutC((u - 0.85) / 0.5);
+      q(".dh").setAttribute("stroke-dashoffset", String(1 - g1)); q(".th").setAttribute("opacity", String(g1 > 0.98 ? 1 - o : 0));
+      q(".dd").setAttribute("stroke-dashoffset", String(1 - g2)); q(".td").setAttribute("opacity", String(g2 > 0.98 ? 1 - o : 0));
+      svg.style.opacity = 1 - o; lh.style.opacity = clamp((u - 1.05) / 0.3) * (1 - o); ld.style.opacity = clamp((u - 1.3) / 0.3) * (1 - o);
+      fadeUp(wt, t0 + 0.9, OUT(i)); setText(wt.children[1], String(Math.round(b.weight * outC((u - 0.9) / 0.9))));
+      if (aw) { const st = sp(u - 1.8, 16, 0.5); aw.style.opacity = clamp(st * 1.3) * (1 - o); aw.style.transform = `rotate(-10deg) scale(${lerp(2.0, 1, clamp(st, 0, 1.2))})`; }
+    });
+  },
   // 切り分け（オーナー「食品ジャンルは視聴者に食べたい！美味しそう！と思わせないといけない」）：
   // 写真の本体から一切れが前へ出て（A）、断面へ大きく寄り、温かい光が横切る（B）。本体は奥でぼける。写真は販売ページの物を動かすだけ
   slice(b, i, s) {
