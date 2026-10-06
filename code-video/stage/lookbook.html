@@ -173,6 +173,31 @@ const KINDS = {
         const op = (a > 0 ? 1 : 0) * (1 - o); Ls[k].style.opacity = op; Cs[k].style.opacity = op; fadeIO(bx, tin - 0.1, out); });
     });
   },
+  // 着た姿：販売ページの着用写真を首から下だけ（顔は使わない・オーナー「どちらも入れたらいい」#291）。
+  // 写真の横に襟から裾まで寸法線が下りて着丈を言う。札（フリーサイズ等）が1つずつ出る
+  worn(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, H = 1000, W = Math.round(H * b.ratio), L = 110, T = 560;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const e = ln("en", "left:52px;top:290px;font-size:140px;line-height:1", b.en), h = ln("jp", "left:60px;top:448px;font-size:64px;line-height:1.15", b.head), pg = page(i, NB, "WEAR");
+    const card = el("div", { class: "abs", style: `left:${L}px;top:${T}px;width:${W}px;height:${H}px;border-radius:18px;overflow:hidden;opacity:0;box-shadow:0 30px 60px rgba(40,30,20,.20)` },
+      `<img src="${DIR}${b.image}" style="width:${W}px;height:${H}px;object-fit:cover">`, $("prodlayer"));
+    const [y0, y1] = b.span.map((v) => T + v * H), x = L + W + 46;   // 襟の上〜裾（写真の高さに対する割合）
+    const svg = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><g stroke="#1C1B19" stroke-width="4">
+      <path class="d" d="M${x},${y0} V${y1}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path class="t" d="M${x - 20},${y0} h40 M${x - 20},${y1} h40" opacity="0"/>
+      <path class="g" d="M${L + W},${y0} H${x - 24} M${L + W},${y1} H${x - 24}" stroke-dasharray="6 8" stroke-width="2" opacity="0"/></g></svg>`);
+    const D = svg.querySelector(".d"), Tk = svg.querySelector(".t"), G = svg.querySelector(".g");
+    const lab = el("div", { class: "abs", style: `left:${x + 30}px;top:${(y0 + y1) / 2 - 70}px;opacity:0;line-height:1` }, `<div style="font:900 34px/1 'Noto Sans JP';color:var(--mut)">${b.dim_label}</div><span class="ennum" style="font-size:150px">${b.dim}</span><span style="font:900 44px/1 'Noto Sans JP'">cm${b.mark || ""}</span>`);
+    const chips = (b.chips || []).map((c, k) => el("div", { class: "abs", style: `left:${x + 30}px;top:${y1 + 60 + k * 92}px;opacity:0;font:900 36px/1 'Noto Sans JP';padding:16px 24px;border-radius:12px;background:var(--ink);color:#F2EFEA;white-space:nowrap` }, c));
+    const nt = el("div", { class: "note", style: "left:64px;top:1610px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(e, t0 + 0.15, out, 12); lineIn(h, t0 + 0.35, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
+      const a = sp(t - (t0 + 0.1), 10, 0.85), o = outC((t - out) / 0.3); card.style.opacity = clamp(a * 1.3) * (1 - o);
+      card.style.transform = `translateY(${(1 - clamp(a)) * 60 - o * 20}px)`; card.firstChild.style.transform = `scale(${1.02 + 0.03 * clamp((t - t0) / (s.t1 - t0))})`;
+      const d = inOutC((t - (t0 + 0.6)) / 0.9); D.setAttribute("stroke-dashoffset", String(1 - d)); D.style.opacity = 1 - o;
+      Tk.setAttribute("opacity", String(clamp((t - (t0 + 0.6)) / 0.2) * (1 - o))); G.setAttribute("opacity", String(clamp((t - (t0 + 1.3)) / 0.3) * (1 - o)));
+      fadeIO(lab, t0 + 1.2, out); setText(lab.querySelector(".ennum"), String(Math.round(b.dim * outC((t - (t0 + 1.2)) / 0.7))));
+      chips.forEach((c, k) => { const q = sp(t - (t0 + 1.7 + k * 0.18), 13, 0.75); c.style.opacity = clamp(q * 1.4) * (1 - o); c.style.transform = `translateX(${(1 - clamp(q)) * 40}px)`; }); });
+  },
   // 選べる：色の一覧＋サイズの札をひと画面に
   choose(b, i, s) {
     const t0 = s.t0, out = OUT(i) - 0.08, n = b.items.length, cw = 316;

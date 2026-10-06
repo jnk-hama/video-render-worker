@@ -64,6 +64,9 @@ for i, b in enumerate(Bs):
     if kind == "warmup":   # editorial.html の warmup：差し込み（0.25〜0.95）→ 温風と色（0.9〜）→ 輪が満ちる
         put(sfx, g["whoosh"](0.7, 200, 2600, 0.5, 0.7), t0 + 0.25, 0.26); put(sfx, g["tock"](240, 0.8), t0 + 0.95, 0.3); put(sfx, g["glide"](1.8, 260, 620, 0.5), t0 + 0.9, 0.16)
         put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 2.5, 0.22)
+    if kind == "worn":   # lookbook.html の worn：写真が上がる（0.1〜）→ 寸法線（0.6〜1.5）→ 数字（1.2〜）→ 札（1.7〜）
+        put(sfx, g["whoosh"](0.5, 300, 2600, 0.5), t0 + 0.1, 0.16); put(sfx, g["glide"](0.9, 300, 700, 0.5), t0 + 0.6, 0.12); put(sfx, g["tock"](300, 0.7), t0 + 1.5, 0.22)
+        for k2 in range(3): put(sfx, g["tick"](2400 + 160 * k2, 0.3), t0 + 1.7 + k2 * 0.18, 0.09)
     if kind == "texture":   # editorial.html の texture：丸が開く（0.05〜）→ なでる（0.6〜2.0）→ 雲（0.4〜）
         put(sfx, g["whoosh"](0.6, 300, 2400, 0.5), t0 + 0.05, 0.16); put(sfx, g["whoosh"](1.4, 150, 900, 0.3, 0.8), t0 + 0.6, 0.14); put(sfx, g["shimmer"](1.3, 0.5), t0 + 1.6, 0.14)
     if kind == "shoes":   # editorial.html の shoes：靴（0.1〜）→ 腕（0.45〜）→ 本体が立つ（0.85）→ 温風と水の粒（1.2〜）
