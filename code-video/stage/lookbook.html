@@ -207,6 +207,27 @@ const KINDS = {
       if (rg) { const r = rg.querySelector(".r"); r.setAttribute("stroke-dashoffset", String(1 - inOutC((t - (t0 + 0.7)) / 0.7))); r.style.opacity = 1 - o; }
       chips.forEach((c, k) => { const q = sp(t - (t0 + 1.7 + k * 0.18), 13, 0.75); c.style.opacity = clamp(q * 1.4) * (1 - o); c.style.transform = `translateX(${(1 - clamp(q)) * 40}px)`; }); });
   },
+  // 猫→同じ柄：販売ページの色見本の猫（柄の説明用）から、同じ柄の平置きへ矢印が伸びる（オーナー「好きな猫の柄を選べる」#293）。
+  // 猫の写真は商品ではない → 文字の層に置き、※で「商品に含まれません」
+  match(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:96px;line-height:1.15", b.head), pg = page(i, NB, "MATCH");
+    const rows = b.pairs.map(([cat, coat, name], k) => { const y = 520 + k * 345, tin = t0 + 0.35 + k * 0.55;
+      const c = el("img", { src: `${DIR}${cat}`, class: "abs", style: `left:70px;top:${y}px;width:300px;height:270px;object-fit:contain;object-position:50% 100%;opacity:0;filter:drop-shadow(0 14px 18px rgba(40,30,20,.18))` });   // 横長の猫（寝そべり）も枠に収める
+      const f = el("img", { src: `${DIR}${coat}`, class: "abs", style: `left:700px;top:${y - 10}px;height:290px;opacity:0` }, "", $("prodlayer"));
+      const ar = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><path class="a" d="M400,${y + 150} C480,${y + 90} 560,${y + 90} 650,${y + 150}" fill="none" stroke="#8C6F5A" stroke-width="6" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path class="h" d="M628,${y + 128} L652,${y + 152} L622,${y + 160}" fill="none" stroke="#8C6F5A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0"/></svg>`);
+      const nm = el("div", { class: "abs", style: `left:390px;top:${y + 168}px;width:280px;text-align:center;font:900 34px/1.2 'Noto Sans JP';opacity:0` }, name);
+      return { c, f, A: ar.querySelector(".a"), H: ar.querySelector(".h"), nm, tin }; });
+    const nt = el("div", { class: "note", style: "left:64px;top:1580px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.15, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.6, out);
+      const o = outC((t - out) / 0.3);
+      rows.forEach((r, k) => { const a = sp(t - r.tin, 11, 0.8); r.c.style.opacity = clamp(a * 1.3) * (1 - o); r.c.style.transform = `translateX(${(1 - clamp(a)) * -50}px)`;
+        const d = inOutC((t - (r.tin + 0.2)) / 0.4); r.A.setAttribute("stroke-dashoffset", String(1 - d)); r.A.style.opacity = 1 - o; r.H.setAttribute("opacity", String((d >= 1 ? 1 : 0) * (1 - o)));
+        const q = sp(t - (r.tin + 0.45), 11, 0.8); r.f.style.opacity = clamp(q * 1.3) * (1 - o); r.f.style.transform = `translateY(${FLOAT(t + k)}px) scale(${lerp(0.85, 1, clamp(q))})`;
+        r.nm.style.opacity = clamp((t - (r.tin + 0.3)) / 0.25) * (1 - o); }); });
+  },
   // 選べる：色の一覧＋サイズの札をひと画面に
   choose(b, i, s) {
     const t0 = s.t0, out = OUT(i) - 0.08, n = b.items.length, cw = 316;
