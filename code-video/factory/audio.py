@@ -64,6 +64,20 @@ for i, b in enumerate(Bs):
     if kind == "warmup":   # editorial.html の warmup：差し込み（0.25〜0.95）→ 温風と色（0.9〜）→ 輪が満ちる
         put(sfx, g["whoosh"](0.7, 200, 2600, 0.5, 0.7), t0 + 0.25, 0.26); put(sfx, g["tock"](240, 0.8), t0 + 0.95, 0.3); put(sfx, g["glide"](1.8, 260, 620, 0.5), t0 + 0.9, 0.16)
         put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 2.5, 0.22)
+    # CM の型（cm.html・#298）
+    if kind == "pain": put(sfx, g["whoosh"](1.8, 120, 600, 0.25, 0.9), t0 + 0.05, 0.12)   # 冷たい夜の低い風
+    if kind == "flip":
+        put(sfx, g["whoosh"](0.5, 300, 2200, 0.5), t0 + 0.1, 0.18); put(sfx, g["tock"](240, 0.8), t0 + 0.72, 0.3)   # 倒れて差さる
+        put(sfx, g["riser"](1.0, 0.4), t0 + 0.6, 0.14); put(sfx, g["shimmer"](1.6, 0.6), t0 + 0.8, 0.18)   # 暖色が広がる
+    if kind == "reveal": put(sfx, g["whoosh"](0.7, 250, 3000, 0.5), t0, 0.16); put(sfx, g["shimmer"](1.0, 0.4), t0 + 0.4, 0.1)
+    if kind == "held":
+        put(sfx, g["whoosh"](0.6, 300, 2600, 0.5), t0, 0.14)
+        for k2 in range(8): put(sfx, g["tick"](2400 + 90 * k2, 0.3), t0 + 0.45 + k2 * 0.1, 0.06)
+    if kind == "cshoes": put(sfx, g["whoosh"](0.6, 300, 2600, 0.5), t0, 0.14); put(sfx, g["glide"](1.4, 280, 640, 0.5), t0 + 0.5, 0.12)
+    if kind == "rapid":
+        n = len(bp.get("words", [])); sl = (t1 - 0.25 - t0 - 0.05) / max(1, n)
+        for k2 in range(n): put(sfx, g["tock"](300 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.24)   # 1語ごとに1つ（拍）
+    if kind == "cmend": put(sfx, g["shimmer"](1.4, 0.5), t0 + 0.1, 0.14); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.0, 0.2)
     if kind == "match":   # lookbook.html の match：猫（0.35＋0.55k）→ 矢印 → 平置き（0.8＋0.55k）
         for k2 in range(len(bp.get("pairs", []))): put(sfx, g["whoosh"](0.4, 400, 2600, 0.5), t0 + 0.35 + k2 * 0.55, 0.12); put(sfx, g["tock"](320 + 40 * k2, 0.7), t0 + 0.8 + k2 * 0.55, 0.2)
     if kind == "worn":   # lookbook.html の worn：写真が上がる（0.1〜）→ 寸法線（0.6〜1.5）→ 数字（1.2〜）→ 札（1.7〜）

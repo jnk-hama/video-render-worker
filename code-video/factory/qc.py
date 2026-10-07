@@ -1,5 +1,5 @@
 # 品質の門番（#267-7・文字は #270）。1つでも落ちたら ok=false（投稿に回さない）
-import json, os, re, subprocess, sys, glob
+import shutil, json, os, re, subprocess, sys, glob
 import numpy as np
 from PIL import Image
 pj, outdir = sys.argv[1], sys.argv[2]
@@ -12,7 +12,7 @@ R["1コマ目に商品"] = {"ok": pg["frame0"]["product"]}
 R["1コマ目に見出し"] = {"ok": pg["frame0"]["texts"] > 0, "数": pg["frame0"]["texts"]}
 R["文字の最小サイズ"] = {"ok": pg["minFont"] >= 23, "px": pg["minFont"]}
 # 2) 文字と商品の重なり（実体の重なり 500画素超を落とす）
-ov = os.path.join(outdir, "ov"); subprocess.run(["node", os.path.join(ROOT, "ovl.mjs"), "0.1", str(json.load(open(os.path.join(ROOT, env["TL"])))["end"] - 0.1), "0.3", ov], cwd=ROOT, env=env, check=True)
+ov = os.path.join(outdir, "ov"); shutil.rmtree(ov, ignore_errors=True); subprocess.run(["node", os.path.join(ROOT, "ovl.mjs"), "0.1", str(json.load(open(os.path.join(ROOT, env["TL"])))["end"] - 0.1), "0.3", ov], cwd=ROOT, env=env, check=True)
 bad = []
 for f in sorted(glob.glob(f"{ov}/txt_*.png")):
     a = np.array(Image.open(f).convert("RGBA"))[:, :, 3] > 20; b = np.array(Image.open(f.replace("txt_", "prd_")).convert("RGBA"))[:, :, 3] > 60
