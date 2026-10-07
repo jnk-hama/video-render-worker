@@ -15,7 +15,7 @@ const probe = () => {
   const minFont = texts.length ? Math.min(...texts.map((e) => parseFloat(getComputedStyle(e).fontSize))) : null;
   const w = document.getElementById("world"); const wr = w && w.getBoundingClientRect();
   const productWorld = !!(w && getComputedStyle(w).display !== "none" && [...w.querySelectorAll("img")].some((im) => vis(im) && inView(im.getBoundingClientRect())));
-  const productCard = [...document.querySelectorAll(".card img")].some((im) => vis(im) && inView(im.getBoundingClientRect()));
+  const productCard = [...document.querySelectorAll(".card img, .prod img")].some((im) => vis(im) && inView(im.getBoundingClientRect()));
   return { texts: texts.length, minFont, product: productWorld || productCard };
 };
 const out = { frame0: null, minFont: 999 };

@@ -99,13 +99,14 @@ const KINDS = {
   },
   // 色：平置きの実画像を1枚ずつ、名前つきで並べる（服は商品の側＝重なりの点検で商品として扱う）
   swatch(b, i, s) {
-    const t0 = s.t0, out = OUT(i) - 0.08, n = b.items.length, cols = 3, cw = 316;
+    const t0 = s.t0 - (i ? 0 : 0.6), out = OUT(i) - 0.08, n = b.items.length, cols = 3, cw = 316;   // 1場面目は 1コマ目から見えている（点検「1コマ目に商品・見出し」）
     const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
     const h = ln("jp", "left:60px;top:300px;font-size:96px;line-height:1.15", b.head), pg = page(i, NB, "COLOR");
     const cells = b.items.map(([img, name], k) => { const x = 66 + (k % cols) * cw, y = 540 + Math.floor(k / cols) * 480;
-      const im = el("img", { src: `${DIR}${img}`, class: "abs", style: `left:${x}px;top:${y}px;width:${cw - 30}px;opacity:0` }, "", $("prodlayer"));
+      const iw = b.img_w || cw - 30;   // 縦長の平置きは幅を詰める（名前と重ならない高さに）
+      const im = el("img", { src: `${DIR}${img}`, class: "abs", style: `left:${x + (cw - 30 - iw) / 2}px;top:${y}px;width:${iw}px;opacity:0` }, "", $("prodlayer"));
       const nm = el("div", { class: "abs en", style: `left:${x}px;top:${y + 372}px;width:${cw - 30}px;text-align:center;font-size:44px;opacity:0` }, name);
-      return { im, nm, tin: t0 + 0.45 + k * 0.16 }; });
+      return { im, nm, tin: t0 + 0.45 + k * (i ? 0.16 : 0.03) }; });
     const nt = el("div", { class: "note", style: "left:64px;top:1560px;width:952px" }, b.note || "");
     K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
     U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
@@ -138,10 +139,15 @@ const KINDS = {
     const nt = el("div", { class: "note", style: `left:64px;top:1700px;width:952px;${W}` }, b.note || ""), pg = page(i, NB, "TOUCH");
     pg.style.color = "#F4F1EC";
     const F = b.at || [F0.body[0] + 20, F0.body[1] + 30];   // 胸〜お腹の平らな所（生地がよく見える）
-    K.push({ t: s.t0 + 0.28, F, A: [620, 1280], z: fitZ(1500), r: -2, ease: "lin" }, { t: s.t1 - 0.28, F: [F[0] + 6, F[1] - 4], A: [620, 1280], z: fitZ(1650), r: -1, ease: "in" });
+    // b.image：主役と別の色の生地の寄り（販売ページの写真）を画面いっぱいに。主役は隠す（同じ服ばかりにしない・オーナー #292）
+    const ph = b.image ? el("img", { src: `${DIR}${b.image}`, class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;object-fit:cover;opacity:0" }, "", $("world").parentElement) : null;
+    if (ph) { $("world").after(ph); ph.after(scrim); }
+    if (ph) K.push({ t: s.t0 + 0.28, F, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    else K.push({ t: s.t0 + 0.28, F, A: [620, 1280], z: fitZ(1500), r: -2, ease: "lin" }, { t: s.t1 - 0.28, F: [F[0] + 6, F[1] - 4], A: [620, 1280], z: fitZ(1650), r: -1, ease: "in" });
     U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(w, t0 + 0.2, out, 12); lineIn(h, t0 + 0.45, out); fadeIO(sub, t0 + 0.9, out); fadeIO(nt, t0 + 1.1, out); fadeIO(pg, t0 + 0.1, out);
       const so = outC((t - (t0 - 0.1)) / 0.4) * (1 - outC((t - out) / 0.35)); scrim.style.opacity = so;
       $("heroG").dataset.backdrop = t > t0 - 0.2 && t < s.t1 ? "1" : "";   // 重なりの点検で背景として扱う（画面いっぱいの質感）
+      if (ph) { ph.style.opacity = clamp((t - (t0 - 0.15)) / 0.3) * (1 - outC((t - out) / 0.3)); ph.style.transform = `scale(${1.08 + 0.08 * clamp((t - t0) / (s.t1 - t0))}) rotate(-1deg)`; }
     });
     TOUCH.push([t0 + 0.5, 1.3]);
   },
@@ -176,18 +182,20 @@ const KINDS = {
   // 着た姿：販売ページの着用写真を首から下だけ（顔は使わない・オーナー「どちらも入れたらいい」#291）。
   // 写真の横に襟から裾まで寸法線が下りて着丈を言う。札（フリーサイズ等）が1つずつ出る
   worn(b, i, s) {
-    const t0 = s.t0, out = OUT(i) - 0.08, H = 1000, W = Math.round(H * b.ratio), L = 110, T = 560;
+    const t0 = s.t0, out = OUT(i) - 0.08, H = b.h || 1000, W = Math.round(H * b.ratio), L = 110, T = 560;
     const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
     const e = ln("en", "left:52px;top:290px;font-size:140px;line-height:1", b.en), h = ln("jp", "left:60px;top:448px;font-size:64px;line-height:1.15", b.head), pg = page(i, NB, "WEAR");
-    const card = el("div", { class: "abs", style: `left:${L}px;top:${T}px;width:${W}px;height:${H}px;border-radius:18px;overflow:hidden;opacity:0;box-shadow:0 30px 60px rgba(40,30,20,.20)` },
-      `<img src="${DIR}${b.image}" style="width:${W}px;height:${H}px;object-fit:cover">`, $("prodlayer"));
-    const [y0, y1] = b.span.map((v) => T + v * H), x = L + W + 46;   // 襟の上〜裾（写真の高さに対する割合）
+    const card = el("div", { class: "abs", style: `left:${L}px;top:${T}px;width:${W}px;height:${H}px;opacity:0;${b.cut ? "filter:drop-shadow(0 30px 40px rgba(40,30,20,.22))" : "border-radius:18px;overflow:hidden;box-shadow:0 30px 60px rgba(40,30,20,.20)"}` },
+      `<img src="${DIR}${b.cut || b.image}" style="width:${W}px;height:${H}px;object-fit:${b.cut ? "contain" : "cover"}">`, $("prodlayer"));   // b.cut＝服だけの切り抜き（枠なし）
+    const rg = b.ring ? el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><circle class="r" cx="${L + b.ring[0] * W}" cy="${T + b.ring[1] * H}" r="${b.ring[2] * W}" fill="none" stroke="#8C6F5A" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-100 ${L + b.ring[0] * W} ${T + b.ring[1] * H})"/></svg>`, $("prodlayer")) : null;   // 丸は写真の飾り＝商品の側（服の輪郭線と同じ）   // 見せたい所を丸で囲む（襟など・割合で指定）
+    const [y0, y1] = (b.span || [0, 1]).map((v) => T + v * H), x = L + W + 46;   // 襟の上〜裾（写真の高さに対する割合）
     const svg = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><g stroke="#1C1B19" stroke-width="4">
       <path class="d" d="M${x},${y0} V${y1}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path class="t" d="M${x - 20},${y0} h40 M${x - 20},${y1} h40" opacity="0"/>
       <path class="g" d="M${L + W},${y0} H${x - 24} M${L + W},${y1} H${x - 24}" stroke-dasharray="6 8" stroke-width="2" opacity="0"/></g></svg>`);
     const D = svg.querySelector(".d"), Tk = svg.querySelector(".t"), G = svg.querySelector(".g");
-    const lab = el("div", { class: "abs", style: `left:${x + 30}px;top:${(y0 + y1) / 2 - 70}px;opacity:0;line-height:1` }, `<div style="font:900 34px/1 'Noto Sans JP';color:var(--mut)">${b.dim_label}</div><span class="ennum" style="font-size:150px">${b.dim}</span><span style="font:900 44px/1 'Noto Sans JP'">cm${b.mark || ""}</span>`);
-    const chips = (b.chips || []).map((c, k) => el("div", { class: "abs", style: `left:${x + 30}px;top:${y1 + 60 + k * 92}px;opacity:0;font:900 36px/1 'Noto Sans JP';padding:16px 24px;border-radius:12px;background:var(--ink);color:#F2EFEA;white-space:nowrap` }, c));
+    if (!b.dim) svg.style.display = "none";
+    const lab = b.dim ? el("div", { class: "abs", style: `left:${x + 30}px;top:${(y0 + y1) / 2 - 70}px;opacity:0;line-height:1` }, `<div style="font:900 34px/1 'Noto Sans JP';color:var(--mut)">${b.dim_label}</div><span class="ennum" style="font-size:150px">${b.dim}</span><span style="font:900 44px/1 'Noto Sans JP'">cm${b.mark || ""}</span>`) : null;
+    const chips = (b.chips || []).map((c, k) => el("div", { class: "abs", style: `left:${x + 30}px;top:${(b.dim ? (y0 + y1) / 2 + 140 : T + H * 0.45) + k * 92}px;opacity:0;font:900 36px/1 'Noto Sans JP';padding:16px 24px;border-radius:12px;background:var(--ink);color:#F2EFEA;white-space:nowrap` }, c));
     const nt = el("div", { class: "note", style: "left:64px;top:1610px;width:952px" }, b.note || "");
     K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
     U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(e, t0 + 0.15, out, 12); lineIn(h, t0 + 0.35, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
@@ -195,7 +203,8 @@ const KINDS = {
       card.style.transform = `translateY(${(1 - clamp(a)) * 60 - o * 20}px)`; card.firstChild.style.transform = `scale(${1.02 + 0.03 * clamp((t - t0) / (s.t1 - t0))})`;
       const d = inOutC((t - (t0 + 0.6)) / 0.9); D.setAttribute("stroke-dashoffset", String(1 - d)); D.style.opacity = 1 - o;
       Tk.setAttribute("opacity", String(clamp((t - (t0 + 0.6)) / 0.2) * (1 - o))); G.setAttribute("opacity", String(clamp((t - (t0 + 1.3)) / 0.3) * (1 - o)));
-      fadeIO(lab, t0 + 1.2, out); setText(lab.querySelector(".ennum"), String(Math.round(b.dim * outC((t - (t0 + 1.2)) / 0.7))));
+      if (lab) { fadeIO(lab, t0 + 1.2, out); setText(lab.querySelector(".ennum"), String(Math.round(b.dim * outC((t - (t0 + 1.2)) / 0.7)))); }
+      if (rg) { const r = rg.querySelector(".r"); r.setAttribute("stroke-dashoffset", String(1 - inOutC((t - (t0 + 0.7)) / 0.7))); r.style.opacity = 1 - o; }
       chips.forEach((c, k) => { const q = sp(t - (t0 + 1.7 + k * 0.18), 13, 0.75); c.style.opacity = clamp(q * 1.4) * (1 - o); c.style.transform = `translateX(${(1 - clamp(q)) * 40}px)`; }); });
   },
   // 選べる：色の一覧＋サイズの札をひと画面に
