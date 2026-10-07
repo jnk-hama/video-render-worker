@@ -114,8 +114,9 @@ const KINDS = {
       placeStick(st, cx, cy, -90 * k); st.querySelector("img").style.filter = `drop-shadow(0 22px 26px rgba(0,0,0,.35)) saturate(${lerp(0.55, 1, k)}) brightness(${lerp(0.82, 1, k)})`;
       const w = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])); W.setAttribute("r", String(w * 1100));
       FL.forEach((f, j) => { f.setAttribute("opacity", String(clamp((t - ins1 + 0.1 - j * 0.05) / 0.25) * (1 - o))); f.setAttribute("stroke-dashoffset", String(-(t - t0) * 260)); });
-      const tc = clamp((t - FLOOD[0] - 0.2) / 0.5);   // 背景が明るくなったら文字を濃く
-      [h0].forEach((h) => h.style.color = mix("EEF4FA", "2A1E14", tc));
+      // 暖色の円の縁が見出しを通る一瞬だけ文字を消し、通り過ぎたら濃い色で出し直す（中間の色＝中間の背景で読めなくなるのを避ける・Actions の点検で 2.6:1）
+      const r = w * 1100 * 2300 / 1100, kk = clamp((r - 950) / 320);
+      h0.style.color = kk < 0.5 ? "#EEF4FA" : "#2A1E14"; h0.style.opacity = String(Math.abs(1 - 2 * kk));
       kin(h0, t0 + 0.05, OUT(i)); kin(h1, FLOOD[0] + 0.1, OUT(i), 0.06);
       fadeUp(lab, FLOOD[1] - 0.3, OUT(i)); fadeUp(nt, FLOOD[1], OUT(i)); });
   },
