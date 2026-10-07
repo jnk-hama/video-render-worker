@@ -51,7 +51,21 @@ function lineIn(e, tin, tout, w = 13) { const a = sp(T - tin, w, 1), o = outC((T
 const ln = (cls, style, html, parent) => el("div", { class: `ln ${cls}`, style }, `<span class="in">${html}</span>`, parent);
 const fadeIO = (e, tin, tout, d = 0.3) => { e.style.opacity = outC((T - tin) / d) * (1 - outC((T - tout) / 0.28)); };
 const ruleAt = (e, tin, tout) => { e.style.transform = `scaleX(${inOutC((T - tin) / 0.5) * (1 - inOutC((T - tout) / 0.3))})`; };
-const page = (i, n, label) => el("div", { class: "pg" }, `${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}　${label}`);
+const STY = P.style || {};   // 版ごとの見せ方の切り替え（#294：no_page＝隅のページ番号を出さない・moving＝場面が止まらない）
+const page = (i, n, label) => el("div", { class: "pg", style: STY.no_page ? "display:none" : "" }, `${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}　${label}`);   // 隅の小さな文字は「AIっぽさ」になる（prompt-motion の作例）
+// 止まらない出入り（#294）：場面ごとの部品を入れ物にまとめ、入る時から動いている（減速）→ ゆっくり流れ続ける → 加速して抜ける（書き出しの動きのブレが付く）
+function movingKinds(kinds) {
+  const W = {};
+  Object.entries(kinds).forEach(([k, f]) => { W[k] = (b, i, s) => {
+    const L = ["ui", "prodlayer", "behind"].map((id) => { const real = $(id), box = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;will-change:transform" }, "", real); real.id = id + "_real"; box.id = id; return [real, box, id]; });
+    try { f(b, i, s); } finally { L.forEach(([real, box, id]) => { box.id = ""; real.id = id; }); }   // 組み立ての間だけ、入れ物を本来の層の名前で呼ばせる
+    const last = i === NB - 1, end = OUT(i);
+    U.push((t) => {
+      const xin = i ? 110 * Math.exp(-6 * Math.max(0, t - (s.t0 - 0.3))) : 0, drift = -12 * (t - (s.t0 + Math.min(end, s.t1)) / 2), q = last ? 0 : clamp((t - (end - 0.32)) / 0.36);
+      const x = xin + drift - 220 * q * q; L.forEach(([, box]) => { box.style.transform = `translateX(${x.toFixed(2)}px)`; }); });
+  }; });
+  return W;
+}
 
 // 服の輪郭：切り抜きの透明度を中心から放射状に調べ、外周の点を世界の単位で返す（なぞる線に使う）
 function contour(n = 120) {
@@ -269,7 +283,7 @@ CORE.start({ grain: [214, 42], wipe: false, refl: false, motionBlur: true,
     $("heroG").style.transform = `translateY(${FLOAT(t)}px)`; $("sh").style.opacity = 1;
     const last = B[B.length - 1]; sweepAt($("sw"), t < last.t0 ? 0.9 : last.t0 + 0.4, 1.1, 0.7);
     TOUCH.forEach(([a, d]) => { if (t > a && t < a + d) sweepAt($("sw"), a, d, 0.9); });
-  } }, KINDS);
+  } }, STY.moving ? movingKinds(KINDS) : KINDS);
 </script>
 </body>
 </html>

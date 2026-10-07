@@ -6,8 +6,9 @@ P = json.load(open(sys.argv[1])); root = sys.argv[2]
 hooks = P.get("variants") or P.get("hooks") or [{"id": "A"}]   # hooks＝見出し違い・variants は中身のカットを差し替えた版も書ける（replace）
 Qs = []
 for h in hooks:
-    Q = copy.deepcopy(P); Q["variant"] = h["id"]; Q["beats"][0].update({k: v for k, v in h.items() if k not in ("id", "replace")}); Q.pop("hooks", None); Q.pop("variants", None)
+    Q = copy.deepcopy(P); Q["variant"] = h["id"]; Q["beats"][0].update({k: v for k, v in h.items() if k not in ("id", "replace", "set")}); Q.pop("hooks", None); Q.pop("variants", None)
     for k, beat in (h.get("replace") or {}).items(): Q["beats"][int(k)] = beat
+    Q.update(h.get("set") or {})   # 設計書全体の差し替え（見せ方の style など・#294）
     Qs.append(Q)
 for Q, m in zip(Qs, motif.pick(Qs)):   # 数字の見せ方（版ごとに別・#279）
     if m: print(Q["variant"], "数字の見せ方", m, file=sys.stderr)
