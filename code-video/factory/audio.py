@@ -78,6 +78,14 @@ for i, b in enumerate(Bs):
         n = len(bp.get("words", [])); sl = (t1 - 0.25 - t0 - 0.05) / max(1, n)
         for k2 in range(n): put(sfx, g["tock"](300 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.24)   # 1語ごとに1つ（拍）
     if kind == "cmend": put(sfx, g["shimmer"](1.4, 0.5), t0 + 0.1, 0.14); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.0, 0.2)
+    # CM 版2（#299）：輪が回る音・連打・ボタンに広がる音
+    if kind in ("orbit", "orbitrap"): put(sfx, g["whoosh"](0.7, 220, 2800, 0.5), t0 - 0.42, 0.18); put(sfx, g["tock"](260, 0.6), t0 + 0.05, 0.16)
+    if kind == "orbit" and bp.get("nums"):
+        for k2 in range(8): put(sfx, g["tick"](2400 + 90 * k2, 0.3), t0 + 0.35 + k2 * 0.1, 0.05)
+    if kind == "orbitrap":
+        n = len(bp.get("words", [])); sl = (t1 - 0.25 - t0 - 0.05) / max(1, n)
+        for k2 in range(n): put(sfx, g["tock"](320 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.24)
+    if kind == "finale3d": put(sfx, g["whoosh"](0.8, 200, 1800, 0.4, 0.8), t0 - 0.3, 0.14); put(sfx, g["shimmer"](1.4, 0.5), t0 + 0.2, 0.12); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.6, 0.2)
     if kind == "match":   # lookbook.html の match：猫（0.35＋0.55k）→ 矢印 → 平置き（0.8＋0.55k）
         for k2 in range(len(bp.get("pairs", []))): put(sfx, g["whoosh"](0.4, 400, 2600, 0.5), t0 + 0.35 + k2 * 0.55, 0.12); put(sfx, g["tock"](320 + 40 * k2, 0.7), t0 + 0.8 + k2 * 0.55, 0.2)
     if kind == "worn":   # lookbook.html の worn：写真が上がる（0.1〜）→ 寸法線（0.6〜1.5）→ 数字（1.2〜）→ 札（1.7〜）
