@@ -96,6 +96,21 @@ for i, b in enumerate(Bs):
     if kind == "unveil":
         put(sfx, g["riser"](0.5, 0.6), max(0, t0 - 0.4), 0.1); put(sfx, g["impact"](0.6, 1.6), t0 + 0.12, 0.22); put(sfx, g["shimmer"](1.6, 0.6), t0 + 0.2, 0.12)
         put(sfx, g["whoosh"](0.6, 300, 2600, 0.5), t0 + 0.5, 0.16); put(sfx, g["tick"](2600, 0.5), t0 + 1.05, 0.14)   # 横を向く・厚みの線
+    # #302 場面の種類を増やした分の音（動きの時刻と同じ定数）
+    if kind == "pocket":
+        for k2 in range(4): put(sfx, g["tock"](180, 0.5), t0 + 0.17 + k2 * 0.7, 0.12)   # 箱が押し込まれては止まる
+    if kind == "flapin":
+        put(sfx, g["whoosh"](0.7, 250, 3000, 0.5), t0, 0.16); put(sfx, g["shimmer"](1.2, 0.5), t0 + 0.1, 0.1)
+        for k2 in range(14): put(sfx, g["tick"](2200 + 40 * k2, 0.3), t0 + 0.45 + k2 * 0.06, 0.05)   # パタパタ
+        put(sfx, g["tock"](300, 0.7), t0 + 1.35, 0.16)
+    if kind == "callout": put(sfx, g["glide"](0.6, 300, 700, 0.5), t0 + 0.45, 0.1); put(sfx, g["tick"](2600, 0.5), t0 + 1.15, 0.12); put(sfx, g["tick"](2900, 0.5), t0 + 1.4, 0.12)
+    if kind == "snap": put(sfx, g["whoosh"](0.6, 300, 2600, 0.5), t0, 0.16); put(sfx, g["tock"](420, 0.9), t0 + 0.85, 0.28)   # カチッ
+    if kind == "fill":
+        for k2 in range(5): put(sfx, g["tick"](1800 + 200 * k2, 0.4), t0 + 0.35 + k2 * 0.24, 0.1)
+    if kind == "checklist":
+        n = len(bp.get("words", [])); sl = (t1 - 0.6 - t0 - 0.05) / max(1, n)
+        for k2 in range(n): put(sfx, g["tock"](320 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.14)
+    if kind == "turntable": put(sfx, g["shimmer"](1.4, 0.5), t0 + 0.2, 0.1); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.1, 0.16)
     if kind == "finale3d": put(sfx, g["whoosh"](0.8, 200, 1800, 0.4, 0.8), t0 - 0.3, 0.14); put(sfx, g["shimmer"](1.4, 0.5), t0 + 0.2, 0.12); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.6, 0.2)
     if kind == "match":   # lookbook.html の match：猫（0.35＋0.55k）→ 矢印 → 平置き（0.8＋0.55k）
         for k2 in range(len(bp.get("pairs", []))): put(sfx, g["whoosh"](0.4, 400, 2600, 0.5), t0 + 0.35 + k2 * 0.55, 0.12); put(sfx, g["tock"](320 + 40 * k2, 0.7), t0 + 0.8 + k2 * 0.55, 0.2)

@@ -241,7 +241,7 @@
  },
  "beats": [
   {
-   "kind": "hook",
+   "kind": "pocket",
    "voice": "line0.mp3",
    "say": "バッテリー、分厚くて邪魔じゃない？",
    "head": [
@@ -249,21 +249,29 @@
     "かさばる。"
    ],
    "source": "悩みの提示（説明文：「持ち歩くのが面倒」をゼロに）",
-   "note": "※悩みの場面の本体の厚みはイメージです。"
+   "note": "※ポケット・分厚い箱・本体の厚みの見せ方は図・イメージです。",
+   "kinds": [
+    "pocket",
+    "hook"
+   ]
   },
   {
-   "kind": "unveil",
+   "kind": "flapin",
    "voice": "line1.mp3",
    "say": "厚さ、わずか8.6ミリ。",
    "head": [
     "厚さ、",
-    "8.6mm。"
+    "8.6mm"
    ],
    "source": "説明文：厚さわずか8.6mm",
-   "note": "※約10.5×7×0.9cm・厚さ8.6mm（販売ページの記載）。回転は図・イメージです。"
+   "note": "※約10.5×7×0.9cm・厚さ8.6mm（販売ページの記載）。ポケットと動きは図・イメージです。",
+   "kinds": [
+    "flapin",
+    "unveil"
+   ]
   },
   {
-   "kind": "orbit",
+   "kind": "callout",
    "voice": "line2.mp3",
    "say": "付けるだけで、15ワット。",
    "head": [
@@ -272,13 +280,25 @@
    ],
    "source": "説明文：Qi2認証・MPP対応でiPhone 15W急速ワイヤレス充電",
    "card": {
-    "image": "box.jpg",
-    "pos": "50% 40%"
+    "image": "back.jpg",
+    "ring": [
+     0.557,
+     0.333,
+     0.36
+    ]
    },
-   "note": "※Qi2（MPP）対応。iPhoneで15Wには iOS 17.2以上（13〜17シリーズ）／17.4以上（12シリーズ）が必要（販売ページの記載）。写真は同じ商品の別のお店の販売ページの箱。"
+   "note": "※Qi2（MPP）対応。iPhoneで15Wには iOS 17.2以上（13〜17シリーズ）／17.4以上（12シリーズ）が必要（販売ページの記載）。写真は同じ商品の別のお店の販売ページの箱の絵。",
+   "kinds": [
+    "callout",
+    "orbit"
+   ],
+   "tips": [
+    "Qi2認証",
+    "最大15W"
+   ]
   },
   {
-   "kind": "orbit",
+   "kind": "snap",
    "voice": "line3.mp3",
    "say": "磁石で、ピタッと。",
    "head": [
@@ -287,12 +307,17 @@
    ],
    "source": "説明文：強力な磁石を内蔵。iPhone 12-17シリーズに近づけるだけで自動的に吸着",
    "card": {
-    "image": "back.jpg"
+    "image": "box.jpg",
+    "pos": "50% 40%"
    },
-   "note": "※iPhone 12〜17シリーズに近づけると吸着（販売ページの記載）。写真は箱に描かれた背面です。"
+   "note": "※iPhone 12〜17シリーズに近づけると吸着（販売ページの記載）。スマホと磁力の線は図・イメージです。",
+   "kinds": [
+    "snap",
+    "orbit"
+   ]
   },
   {
-   "kind": "orbit",
+   "kind": "fill",
    "voice": "line4.mp3",
    "say": "スマホ約1回分の容量。",
    "head": [
@@ -304,10 +329,14 @@
     "hero": true,
     "bg": "radial-gradient(circle at 50% 38%,#3a3d46,#0e0f12 75%)"
    },
-   "note": "※5000mAh（19.6Wh）。スマホ1台を約1回フル充電（販売ページの記載）。"
+   "note": "※5000mAh（19.6Wh）。スマホ1台を約1回フル充電（販売ページの記載）。目盛りは図・イメージです。",
+   "kinds": [
+    "fill",
+    "orbit"
+   ]
   },
   {
-   "kind": "cascade",
+   "kind": "checklist",
    "voice": "line5.mp3",
    "say": "4色から選べる。",
    "words": [
@@ -344,10 +373,14 @@
     "c_white.png"
    ],
    "pair_h": 300,
-   "note": "※USB-C 20W・パススルー・FOD（異物検知）・4色：グレー／水色／ホワイト／ピンク（販売ページの記載）。"
+   "note": "※USB-C 20W・パススルー・FOD（異物検知）・4色：グレー／水色／ホワイト／ピンク（販売ページの記載）。",
+   "kinds": [
+    "checklist",
+    "cascade"
+   ]
   },
   {
-   "kind": "finale3d",
+   "kind": "turntable",
    "voice": "line6.mp3",
    "say": "リンクはプロフィールへ。",
    "big": "Air",
@@ -364,7 +397,11 @@
     "c_white.png"
    ],
    "pair_h": 320,
-   "note": "※価格・在庫・最新情報はリンク先でご確認ください。写真は販売ページ（同じ商品の別のお店を含む）の物です。"
+   "note": "※価格・在庫・最新情報はリンク先でご確認ください。写真は販売ページ（同じ商品の別のお店を含む）の物です。",
+   "kinds": [
+    "turntable",
+    "finale3d"
+   ]
   }
  ],
  "hero": {
@@ -391,19 +428,22 @@
   "why": "厚さ8.6mm÷幅70mm＝0.123（販売ページの寸法 10.5×7×0.9cm）。背面の色は箱の絵の黒"
  },
  "style": {
-  "lux": true,
-  "palette": "graphite",
-  "deck": "stack",
-  "head": "blur",
-  "rapid": "punch",
-  "burst": "flare",
-  "bokeh": 16
+  "theme": "white",
+  "accent": "#5B4FA6"
  },
  "recipe": {
-  "seed": 54617,
-  "pool": 6,
-  "allowed": 144,
-  "total": 192,
-  "recent_distance": 6
- }
+  "seed": 227300,
+  "theme": "white",
+  "kinds": [
+   "pocket",
+   "flapin",
+   "callout",
+   "snap",
+   "fill",
+   "checklist",
+   "turntable"
+  ],
+  "same_as_last": []
+ },
+ "accent": "#5B4FA6"
 }

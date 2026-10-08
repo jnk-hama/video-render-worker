@@ -1,7 +1,18 @@
 [
  {
   "product_key": "cado-foehn-cm",
+  "theme": "dark",
+  "kinds": [
+   "pain",
+   "flip",
+   "orbit",
+   "orbit",
+   "orbit",
+   "cascade",
+   "finale3d"
+  ],
   "style": {
+   "theme": "dark",
    "palette": "amber",
    "deck": "ring",
    "head": "mask",
@@ -13,7 +24,18 @@
  },
  {
   "product_key": "ugreen-air",
+  "theme": "dark",
+  "kinds": [
+   "hook",
+   "unveil",
+   "orbit",
+   "orbit",
+   "orbit",
+   "cascade",
+   "finale3d"
+  ],
   "style": {
+   "theme": "dark",
    "palette": "graphite",
    "deck": "stack",
    "head": "blur",
@@ -22,5 +44,23 @@
    "bokeh": 16
   },
   "seed": 54617
+ },
+ {
+  "product_key": "ugreen-air",
+  "theme": "white",
+  "kinds": [
+   "pocket",
+   "flapin",
+   "callout",
+   "snap",
+   "fill",
+   "checklist",
+   "turntable"
+  ],
+  "style": {
+   "theme": "white",
+   "accent": "#5B4FA6"
+  },
+  "seed": 227300
  }
 ]
