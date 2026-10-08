@@ -30,6 +30,13 @@
   #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:#3E3A33; border:2px solid #3E3A33; background:rgba(255,253,248,.94); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }
   #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:multiply; opacity:.08; pointer-events:none; }
   .card { position:absolute; border-radius:26px; overflow:hidden; box-shadow:0 40px 80px rgba(60,35,15,.22), 0 8px 18px rgba(60,35,15,.12); background:#fff; }
+  /* 版3（#300）：暗いスタジオに暖色の光。文字は生成り、得の1語は金（光沢が横切る） */
+  body.lux #bgWarm { background:radial-gradient(ellipse 760px 900px at 50% 56%, #6A3D1B 0%, #3A2010 42%, #170D07 78%, #0B0604 100%); }
+  body.lux #light { background:radial-gradient(circle at 50% 22%, rgba(255,190,120,.30) 0%, rgba(255,190,120,0) 50%); mix-blend-mode:screen; }
+  body.lux #grain { mix-blend-mode:overlay; opacity:.07; }
+  body.lux .h1 { color:#F6EBDD; }
+  body.lux .note { color:#C9B39A; }
+  .gold { color:#E3A25C; background:linear-gradient(100deg, #B8662A 0%, #E9B577 28%, #FFF0D4 44%, #E3A25C 58%, #B8662A 100%); background-size:260% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
   .cta { position:absolute; display:flex; align-items:center; gap:16px; height:112px; padding:0 48px; border-radius:56px; background:var(--ink); color:#fff; font:900 42px/1 "Noto Sans JP"; letter-spacing:.05em; white-space:nowrap; }
 </style>
 </head>
@@ -88,36 +95,49 @@ function maskLine(cls, style, text, tin, tout, ist = "") {
 }
 function maskHead(h, top, tin, tout) {
   const fs = Math.min(200, Math.floor(950 / Math.max(1, [...(h[1] || "")].length)));
-  return [maskLine("h1", `left:66px;top:${top}px`, h[0], tin, tout), maskLine("h2", `left:56px;top:${top + 100}px`, h[1] || "", tin + 0.12, tout, `font-size:${fs}px;line-height:1.05`)];
+  return [maskLine("h1", `left:66px;top:${top}px`, h[0], tin, tout), maskLine(LUX ? "h2 gold" : "h2", `left:56px;top:${top + 100}px`, h[1] || "", tin + 0.12, tout, `font-size:${fs}px;line-height:1.05`)];
 }
 // 3D のカードの輪（Reelfolio の Carousel 3D・#297）：利点の写真を空間に並べ、場面が変わるたびに輪が回る。正面だけピントが合い、他はぼけて奥へ
-const RING = { cx: 540, cy: 1040, R: 560, W: 600, H: 800, cards: [], beats: [], built: false };
+const RING = { cx: 540, cy: 1040, R: 560, W: 600, H: 800, step: 90, cards: [], beats: [], built: false };
 function buildRing() {
   if (RING.built) return; RING.built = true;
+  if (LUX) Object.assign(RING, { cy: 1080, R: 800, W: 660, H: 880, step: 60 });   // 版3：大きく・6枚
   RING.beats = B.map((s, i) => ({ s, b: P.beats[i], i })).filter((x) => /^orbit/.test(x.b.kind));
   const st = el("div", { class: "abs", style: `left:${RING.cx}px;top:${RING.cy}px;width:0;height:0;perspective:2300px;perspective-origin:0 0` }, "", $("prodlayer"));
   const ring = el("div", { class: "abs", style: "left:0;top:0;width:0;height:0;transform-style:preserve-3d" }, "", st);
   RING.stage = st; RING.ring = ring;
-  RING.cards = RING.beats.map(({ b }, k) => {
-    const c = b.card, card = el("div", { class: "abs", style: `left:${-RING.W / 2}px;top:${-RING.H / 2}px;width:${RING.W}px;height:${RING.H}px;border-radius:30px;overflow:hidden;backface-visibility:hidden;background:${c.bg || "#fff"};box-shadow:0 50px 90px rgba(60,35,15,.28), 0 10px 22px rgba(60,35,15,.14);transform:rotateY(${k * 90}deg) translateZ(${RING.R}px)` }, "", ring);
+  const extra = LUX ? (P.ring_extra || []).map((card) => ({ b: { card } })) : [];   // 版3：輪を6枚に（隣のカードが画面の端に覗く＝奥行き）
+  RING.cards = RING.beats.concat(extra).map(({ b }, k) => {
+    const sh = LUX ? "box-shadow:0 20px 40px rgba(0,0,0,.5);border:2px solid rgba(255,222,186,.32)" : "box-shadow:0 50px 90px rgba(60,35,15,.28), 0 10px 22px rgba(60,35,15,.14)";
+    const c = b.card, card = el("div", { class: "abs", style: `left:${-RING.W / 2}px;top:${-RING.H / 2}px;width:${RING.W}px;height:${RING.H}px;border-radius:30px;overflow:hidden;backface-visibility:hidden;background:${c.bg || "#fff"};${sh};transform:rotateY(${k * RING.step}deg) translateZ(${RING.R}px)` }, "", ring);
     if (c.image) el("img", { src: `${DIR}${c.image}`, style: `position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${c.pos || "50% 50%"}` }, "", card);
+    if (c.hero) el("img", { src: `${DIR}${P.hero.cutout}`, style: `position:absolute;left:50%;top:70px;height:${RING.H - 140}px;transform:translateX(-50%) rotate(-8deg);filter:drop-shadow(0 30px 30px rgba(0,0,0,.45))` }, "", card);
     if (c.cut) { const iw = RING.W - 40, ih = iw * c.size[1] / c.size[0], top = (RING.H - ih) / 2 + 30, kk = iw / c.size[0];
       el("img", { src: `${DIR}${c.cut}`, style: `position:absolute;left:20px;top:${top}px;width:${iw}px;filter:drop-shadow(0 24px 26px rgba(60,35,15,.22))` }, "", card);
       const fl = (c.flow || []).map((d) => `<path class="fl" d="${d}" fill="none" stroke="#E8823A" stroke-width="${7 / kk}" stroke-linecap="round" stroke-dasharray="${26 / kk} ${22 / kk}"/>`).join("");
       const dp = (c.vents || []).flatMap(([x, y]) => Array.from({ length: 7 }, (_, j) => `<circle class="dp" cx="${x + ((j * 29) % 60) - 30}" cy="${y}" r="${(11 + (j % 3) * 4) / kk}" fill="#A9D3EA" stroke="#fff" stroke-width="${2.5 / kk}" opacity="0"/>`)).join("");
       el("div", { class: "abs", style: `left:20px;top:${top}px;width:${iw}px;height:${ih}px` }, `<svg width="${iw}" height="${ih}" viewBox="0 0 ${c.size[0]} ${c.size[1]}">${fl}${dp}</svg>`, card); }
     if (c.pair) c.pair.forEach((im, j) => el("img", { src: `${DIR}${im}`, style: `position:absolute;left:${RING.W / 2 + (j ? 30 : -110)}px;top:90px;height:${RING.H - 150}px;filter:drop-shadow(0 24px 26px rgba(60,35,15,.25));transform:rotate(${j ? 4 : -4}deg)` }, "", card));
+    if (LUX) el("div", { class: "shn", style: "position:absolute;inset:0;background:linear-gradient(115deg, rgba(255,255,255,0) 38%, rgba(255,244,228,.26) 50%, rgba(255,255,255,0) 62%);background-size:300% 100%;mix-blend-mode:screen" }, "", card);   // 光沢：カードの向きで光が滑る
     return card; });
 }
+// 輪の向き（場面ごとに1枚分回る・少し行き過ぎて戻る）と、回っている間の「引き」の強さ
+function ringPose(t) { let ang = 0, bump = 0;
+  RING.beats.forEach(({ s }, j) => { if (j) { ang -= RING.step * sp(t - (s.t0 - 0.42), 8, 0.72); bump = Math.max(bump, Math.sin(Math.PI * clamp((t - (s.t0 - 0.5)) / 0.8))); } });
+  return [ang, bump]; }
 function ringAt(t) {
-  const first = RING.beats[0].s, fin = B.find((s, i) => P.beats[i].kind === "finale3d");
-  let ang = 0; RING.beats.forEach(({ s }, j) => { if (j) ang -= 90 * sp(t - (s.t0 - 0.42), 8, 0.72); });   // 場面ごとに輪が1枚分回る（少し行き過ぎて戻る）
-  const e = outC((t - (first.t0 - 0.05)) / 0.8), x = fin ? inOutC((t - (fin.t0 - 0.3)) / 0.7) : 0;
-  const z = -RING.R - 2600 * (1 - e) - 2800 * x, ry = ang + 55 * (1 - e) + Math.sin(t * 0.6) * 3, rx = -5 + Math.sin(t * 0.45) * 1.6;   // 奥から飛んできて、ゆっくり揺れ、最後は奥へ遠ざかる
+  const first = RING.beats[0].s, fin = B.find((s, i) => P.beats[i].kind === "finale3d"), cas = B.find((s, i) => P.beats[i].kind === "cascade");
+  const [ang, bump] = ringPose(t), [ang0] = ringPose(t - 1 / 60), vel = Math.abs(ang - ang0) * 60;   // 回る速さ（度/秒）＝ぶれの強さ
+  const e = outC((t - (first.t0 - 0.05)) / (LUX ? 1.0 : 0.8)), x = fin ? inOutC((t - (fin.t0 - 0.3)) / 0.7) : 0;
+  const xf = cas ? inOutC((t - (cas.t0 - 0.35)) / 0.55) : 0;   // 版3：連打の前に輪がカメラを突き抜ける
+  const z = -RING.R - 2600 * (1 - e) - 2800 * x - (LUX ? 900 * bump : 0) + 2400 * xf * xf, ry = ang + (LUX ? 160 : 55) * (1 - e) + Math.sin(t * 0.6) * 3, rx = -5 + Math.sin(t * 0.45) * 1.6 + (LUX ? 6 * bump : 0);   // 奥から回りながら飛んできて、回る間は引いて輪の全体を見せ、最後は奥へ遠ざかる
   RING.ring.style.transform = `translateZ(${z.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
-  RING.stage.style.opacity = String(clamp((t - (first.t0 - 0.05)) / 0.15) * (1 - x));
-  RING.cards.forEach((c, k) => { let d = ((ry + k * 90) % 360 + 540) % 360 - 180; d = Math.abs(d) / 90;   // 正面からの角度（枚数）
-    c.style.filter = `blur(${Math.min(9, d * 8).toFixed(2)}px) brightness(${(1 - 0.22 * Math.min(1, d)).toFixed(3)})`; });
+  RING.stage.style.opacity = String(clamp((t - (first.t0 - 0.05)) / 0.15) * (1 - x) * (1 - clamp((xf - 0.55) / 0.35)));
+  if (STREAK) STREAK(t, Math.max(bump * clamp((t - first.t0) / 0.3), Math.sin(Math.PI * xf)));
+  const mb = LUX ? Math.min(7, vel / 70) : 0;
+  RING.cards.forEach((c, k) => { const a = ((ry + k * RING.step) % 360 + 540) % 360 - 180, d = Math.abs(a) / RING.step;   // 正面からの角度（枚数）
+    c.style.filter = `blur(${Math.min(LUX ? 10 : 9, d * (LUX ? 7 : 8) + mb).toFixed(2)}px) brightness(${(1 - (LUX ? 0.35 : 0.22) * Math.min(1, d)).toFixed(3)})`;
+    const shn = c.querySelector(".shn"); if (shn) shn.style.backgroundPosition = `${(50 - a * 1.6).toFixed(1)}% 0`; });
   const c0 = RING.cards[0], rv = outC((t - (first.t0 - 0.15)) / 0.7);   // 1枚目は丸い窓から開く（Reveal）
   c0.style.clipPath = rv >= 1 ? "none" : `circle(${(rv * 75).toFixed(1)}% at 50% 50%)`;
   RING.beats.forEach(({ s, b }, k) => { const u = t - s.t0, on = t > s.t0 - 0.3 && t < s.t1; const card = RING.cards[k];
@@ -128,8 +148,8 @@ function ringAt(t) {
 let DOT = null;
 function dotAt(t) {
   if (!DOT) return;
-  const idx = (k) => B.findIndex((s, i) => P.beats[i].kind === k), fl = idx("flip"), o0 = B.findIndex((s, i) => /^orbit/.test(P.beats[i].kind)), rp = idx("orbitrap"), fn = idx("finale3d");
-  const ink = [42, 30, 20], am = [201, 103, 30];
+  const idx = (k) => B.findIndex((s, i) => P.beats[i].kind === k), fl = idx("flip"), o0 = B.findIndex((s, i) => /^orbit/.test(P.beats[i].kind)), rp = Math.max(idx("orbitrap"), idx("cascade")), fn = idx("finale3d");
+  const ink = LUX ? [234, 170, 102] : [42, 30, 20], am = [201, 103, 30];   // 版3：ボタンは金（暗い地の上で光る）
   let x = IN.x, y = IN.y - 150, w = 0, h = 0, rad = 50, col = am;
   if (fl >= 0 && t >= FLOOD[1] - 0.2) { const a = sp(t - (FLOOD[1] - 0.2), 12, 0.6); w = h = 34 * a; }
   if (o0 >= 0 && t >= B[o0].t0 - 0.35) { const a = inOutC((t - (B[o0].t0 - 0.35)) / 0.7), up = clamp(a * 2), lf = clamp(a * 2 - 1);   // まず上へ、それから左の見出しの下へ
@@ -139,14 +159,60 @@ function dotAt(t) {
   if (fn >= 0 && t >= B[fn].t0 + 0.6) { const a = inOutC((t - (B[fn].t0 + 0.6)) / 0.6); x = 540; y = lerp(600, 1596, a); w = lerp(180, 34, clamp(a * 2)); h = lerp(10, 34, clamp(a * 2)); rad = lerp(5, 50, clamp(a * 2));
     const g = inOutC((t - (B[fn].t0 + 1.2)) / 0.45); if (g > 0) { w = lerp(34, 640, g); h = lerp(34, 112, g); rad = lerp(17, 56, g); col = am.map((v, j) => Math.round(lerp(v, ink[j], g))); } }
   DOT.style.width = `${w}px`; DOT.style.height = `${h}px`; DOT.style.borderRadius = `${rad}px`; DOT.style.background = `rgb(${col.join(",")})`; DOT.style.transform = `translate(${x - w / 2}px, ${y - h / 2}px)`;
+  DOT.style.boxShadow = LUX && h > 0 ? `0 0 ${Math.round(18 + h * 0.4)}px rgba(255,170,90,.55)` : "none";   // 暗い所では点が光る
+}
+
+// ===== 版3（#300）：ド派手×高級 =====
+// オーナー「もっとド派手で高級な描写を期待していた」。版2はベージュの地に小さなカード1枚＝地味だった。
+// 高級＝暗いスタジオに暖色の光・金の文字・商品の上を光沢が横切る・床に映り込む。
+// ド派手＝差した瞬間に光が弾ける（衝撃の輪・光の筋・火花・揺れ）・輪が引いて全体が見える・速さの線・斜めに流れるカードの壁（Iso Cascade）・カメラを突き抜ける
+const LUX = !!(P.style && P.style.lux);
+if (LUX) document.body.classList.add("lux");
+const SHAKES = [];   // [時刻, 強さ px]：衝撃で画面が揺れて0.45秒で収まる
+function shakeAt(t) { let x = 0, y = 0; SHAKES.forEach(([t0, a]) => { const u = t - t0; if (u > 0 && u < 0.45) { const d = a * Math.exp(-u * 9); x += d * Math.sin(u * 95); y += d * Math.cos(u * 77); } }); return [x, y]; }
+// 商品（切り抜き）＋光沢が横切る（切り抜きの形で切る）＋床への映り込み。高さを決めると幅は写真の比で決まる
+function prodImg(src, style, parent, t0, per = 2.4) {
+  const w = el("div", { class: "abs", style: `${style}` }, `<img src="${DIR}${src}" style="display:block;height:100%;width:auto;-webkit-box-reflect:below 6px linear-gradient(transparent 86%, rgba(255,255,255,.2))">`, parent);
+  const g = el("div", { class: "abs", style: `left:0;top:0;width:100%;height:100%;pointer-events:none;-webkit-mask:url(${DIR}${src}) center/100% 100% no-repeat;mask:url(${DIR}${src}) center/100% 100% no-repeat;background:linear-gradient(105deg, rgba(255,240,220,0) 40%, rgba(255,246,232,.8) 50%, rgba(255,240,220,0) 60%);background-size:300% 100%;mix-blend-mode:screen` }, "", w);
+  U.push((t) => { const p = ((t - t0) % per + per) % per / per; g.style.backgroundPosition = `${lerp(100, 0, inOutC(clamp(p / 0.5)))}% 0`; g.style.opacity = t < t0 || p > 0.5 ? 0 : 1; });
+  return w;
+}
+// 宙に漂う暖色の玉ぼけ（背景の層）
+function bokeh(parent, n, seed, vis) {
+  const r = mulberry32(seed), Q = Array.from({ length: n }, () => ({ x: r() * 1080, y: r() * 1920, s: 30 + r() * 120, v: 10 + r() * 30, ph: r() * 6, a: 0.10 + r() * 0.22 }));
+  const els = Q.map((q) => el("div", { class: "abs", style: `left:0;top:0;width:${q.s}px;height:${q.s}px;border-radius:50%;background:radial-gradient(circle, rgba(255,196,130,${q.a}) 0%, rgba(255,196,130,${(q.a * 0.5).toFixed(3)}) 45%, rgba(255,196,130,0) 70%)` }, "", parent));
+  U.push((t) => { const o = vis(t); parent.style.opacity = String(o); if (o <= 0) return;
+    els.forEach((e, k) => { const q = Q[k]; e.style.transform = `translate(${(q.x + Math.sin(t * 0.5 + q.ph) * 30 - q.s / 2).toFixed(1)}px, ${((((q.y - t * q.v) % 2100) + 2100) % 2100 - 90 - q.s / 2).toFixed(1)}px)`; }); });
+}
+// 速さの線（輪が回る間・カメラを突き抜ける間だけ）
+function streaks(parent) {
+  const r = mulberry32(99), S = Array.from({ length: 18 }, () => ({ y: 420 + r() * 1300, w: 200 + r() * 700, h: 2 + r() * 5, v: 2600 + r() * 2600, x0: r() * 2400 }));
+  const els = S.map((q) => el("div", { class: "abs", style: `left:0;top:${q.y.toFixed(0)}px;width:${q.w.toFixed(0)}px;height:${q.h.toFixed(1)}px;border-radius:4px;background:linear-gradient(90deg, rgba(255,210,150,0), rgba(255,230,196,.85), rgba(255,210,150,0))` }, "", parent));
+  return (t, k) => { parent.style.opacity = String(k); if (k <= 0.01) return; els.forEach((e, j) => { const q = S[j]; e.style.transform = `translateX(${(1700 - ((q.x0 + t * q.v) % 2400) - q.w / 2).toFixed(0)}px)`; }); };
+}
+let STREAK = null;
+// 差した瞬間に光が弾ける：閃光（1回だけ・点滅の上限 #294）・衝撃の輪3本・光の筋・火花・揺れ
+function burst(parent, x, y, t0, t1) {
+  const r = mulberry32(7), SP = Array.from({ length: 46 }, () => ({ a: r() * Math.PI * 2, v: 900 + r() * 1500, l: 0.6 + r() * 0.5, w: 3 + r() * 4 }));
+  const svg = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px" }, `<svg width="1080" height="1920"><g fill="none" stroke="#F6C88E">${[0, 1, 2].map(() => `<circle class="rg" cx="${x}" cy="${y}" r="0"/>`).join("")}</g><g stroke-linecap="round">${SP.map((q) => `<line class="sp" stroke="#FFD9A6" stroke-width="${q.w.toFixed(1)}"/>`).join("")}</g></svg>`, parent);
+  const RG = svg.querySelectorAll(".rg"), SL = svg.querySelectorAll(".sp");
+  const rays = el("div", { class: "abs", style: `left:${x - 1300}px;top:${y - 1300}px;width:2600px;height:2600px;border-radius:50%;background:repeating-conic-gradient(from 0deg, rgba(255,214,150,0) 0deg 7deg, rgba(255,214,150,.30) 9deg 10deg, rgba(255,214,150,0) 12deg 18deg);-webkit-mask:radial-gradient(circle, #000 0%, rgba(0,0,0,.6) 30%, transparent 62%);mask:radial-gradient(circle, #000 0%, rgba(0,0,0,.6) 30%, transparent 62%);opacity:0` }, "", parent);
+  const fl = el("div", { class: "abs", style: `left:${x - 700}px;top:${y - 700}px;width:1400px;height:1400px;border-radius:50%;background:radial-gradient(circle, rgba(255,248,236,.95) 0%, rgba(255,214,160,.6) 22%, rgba(255,190,120,0) 60%);opacity:0` }, "", parent);
+  SHAKES.push([t0, 22]);
+  U.push((t) => { const u = t - t0, on = t < t1, o = on ? 1 : 0; svg.style.display = rays.style.display = fl.style.display = on ? "" : "none";
+    RG.forEach((c, k) => { const q = clamp((u - k * 0.09) / 0.95), e = outC(q); c.setAttribute("r", String(e * 1500)); c.setAttribute("stroke-width", String(18 * (1 - q))); c.setAttribute("opacity", String(u > k * 0.09 && q < 1 ? (1 - q) * 0.9 : 0)); });
+    SL.forEach((l, k) => { const q = SP[k], tt = u, p = q.v * (1 - Math.exp(-3 * tt)) / 3, sv = q.v * Math.exp(-3 * tt), cx = x + Math.cos(q.a) * p, cy = y + Math.sin(q.a) * p + 260 * tt * tt, len = Math.max(4, sv * 0.05);
+      l.setAttribute("x1", cx.toFixed(1)); l.setAttribute("y1", cy.toFixed(1)); l.setAttribute("x2", (cx - Math.cos(q.a) * len).toFixed(1)); l.setAttribute("y2", (cy - Math.sin(q.a) * len).toFixed(1)); l.setAttribute("opacity", tt > 0 && tt < q.l ? String(1 - tt / q.l) : "0"); });
+    rays.style.opacity = String(u > 0 ? (0.25 + 0.75 * Math.exp(-u * 3)) * clamp((t1 - t) / 0.3) * o : 0); rays.style.transform = `rotate(${(u * 9).toFixed(2)}deg) scale(${(0.6 + 0.4 * outC(u / 0.5)).toFixed(3)})`;
+    fl.style.opacity = String(u > 0 ? 0.95 * Math.exp(-u * 7) : 0); fl.style.transform = `scale(${(0.3 + 0.9 * outC(u / 0.35)).toFixed(3)})`; });
 }
 const KINDS = {
   // 利点（輪の1枚）：輪が回って正面に来た写真に、線から立ち上がる見出し。数字があれば下に数え上げ
   orbit(b, i, s) {
     buildRing(); const t0 = s.t0;
     maskHead(b.head, 300, t0 - 0.05, OUT(i));
-    const nums = (b.nums || []).map(([lab, v, u], k) => el("div", { class: "abs", style: `left:${k ? 600 : 130}px;top:1515px;opacity:0;line-height:1;white-space:nowrap` }, `<span style="font:900 30px/1 'Noto Sans JP';color:var(--mut);margin-right:10px">${lab}</span><span class="gar" style="font-size:110px">0</span><span style="font:900 40px/1 'Noto Sans JP'">${u}</span>`));
-    const nt = el("div", { class: "note", style: `left:70px;top:${b.nums ? 1650 : 1600}px;width:940px;opacity:0` }, b.note || "");
+    const nums = (b.nums || []).map(([lab, v, u], k) => el("div", { class: "abs", style: `left:${k ? 600 : 130}px;top:${LUX ? 1610 : 1515}px;opacity:0;line-height:1;white-space:nowrap;${LUX ? "color:#F6EBDD" : ""}` }, `<span style="font:900 30px/1 'Noto Sans JP';color:${LUX ? "#C9B39A" : "var(--mut)"};margin-right:10px">${lab}</span><span class="gar" style="font-size:110px">0</span><span style="font:900 40px/1 'Noto Sans JP'">${u}</span>`));
+    const nt = el("div", { class: "note", style: `left:70px;top:${LUX ? (b.nums ? 1740 : 1650) : b.nums ? 1650 : 1600}px;width:940px;opacity:0` }, b.note || "");
     hideCam(s);
     U.push((t) => { fadeUp(nt, t0 + 0.6, OUT(i));
       nums.forEach((n, k) => { const c0 = t0 + 0.35 + k * 0.3; fadeUp(n, c0 - 0.1, OUT(i)); setText(n.querySelector(".gar"), String(Math.round(b.nums[k][1] * outC((t - c0) / 0.7)))); }); });
@@ -164,16 +230,56 @@ const KINDS = {
         w.style.opacity = on ? clamp(e * 1.2) * (1 - o) : 0; w.style.transform = `translateY(${(1 - e) * 40}px)`; if (subs[k]) subs[k].style.opacity = on ? clamp(e * 1.2) * (1 - o) : 0; });
       fadeUp(nt, t0 + 0.3, OUT(i)); });
   },
+  // 版3 加速：輪がカメラを突き抜けると、傾いたカードの壁が斜めに流れ続ける（Reelfolio の Iso Cascade）。
+  // その上で1語ずつ大きく打ち込む（ぶれから止まる・1語ごとに画面が揺れる）。下に2色の本体（光沢と映り込み）
+  cascade(b, i, s) {
+    const t0 = s.t0 + 0.05, n = b.words.length, slot = (s.t1 - 0.25 - t0) / n, imgs = b.stream || [], L = Math.max(1, imgs.length);
+    const st = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;overflow:hidden;perspective:1700px;opacity:0" }, "", $("under"));   // 背景の層（飾りの壁）
+    const plane = el("div", { class: "abs", style: "left:-700px;top:-600px;width:2480px;height:3400px;transform:rotateX(50deg) rotateZ(-32deg);transform-origin:50% 50%" }, "", st);
+    const COLS = 7, CW = 300, CH = 400, PIT = CH + 44, cols = Array.from({ length: COLS }, (_, c) => {
+      const col = el("div", { class: "abs", style: `left:${c * (CW + 44)}px;top:0;width:${CW}px` }, "", plane);
+      for (let k = 0; k < 2 * L + 9; k++) { const src = imgs[(c * 3 + k) % L], png = /\.png$/.test(src || "");
+        el("div", { class: "abs", style: `left:0;top:${k * PIT}px;width:${CW}px;height:${CH}px;border-radius:22px;overflow:hidden;background:${png ? "linear-gradient(160deg,#4A2C16,#1E120A)" : "#222"};box-shadow:0 30px 60px rgba(0,0,0,.5);border:2px solid rgba(255,222,186,.25)` },
+          src ? `<img src="${DIR}${src}" style="width:100%;height:100%;object-fit:${png ? "contain" : "cover"};${png ? "padding:24px" : ""}">` : "", col); }
+      return col; });
+    const veil = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;background:linear-gradient(180deg, rgba(12,7,4,.94) 0%, rgba(12,7,4,.86) 34%, rgba(12,7,4,.5) 58%, rgba(12,7,4,.62) 80%, rgba(12,7,4,.92) 100%)" }, "", st);   // 文字の下は暗く（読める）・下の本体の周りは壁が覗く
+    const ws = b.words.map((w, k) => { const fs = Math.min(170, Math.floor(940 / [...w.t].length));
+      return el("div", { class: "abs", style: `left:0;top:${470 - fs}px;width:1080px;text-align:center;opacity:0;line-height:1.1` }, `<div style="font:900 ${fs}px/1.1 'Noto Sans JP';letter-spacing:.02em;color:#F6EBDD">${w.t}</div>`); });
+    const subs = b.words.map((w) => w.sub ? el("div", { class: "abs", style: "left:0;top:500px;width:1080px;text-align:center;font:700 38px/1 'Noto Sans JP';color:#D9C3A8;opacity:0" }, w.sub) : null);
+    const glow = el("div", { class: "abs", style: "left:190px;top:960px;width:700px;height:760px;border-radius:50%;background:radial-gradient(ellipse, rgba(255,180,100,.35) 0%, rgba(255,180,100,0) 65%);opacity:0" }, "", $("under"));
+    const pair = (b.pair || []).map((im, k) => prodImg(im, `left:${k ? 556 : 420}px;top:1000px;height:600px;opacity:0;filter:drop-shadow(0 30px 34px rgba(0,0,0,.55))`, $("prodlayer"), t0 + 0.4 + k * 0.5, 2.2));
+    $("under").prepend(glow); $("under").prepend(st);   // 壁はいちばん奥（旅してきた点・速さの線より後ろ）
+    const nt = el("div", { class: "note", style: "left:70px;top:1700px;width:940px;opacity:0" }, b.note || "");
+    b.words.forEach((w, k) => SHAKES.push([t0 + k * slot, 9]));
+    hideCam(s);
+    U.push((t) => { const o = outC((t - OUT(i)) / 0.25), on = t >= s.t0 - 0.35 && t < s.t1;
+      st.style.display = glow.style.display = on ? "" : "none"; st.style.opacity = String(clamp((t - (s.t0 - 0.2)) / 0.3) * (1 - o));
+      const u = Math.max(0, t - (s.t0 - 0.35)), y = 150 * u + 1500 * (1 - Math.exp(-3.2 * u));   // 速く入って、一定の速さで流れ続ける
+      cols.forEach((c, k) => { const yy = ((k % 2 ? 0.86 : 1) * y + k * 170) % (PIT * L); c.style.transform = `translateY(${(-yy - 2 * PIT).toFixed(1)}px)`; });   // 写真の並びが一巡する長さで繋ぎ目なく戻す
+      ws.forEach((w, k) => { const a = t - (t0 + k * slot), vis = a >= 0 && (a < slot || k === n - 1), e = outC(a / 0.2);
+        w.style.opacity = vis ? clamp(e * 1.3) * (1 - o) : 0; w.style.transform = `scale(${lerp(1.7, 1, e).toFixed(3)})`; w.style.filter = e < 1 ? `blur(${((1 - e) * 12).toFixed(1)}px)` : "none";
+        if (subs[k]) subs[k].style.opacity = vis ? 1 - o : 0; });   // 補足は語と同時に出す（短い拍でも0.5秒以上読める）
+      const hi = b.words.findIndex((w) => w.pair), hot = hi >= 0 && t >= t0 + hi * slot && t < t0 + (hi + 1) * slot;   // 「2色から」の間だけ前へ
+      glow.style.opacity = String(clamp((t - t0) / 0.4) * (1 - o) * (hot ? 1 : 0.7));
+      pair.forEach((p, k) => { const a = sp(t - (t0 - 0.1 + k * 0.08), 10, 0.75); p.style.opacity = String(clamp(a * 1.4) * (1 - o));
+        p.style.transform = `translateY(${((1 - clamp(a)) * 220 + Math.sin(t * 1.4 + k) * 5).toFixed(1)}px) rotate(${k ? 6 : -6}deg) scale(${hot ? 1.1 : 1})`; });
+      fadeUp(nt, t0 + 0.3, OUT(i)); });
+  },
   // 締め：輪が奥へ遠ざかり、大きな名前の文字の手前に2色の本体。旅してきた点がリンクのボタンに広がる
   finale3d(b, i, s) {
     const t0 = s.t0;
-    const big = el("div", { class: "abs", style: "left:0;top:560px;width:1080px;text-align:center;font:500 300px/1 'Cormorant Garamond';letter-spacing:.06em;color:#E7D2BA;opacity:0" }, b.big || "", $("under"));
-    maskLine("min", "left:0;top:300px;width:1080px;text-align:center", b.tag || "", t0 + 0.05, 999, "font-size:96px");
-    const pair = (b.pair || []).map((im, k) => el("img", { src: `${DIR}${im}`, class: "abs", style: `left:${k ? 560 : 420}px;top:480px;height:720px;opacity:0;filter:drop-shadow(0 30px 34px rgba(60,35,15,.28))` }, "", $("prodlayer")));
-    const rv = el("div", { class: "abs", style: "left:0;top:1250px;width:1080px;text-align:center;opacity:0;line-height:1" }, `<span class="gar" style="font-size:150px">0</span><span style="font:900 44px/1 'Noto Sans JP';margin-left:10px">件のレビュー</span><span style="font:900 44px/1 'Noto Sans JP';color:#9A4A12;margin-left:22px">★${b.rating.toFixed(2)}</span>`);
+    if (LUX) {   // 版3：上から細い光（スポットライト）が降り、床が丸く光る
+      const cone = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1300px;clip-path:polygon(470px 0, 610px 0, 980px 1250px, 100px 1250px);background:linear-gradient(180deg, rgba(255,226,184,.30) 0%, rgba(255,214,160,.10) 70%, rgba(255,214,160,0) 100%);filter:blur(14px);opacity:0" }, "", $("under"));
+      const floor = el("div", { class: "abs", style: "left:190px;top:1020px;width:700px;height:240px;border-radius:50%;background:radial-gradient(ellipse, rgba(255,200,140,.42) 0%, rgba(255,200,140,0) 68%);opacity:0" }, "", $("under"));
+      U.push((t) => { const a = clamp((t - t0 - 0.05) / 0.5); cone.style.opacity = String(a * (0.85 + 0.15 * Math.sin(t * 2.1))); floor.style.opacity = String(a); }); }
+    const big = el("div", { class: `abs${LUX ? " gold" : ""}`, style: `left:0;top:560px;width:1080px;text-align:center;font:500 300px/1 'Cormorant Garamond';letter-spacing:.06em;${LUX ? "" : "color:#E7D2BA;"}opacity:0` }, b.big || "", $("under"));
+    maskLine("min", "left:0;top:300px;width:1080px;text-align:center", b.tag || "", t0 + 0.05, 999, `font-size:96px;${LUX ? "color:#F6EBDD" : ""}`);
+    const pair = (b.pair || []).map((im, k) => LUX ? prodImg(im, `left:${k ? 556 : 424}px;top:470px;height:660px;opacity:0;filter:drop-shadow(0 30px 34px rgba(0,0,0,.55))`, $("prodlayer"), t0 + 0.7 + k * 0.4, 2.4)
+      : el("img", { src: `${DIR}${im}`, class: "abs", style: `left:${k ? 560 : 420}px;top:480px;height:720px;opacity:0;filter:drop-shadow(0 30px 34px rgba(60,35,15,.28))` }, "", $("prodlayer")));
+    const rv = el("div", { class: "abs", style: `left:0;top:1250px;width:1080px;text-align:center;opacity:0;line-height:1;${LUX ? "color:#F6EBDD" : ""}` }, `<span class="gar" style="font-size:150px">0</span><span style="font:900 44px/1 'Noto Sans JP';margin-left:10px">件のレビュー</span><span style="font:900 44px/1 'Noto Sans JP';color:${LUX ? "#EBB173" : "#9A4A12"};margin-left:22px">★${b.rating.toFixed(2)}</span>`);
     const dt = el("div", { class: "note", style: "left:0;top:1410px;width:1080px;text-align:center;opacity:0" }, b.date);
-    const nm = el("div", { class: "abs", style: "left:0;top:1470px;width:1080px;text-align:center;font:900 44px/1 'Noto Sans JP';opacity:0" }, P.name);
-    const ct = el("div", { class: "abs", style: "left:0;top:1540px;width:1080px;height:112px;display:flex;align-items:center;justify-content:center;gap:16px;font:900 42px/1 'Noto Sans JP';color:#fff;letter-spacing:.05em;opacity:0;z-index:2" }, `${b.cta}<svg width="38" height="38" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#F0A15E" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`);   // ボタンの地は旅してきた点（DOT）
+    const nm = el("div", { class: "abs", style: `left:0;top:1470px;width:1080px;text-align:center;font:900 44px/1 'Noto Sans JP';opacity:0;${LUX ? "color:#F6EBDD" : ""}` }, P.name);
+    const ct = el("div", { class: "abs", style: `left:0;top:1540px;width:1080px;height:112px;display:flex;align-items:center;justify-content:center;gap:16px;font:900 42px/1 'Noto Sans JP';color:${LUX ? "#1E120A" : "#fff"};letter-spacing:.05em;opacity:0;z-index:2` }, `${b.cta}<svg width="38" height="38" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="${LUX ? "#1E120A" : "#F0A15E"}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`);   // ボタンの地は旅してきた点（DOT）
     const nt = el("div", { class: "note", style: "left:70px;top:1680px;width:940px;text-align:center;opacity:0" }, b.note || "");
     hideCam(s);
     U.push((t) => { const u = t - t0;
@@ -206,8 +312,10 @@ const KINDS = {
     G.innerHTML = [-180, -100, -30, 40, 110, 190].map((dy) => `<path class="fl" d="M${IN.x - 40},${IN.y} C${IN.x - 240},${IN.y + dy * 0.3} ${IN.x - 420},${IN.y + dy} ${FUT.x + 60},${IN.y + dy * 1.1}" fill="none" stroke="rgba(255,240,222,.95)" stroke-width="7" stroke-linecap="round" stroke-dasharray="40 46" opacity="0"/>`).join("");
     const FL = G.querySelectorAll(".fl");
     const st = stickEl($("prodlayer"));
-    const [h0, h1] = head2(b.head, 330, false);
-    const lab = el("div", { class: "abs", style: `left:66px;top:${FUT.y + FUT.h + 50}px;opacity:0` }, `<span style="font:900 40px/1 'Noto Sans JP'">${b.label}</span><span style="font:700 34px/1 'Noto Sans JP';color:#8A3F0C;margin-left:20px">${b.temp || ""}</span>`);
+    if (LUX) burst($("under"), IN.x, IN.y, ins1, s.t1);   // 版3：差した瞬間に光が弾ける
+    // 版3：地は最後まで暗い（紺→暖色の暗いスタジオ）ので、見出しは生成り＋金のまま色を切り替えない
+    const [h0, h1] = LUX ? [maskLine("h1", "left:66px;top:330px", b.head[0], t0 + 0.05, OUT(i)), maskLine("h2 gold", "left:56px;top:430px", b.head[1] || "", FLOOD[0] + 0.05, OUT(i), "font-size:200px;line-height:1.05")] : head2(b.head, 330, false);
+    const lab = el("div", { class: "abs", style: `left:66px;top:${FUT.y + FUT.h + 50}px;opacity:0;${LUX ? "color:#F6EBDD" : ""}` }, `<span style="font:900 40px/1 'Noto Sans JP'">${b.label}</span><span style="font:700 34px/1 'Noto Sans JP';color:${LUX ? "#EBB173" : "#8A3F0C"};margin-left:20px">${b.temp || ""}</span>`);
     const nt = el("div", { class: "note", style: `left:70px;top:${FUT.y + FUT.h + 120}px;width:940px;opacity:0` }, b.note || "");
     hideCam(s);
     U.push((t) => { const o = outC((t - OUT(i)) / 0.25), on = t >= t0 && t < s.t1;
@@ -218,9 +326,9 @@ const KINDS = {
       const w = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])); W.setAttribute("r", String(w * 1100));
       FL.forEach((f, j) => { f.setAttribute("opacity", String(clamp((t - ins1 + 0.1 - j * 0.05) / 0.25) * (1 - o))); f.setAttribute("stroke-dashoffset", String(-(t - t0) * 260)); });
       // 暖色の円の縁が見出しを通る一瞬だけ文字を消し、通り過ぎたら濃い色で出し直す（中間の色＝中間の背景で読めなくなるのを避ける・Actions の点検で 2.6:1）
-      const r = w * 1100 * 2300 / 1100, kk = clamp((r - 950) / 320);
-      h0.style.color = kk < 0.5 ? "#EEF4FA" : "#2A1E14"; h0.style.opacity = String(Math.abs(1 - 2 * kk));
-      kin(h0, t0 + 0.05, OUT(i)); kin(h1, FLOOD[0] + 0.1, OUT(i), 0.06);
+      if (!LUX) { const r = w * 1100 * 2300 / 1100, kk = clamp((r - 950) / 320);
+        h0.style.color = kk < 0.5 ? "#EEF4FA" : "#2A1E14"; h0.style.opacity = String(Math.abs(1 - 2 * kk));
+        kin(h0, t0 + 0.05, OUT(i)); kin(h1, FLOOD[0] + 0.1, OUT(i), 0.06); }
       fadeUp(lab, FLOOD[1] - 0.3, OUT(i)); fadeUp(nt, FLOOD[1], OUT(i)); });
   },
   // 利点1：使っている所の実写が丸い窓から開く（Reelfolio の Reveal・#297）。写真は販売ページの物
@@ -310,7 +418,11 @@ CORE.start({ grain: [215, 40], wipe: false, refl: false, motionBlur: false,
     const w = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0]));
     $("bgWarm").style.clipPath = `circle(${(w * 2300).toFixed(1)}px at ${IN.x}px ${IN.y}px)`;
     $("light").style.opacity = String(w * (0.8 + 0.2 * Math.sin(t * 0.6)));
-    if (RING.built) ringAt(t); dotAt(t); } }, KINDS);
+    if (RING.built) ringAt(t); dotAt(t);
+    if (LUX) { const [sx, sy] = shakeAt(t); ["under", "prodlayer", "ui"].forEach((id) => { $(id).style.transform = sx || sy ? `translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px)` : ""; });
+      const g = `${(100 - ((t * 0.45) % 1) * 200).toFixed(1)}% 0`; document.querySelectorAll(".gold").forEach((e) => { e.style.backgroundPosition = g; }); } } }, KINDS);   // 金の文字の上を光がゆっくり横切る
+if (LUX) { const bk = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;opacity:0" }, "", $("under")); bokeh(bk, 26, 3, (t) => clamp((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])));   // 暖色が広がった後だけ玉ぼけが漂う
+  STREAK = streaks(el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;opacity:0" }, "", $("under"))); }
 DOT = el("div", { class: "abs", style: "left:0;top:0;width:0;height:0" }, "", $("under"));   // 暖色の点（背景の層：本体の後ろを通り、ボタンの地になる）
 </script>
 </body>

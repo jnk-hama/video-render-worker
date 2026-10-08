@@ -85,6 +85,12 @@ for i, b in enumerate(Bs):
     if kind == "orbitrap":
         n = len(bp.get("words", [])); sl = (t1 - 0.25 - t0 - 0.05) / max(1, n)
         for k2 in range(n): put(sfx, g["tock"](320 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.24)
+    # CM 版3（#300）：差した瞬間の衝撃・カメラを突き抜ける風・1語ごとの打ち込み
+    if kind == "flip" and bp.get("burst"): put(sfx, g["impact"](0.6, 1.6), t0 + 0.75, 0.34)
+    if kind == "cascade":
+        put(sfx, g["whoosh"](0.7, 160, 3600, 0.6, 0.6), t0 - 0.4, 0.26)
+        n = len(bp.get("words", [])); sl = (t1 - 0.25 - t0 - 0.05) / max(1, n)
+        for k2 in range(n): put(sfx, g["impact"](0.35, 1.0), t0 + 0.05 + k2 * sl, 0.16); put(sfx, g["tock"](320 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.2)
     if kind == "finale3d": put(sfx, g["whoosh"](0.8, 200, 1800, 0.4, 0.8), t0 - 0.3, 0.14); put(sfx, g["shimmer"](1.4, 0.5), t0 + 0.2, 0.12); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.6, 0.2)
     if kind == "match":   # lookbook.html の match：猫（0.35＋0.55k）→ 矢印 → 平置き（0.8＋0.55k）
         for k2 in range(len(bp.get("pairs", []))): put(sfx, g["whoosh"](0.4, 400, 2600, 0.5), t0 + 0.35 + k2 * 0.55, 0.12); put(sfx, g["tock"](320 + 40 * k2, 0.7), t0 + 0.8 + k2 * 0.55, 0.2)
