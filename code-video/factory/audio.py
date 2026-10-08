@@ -97,6 +97,9 @@ for i, b in enumerate(Bs):
         put(sfx, g["riser"](0.5, 0.6), max(0, t0 - 0.4), 0.1); put(sfx, g["impact"](0.6, 1.6), t0 + 0.12, 0.22); put(sfx, g["shimmer"](1.6, 0.6), t0 + 0.2, 0.12)
         put(sfx, g["whoosh"](0.6, 300, 2600, 0.5), t0 + 0.5, 0.16); put(sfx, g["tick"](2600, 0.5), t0 + 1.05, 0.14)   # 横を向く・厚みの線
     # #302 場面の種類を増やした分の音（動きの時刻と同じ定数）
+    if kind == "edgehook":   # 暗いスタジオの低い響き → 正面を向く瞬間の光芒にきらめき
+        put(sfx, g["pad"]([55.0, 82.41, 110.0], 2.4, 0.6), t0, 0.16); put(sfx, g["riser"](1.2, 0.5), t0 + 0.7, 0.1)
+        put(sfx, g["whoosh"](0.9, 200, 2400, 0.4), t0 + 1.25, 0.12); put(sfx, g["shimmer"](1.4, 0.6), t0 + 1.9, 0.16)
     if kind == "pocket":
         for k2 in range(4): put(sfx, g["tock"](180, 0.5), t0 + 0.17 + k2 * 0.7, 0.12)   # 箱が押し込まれては止まる
     if kind == "flapin":

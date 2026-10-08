@@ -206,7 +206,7 @@ const PALS = {
   champagne: { g: "255,226,180", g2: "255,246,230", d: "9,8,6", gs: "#F2DDB4", c1: "#4A3E2C", c0: "#16130D", tx: "#F7F1E6", mu: "#C8BBA4", mu2: "#DCCFB8", hi: "#E8D2A6", a: ["#8E7650", "#E3CFA6", "#FFF9EC", "#C9B188"], b: ["#5C4C36", "#2F271C", "#14110C", "#090806"], btn: [230, 212, 176], dot: [190, 160, 110] },
   graphite: { g: "220,226,236", g2: "246,248,252", d: "6,6,8", gs: "#E4E8F0", c1: "#2E3138", c0: "#101114", tx: "#F2F3F5", mu: "#AEB2BA", mu2: "#C9CCD2", hi: "#E6E9EE", a: ["#6E737D", "#D5D9E0", "#FFFFFF", "#A9AEB8"], b: ["#3A3D44", "#1E2025", "#0C0D10", "#050506"], btn: [222, 226, 232], dot: [160, 168, 180] } };
 const PAL = PALS[STY.palette] || PALS.amber;
-const WHITE = STY.theme === "white"; let POCKET = null;   // #302 白いスタジオ
+const WHITE = STY.theme === "white"; let POCKET = null, SLABEND = null;   // SLABEND：前の場面が本体を置いて終わった所（次の場面はそこから動かす）   // #302 白いスタジオ
 if (WHITE) { document.body.classList.add("white"); if (STY.accent) document.body.style.setProperty("--acc", STY.accent); }
 if (LUX) { document.body.classList.add("lux"); const bs = document.body.style;
   ["g", "g2", "d", "gs", "c1", "c0", "tx", "mu", "mu2", "hi"].forEach((k) => bs.setProperty(`--${k}`, PAL[k])); PAL.a.forEach((v, k) => bs.setProperty(`--a${k}`, v)); PAL.b.forEach((v, k) => bs.setProperty(`--b${k}`, v)); }
@@ -275,7 +275,9 @@ function buildSlab() {
     face(W, H, `rotateY(180deg) translateZ(${T / 2}px)`, `border-radius:${R}px;background:${sb.back || sb.edge}`),
     face(T, H - 2 * R, `rotateY(90deg) translateZ(${W / 2 - 3}px)`, `background:${sideBg}`), face(T, H - 2 * R, `rotateY(-90deg) translateZ(${W / 2 - 3}px)`, `background:${sideBg}`),
     face(W - 2 * R, T, `rotateX(90deg) translateZ(${H / 2 - 3}px)`, `background:${sb.edge}`), face(W - 2 * R, T, `rotateX(-90deg) translateZ(${H / 2 - 3}px)`, `background:${sb.edge}`)];
-  SLAB = { st, box, faces, W, H, T }; return SLAB;
+  const spec = [faces[2], faces[3]].map((f) => el("div", { class: "abs", style: "left:0;top:0;width:100%;height:30%;opacity:0;background:linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.95) 50%, rgba(255,255,255,0))" }, "", f));   // #303 縁を走る光
+  const glint = el("div", { class: "abs", style: `left:0;top:0;width:100%;height:100%;opacity:0;pointer-events:none;-webkit-mask:url(${DIR}${P.hero.cutout}) center/100% 100% no-repeat;mask:url(${DIR}${P.hero.cutout}) center/100% 100% no-repeat;background:linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.85) 50%, rgba(255,255,255,0) 62%);background-size:300% 100%;mix-blend-mode:screen` }, "", faces[0]);   // 面を横切る光沢
+  SLAB = { st, box, faces, W, H, T, spec, glint }; return SLAB;
 }
 // 悩み→転換の間の本体の動き：悩みでは暗い影で分厚く（※イメージ）、光が弾けると本当の厚みに締まり、回って横から薄さを見せ、正面へ戻る
 // #302：場面ごとに本体（板）の置き方を登録する。どの場面の時間にも入らない時は隠す
@@ -295,6 +297,39 @@ function slabAt(t) {
   const f = `brightness(${br.toFixed(3)}) saturate(${lerp(0.3, 1, br).toFixed(3)})`; SLAB.faces.forEach((e) => { e.style.filter = f; });
 }
 const KINDS = {
+  // #303 つかみ「一本の光」（オーナー「1シーン目が一番弱い！一番のフックが弱いとやばい！もっと1シーン目高級に作り込んで」）
+  //   真っ暗なスタジオに細い光の線が1本だけ立つ（本体の横顔）→ 縁を光が走り、カメラがゆっくり寄る（何だろう？）→ 回って正面を向くと薄いバッテリーだった
+  //   正面を向く瞬間に光沢が面を横切り、横に伸びる光芒が1回走る。見出しは字の間が広い所からゆっくり締まる。次の場面で暗い地が白く抜ける
+  edgehook(b, i, s) {
+    buildSlab(); const t0 = s.t0, end = s.t1, CY = 1060, tf = t0 + 1.95;
+    const dark = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;background:radial-gradient(ellipse 760px 980px at 50% 52%, #2B2E36 0%, #121318 52%, #050506 100%)" }, "", $("under"));
+    const cone = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1500px;clip-path:polygon(500px 0, 580px 0, 900px 1450px, 180px 1450px);background:linear-gradient(180deg, rgba(235,240,255,.22) 0%, rgba(235,240,255,.07) 70%, rgba(235,240,255,0) 100%);filter:blur(16px)" }, "", $("under"));
+    const r = mulberry32(11), DU = Array.from({ length: 46 }, () => ({ x: 260 + r() * 560, y: 200 + r() * 1200, s: 2 + r() * 4, v: 6 + r() * 18, ph: r() * 6 }));
+    const dust = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px" }, `<svg width="1080" height="1920">${DU.map((q) => `<circle r="${q.s.toFixed(1)}" fill="#EEF2FF"/>`).join("")}</svg>`, $("under"));
+    const DC = dust.querySelectorAll("circle");
+    const floor = el("div", { class: "abs scrim", style: `left:140px;top:${CY + 330}px;width:800px;height:120px;border-radius:50%;background:radial-gradient(ellipse, rgba(225,232,255,.30) 0%, rgba(225,232,255,0) 70%)` }, "", $("under"));
+    const fl = el("div", { class: "abs", style: `left:-200px;top:${CY - 60}px;width:1480px;height:120px;opacity:0;background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255,255,255,.9) 0%, rgba(210,220,255,.45) 20%, rgba(210,220,255,0) 70%)` }, `<div style="position:absolute;left:0;top:57px;width:100%;height:6px;background:linear-gradient(90deg, rgba(255,255,255,0), #fff 50%, rgba(255,255,255,0))"></div>`, $("prodlayer"));   // 横に伸びる光芒（1回だけ・点滅の上限 #294）
+    const dim = el("div", { class: "abs", style: `left:0;top:0;width:1080px;height:1920px;opacity:0` }, `<svg width="1080" height="1920"><g stroke="#C9D1E6" stroke-width="2" fill="none"><path d="M330,${CY} H500 M580,${CY} H750 M500,${CY - 14} V${CY + 14} M580,${CY - 14} V${CY + 14}"/></g></svg>`, $("under"));   // 厚みを挟む細い製図の線
+    const dl = el("div", { class: "abs", style: `left:250px;top:${CY - 76}px;width:280px;text-align:center;font:500 44px/1 'Cormorant Garamond';letter-spacing:.2em;color:#C9D1E6;opacity:0` }, "8.6 mm");
+    const h0 = el("div", { class: "abs", style: "left:0;top:300px;width:1080px;text-align:center;white-space:nowrap;font:700 64px/1.2 'Shippori Mincho';color:#E9ECF4" }, b.head[0]);
+    const h1 = el("div", { class: "abs", style: "left:0;top:392px;width:1080px;text-align:center;white-space:nowrap;font:700 140px/1.1 'Shippori Mincho';color:#F4F5FA;text-shadow:0 0 40px rgba(200,210,255,.25)" }, b.head[1] || "");
+    const nt = el("div", { class: "note", style: "left:70px;top:1720px;width:940px;color:#8E95A6" }, b.note || "");
+    SLABK.push({ a: -1, b: end, f: (t) => { const u = t - t0, ry = u < 1.25 ? 90 - 10 * u / 1.25 : u < 2.25 ? lerp(80, -16, inOutC((u - 1.25) / 1.0)) : -16 - 2 * (u - 2.25);
+      slabSet(540, CY + Math.sin(t * 1.1) * 6, 1.18 + 0.05 * u, 3, ry); SLAB.spec.forEach((e) => { e.style.opacity = String(clamp((Math.abs(ry) - 55) / 20)); e.style.top = `${((u * 0.9) % 1.3 - 0.3) * 100}%`; });
+      SLAB.glint.style.opacity = String(Math.sin(Math.PI * clamp((u - 1.7) / 0.7))); SLAB.glint.style.backgroundPosition = `${lerp(100, 0, clamp((u - 1.7) / 0.7))}% 0`; } });
+    SLABEND = { x: 540, y: CY, sc: 1.18 + 0.05 * (end - t0), ry: -16 - 2 * Math.max(0, end - t0 - 2.25) };
+    hideCam(s);
+    U.push((t) => { const u = t - t0, on = t < end + 0.6;
+      [dark, cone, dust, floor].forEach((e) => { e.style.display = on ? "" : "none"; });
+      const rr = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])) * 2300, m = rr > 0 ? `radial-gradient(circle at ${IN.x}px ${IN.y}px, transparent ${rr.toFixed(0)}px, #000 ${(rr + 2).toFixed(0)}px)` : "none";   // 次の場面で、暗い地がポケットの所から白く抜ける
+      [dark, cone, dust, floor].forEach((e) => { e.style.webkitMaskImage = e.style.maskImage = m; });
+      DU.forEach((q, k) => { DC[k].setAttribute("cx", (q.x + Math.sin(t * 0.7 + q.ph) * 24).toFixed(1)); DC[k].setAttribute("cy", ((((q.y - t * q.v) % 1250) + 1250) % 1250 + 200).toFixed(1)); DC[k].setAttribute("opacity", (0.25 + 0.35 * Math.sin(t * 1.3 + q.ph) ** 2).toFixed(2)); });
+      const vis = t < end ? 1 : 0; h0.style.display = h1.style.display = nt.style.display = dl.style.display = vis ? "" : "none";
+      const tr = (k) => `${lerp(k ? 0.16 : 0.42, 0.04, outC((u + 0.3) / 2.6)).toFixed(3)}em`;   // 字の間が広い所からゆっくり締まる（止まらない・高級）
+      h0.style.letterSpacing = tr(0); h1.style.letterSpacing = tr(1); h1.style.opacity = String(0.75 + 0.25 * clamp((u + 0.2) / 0.6));
+      const dd = clamp((u - 0.35) / 0.3) * (1 - clamp((u - 1.25) / 0.25)); dim.style.opacity = String(dd); dl.style.opacity = String(dd);
+      fl.style.opacity = String(u > 1.9 ? Math.exp(-(u - 1.9) * 3.2) : 0); fl.style.transform = `scaleX(${(0.2 + 1.3 * outC(clamp((u - 1.9) / 0.8))).toFixed(3)})`; fl.style.display = t < end ? "" : "none"; });
+  },
   // ===== #302 場面の種類そのものを増やす（オーナー「モーショングラフィック全く同じです。それをするなと言いました」）=====
   // 版3・#301 は同じ骨組み（暗い影→光が弾ける→カード3枚→連打→スポットライト）の色や向きを変えただけだった。ここからは場面の動き自体が違う物を足す
   // 悩み：ポケットの絵（※図）に分厚い影の箱が詰まって、ふくらむ。答えの本体は右で待っている
@@ -317,16 +352,19 @@ const KINDS = {
   // 転換：影の箱が消え、白い光が広がる。本体が横を向いて薄さのままポケットへスッと入る。数字はパタパタ（空港の表示）で決まる
   flapin(b, i, s) {
     buildSlab(); const t0 = s.t0, PX = 400, T = 1000; IN = { x: PX, y: T }; FLOOD = [t0 + 0.05, t0 + 0.85];
+    if (!POCKET) { POCKET = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;pointer-events:none" }, `<svg width="1080" height="1920"><path class="pk" d="M150,1000 Q400,1050 650,1000 Q650,1300 610,1600 Q400,1660 190,1600 Q150,1300 150,1000 Z" fill="#34476A" stroke="#1E2A40" stroke-width="6"/><path class="st" d="M176,1030 Q620,1300 588,1576 Q400,1630 212,1576 Q180,1300 176,1030" fill="none" stroke="#E2B866" stroke-width="4" stroke-dasharray="14 10"/></svg>`, $("prodlayer"));   // #303：悩みの場面が無い時は、ここでポケットが下から上がってくる
+      const pkIn = POCKET; U.push((t) => { const a2 = sp(t - t0 - 0.05, 9, 0.8); pkIn.style.opacity = String(clamp(a2 * 1.4)); pkIn.style.transform = `translateY(${((1 - clamp(a2)) * 500).toFixed(1)}px)`; }); }
     maskLine("h1", "left:66px;top:300px", b.head[0], t0 + 0.05, OUT(i));
     const digs = [...String(b.head[1] || "")], row = el("div", { class: "abs", style: "left:66px;top:410px;display:flex;align-items:flex-end;gap:12px;white-space:nowrap" }, "");
     const tiles = digs.map((c) => /\d/.test(c) ? el("div", { class: "abs", style: "position:relative;width:150px;height:220px;border-radius:18px;background:#15171C;color:#fff;font:400 170px/220px 'Dela Gothic One';text-align:center;box-shadow:0 18px 30px rgba(0,0,0,.25);opacity:0" }, `<span>${c}</span><i style="position:absolute;left:0;top:109px;width:100%;height:3px;background:rgba(255,255,255,.35)"></i>`, row)
       : el("div", { class: "abs", style: `position:relative;font:400 ${/[.]/.test(c) ? 170 : 110}px/1 'Dela Gothic One';color:var(--acc, #5B4FA6);opacity:0` }, c, row));
     const nt = el("div", { class: "note", style: "left:70px;top:1720px;width:940px;opacity:0" }, b.note || "");
     SLABK.push({ a: t0 - 0.02, b: s.t1, f: (t) => { const u = t - t0, f1 = inOutC(u / 0.7), f2 = inOutC((u - 0.7) / 0.6), f3 = inOutC((u - 1.3) / 0.5);   // 飛んで横を向く → 入る → 正面
-      const x = lerp(860, PX, f1), y = lerp(1330, 900, f1) + 240 * f2, sc = lerp(0.42, 0.8, f1), ry = lerp(-24 + 5 * t0, 88, f1) - 98 * f3; slabSet(x, y, sc, lerp(10, 4, f1), ry); } });
+      const S0 = SLABEND || { x: 860, y: 1330, sc: 0.42, ry: -24 + 5 * t0 };
+      const x = lerp(S0.x, PX, f1), y = lerp(S0.y, 900, f1) + 240 * f2, sc = lerp(S0.sc, 0.8, f1), ry = lerp(S0.ry, 88, f1) - 98 * f3; slabSet(x, y, sc, lerp(10, 4, f1), ry); } });
     hideCam(s);
     U.push((t) => { const u = t - t0, o = outC((t - OUT(i)) / 0.25);
-      if (POCKET && t >= t0 && t < s.t1) { const bg = 92 * (1 - outC(u / 0.5)); POCKET.querySelector(".pk").setAttribute("d", `M150,1000 Q400,1050 650,1000 Q${650 + bg},1300 610,1600 Q400,1660 190,1600 Q${150 - bg},1300 150,1000 Z`); POCKET.querySelector(".st").setAttribute("d", `M176,1030 Q${620 + bg},1300 588,1576 Q400,1630 212,1576 Q${180 - bg},1300 176,1030`); }   // ふくらみが戻る
+      if (POCKET && POCKET.dataset.bulge && t >= t0 && t < s.t1) { const bg = 92 * (1 - outC(u / 0.5)); POCKET.querySelector(".pk").setAttribute("d", `M150,1000 Q400,1050 650,1000 Q${650 + bg},1300 610,1600 Q400,1660 190,1600 Q${150 - bg},1300 150,1000 Z`); POCKET.querySelector(".st").setAttribute("d", `M176,1030 Q${620 + bg},1300 588,1576 Q400,1630 212,1576 Q${180 - bg},1300 176,1030`); }   // ふくらみが戻る
       if (POCKET) POCKET.style.display = t < s.t1 ? "" : "none";
       tiles.forEach((e, k) => { const stop = t0 + 0.9 + k * 0.22, a = sp(u - 0.5 - k * 0.08, 12, 0.8); e.style.opacity = String(clamp(a * 1.4) * (1 - o)); e.style.transform = `translateY(${((1 - clamp(a)) * 50).toFixed(1)}px)`;
         if (!/\d/.test(digs[k])) return; const sp2 = e.firstChild;
