@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-07T10:27:37+00:00",
+ "generated_at": "2026-10-08T10:47:36+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -13,18 +13,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wuozi5",
-    "title": "I didn't even know the human body could move like that",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wuozi5/i_didnt_even_know_the_human_body_could_move_like/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wvmas0",
-    "title": "Harry Mack Freestyles for Matthew McConaughey and Woody Harrelson",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wvmas0/harry_mack_freestyles_for_matthew_mcconaughey_and/",
+    "id": "t3_1wzdp64",
+    "title": "Brazilians practicing futbol",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzdp64/brazilians_practicing_futbol/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,28 +31,19 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wye8ku",
-    "title": "Max Verstappen vs 100 Amateur Kart Racers",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wye8ku/max_verstappen_vs_100_amateur_kart_racers/",
+    "id": "t3_1wzse1q",
+    "title": "British adventurer Karl Bushby has finally completed his 28 year journey around the world. Today he reached the finish line in Hull, England after walking more than 30,000 miles without flying or using motorized transport.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzse1q/british_adventurer_karl_bushby_has_finally/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wu70t2",
-    "title": "Nice to see some good news ❤️",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wu70t2/nice_to_see_some_good_news/",
-    "subreddit": "BeAmazed",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wuo7yy",
-    "title": "The reaction of search and rescue dogs when they find people buried in snow and rubble during training",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wuo7yy/the_reaction_of_search_and_rescue_dogs_when_they/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1wvmas0",
+    "title": "Harry Mack Freestyles for Matthew McConaughey and Woody Harrelson",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wvmas0/harry_mack_freestyles_for_matthew_mcconaughey_and/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -76,9 +58,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wuqscw",
-    "title": "The pilot who saved 174 lives by fighting off a mid-air attack and recovering a Boeing 737 MAX from a fatal dive",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wuqscw/the_pilot_who_saved_174_lives_by_fighting_off_a/",
+    "id": "t3_1wwnxmr",
+    "title": "Incase you never knew, this is how swans give hugs",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wwnxmr/incase_you_never_knew_this_is_how_swans_give_hugs/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -94,10 +76,19 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wu65jf",
-    "title": "HMB New Sport Just Dropped...",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1wu65jf/hmb_new_sport_just_dropped/",
-    "subreddit": "holdmybeer",
+    "id": "t3_1wuzdn9",
+    "title": "Mr. Bean only had 15 episodes. As a kid, it felt like there were 10 seasons of this show",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wuzdn9/mr_bean_only_had_15_episodes_as_a_kid_it_felt/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wv3mu3",
+    "title": "An Indian ambulance driver saved this monkey by providing CPR after it had collapsed on being chased by a pack of dogs.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wv3mu3/an_indian_ambulance_driver_saved_this_monkey_by/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -121,6 +112,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1x039gm",
+    "title": "HMB while I wrestle with a bear",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1x039gm/hmb_while_i_wrestle_with_a_bear/",
+    "subreddit": "holdmybeer",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wymsod",
     "title": "Underwater Ceramic Technician",
     "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wymsod/underwater_ceramic_technician/",
@@ -130,9 +130,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wunupu",
-    "title": "I can relate so hard",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wunupu/i_can_relate_so_hard/",
+    "id": "t3_1wxiwob",
+    "title": "Didn't have to do him like that.",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wxiwob/didnt_have_to_do_him_like_that/",
     "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
@@ -213,6 +213,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1wzsvx3",
+    "title": "Homemade Silent Hill Nurse cosplay for Halloween",
+    "url": "https://www.reddit.com/r/cosplay/comments/1wzsvx3/homemade_silent_hill_nurse_cosplay_for_halloween/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wx3f3b",
     "title": "[ART] Shun Saeki (Food Wars: Shokugeki no Soma) is the latest mangaka to jump on the genderbent Draco Malfoy trend",
     "url": "https://www.reddit.com/r/manga/comments/1wx3f3b/art_shun_saeki_food_wars_shokugeki_no_soma_is_the/",
@@ -231,18 +240,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wwngtk",
-    "title": "[DISC] The Trolley Problem and Mom - Oneshot by @kou88450",
-    "url": "https://www.reddit.com/r/manga/comments/1wwngtk/disc_the_trolley_problem_and_mom_oneshot_by/",
+    "id": "t3_1wz9rc4",
+    "title": "[DISC] Since I'm Interested In Your Hair - Ch. 1",
+    "url": "https://www.reddit.com/r/manga/comments/1wz9rc4/disc_since_im_interested_in_your_hair_ch_1/",
     "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wz9rc4",
-    "title": "[DISC] Since I'm Interested In Your Hair - Ch. 1",
-    "url": "https://www.reddit.com/r/manga/comments/1wz9rc4/disc_since_im_interested_in_your_hair_ch_1/",
+    "id": "t3_1wwngtk",
+    "title": "[DISC] The Trolley Problem and Mom - Oneshot by @kou88450",
+    "url": "https://www.reddit.com/r/manga/comments/1wwngtk/disc_the_trolley_problem_and_mom_oneshot_by/",
     "subreddit": "manga",
     "views": 0,
     "has_media": true,
