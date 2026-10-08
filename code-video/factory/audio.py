@@ -88,9 +88,14 @@ for i, b in enumerate(Bs):
     # CM 版3（#300）：差した瞬間の衝撃・カメラを突き抜ける風・1語ごとの打ち込み
     if kind == "flip" and bp.get("burst"): put(sfx, g["impact"](0.6, 1.6), t0 + 0.75, 0.34)
     if kind == "cascade":
-        put(sfx, g["whoosh"](0.7, 160, 3600, 0.6, 0.6), t0 - 0.4, 0.26)
+        put(sfx, g["whoosh"](0.7, 160, 3600, 0.6, 0.6), t0 - 0.4, 0.16)
         n = len(bp.get("words", [])); sl = (t1 - 0.25 - t0 - 0.05) / max(1, n)
-        for k2 in range(n): put(sfx, g["impact"](0.35, 1.0), t0 + 0.05 + k2 * sl, 0.16); put(sfx, g["tock"](320 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.2)
+        for k2 in range(n): put(sfx, g["impact"](0.35, 1.0), t0 + 0.05 + k2 * sl, 0.08); put(sfx, g["tock"](320 + 60 * k2, 0.7), t0 + 0.05 + k2 * sl, 0.12)
+    # 組み合わせ生成（#301）：どの商品にも使える悩み・転換
+    if kind == "hook": put(sfx, g["whoosh"](1.8, 120, 600, 0.25, 0.9), t0 + 0.05, 0.12)
+    if kind == "unveil":
+        put(sfx, g["riser"](0.5, 0.6), max(0, t0 - 0.4), 0.1); put(sfx, g["impact"](0.6, 1.6), t0 + 0.12, 0.22); put(sfx, g["shimmer"](1.6, 0.6), t0 + 0.2, 0.12)
+        put(sfx, g["whoosh"](0.6, 300, 2600, 0.5), t0 + 0.5, 0.16); put(sfx, g["tick"](2600, 0.5), t0 + 1.05, 0.14)   # 横を向く・厚みの線
     if kind == "finale3d": put(sfx, g["whoosh"](0.8, 200, 1800, 0.4, 0.8), t0 - 0.3, 0.14); put(sfx, g["shimmer"](1.4, 0.5), t0 + 0.2, 0.12); put(sfx, g["bell"](1318.5, 0.7, 1.6), t0 + 1.6, 0.2)
     if kind == "match":   # lookbook.html の match：猫（0.35＋0.55k）→ 矢印 → 平置き（0.8＋0.55k）
         for k2 in range(len(bp.get("pairs", []))): put(sfx, g["whoosh"](0.4, 400, 2600, 0.5), t0 + 0.35 + k2 * 0.55, 0.12); put(sfx, g["tock"](320 + 40 * k2, 0.7), t0 + 0.8 + k2 * 0.55, 0.2)
@@ -197,9 +202,11 @@ for i, b in enumerate(Bs):
         for fq, dl in [(1046.5, 0), (1318.5, 0.045), (1568.0, 0.09), (2093.0, 0.135)]: put(sfx, g["bell"](fq, 1.0, 2.2), cta + dl, 0.18, (dl - 0.07) * 4)
 sfx = g["reverb"](sfx, 1.6, 0.25) * (1 - 0.5 * env)
 if P["template"] == "paper": music *= 0.4; sfx *= 0.45   # 拍と効果音が多い型。声との差 9dB 以上を守る（#267-7）
+m = env > 0.5; r = lambda x: 20 * np.log10(np.sqrt(np.mean(x[:, m] ** 2)) + 1e-12)
+need = 10.5 - (r(voice) - r(music * 0.55 + sfx * 0.6))   # 声との差 9dB 以上（#267-7）を、型や声の長さに関わらず自動で守る（短い声の CM で 8.0dB になった・#301）
+if need > 0: music *= 10 ** (-need / 20); sfx *= 10 ** (-need / 20)
 mix = voice + music * 0.55 + sfx * 0.6; mix /= np.abs(mix).max() / 0.8
 wav = out.replace(".m4a", ".wav"); wavfile.write(wav, SR, mix.T.astype(np.float32))
 subprocess.run([FF, "-v", "error", "-y", "-i", wav, "-af", "loudnorm=I=-14:TP=-1.5:LRA=7", "-ar", "48000", "-c:a", "aac", "-b:a", "192k", out], check=True)
-bed = music * 0.55 + sfx * 0.6; m = env > 0.5
-r = lambda x: 20 * np.log10(np.sqrt(np.mean(x[:, m] ** 2)) + 1e-12)
+bed = music * 0.55 + sfx * 0.6
 print(json.dumps({"voice_over_bed_db": round(r(voice) - r(bed), 1), "music_db": round(r(voice) - r(music * 0.55), 1), "sfx_db": round(r(voice) - r(sfx * 0.6), 1)}))

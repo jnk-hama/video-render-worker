@@ -1,0 +1,26 @@
+[
+ {
+  "product_key": "cado-foehn-cm",
+  "style": {
+   "palette": "amber",
+   "deck": "ring",
+   "head": "mask",
+   "rapid": "wall",
+   "burst": "full",
+   "bokeh": 30
+  },
+  "seed": null
+ },
+ {
+  "product_key": "ugreen-air",
+  "style": {
+   "palette": "graphite",
+   "deck": "stack",
+   "head": "blur",
+   "rapid": "punch",
+   "burst": "flare",
+   "bokeh": 16
+  },
+  "seed": 54617
+ }
+]
