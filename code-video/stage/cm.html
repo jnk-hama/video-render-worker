@@ -271,18 +271,21 @@ function buildSlab() {
   const box = el("div", { class: "abs", style: "left:0;top:0;width:0;height:0;transform-style:preserve-3d" }, "", st);
   const face = (w, h, tf, css, html = "") => el("div", { class: "abs", style: `left:${-w / 2}px;top:${-h / 2}px;width:${w}px;height:${h}px;transform:${tf};backface-visibility:hidden;${css}` }, html, box);
   const sideBg = `linear-gradient(90deg, ${sb.edge} 0%, rgba(255,255,255,.55) 50%, ${sb.edge} 100%)`;
-  const faces = [face(W, H, `translateZ(${T / 2}px)`, "", `<img src="${DIR}${P.hero.cutout}" style="display:block;width:100%;height:100%">`),
+  const PH = sb.photo;   // #304 写真のまま（側面・背面を作り物で付けない＝CG に見えない）
+  const faces = [face(W, H, PH ? "none" : `translateZ(${T / 2}px)`, "", `<img src="${DIR}${P.hero.cutout}" style="display:block;width:100%;height:100%">`)].concat(PH ? [] : [
     face(W, H, `rotateY(180deg) translateZ(${T / 2}px)`, `border-radius:${R}px;background:${sb.back || sb.edge}`),
     face(T, H - 2 * R, `rotateY(90deg) translateZ(${W / 2 - 3}px)`, `background:${sideBg}`), face(T, H - 2 * R, `rotateY(-90deg) translateZ(${W / 2 - 3}px)`, `background:${sideBg}`),
-    face(W - 2 * R, T, `rotateX(90deg) translateZ(${H / 2 - 3}px)`, `background:${sb.edge}`), face(W - 2 * R, T, `rotateX(-90deg) translateZ(${H / 2 - 3}px)`, `background:${sb.edge}`)];
-  const spec = [faces[2], faces[3]].map((f) => el("div", { class: "abs", style: "left:0;top:0;width:100%;height:30%;opacity:0;background:linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.95) 50%, rgba(255,255,255,0))" }, "", f));   // #303 縁を走る光
+    face(W - 2 * R, T, `rotateX(90deg) translateZ(${H / 2 - 3}px)`, `background:${sb.edge}`), face(W - 2 * R, T, `rotateX(-90deg) translateZ(${H / 2 - 3}px)`, `background:${sb.edge}`)]);
+  const spec = (PH ? [] : [faces[2], faces[3]]).map((f) => el("div", { class: "abs", style: "left:0;top:0;width:100%;height:30%;opacity:0;background:linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.95) 50%, rgba(255,255,255,0))" }, "", f));   // #303 縁を走る光
   const glint = el("div", { class: "abs", style: `left:0;top:0;width:100%;height:100%;opacity:0;pointer-events:none;-webkit-mask:url(${DIR}${P.hero.cutout}) center/100% 100% no-repeat;mask:url(${DIR}${P.hero.cutout}) center/100% 100% no-repeat;background:linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.85) 50%, rgba(255,255,255,0) 62%);background-size:300% 100%;mix-blend-mode:screen` }, "", faces[0]);   // 面を横切る光沢
   SLAB = { st, box, faces, W, H, T, spec, glint }; return SLAB;
 }
 // 悩み→転換の間の本体の動き：悩みでは暗い影で分厚く（※イメージ）、光が弾けると本当の厚みに締まり、回って横から薄さを見せ、正面へ戻る
 // #302：場面ごとに本体（板）の置き方を登録する。どの場面の時間にも入らない時は隠す
 const SLABK = [];
-function slabSet(x, y, sc, rx, ry, rz = 0, th = 1, br = 1) { SLAB.st.style.left = `${x.toFixed(1)}px`; SLAB.st.style.top = `${y.toFixed(1)}px`;
+function slabSet(x, y, sc, rx, ry, rz = 0, th = 1, br = 1) {
+  if (P.slab && P.slab.photo) { ry = clamp(ry, -12, 12); rx = clamp(rx, -6, 6); th = 1; }   // #304 写真は撮られた角度から大きく回さない
+  SLAB.st.style.left = `${x.toFixed(1)}px`; SLAB.st.style.top = `${y.toFixed(1)}px`;
   SLAB.box.style.transform = `scale(${sc.toFixed(3)}) rotateZ(${rz.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale3d(1,1,${th.toFixed(3)})`;
   const f = br >= 0.999 ? "none" : `brightness(${br.toFixed(3)})`; SLAB.faces.forEach((e) => { e.style.filter = f; }); }
 function slabAt(t) {
@@ -297,6 +300,78 @@ function slabAt(t) {
   const f = `brightness(${br.toFixed(3)}) saturate(${lerp(0.3, 1, br).toFixed(3)})`; SLAB.faces.forEach((e) => { e.style.filter = f; });
 }
 const KINDS = {
+  // #305 つかみ「手のひら」（オーナー「バックの暗さもリアルな背景に」→ C の木の机と植物 →「これに手に乗せてる描写作れる？」）
+  //   本物の映像（Pexels の机と植物）に、本物の手（Pexels の差し出した手の1コマを切り抜き）、手のひらに販売ページの写真の本体。合成は ※合成イメージ と出す
+  //   1コマ目から本体が手のひらにある（#267）。手はゆっくり差し出され、カメラは少し寄る。光沢が本体を横切る。見出しは字の間が締まる
+  palm(b, i, s) {
+    const t0 = s.t0, end = s.t1, H = b.hand, PR = b.prod;
+    const real = loadBroll(b.broll, b.frames);
+    const cv = el("canvas", { class: "abs scrim", width: 1080, height: 1920, style: "left:0;top:0;width:1080px;height:1920px;filter:blur(1px) saturate(.95)" }, "", $("under"));
+    const veil = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;background:linear-gradient(180deg, rgba(250,250,248,.86) 0%, rgba(250,250,248,.6) 30%, rgba(250,250,248,0) 46%)" }, "", $("under"));   // 見出しの下を明るく（植物の濃い緑の上でも読める）
+    const grp = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;transform-origin:60% 80%" }, "", $("prodlayer"));
+    el("img", { src: `${DIR}${H.cut}`, class: "abs", style: `left:${H.x}px;top:${H.y}px;width:${H.w}px;filter:drop-shadow(0 30px 40px rgba(60,50,40,.25))` }, "", grp);
+    el("div", { class: "abs", style: `left:${PR.x - PR.h * 0.32}px;top:${PR.y + PR.h * 0.18}px;width:${PR.h * 0.64}px;height:${PR.h * 0.42}px;border-radius:50%;background:rgba(70,50,40,.45);filter:blur(18px);transform:rotate(${PR.r}deg)` }, "", grp);   // 手のひらに落ちる影
+    const pw = el("div", { class: "abs", style: `left:${PR.x}px;top:${PR.y}px;height:${PR.h}px;transform:translate(-50%,-50%) rotate(${PR.r}deg)` }, `<img src="${DIR}${PR.cut}" style="display:block;height:100%;width:auto;filter:drop-shadow(0 10px 12px rgba(40,30,25,.35))">`, grp);
+    const gl = el("div", { class: "abs", style: `left:0;top:0;width:100%;height:100%;pointer-events:none;-webkit-mask:url(${DIR}${PR.cut}) center/100% 100% no-repeat;mask:url(${DIR}${PR.cut}) center/100% 100% no-repeat;background:linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.85) 50%, rgba(255,255,255,0) 62%);background-size:300% 100%;mix-blend-mode:screen;opacity:0` }, "", pw);
+    const h0 = el("div", { class: "abs", style: "left:0;top:300px;width:1080px;text-align:center;white-space:nowrap;font:700 64px/1.2 'Shippori Mincho';color:#2A2C31" }, b.head[0]);
+    const h1 = el("div", { class: "abs", style: "left:0;top:392px;width:1080px;text-align:center;white-space:nowrap;font:700 140px/1.1 'Shippori Mincho';color:#15171C" }, b.head[1] || "");
+    const nt = el("div", { class: "note", style: "left:70px;top:1740px;width:940px;color:#3E4148" }, b.note || "");
+    SLABEND = { x: PR.x, y: PR.y, sc: 0.55, ry: 0 };
+    hideCam(s);
+    U.push((t) => { const u = t - t0, on = t < end + 0.6, vis = t < end;
+      [cv, veil].forEach((e) => { e.style.display = on ? "" : "none"; }); grp.style.display = h0.style.display = h1.style.display = nt.style.display = vis ? "" : "none";
+      if (on) cv.getContext("2d").drawImage(real[Math.min(real.length - 1, Math.floor(Math.max(0, t) * 25))], 0, 0, 1080, 1920);
+      const rr = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])) * 2300, m = rr > 0 ? `radial-gradient(circle at ${IN.x}px ${IN.y}px, transparent ${rr.toFixed(0)}px, #000 ${(rr + 2).toFixed(0)}px)` : "none";   // 次の場面で白く抜ける
+      [cv, veil].forEach((e) => { e.style.webkitMaskImage = e.style.maskImage = m; });
+      const a = outC((u + 0.6) / 2.4);   // 手がゆっくり差し出される（1コマ目からもう見えている）
+      grp.style.transform = `translate(${((1 - a) * 60).toFixed(1)}px, ${((1 - a) * 90 + Math.sin(t * 1.3) * 4).toFixed(1)}px) scale(${(0.96 + 0.06 * a).toFixed(3)})`;
+      cv.style.transform = `scale(${(1 + 0.03 * clamp(u / 2.6)).toFixed(4)})`;
+      const q = clamp((u - 1.1) / 0.8); gl.style.opacity = String(Math.sin(Math.PI * q)); gl.style.backgroundPosition = `${lerp(100, 0, q)}% 0`;
+      const tr = (k) => `${lerp(k ? 0.16 : 0.42, 0.04, outC((u + 0.3) / 2.6)).toFixed(3)}em`; h0.style.letterSpacing = tr(0); h1.style.letterSpacing = tr(1); });
+  },
+  // #304 つかみ「光の隙間」（オーナー「バッテリーがなんか凄く偽物感というかCG感が凄くて」）
+  //   写真を撮られた角度から回さない（側面を作り物で付けない）。真っ暗なスタジオに本物の光の線が1本 → 線が左右に開き、光の隙間から本物の写真の本体が現れる
+  //   床に映り込み、表面を光沢が横切る。見出しは字の間が広い所からゆっくり締まる。次の場面で暗い地が白く抜ける
+  slit(b, i, s) {
+    buildSlab(); const t0 = s.t0, end = s.t1, CY = 1060, to = t0 + 1.0, sc0 = 1.1, HW = SLAB.W * sc0 / 2 + 30;
+    const dark = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;background:radial-gradient(ellipse 760px 980px at 50% 52%, #2B2E36 0%, #121318 52%, #050506 100%)" }, "", $("under"));
+    const cone = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1500px;clip-path:polygon(500px 0, 580px 0, 900px 1450px, 180px 1450px);background:linear-gradient(180deg, rgba(235,240,255,.20) 0%, rgba(235,240,255,.06) 70%, rgba(235,240,255,0) 100%);filter:blur(16px)" }, "", $("under"));
+    const r = mulberry32(11), DU = Array.from({ length: 46 }, () => ({ x: 260 + r() * 560, y: 200 + r() * 1200, s: 2 + r() * 4, v: 6 + r() * 18, ph: r() * 6 }));
+    const dust = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px" }, `<svg width="1080" height="1920">${DU.map((q) => `<circle r="${q.s.toFixed(1)}" fill="#EEF2FF"/>`).join("")}</svg>`, $("under"));
+    const DC = dust.querySelectorAll("circle");
+    const floor = el("div", { class: "abs scrim", style: `left:140px;top:${CY + 360}px;width:800px;height:120px;border-radius:50%;background:radial-gradient(ellipse, rgba(225,232,255,.28) 0%, rgba(225,232,255,0) 70%)` }, "", $("under"));
+    // #305 背景を本物の映像に（オーナー「バックの暗さもリアルな背景に、変えるのは？」）：真上から見た黒い大理石の台。暗く・少しぼかして奥行き、周りは落とす
+    const real = b.broll ? loadBroll(b.broll, b.frames) : null;
+    const cv = real ? el("canvas", { class: "abs scrim", width: 1080, height: 1920, style: "left:0;top:0;width:1080px;height:1920px;filter:brightness(.6) contrast(1.08) saturate(.85) blur(1.2px)" }, "", $("under")) : null;
+    const vig = real ? el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;background:radial-gradient(ellipse 620px 820px at 50% 55%, rgba(0,0,0,0) 0%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.82) 100%)" }, "", $("under")) : null;
+    const shadow = real ? el("div", { class: "abs", style: `left:${540 - SLAB.W * sc0 / 2 + 18}px;top:${CY - SLAB.H * sc0 / 2 + 34}px;width:${SLAB.W * sc0}px;height:${SLAB.H * sc0}px;border-radius:${SLAB.W * 0.12}px;background:rgba(0,0,0,.75);filter:blur(26px);opacity:0` }, "", $("under")) : null;   // 台に落ちる影（真上の光）
+    const ref = el("img", { src: `${DIR}${P.hero.cutout}`, class: "abs", style: `${real ? "display:none;" : ""}left:${540 - SLAB.W * sc0 / 2}px;top:${CY + SLAB.H * sc0 / 2 + 8}px;width:${SLAB.W * sc0}px;height:${SLAB.H * sc0}px;transform:scaleY(-1);transform-origin:50% 0;opacity:.22;-webkit-mask:linear-gradient(0deg, rgba(0,0,0,0) 72%, #000 100%);mask:linear-gradient(0deg, rgba(0,0,0,0) 72%, #000 100%)` }, "", $("under"));   // 黒い床への映り込み（同じ写真を上下反転して薄く）
+    const glow = (x) => el("div", { class: "abs", style: `left:${x}px;top:${CY - 470}px;width:6px;height:940px;border-radius:3px;background:linear-gradient(180deg, rgba(255,255,255,0), #fff 18%, #fff 82%, rgba(255,255,255,0));box-shadow:0 0 28px 8px rgba(215,225,255,.75);opacity:0` }, "", $("prodlayer"));
+    const L = glow(537), R = glow(537);   // 光の線（開くと2本に分かれて左右へ）
+    const fl = el("div", { class: "abs", style: `left:-200px;top:${CY - 60}px;width:1480px;height:120px;opacity:0;background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255,255,255,.85) 0%, rgba(210,220,255,.4) 20%, rgba(210,220,255,0) 70%)` }, `<div style="position:absolute;left:0;top:57px;width:100%;height:5px;background:linear-gradient(90deg, rgba(255,255,255,0), #fff 50%, rgba(255,255,255,0))"></div>`, $("prodlayer"));
+    const h0 = el("div", { class: "abs", style: "left:0;top:300px;width:1080px;text-align:center;white-space:nowrap;font:700 64px/1.2 'Shippori Mincho';color:#E9ECF4" }, b.head[0]);
+    const h1 = el("div", { class: "abs", style: "left:0;top:392px;width:1080px;text-align:center;white-space:nowrap;font:700 140px/1.1 'Shippori Mincho';color:#F4F5FA;text-shadow:0 0 40px rgba(200,210,255,.25)" }, b.head[1] || "");
+    const nt = el("div", { class: "note", style: "left:70px;top:1720px;width:940px;color:#8E95A6" }, b.note || "");
+    const hwAt = (t) => HW * inOutC((t - to) / 0.7);
+    SLABK.push({ a: -1, b: end, f: (t) => { const u = t - t0, hw = hwAt(t);
+      slabSet(540, CY + Math.sin(t * 1.1) * 5, sc0 + 0.035 * u, 2, -5 + 3 * Math.sin(t * 0.8));
+      SLAB.st.style.clipPath = hw >= HW - 0.5 ? "none" : `polygon(${-hw}px -900px, ${hw}px -900px, ${hw}px 900px, ${-hw}px 900px)`;   // 光の隙間の幅だけ見える
+      SLAB.glint.style.opacity = String(Math.sin(Math.PI * clamp((u - 1.6) / 0.8))); SLAB.glint.style.backgroundPosition = `${lerp(100, 0, clamp((u - 1.6) / 0.8))}% 0`; } });
+    SLABEND = { x: 540, y: CY, sc: sc0 + 0.035 * (end - t0), ry: -5 };
+    hideCam(s);
+    U.push((t) => { const u = t - t0, on = t < end + 0.6, vis = t < end, hw = hwAt(t);
+      [dark, cone, dust, floor].concat(real ? [cv, vig, shadow] : [ref]).forEach((e) => { e.style.display = on ? "" : "none"; });
+      if (real && on) { const im = real[Math.min(real.length - 1, Math.floor(Math.max(0, t) * 25))]; cv.getContext("2d").drawImage(im, 0, 0, 1080, 1920); shadow.style.opacity = String(clamp(hw / HW) * 0.9); }
+      const rr = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])) * 2300, m = rr > 0 ? `radial-gradient(circle at ${IN.x}px ${IN.y}px, transparent ${rr.toFixed(0)}px, #000 ${(rr + 2).toFixed(0)}px)` : "none";
+      [dark, cone, dust, floor].concat(real ? [cv, vig, shadow] : []).forEach((e) => { e.style.webkitMaskImage = e.style.maskImage = m; });
+      DU.forEach((q, k) => { DC[k].setAttribute("cx", (q.x + Math.sin(t * 0.7 + q.ph) * 24).toFixed(1)); DC[k].setAttribute("cy", ((((q.y - t * q.v) % 1250) + 1250) % 1250 + 200).toFixed(1)); DC[k].setAttribute("opacity", (0.25 + 0.35 * Math.sin(t * 1.3 + q.ph) ** 2).toFixed(2)); });
+      const grow = clamp((u + 0.2) / 1.0), lo = (u < 1.0 ? 0.55 + 0.45 * grow : 1) * (1 - clamp((hw - HW * 0.7) / (HW * 0.3)));   // 線がだんだん明るくなり、開き切ると消える
+      L.style.opacity = R.style.opacity = String(vis ? lo : 0); L.style.transform = `translateX(${-hw}px) scaleY(${lerp(0.55, 1, grow).toFixed(3)})`; R.style.transform = `translateX(${hw}px) scaleY(${lerp(0.55, 1, grow).toFixed(3)})`;
+      ref.style.clipPath = `inset(0 ${(SLAB.W * sc0 / 2 - Math.min(hw, SLAB.W * sc0 / 2)).toFixed(1)}px)`; ref.style.opacity = String(0.22 * clamp(hw / 40));
+      h0.style.display = h1.style.display = nt.style.display = fl.style.display = vis ? "" : "none";
+      const tr = (k) => `${lerp(k ? 0.16 : 0.42, 0.04, outC((u + 0.3) / 2.6)).toFixed(3)}em`; h0.style.letterSpacing = tr(0); h1.style.letterSpacing = tr(1);
+      fl.style.opacity = String(u > 1.0 ? Math.exp(-(u - 1.0) * 3.2) : 0); fl.style.transform = `scaleX(${(0.2 + 1.3 * outC(clamp((u - 1.0) / 0.8))).toFixed(3)})`; });
+  },
   // #303 つかみ「一本の光」（オーナー「1シーン目が一番弱い！一番のフックが弱いとやばい！もっと1シーン目高級に作り込んで」）
   //   真っ暗なスタジオに細い光の線が1本だけ立つ（本体の横顔）→ 縁を光が走り、カメラがゆっくり寄る（何だろう？）→ 回って正面を向くと薄いバッテリーだった
   //   正面を向く瞬間に光沢が面を横切り、横に伸びる光芒が1回走る。見出しは字の間が広い所からゆっくり締まる。次の場面で暗い地が白く抜ける
@@ -322,7 +397,7 @@ const KINDS = {
     U.push((t) => { const u = t - t0, on = t < end + 0.6;
       [dark, cone, dust, floor].forEach((e) => { e.style.display = on ? "" : "none"; });
       const rr = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])) * 2300, m = rr > 0 ? `radial-gradient(circle at ${IN.x}px ${IN.y}px, transparent ${rr.toFixed(0)}px, #000 ${(rr + 2).toFixed(0)}px)` : "none";   // 次の場面で、暗い地がポケットの所から白く抜ける
-      [dark, cone, dust, floor].forEach((e) => { e.style.webkitMaskImage = e.style.maskImage = m; });
+      [dark, cone, dust, floor].concat(real ? [cv, vig, shadow] : []).forEach((e) => { e.style.webkitMaskImage = e.style.maskImage = m; });
       DU.forEach((q, k) => { DC[k].setAttribute("cx", (q.x + Math.sin(t * 0.7 + q.ph) * 24).toFixed(1)); DC[k].setAttribute("cy", ((((q.y - t * q.v) % 1250) + 1250) % 1250 + 200).toFixed(1)); DC[k].setAttribute("opacity", (0.25 + 0.35 * Math.sin(t * 1.3 + q.ph) ** 2).toFixed(2)); });
       const vis = t < end ? 1 : 0; h0.style.display = h1.style.display = nt.style.display = dl.style.display = vis ? "" : "none";
       const tr = (k) => `${lerp(k ? 0.16 : 0.42, 0.04, outC((u + 0.3) / 2.6)).toFixed(3)}em`;   // 字の間が広い所からゆっくり締まる（止まらない・高級）
@@ -452,7 +527,8 @@ const KINDS = {
     const nm = el("div", { class: "abs", style: `left:0;top:1520px;width:1080px;text-align:center;font:900 ${[...P.name].length > 20 ? 36 : 44}px/1 'Noto Sans JP';color:#15171C;opacity:0` }, P.name);
     const ct = el("div", { class: "abs", style: "left:50%;top:1580px;height:104px;padding:0 46px;border-radius:52px;background:#15171C;color:#fff;display:flex;align-items:center;gap:14px;font:900 40px/1 'Noto Sans JP';white-space:nowrap;opacity:0" }, `${b.cta}<svg width="34" height="34" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`);
     const nt = el("div", { class: "note", style: "left:70px;top:1720px;width:940px;text-align:center;opacity:0" }, b.note || "");
-    SLABK.push({ a: t0, b: 999, f: (t) => { const u = t - t0, a = sp(u + 0.05, 8, 0.8); slabSet(540, lerp(1300, 900, clamp(a)), 0.95, 6, -30 + 112 * u); } });   // 1秒に約110度＝締めの間にほぼ1回転
+    SLABK.push({ a: t0, b: 999, f: (t) => { const u = t - t0, a = sp(u + 0.05, 8, 0.8); slabSet(540, lerp(1300, 900, clamp(a)), 0.95, 3, P.slab.photo ? 7 * Math.sin(u * 1.3) : -30 + 112 * u);
+      if (P.slab.photo) { const q = ((u - 0.6) % 1.6 + 1.6) % 1.6 / 1.1; SLAB.glint.style.opacity = String(u > 0.6 && q < 1 ? Math.sin(Math.PI * q) : 0); SLAB.glint.style.backgroundPosition = `${lerp(100, 0, clamp(q))}% 0`; } } });   // 写真の時は回さず、光沢がくり返し横切る   // 1秒に約110度＝締めの間にほぼ1回転
     hideCam(s);
     U.push((t) => { const u = t - t0; big.style.opacity = String(clamp((u - 0.1) / 0.5)); ped.style.opacity = String(clamp((u - 0.05) / 0.4));
       fadeUp(rv, t0 + 0.5, 999, 30); setText(rv.querySelector(".gar"), String(Math.round(b.reviews * outC((u - 0.5) / 0.9))));

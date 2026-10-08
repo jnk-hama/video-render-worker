@@ -165,6 +165,9 @@ def assets(P):
     os.makedirs(os.path.join(D, "voice"), exist_ok=True)
     for i, (_, f) in enumerate(voices(P)): shutil.copy(os.path.join(S, f"line{i}.mp3"), os.path.join(D, "voice", f))
     cand = {}
+    for c in pr.get("cutouts", []):   # #305 動画の1コマから切り抜く（src="vid1@0.5"＝2本目の動画の0.5秒目）
+        if "@" in c["src"]:
+            v, ts = c["src"].split("@"); subprocess.run([FF, "-loglevel", "error", "-y", "-ss", ts, "-i", os.path.join(S, v + ".mp4"), "-frames:v", "1", "-q:v", "2", os.path.join(S, c["src"] + ".jpg")], check=True)
     for c in pr.get("cutouts", []):   # 範囲を切る → EDSR で4倍 → BiRefNet（1枚ずつ別の処理＝メモリ不足を避ける）
         crop = os.path.join(S, f"{c['out']}_src.png"); sr = os.path.join(S, f"{c['out']}_sr.png")
         Image.open(os.path.join(S, c["src"] + ".jpg")).convert("RGB").crop(tuple(c["crop"])).save(crop)
