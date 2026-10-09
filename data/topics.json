@@ -1,30 +1,12 @@
 {
- "generated_at": "2026-10-08T10:47:36+00:00",
+ "generated_at": "2026-10-09T10:47:33+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1wv90y5",
-    "title": "Standing Double Backflip",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wv90y5/standing_double_backflip/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wzdp64",
     "title": "Brazilians practicing futbol",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzdp64/brazilians_practicing_futbol/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wyqzfv",
-    "title": "Diorama of NY in 1997",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wyqzfv/diorama_of_ny_in_1997/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,9 +22,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wvmas0",
-    "title": "Harry Mack Freestyles for Matthew McConaughey and Woody Harrelson",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wvmas0/harry_mack_freestyles_for_matthew_mcconaughey_and/",
+    "id": "t3_1wyqzfv",
+    "title": "Diorama of NY in 1997",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wyqzfv/diorama_of_ny_in_1997/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x0piuk",
+    "title": "Grey car driver has probably been driving around with that extinguisher for five years just waiting for this exact moment.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x0piuk/grey_car_driver_has_probably_been_driving_around/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wye8ku",
+    "title": "Max Verstappen vs 100 Amateur Kart Racers",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wye8ku/max_verstappen_vs_100_amateur_kart_racers/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -76,64 +76,64 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wuzdn9",
-    "title": "Mr. Bean only had 15 episodes. As a kid, it felt like there were 10 seasons of this show",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wuzdn9/mr_bean_only_had_15_episodes_as_a_kid_it_felt/",
+    "id": "t3_1x0jhgp",
+    "title": "Girl gets rescue parrot to fly to her for the first time.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1x0jhgp/girl_gets_rescue_parrot_to_fly_to_her_for_the/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wv3mu3",
-    "title": "An Indian ambulance driver saved this monkey by providing CPR after it had collapsed on being chased by a pack of dogs.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wv3mu3/an_indian_ambulance_driver_saved_this_monkey_by/",
+    "id": "t3_1x00y7d",
+    "title": "Gray squirrel from Japan's Hokkaido island. Woah.",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1x00y7d/gray_squirrel_from_japans_hokkaido_island_woah/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wwm4i0",
-    "title": "HMB while i breakdance",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1wwm4i0/hmb_while_i_breakdance/",
-    "subreddit": "holdmybeer",
+    "id": "t3_1wzzz87",
+    "title": "Dude is looking Fly!",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wzzz87/dude_is_looking_fly/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1ww21k5",
-    "title": "HMB while I try this amazing flying jump kick",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1ww21k5/hmb_while_i_try_this_amazing_flying_jump_kick/",
-    "subreddit": "holdmybeer",
+    "id": "t3_1wxhlb4",
+    "title": "Hesitation makes things easier sometimes",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wxhlb4/hesitation_makes_things_easier_sometimes/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x039gm",
-    "title": "HMB while I wrestle with a bear",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1x039gm/hmb_while_i_wrestle_with_a_bear/",
-    "subreddit": "holdmybeer",
+    "id": "t3_1wxpjcj",
+    "title": "That's a great trick for ink shading, Very cool (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wxpjcj/thats_a_great_trick_for_ink_shading_very_cool/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wymsod",
-    "title": "Underwater Ceramic Technician",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wymsod/underwater_ceramic_technician/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1wx0qvi",
+    "title": "Nice swing (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1wx0qvi/nice_swing_source_link_in_description/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wxiwob",
-    "title": "Didn't have to do him like that.",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wxiwob/didnt_have_to_do_him_like_that/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1x0m2l7",
+    "title": "100 Year Old Flute Player Shocks The Nursing Home (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1x0m2l7/100_year_old_flute_player_shocks_the_nursing_home/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,82 +141,64 @@
   ],
   "B": [
    {
-    "id": "t3_1wv1ytk",
-    "title": "Frieren [Sousou no Frieren]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wv1ytk/frieren_sousou_no_frieren/",
-    "subreddit": "awwnime",
+    "id": "t3_1wxdote",
+    "title": "She brings me & others a lot of joy",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wxdote/she_brings_me_others_a_lot_of_joy/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wwxkst",
-    "title": "Ichika Headpats (GunTree) [Blue Archive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wwxkst/ichika_headpats_guntree_blue_archive/",
-    "subreddit": "awwnime",
+    "id": "t3_1wwinip",
+    "title": "The trend I can get behind.",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wwinip/the_trend_i_can_get_behind/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wwdqmc",
-    "title": "Silver Wolf [Honkai: Star Rail]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wwdqmc/silver_wolf_honkai_star_rail/",
-    "subreddit": "awwnime",
+    "id": "t3_1wwmk09",
+    "title": "Malefoid sometimes hides her feelings in Parseltongue",
+    "url": "https://www.reddit.com/r/Animemes/comments/1wwmk09/malefoid_sometimes_hides_her_feelings_in/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wvmsi7",
-    "title": "Carlotta [Wuthering Waves]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1wvmsi7/carlotta_wuthering_waves/",
-    "subreddit": "awwnime",
+    "id": "t3_1x0qmj5",
+    "title": "The virgin reboot vs The CHAD FanFictions.",
+    "url": "https://www.reddit.com/r/Animemes/comments/1x0qmj5/the_virgin_reboot_vs_the_chad_fanfictions/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1ww5p8q",
-    "title": "Ben Tennyson (Ben 10) Cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1ww5p8q/ben_tennyson_ben_10_cosplay/",
-    "subreddit": "cosplay",
+    "id": "t3_1wy8yz4",
+    "title": "[WDWT] it’s been a long time",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wy8yz4/wdwt_its_been_a_long_time/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wxoru7",
-    "title": "Miriko from My Hero Academia",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wxoru7/miriko_from_my_hero_academia/",
-    "subreddit": "cosplay",
+    "id": "t3_1wz32j8",
+    "title": "[WDYWT] another one cuz i missed Reddit comments 😌",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wz32j8/wdywt_another_one_cuz_i_missed_reddit_comments/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wvnf7w",
-    "title": "Nikki cosplay from Obsession",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wvnf7w/nikki_cosplay_from_obsession/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wyvpwa",
-    "title": "[Self] Captain Jack Sparrow",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wyvpwa/self_captain_jack_sparrow/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wzsvx3",
-    "title": "Homemade Silent Hill Nurse cosplay for Halloween",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wzsvx3/homemade_silent_hill_nurse_cosplay_for_halloween/",
-    "subreddit": "cosplay",
+    "id": "t3_1wxkk2x",
+    "title": "Beyond Windy in Chicago",
+    "url": "https://www.reddit.com/r/streetwear/comments/1wxkk2x/beyond_windy_in_chicago/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -258,12 +240,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wvunnp",
-    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 8",
-    "url": "https://www.reddit.com/r/manga/comments/1wvunnp/disc_the_story_of_a_girl_who_can_read_minds_ch_8/",
+    "id": "t3_1wzzhuq",
+    "title": "[DISC] Wolf - Oneshot by @ka92",
+    "url": "https://www.reddit.com/r/manga/comments/1wzzhuq/disc_wolf_oneshot_by_ka92/",
     "subreddit": "manga",
     "views": 0,
-    "has_media": false,
+    "has_media": true,
     "source": "rss"
    }
   ]
