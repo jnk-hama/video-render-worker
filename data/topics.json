@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-09T10:47:33+00:00",
+ "generated_at": "2026-10-10T10:02:55+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,6 +7,15 @@
     "id": "t3_1wzdp64",
     "title": "Brazilians practicing futbol",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzdp64/brazilians_practicing_futbol/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x0piuk",
+    "title": "Grey car driver has probably been driving around with that extinguisher for five years just waiting for this exact moment.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x0piuk/grey_car_driver_has_probably_been_driving_around/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -31,15 +40,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x0piuk",
-    "title": "Grey car driver has probably been driving around with that extinguisher for five years just waiting for this exact moment.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x0piuk/grey_car_driver_has_probably_been_driving_around/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wye8ku",
     "title": "Max Verstappen vs 100 Amateur Kart Racers",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wye8ku/max_verstappen_vs_100_amateur_kart_racers/",
@@ -49,27 +49,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wvtrzv",
-    "title": "Maggie's Incredible Comeback.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wvtrzv/maggies_incredible_comeback/",
-    "subreddit": "BeAmazed",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wwnxmr",
     "title": "Incase you never knew, this is how swans give hugs",
     "url": "https://www.reddit.com/r/BeAmazed/comments/1wwnxmr/incase_you_never_knew_this_is_how_swans_give_hugs/",
-    "subreddit": "BeAmazed",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wwao0m",
-    "title": "These are the Three Whale Rocks (Hin Sam Wan) in Phu Sing Forest Park, Bueng Kan Province, northeastern Thailand.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1wwao0m/these_are_the_three_whale_rocks_hin_sam_wan_in/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -94,6 +76,24 @@
     "source": "rss"
    },
    {
+    "id": "t3_1x0yjv3",
+    "title": "F1 Racing Pit Stops in 1990 vs 2026",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1x0yjv3/f1_racing_pit_stops_in_1990_vs_2026/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wzc1op",
+    "title": "Halo is a Great Pyrenees who was born without front legs and later had one back leg amputated for health reasons. She just got her prosthetics, and this is the first day of her life she’s been able to run with her friends. 🐾",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1wzc1op/halo_is_a_great_pyrenees_who_was_born_without/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1wzzz87",
     "title": "Dude is looking Fly!",
     "url": "https://www.reddit.com/r/Unexpected/comments/1wzzz87/dude_is_looking_fly/",
@@ -112,28 +112,28 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wxpjcj",
-    "title": "That's a great trick for ink shading, Very cool (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1wxpjcj/thats_a_great_trick_for_ink_shading_very_cool/",
-    "subreddit": "toptalent",
+    "id": "t3_1wxsx5v",
+    "title": "Interesting job description",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1wxsx5v/interesting_job_description/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wx0qvi",
-    "title": "Nice swing (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1wx0qvi/nice_swing_source_link_in_description/",
-    "subreddit": "toptalent",
+    "id": "t3_1wy0abt",
+    "title": "The tree perfectly fitting into the sunset.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wy0abt/the_tree_perfectly_fitting_into_the_sunset/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x0m2l7",
-    "title": "100 Year Old Flute Player Shocks The Nursing Home (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1x0m2l7/100_year_old_flute_player_shocks_the_nursing_home/",
-    "subreddit": "toptalent",
+    "id": "t3_1wxiqcf",
+    "title": "Monkey Smells a Century Egg.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1wxiqcf/monkey_smells_a_century_egg/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,109 +141,100 @@
   ],
   "B": [
    {
-    "id": "t3_1wxdote",
-    "title": "She brings me & others a lot of joy",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wxdote/she_brings_me_others_a_lot_of_joy/",
-    "subreddit": "Animemes",
+    "id": "t3_1wwxkst",
+    "title": "Ichika Headpats (GunTree) [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1wwxkst/ichika_headpats_guntree_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wwinip",
-    "title": "The trend I can get behind.",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wwinip/the_trend_i_can_get_behind/",
-    "subreddit": "Animemes",
+    "id": "t3_1x19c8o",
+    "title": "Casual Asuna [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x19c8o/casual_asuna_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wwmk09",
-    "title": "Malefoid sometimes hides her feelings in Parseltongue",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wwmk09/malefoid_sometimes_hides_her_feelings_in/",
-    "subreddit": "Animemes",
+    "id": "t3_1x0dg6o",
+    "title": "Kasane Teto with her hair down [Vocaloid]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x0dg6o/kasane_teto_with_her_hair_down_vocaloid/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x0qmj5",
-    "title": "The virgin reboot vs The CHAD FanFictions.",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x0qmj5/the_virgin_reboot_vs_the_chad_fanfictions/",
-    "subreddit": "Animemes",
+    "id": "t3_1x0xokx",
+    "title": "Perlica's many expressions by 千夜QYS3 [Arknights Endfield]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x0xokx/perlicas_many_expressions_by_千夜qys3_arknights/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wy8yz4",
-    "title": "[WDWT] it’s been a long time",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wy8yz4/wdwt_its_been_a_long_time/",
-    "subreddit": "streetwear",
+    "id": "t3_1x0wff8",
+    "title": "Looks like a saint — But a saint she ain’t",
+    "url": "https://www.reddit.com/r/animegifs/comments/1x0wff8/looks_like_a_saint_but_a_saint_she_aint/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wz32j8",
-    "title": "[WDYWT] another one cuz i missed Reddit comments 😌",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wz32j8/wdywt_another_one_cuz_i_missed_reddit_comments/",
-    "subreddit": "streetwear",
+    "id": "t3_1wz9ace",
+    "title": "Making The Best Of A Fall",
+    "url": "https://www.reddit.com/r/animegifs/comments/1wz9ace/making_the_best_of_a_fall/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wxkk2x",
-    "title": "Beyond Windy in Chicago",
-    "url": "https://www.reddit.com/r/streetwear/comments/1wxkk2x/beyond_windy_in_chicago/",
-    "subreddit": "streetwear",
+    "id": "t3_1wz5fql",
+    "title": "Where are the nipples? [My Dress-Up Darling]",
+    "url": "https://www.reddit.com/r/anime/comments/1wz5fql/where_are_the_nipples_my_dressup_darling/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wx3f3b",
-    "title": "[ART] Shun Saeki (Food Wars: Shokugeki no Soma) is the latest mangaka to jump on the genderbent Draco Malfoy trend",
-    "url": "https://www.reddit.com/r/manga/comments/1wx3f3b/art_shun_saeki_food_wars_shokugeki_no_soma_is_the/",
-    "subreddit": "manga",
+    "id": "t3_1wxbf7d",
+    "title": "Putting on Alya's sock + Panty shot [Alya Sometimes Hides Her Feelings in Russian]",
+    "url": "https://www.reddit.com/r/anime/comments/1wxbf7d/putting_on_alyas_sock_panty_shot_alya_sometimes/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wvtnhm",
-    "title": "[ART] Female Malfoy (Harry Potter) drawn by Souichirou Yamamoto (Author of Mane Mane Nichi Nichi)",
-    "url": "https://www.reddit.com/r/manga/comments/1wvtnhm/art_female_malfoy_harry_potter_drawn_by/",
-    "subreddit": "manga",
+    "id": "t3_1wx4kyg",
+    "title": "As rezero season ended wanted to share a rem art i did. (Rezero)",
+    "url": "https://www.reddit.com/r/anime/comments/1wx4kyg/as_rezero_season_ended_wanted_to_share_a_rem_art/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wz9rc4",
-    "title": "[DISC] Since I'm Interested In Your Hair - Ch. 1",
-    "url": "https://www.reddit.com/r/manga/comments/1wz9rc4/disc_since_im_interested_in_your_hair_ch_1/",
-    "subreddit": "manga",
+    "id": "t3_1wxxixh",
+    "title": "Ishtar joins the party [Fate/Grand Order – Absolute Demonic Front: Babylonia]",
+    "url": "https://www.reddit.com/r/anime/comments/1wxxixh/ishtar_joins_the_party_fategrand_order_absolute/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wwngtk",
-    "title": "[DISC] The Trolley Problem and Mom - Oneshot by @kou88450",
-    "url": "https://www.reddit.com/r/manga/comments/1wwngtk/disc_the_trolley_problem_and_mom_oneshot_by/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wzzhuq",
-    "title": "[DISC] Wolf - Oneshot by @ka92",
-    "url": "https://www.reddit.com/r/manga/comments/1wzzhuq/disc_wolf_oneshot_by_ka92/",
-    "subreddit": "manga",
+    "id": "t3_1x1gfay",
+    "title": "How Not to Summon a Demon Lord ULT | Teaser Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1x1gfay/how_not_to_summon_a_demon_lord_ult_teaser_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
