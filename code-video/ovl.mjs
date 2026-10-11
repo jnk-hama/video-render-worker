@@ -9,7 +9,7 @@ const b = await chromium.launch({ executablePath: process.env.CHROME || "/opt/pw
 const p = await b.newPage({ viewport: { width: 1080, height: 1920 } });
 await p.addInitScript((a) => { window.TIMELINE = a[0]; window.PRODUCT = a[1]; }, [TL, process.env.PRODUCT ? JSON.parse(fs.readFileSync(process.env.PRODUCT, "utf8")) : null]);
 await p.goto("file://" + path.join(dir, process.env.PAGE || "stage/index.html")); await p.evaluate(() => window.READY); await p.waitForTimeout(250);
-await p.addStyleTag({ content: "html,body{background:transparent!important} #bg,#grain,#vig,#halo,#table,#ring,#life,#rank,#broll,#brollShade,#wipe,#redbg,#altbg,.blob,#air,#silk,#under,#over,.scrim{display:none!important}" });
+await p.addStyleTag({ content: "html,body{background:transparent!important} #bg,#grain,#vig,#halo,#table,#ring,#life,#rank,#broll,#brollShade,#wipe,#redbg,#altbg,.blob,#air,#silk,#under,#over,.scrim,#credit{display:none!important}" });
 for (let t = t0; t <= t1 + 1e-6; t += st) {
   await p.evaluate((t) => { window.seek(t); (document.getElementById("stage")||{style:{}}).style.transform = "none"; document.getElementById("ui").style.display = ""; (document.getElementById("behind")||{style:{}}).style.display = ""; }, t);
   const tag = t.toFixed(2);

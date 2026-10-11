@@ -69,6 +69,16 @@ jobs:
             code-video/models
           key: code-video-models-v1
 
+      # #308 声が VOICEVOX（無料・オープンソース）の設計書の時だけ、エンジンをこのジョブの中で起動する。版は固定（エイリアス禁止）
+      - name: VOICEVOX を起動
+        run: |
+          set -euo pipefail
+          if grep -q '"voicevox:' "products/$KEY.json"; then
+            docker run -d -p 50021:50021 voicevox/voicevox_engine:cpu-amd64-ubuntu22.04-0.25.2
+            for i in $(seq 90); do curl -fsS localhost:50021/version && exit 0; sleep 2; done
+            echo "::error::VOICEVOX が起動しませんでした"; exit 1
+          fi
+
       - name: 素材を取る・下ごしらえ
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

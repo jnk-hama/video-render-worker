@@ -251,7 +251,9 @@
     "grade": "none",
     "why": "1シーン目の背景：本物の木の机と植物（Pexels id=8051341・商用可）。オーナーが選んだ C（#305）"
    }
-  ]
+  ],
+  "voice": "voicevox:WhiteCUL",
+  "speed": 0.95
  },
  "beats": [
   {

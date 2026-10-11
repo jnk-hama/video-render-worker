@@ -20,6 +20,27 @@ def tts_text(s, P):
     for k in sorted(rd, key=len, reverse=True): s = s.replace(k, rd[k])
     return s
 
+def vv_line(text, pr):
+    """VOICEVOX の1行の依頼（#308）：voice が "voicevox:話者[/型]" の時だけ。それ以外は None（edge-tts のまま）"""
+    v = pr.get("voice", "")
+    if not v.startswith("voicevox:"): return None
+    name, _, style = v[len("voicevox:"):].partition("/")
+    return {"engine": "voicevox", "speaker": name, "style": style or "ノーマル", "text": text, "speed": pr.get("speed", 1.0)}
+
+def vv_synth(d, out):
+    """VOICEVOX（Actions の中で起動したエンジン）で1行を mp3 にする。読み（カナ）も out の .kana.txt に残す：聞けない所で読み違いを文字で確かめるため"""
+    import urllib.request, urllib.parse
+    base = os.environ.get("VOICEVOX_URL", "http://localhost:50021")
+    api = lambda path, data=None: urllib.request.urlopen(urllib.request.Request(base + path, data=data, headers={"Content-Type": "application/json"}), timeout=120).read()
+    sp = next((s for s in json.loads(api("/speakers")) if s["name"] == d["speaker"]), None)
+    st = sp and next((t for t in sp["styles"] if t["name"] == d["style"]), None)
+    if not st: sys.exit(f"VOICEVOX に無い話者・型: {d['speaker']} / {d['style']}")
+    q = json.loads(api(f"/audio_query?speaker={st['id']}&text=" + urllib.parse.quote(d["text"]), b""))
+    q["speedScale"] = d["speed"]
+    wav = out[:-4] + ".wav"; open(wav, "wb").write(api(f"/synthesis?speaker={st['id']}", json.dumps(q).encode()))
+    subprocess.run([FF, "-loglevel", "error", "-y", "-i", wav, "-b:a", "192k", out], check=True); os.remove(wav)
+    open(out[:-4] + ".kana.txt", "w").write(q.get("kana", "")); print(os.path.basename(out), d["text"], "→", q.get("kana", ""))
+
 def voices(P):
     """読み上げの一覧 [(文, 置く名前)]：各カット → 見出しの別案（hooks の2つ目以降）の順。line<i>.mp3 の i がこの並び"""
     vs = (P.get("variants") or P.get("hooks") or [])[1:]
@@ -32,7 +53,7 @@ def request(P):
     pr = P["prep"]; path = os.path.join(REPO, "samples/motion/request.json")
     old = json.load(open(path)) if os.path.exists(path) else {}
     req = {"images": pr["images"], "voice": pr.get("voice", "ja-JP-NanamiNeural"), "rate": pr.get("rate", "+8%"),
-           "lines": [tts_text(s, P) for s, _ in voices(P)], "videos": pr.get("videos", []), "nonce": old.get("nonce", 0) + 1}
+           "lines": [vv_line(tts_text(s, P), pr) or tts_text(s, P) for s, _ in voices(P)], "videos": pr.get("videos", []), "nonce": old.get("nonce", 0) + 1}
     json.dump(req, open(path, "w"), ensure_ascii=False, indent=2); print("書いた:", path, "nonce", req["nonce"]); print("次：commit・push → Actions の完了を待って unpack")
 
 def decrypt(dst):
@@ -153,6 +174,8 @@ def fetch(P):
         subprocess.run(["curl", "-fsSL", "-o", os.path.join(S, f"vid{i}.mp4"), u], check=True)   # Pexels は Python の urllib を 403 で断る（curl は通る・2026-10-05 実測）
     import time
     for i, (say, _) in enumerate(voices(P)):
+        d = vv_line(tts_text(say, P), pr)
+        if d: vv_synth(d, os.path.join(S, f"line{i}.mp3")); continue
         for k in range(3):   # edge-tts は相手側の 500 で時々落ちる（2026-10-05 実測）。間を空けて3回まで
             if subprocess.run(["edge-tts", "--voice", pr.get("voice", "ja-JP-NanamiNeural"), f"--rate={pr.get('rate', '+8%')}", "--text", tts_text(say, P), "--write-media", os.path.join(S, f"line{i}.mp3")]).returncode == 0: break
             if k == 2: sys.exit(f"edge-tts が3回とも失敗: line{i}")

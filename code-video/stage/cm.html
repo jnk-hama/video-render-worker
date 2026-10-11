@@ -208,6 +208,8 @@ const PALS = {
 const PAL = PALS[STY.palette] || PALS.amber;
 const WHITE = STY.theme === "white"; let POCKET = null, SLABEND = null;   // SLABEND：前の場面が本体を置いて終わった所（次の場面はそこから動かす）   // #302 白いスタジオ
 if (WHITE) { document.body.classList.add("white"); if (STY.accent) document.body.style.setProperty("--acc", STY.accent); }
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || "");   // #308 VOICEVOX の声は規約で「VOICEVOX:話者名」の記載が条件。オーナー「表記は小さく透過して表示」→ PR の下に全編。見出しの点検（#ui）・重なりの点検（ovl.mjs）の外に置く
+  if (vv) document.body.insertBefore(el("div", { id: "credit", class: "abs", style: `left:66px;top:226px;font:500 20px/1 "Noto Sans JP";letter-spacing:.04em;opacity:.5;color:${WHITE ? "#15171C" : "#F3EEE6"}` }, `VOICEVOX:${vv[1]}`, document.body), $("grain")); }
 if (LUX) { document.body.classList.add("lux"); const bs = document.body.style;
   ["g", "g2", "d", "gs", "c1", "c0", "tx", "mu", "mu2", "hi"].forEach((k) => bs.setProperty(`--${k}`, PAL[k])); PAL.a.forEach((v, k) => bs.setProperty(`--a${k}`, v)); PAL.b.forEach((v, k) => bs.setProperty(`--b${k}`, v)); }
 const SHAKES = [];   // [時刻, 強さ px]：衝撃で画面が揺れて0.45秒で収まる
