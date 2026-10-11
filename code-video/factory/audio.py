@@ -225,7 +225,7 @@ for i, b in enumerate(Bs):
 sfx = g["reverb"](sfx, 1.6, 0.25) * (1 - 0.5 * env)
 if P["template"] == "paper": music *= 0.4; sfx *= 0.45   # 拍と効果音が多い型。声との差 9dB 以上を守る（#267-7）
 m = env > 0.5; r = lambda x: 20 * np.log10(np.sqrt(np.mean(x[:, m] ** 2)) + 1e-12)
-need = 10.5 - (r(voice) - r(music * 0.55 + sfx * 0.6))   # 声との差 9dB 以上（#267-7）を、型や声の長さに関わらず自動で守る（短い声の CM で 8.0dB になった・#301）
+need = 14.0 - (r(voice) - r(music * 0.55 + sfx * 0.6))   # 声との差 9dB 以上（#267-7）を、型や声の長さに関わらず自動で守る（短い声の CM で 8.0dB になった・#301）。#309 オーナー「声のボリュームもう少し大きく」で 10.5 → 14.0
 if need > 0: music *= 10 ** (-need / 20); sfx *= 10 ** (-need / 20)
 mix = voice + music * 0.55 + sfx * 0.6; mix /= np.abs(mix).max() / 0.8
 wav = out.replace(".m4a", ".wav"); wavfile.write(wav, SR, mix.T.astype(np.float32))
