@@ -40,6 +40,12 @@ def vv_synth(d, out):
     wav = out[:-4] + ".wav"; open(wav, "wb").write(api(f"/synthesis?speaker={st['id']}", json.dumps(q).encode()))
     subprocess.run([FF, "-loglevel", "error", "-y", "-i", wav, "-b:a", "192k", out], check=True); os.remove(wav)
     open(out[:-4] + ".kana.txt", "w").write(q.get("kana", "")); print(os.path.basename(out), d["text"], "→", q.get("kana", ""))
+    # #312 言葉に合わせて見せる（product-launch-motion の考え方）：1音ずつの喋り始めの時刻（秒・この mp3 の頭から）を残す。速さ（speedScale）で割った値＝実際に聞こえる時刻
+    tm, t = [], q.get("prePhonemeLength", 0.1)
+    for ap in q["accent_phrases"]:
+        for m in ap["moras"]: tm.append({"k": m["text"], "t": round(t / d["speed"], 3)}); t += (m.get("consonant_length") or 0) + m["vowel_length"]
+        if ap.get("pause_mora"): t += ap["pause_mora"]["vowel_length"]
+    json.dump(tm, open(out[:-4] + ".timing.json", "w"), ensure_ascii=False)
 
 def voices(P):
     """読み上げの一覧 [(文, 置く名前)]：各カット → 見出しの別案（hooks の2つ目以降）の順。line<i>.mp3 の i がこの並び"""
@@ -186,7 +192,9 @@ def assets(P):
     pr = P["prep"]; D, S = dirs(P)
     from PIL import Image
     os.makedirs(os.path.join(D, "voice"), exist_ok=True)
-    for i, (_, f) in enumerate(voices(P)): shutil.copy(os.path.join(S, f"line{i}.mp3"), os.path.join(D, "voice", f))
+    for i, (_, f) in enumerate(voices(P)):
+        shutil.copy(os.path.join(S, f"line{i}.mp3"), os.path.join(D, "voice", f))
+        if os.path.exists(os.path.join(S, f"line{i}.timing.json")): shutil.copy(os.path.join(S, f"line{i}.timing.json"), os.path.join(D, "voice", f + ".timing.json"))   # #312 言葉の時刻
     cand = {}
     for c in pr.get("cutouts", []):   # #305 動画の1コマから切り抜く（src="vid1@0.5"＝2本目の動画の0.5秒目）
         if "@" in c["src"]:

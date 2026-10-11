@@ -302,6 +302,29 @@ function slabAt(t) {
   const f = `brightness(${br.toFixed(3)}) saturate(${lerp(0.3, 1, br).toFixed(3)})`; SLAB.faces.forEach((e) => { e.style.filter = f; });
 }
 const KINDS = {
+  // #311 つかみ「本物の写真のカード」（E-049「合成すぎる」→ 合成しない。claude-motion-design などの見本は写真や画面を平らなカードのまま見せていた）
+  //   販売ページの写真（本体と箱）を切り抜かず角丸のカードで置く。1コマ目から見えていて、バネで少し行き過ぎて止まる。地は淡い色のぼけがゆっくり漂う白
+  //   光沢がカードを横切る。終わりにカードの地と箱が消え、同じ位置の本体（同じ写真の切り抜き）だけが残って次の場面へ飛ぶ（共有要素の受け渡し）
+  cardhook(b, i, s) {
+    buildSlab(); const t0 = s.t0, end = s.t1, C = b.card, CW = 900, CH = CW * (C.crop[3] - C.crop[1]) / (C.crop[2] - C.crop[0]), CX = 540, CY = 1190, hand = end - 0.45;
+    const k = CW / (C.crop[2] - C.crop[0]), PX = CX - CW / 2 + ((C.prod[0] + C.prod[2]) / 2 - C.crop[0]) * k, PY = CY - CH / 2 + ((C.prod[1] + C.prod[3]) / 2 - C.crop[1]) * k, PSC = (C.prod[2] - C.prod[0]) * k / SLAB.W;
+    const wall = el("div", { class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;background:radial-gradient(ellipse 900px 1100px at 50% 45%, #FFFFFF 0%, #F4F4F8 60%, #E9EAF0 100%)" }, "", $("under"));   // 白いスタジオの地（次の場面の白い広がりで抜ける）
+    const BL = [["#C9C1F2", 220, 820, 620], ["#BFE3F6", 860, 1180, 700], ["#D7F0E4", 380, 1560, 560]].map(([c, x, y, r]) => ({ x, y, r, e: el("div", { class: "abs scrim", style: `left:0;top:0;width:${r * 2}px;height:${r * 2}px;border-radius:50%;background:radial-gradient(circle, ${c} 0%, rgba(255,255,255,0) 68%);opacity:.8` }, "", $("under")) }));
+    const card = el("div", { class: "card", style: `left:${CX - CW / 2}px;top:${CY - CH / 2}px;width:${CW}px;height:${CH}px;border-radius:36px;box-shadow:0 40px 90px rgba(40,40,70,.18), 0 10px 22px rgba(40,40,70,.10)` }, `<img src="${DIR}${C.image}" style="width:100%;height:100%;object-fit:cover">`, $("prodlayer"));
+    const gl = el("div", { class: "abs", style: "left:0;top:0;width:100%;height:100%;background:linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.75) 50%, rgba(255,255,255,0) 60%);background-size:300% 100%;mix-blend-mode:screen;opacity:0" }, "", card);
+    const [h0, h1] = maskHead(b.head, 300, t0 - 0.45, OUT(i));
+    SLABK.push({ a: hand, b: end, f: () => slabSet(PX, PY, PSC, 0, 0) });   // 本体だけが残る（カードと同じ位置・同じ大きさ）
+    SLABEND = { x: PX, y: PY, sc: PSC, ry: 0 };
+    hideCam(s);
+    U.push((t) => { const u = t - t0, vis = t < end, on = t < end + 0.9;
+      const rr = inOutC((t - FLOOD[0]) / (FLOOD[1] - FLOOD[0])) * 2300; wall.style.display = on ? "" : "none";
+      wall.style.webkitMaskImage = wall.style.maskImage = rr > 0 ? `radial-gradient(circle at ${IN.x}px ${IN.y}px, transparent ${rr.toFixed(0)}px, #000 ${(rr + 2).toFixed(0)}px)` : "none";
+      BL.forEach((q, j) => { q.e.style.display = vis ? "" : "none"; q.e.style.transform = `translate(${(q.x - q.r + Math.sin(t * 0.35 + j * 2) * 60).toFixed(1)}px, ${(q.y - q.r + Math.cos(t * 0.3 + j) * 50).toFixed(1)}px)`; });
+      card.style.display = vis ? "" : "none";
+      const sc = (0.94 + 0.06 * sp(u + 0.05, 9, 0.55)) * (1 + 0.025 * (1 - clamp(u / (hand - t0))));   // バネで止まり、受け渡しまでにゆっくり元の大きさへ
+      card.style.transform = `scale(${sc.toFixed(4)})`; card.style.opacity = String(1 - clamp((t - hand) / 0.3));
+      const q = clamp((u - 1.25) / 0.8); gl.style.opacity = String(Math.sin(Math.PI * q)); gl.style.backgroundPosition = `${lerp(100, 0, q)}% 0`; });
+  },
   // #305 つかみ「手のひら」（オーナー「バックの暗さもリアルな背景に」→ C の木の机と植物 →「これに手に乗せてる描写作れる？」）
   //   本物の映像（Pexels の机と植物）に、本物の手（Pexels の差し出した手の1コマを切り抜き）、手のひらに販売ページの写真の本体。合成は ※合成イメージ と出す
   //   1コマ目から本体が手のひらにある（#267）。手はゆっくり差し出され、カメラは少し寄る。光沢が本体を横切る。見出しは字の間が締まる
@@ -444,10 +467,11 @@ const KINDS = {
     U.push((t) => { const u = t - t0, o = outC((t - OUT(i)) / 0.25);
       if (POCKET && POCKET.dataset.bulge && t >= t0 && t < s.t1) { const bg = 92 * (1 - outC(u / 0.5)); POCKET.querySelector(".pk").setAttribute("d", `M150,1000 Q400,1050 650,1000 Q${650 + bg},1300 610,1600 Q400,1660 190,1600 Q${150 - bg},1300 150,1000 Z`); POCKET.querySelector(".st").setAttribute("d", `M176,1030 Q${620 + bg},1300 588,1576 Q400,1630 212,1576 Q${180 - bg},1300 176,1030`); }   // ふくらみが戻る
       if (POCKET) POCKET.style.display = t < s.t1 ? "" : "none";
-      tiles.forEach((e, k) => { const stop = t0 + 0.9 + k * 0.22, a = sp(u - 0.5 - k * 0.08, 12, 0.8); e.style.opacity = String(clamp(a * 1.4) * (1 - o)); e.style.transform = `translateY(${((1 - clamp(a)) * 50).toFixed(1)}px)`;
+      const st0 = s.cue != null ? s.cue : t0 + 0.9;   // #312 数字は言った瞬間に止まる（言葉に合わせて見せる）
+      tiles.forEach((e, k) => { const stop = st0 + k * 0.22, a = sp(u - 0.5 - k * 0.08, 12, 0.8); e.style.opacity = String(clamp(a * 1.4) * (1 - o)); e.style.transform = `translateY(${((1 - clamp(a)) * 50).toFixed(1)}px)`;
         if (!/\d/.test(digs[k])) return; const sp2 = e.firstChild;
         if (t >= stop) { sp2.textContent = digs[k]; e.style.transform += " scaleY(1)"; }
-        else { const q = Math.max(0, (t - (t0 + 0.4)) / (stop - t0 - 0.4)) * 9, ph = q % 1; sp2.textContent = String((+digs[k] - 9 + Math.floor(q) + 20) % 10); e.style.transform += ` scaleY(${(1 - 0.7 * Math.sin(ph * Math.PI)).toFixed(3)})`; } });   // 桁がめくれて止まる
+        else { const f0 = Math.min(t0 + 0.4, st0 - 0.5), q = Math.max(0, (t - f0) / (stop - f0)) * 9, ph = q % 1; sp2.textContent = String((+digs[k] - 9 + Math.floor(q) + 20) % 10); e.style.transform += ` scaleY(${(1 - 0.7 * Math.sin(ph * Math.PI)).toFixed(3)})`; } });   // 桁がめくれて止まる
       fadeUp(nt, t0 + 1.0, OUT(i)); });
   },
   // 利点：写真の大事な所を一筆でなぞり、指し示しの線から札が出る（callouts を CM 用に）
@@ -462,11 +486,12 @@ const KINDS = {
     const [h0, h1] = head2(b.head, 300, false);
     const nt = el("div", { class: "note", style: `left:70px;top:${Y + CH + 50}px;width:940px;opacity:0` }, b.note || "");
     hideCam(s);
+    const cs = s.cue != null ? s.cue - t0 - (1.15 + 0.25 * (tips.length - 1)) : 0;   // #312 最後の札（例：最大15W）が、その言葉を言う瞬間に出る
     U.push((t) => { const u = t - t0, o = outC((t - OUT(i)) / 0.25), a = sp(u + 0.05, 9, 0.75);
       card.style.opacity = String(clamp(a * 1.4) * (1 - o)); card.style.transform = `perspective(1600px) rotateY(${lerp(55, 0, clamp(a)).toFixed(2)}deg) translateX(${((1 - clamp(a)) * -120).toFixed(1)}px)`;
       ln.querySelector(".ci").setAttribute("stroke-dashoffset", String(1 - inOutC((u - 0.45) / 0.55))); ln.style.opacity = String(1 - o);
-      ln.querySelectorAll(".pt").forEach((p, k) => p.setAttribute("stroke-dashoffset", String(1 - inOutC((u - 0.9 - k * 0.25) / 0.35))));
-      chips.forEach((e, k) => { const q = sp(u - 1.15 - k * 0.25, 13, 0.6); e.style.opacity = String(clamp(q * 1.4) * (1 - o)); e.style.transform = `scale(${lerp(0.6, 1, clamp(q, 0, 1.2)).toFixed(3)})`; e.style.transformOrigin = "0 50%"; });
+      ln.querySelectorAll(".pt").forEach((p, k) => p.setAttribute("stroke-dashoffset", String(1 - inOutC((u - cs - 0.9 - k * 0.25) / 0.35))));
+      chips.forEach((e, k) => { const q = sp(u - cs - 1.15 - k * 0.25, 13, 0.6); e.style.opacity = String(clamp(q * 1.4) * (1 - o)); e.style.transform = `scale(${lerp(0.6, 1, clamp(q, 0, 1.2)).toFixed(3)})`; e.style.transformOrigin = "0 50%"; });
       kin(h0, t0 + 0.05, OUT(i)); kin(h1, t0 + 0.2, OUT(i), 0.05); fadeUp(nt, t0 + 1.2, OUT(i)); });
   },
   // 利点：本体が回りながら飛んできて、スマホの形（※図）の背面に「カチッ」と吸い付く。磁力の線が広がる

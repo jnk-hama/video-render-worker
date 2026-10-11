@@ -235,29 +235,31 @@
     ],
     "sr": true,
     "why": "同：箱の正面（15W・20W・Ultra-slim の表記）。左の本体は入れない"
+   },
+   {
+    "out": "card.jpg",
+    "src": "img3",
+    "crop": [
+     0,
+     150,
+     720,
+     672
+    ],
+    "sr": true,
+    "size": [
+     1800,
+     1305
+    ],
+    "why": "#311 1シーン目のカード：別のお店の画像1枚目（本体と箱）を切り抜かずにそのまま。上の見出しの字と下の型番の字は入れない"
    }
   ],
   "why": "使う：img0（4色）・img3（正面の本体）・img5（箱＝背面の絵と表記）。使わない：img1（発火・安全試験＝安全の言い切り）・img2（人物の顔）・img4（ランキングの札）",
-  "videos": [
-   "https://videos.pexels.com/video-files/8051341/8051341-hd_1080_1920_24fps.mp4",
-   "https://videos.pexels.com/video-files/4630694/4630694-hd_1080_2048_25fps.mp4"
-  ],
-  "broll": [
-   {
-    "out": "table",
-    "src": "vid0",
-    "ss": 0,
-    "t": 3.4,
-    "grade": "none",
-    "why": "1シーン目の背景：本物の木の机と植物（Pexels id=8051341・商用可）。オーナーが選んだ C（#305）"
-   }
-  ],
   "voice": "voicevox:WhiteCUL",
   "speed": 0.95
  },
  "beats": [
   {
-   "kind": "palm",
+   "kind": "cardhook",
    "voice": "line0.mp3",
    "say": "この薄さで、バッテリー。",
    "head": [
@@ -265,19 +267,24 @@
     "バッテリー。"
    ],
    "source": "説明文：厚さわずか8.6mm（1シーン目＝つかみ。オーナー「1シーン目が一番弱い！もっと高級に作り込んで」#303）",
-   "note": "※本体は合成イメージです。",
    "kinds": [
-    "palm"
+    "cardhook"
    ],
-   "broll": "table",
-   "prod": {
-    "cut": "front.png",
-    "x": 560,
-    "y": 1290,
-    "h": 560,
-    "r": 0
-   },
-   "frames": 86
+   "card": {
+    "image": "card.jpg",
+    "crop": [
+     0,
+     150,
+     720,
+     672
+    ],
+    "prod": [
+     34,
+     238,
+     331,
+     667
+    ]
+   }
   },
   {
    "kind": "flapin",
@@ -292,7 +299,8 @@
    "kinds": [
     "flapin",
     "unveil"
-   ]
+   ],
+   "cue": "ハッテンロク"
   },
   {
    "kind": "callout",
@@ -319,7 +327,8 @@
    "tips": [
     "Qi2認証",
     "最大15W"
-   ]
+   ],
+   "cue": "ジュウゴワット"
   },
   {
    "kind": "snap",
@@ -470,5 +479,8 @@
   ],
   "same_as_last": []
  },
- "accent": "#5B4FA6"
+ "accent": "#5B4FA6",
+ "music": {
+  "sync": true
+ }
 }

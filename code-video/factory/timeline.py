@@ -6,9 +6,9 @@ LEAD = 0.25           # カットの頭から喋り始めまで
 TAIL = {"cover": 0.55, "counter": 0.6, "macro_broll": 0.6, "ring": 0.7, "compare": 0.7, "chips": 0.55, "finale": 1.6,
         "problem": 0.75, "airflow": 0.7, "slash": 0.8, "colors": 0.7,
         "hook": 0.55, "chips": 0.6, "cells": 0.75, "bars": 0.7, "explode": 1.0,
-        "gauge": 0.5, "swatch": 1.0, "sizes": 0.75, "touch": 0.5, "callouts": 0.6, "choose": 0.8, "num": 0.7, "tour": 0.6, "points": 0.9, "slice": 0.6, "warmup": 0.6, "spec": 0.6, "shoes": 0.6, "texture": 0.6, "worn": 0.6, "match": 0.6, "pain": 0.35, "flip": 0.5, "reveal": 0.45, "held": 0.5, "cshoes": 0.45, "rapid": 0.3, "cmend": 1.0, "orbit": 0.45, "orbitrap": 0.3, "cascade": 0.3, "hook": 0.35, "unveil": 0.5, "pocket": 0.35, "edgehook": 0.45, "slit": 0.45, "palm": 0.45, "flapin": 0.5, "callout": 0.45, "snap": 0.45, "fill": 0.45, "checklist": 0.5, "turntable": 1.0, "finale3d": 1.0}
+        "gauge": 0.5, "swatch": 1.0, "sizes": 0.75, "touch": 0.5, "callouts": 0.6, "choose": 0.8, "num": 0.7, "tour": 0.6, "points": 0.9, "slice": 0.6, "warmup": 0.6, "spec": 0.6, "shoes": 0.6, "texture": 0.6, "worn": 0.6, "match": 0.6, "pain": 0.35, "flip": 0.5, "reveal": 0.45, "held": 0.5, "cshoes": 0.45, "rapid": 0.3, "cmend": 1.0, "orbit": 0.45, "orbitrap": 0.3, "cascade": 0.3, "hook": 0.35, "unveil": 0.5, "pocket": 0.35, "edgehook": 0.45, "slit": 0.45, "palm": 0.45, "flapin": 0.5, "callout": 0.45, "snap": 0.45, "fill": 0.45, "checklist": 0.5, "turntable": 1.0, "finale3d": 1.0, "cardhook": 0.45}
 MIN_NUM = {"dims": 3.3, "calendar": 3.4, "magnify": 3.3, "flap": 3.1, "cup": 3.1}   # 数字の見せ方：最後の数字・判が1秒以上読める長さ（numfx.js の段取り）
-MIN = {"explode": 6.2, "swatch": 2.9, "callouts": 3.0, "choose": 2.7, "num": 2.9, "tour": 4.6, "points": 3.6, "slice": 4.2, "warmup": 4.2, "spec": 3.8, "shoes": 4.0, "texture": 4.0, "worn": 3.8, "match": 2.7, "pain": 2.3, "flip": 3.0, "reveal": 2.5, "held": 2.8, "cshoes": 2.8, "rapid": 2.8, "cmend": 3.2, "orbit": 2.6, "orbitrap": 2.8, "cascade": 2.8, "hook": 2.3, "unveil": 3.0, "pocket": 2.3, "edgehook": 2.6, "slit": 2.6, "palm": 2.6, "flapin": 3.0, "callout": 2.6, "snap": 2.6, "fill": 2.6, "checklist": 2.8, "turntable": 3.4, "finale3d": 3.4}   # 分解は動きの段取りが決まっている（最後の文字が1秒以上読める長さ）
+MIN = {"explode": 6.2, "swatch": 2.9, "callouts": 3.0, "choose": 2.7, "num": 2.9, "tour": 4.6, "points": 3.6, "slice": 4.2, "warmup": 4.2, "spec": 3.8, "shoes": 4.0, "texture": 4.0, "worn": 3.8, "match": 2.7, "pain": 2.3, "flip": 3.0, "reveal": 2.5, "held": 2.8, "cshoes": 2.8, "rapid": 2.8, "cmend": 3.2, "orbit": 2.6, "orbitrap": 2.8, "cascade": 2.8, "hook": 2.3, "unveil": 3.0, "pocket": 2.3, "edgehook": 2.6, "slit": 2.6, "palm": 2.6, "flapin": 3.0, "callout": 2.6, "snap": 2.6, "fill": 2.6, "checklist": 2.8, "turntable": 3.4, "finale3d": 3.4, "cardhook": 2.6}   # 分解は動きの段取りが決まっている（最後の文字が1秒以上読める長さ）
 
 def speech_end(path):
     """喋りの終わり（最後の無音の始まり）。末尾に無音が無ければ全体の長さ"""
@@ -17,12 +17,26 @@ def speech_end(path):
     dur = float(re.search(r"Duration: (\d+):(\d+):([0-9.]+)", err).groups()[2])
     return starts[-1] if starts and starts[-1] > 0.5 else dur
 
+def cue_time(voice, kana, start):
+    """#312 言葉に合わせる：設計書の cue（その言葉の読み・カタカナ。line<i>.kana.txt で確かめて書く）を喋り始める時刻（動画の秒）。見つからなければ止める（黙ってずらさない）"""
+    tm = json.load(open(voice + ".timing.json")) if os.path.exists(voice + ".timing.json") else sys.exit(f"言葉の時刻が無い（VOICEVOX の声だけ）: {voice}")
+    ks = "".join(m["k"] for m in tm); j = ks.find(kana)
+    if j < 0: sys.exit(f"cue「{kana}」が読み「{ks}」に無い: {voice}")
+    pos = 0
+    for m in tm:
+        if pos >= j: return round(start + m["t"] / TEMPO, 3)
+        pos += len(m["k"])
+
 def build(product_path, asset_dir, out):
     P = json.load(open(product_path)); t = 0.0; beats = []
     for b in P["beats"]:
         s = speech_end(os.path.join(asset_dir, "voice", b["voice"]))
         d = max(LEAD + s / TEMPO + b.get("tail", TAIL[b["kind"]]), MIN_NUM.get(b.get("motif"), MIN.get(b["kind"], 0)) if b["kind"] == "num" else max(3.6, 0.45 + 1.05 * len(b["items"])) if b["kind"] == "tour" else MIN.get(b["kind"], 0))   # 中身めぐりは品の数で（1品1秒ちょっと）
+        if P.get("music", {}).get("sync"):   # 拍で切る（claude-motion-design の考え方・オーナー「OK」2026-10-11）：カットの終わりを BGM の半拍にそろえる。喋りの後ろ（TAIL 0.35秒以上）を0.12秒より削らない
+            half = 30 / P["music"].get("bpm", 96); e = round((t + d) / half) * half
+            d = (e + half if e < t + d - 0.12 else e) - t
         beats.append({"kind": b["kind"], "t0": round(t, 3), "t1": round(t + d, 3), "voice": {"file": b["voice"], "start": round(t + LEAD, 3), "tempo": TEMPO, "len": round(s / TEMPO, 3)}})
+        if b.get("cue"): beats[-1]["cue"] = cue_time(os.path.join(asset_dir, "voice", b["voice"]), b["cue"], t + LEAD)
         t += d
     tl = {"cuts": [b["t0"] for b in beats], "end": round(t, 3), "beats": beats, "voice": [b["voice"] for b in beats], "bpm": P.get("music", {}).get("bpm", 96)}
     json.dump(tl, open(out, "w"), ensure_ascii=False, indent=1)
