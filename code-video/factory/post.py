@@ -11,7 +11,7 @@ for b in B:
         n = "※" + n.strip()
         if n not in notes and "イメージ映像" not in n: notes.append(n)
 tags = post.get("tags", [])
-url = post.get("affiliate_url")
+url = post.get("affiliate_url") or P.get("affiliate_url")   # 設計書の上の段に置いた物も読む（UGREEN は rakuten の取り込みで上の段に入っていた）
 tiktok = "\n".join(["#PR " + hook, ""] + ["✔ " + p for p in points] + [""] + notes + ["", "商品リンクはプロフィールから", " ".join(["#楽天"] + tags)])
 def xlen(s):   # X の数え方：URL は 23、全角は 2、半角は 1（上限 280）
     s2 = re.sub(r"https?://\S+", "x" * 23, s); return sum(2 if unicodedata.east_asian_width(c) in "WFA" else 1 for c in s2)
