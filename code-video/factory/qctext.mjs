@@ -22,7 +22,7 @@ const walk = (v, key) => {
 PR.beats.forEach((b) => walk(b, ""));
 if (PR.name) expected.push(PR.name);   // 商品名は必ず画面に出す（#276）
 if (PR.target && PR.target.who) expected.push(PR.target.who);   // 誰に向けた動画かも画面に出す（#283）
-const norm = (s) => s.replace(/[\s,~〜]/g, "");
+const norm = (s) => s.replace(/[\s,~〜。]/g, "");   // #315 見出しの句点は画面に出さないので、照合でも数えない
 const out = { mojibake: [], tofu: [], missing: [], prRatio: 0 };
 // 1) 設計書の文字化け（読み上げの文も見る）
 const allStr = []; const all = (v) => { if (typeof v === "string") allStr.push(v); else if (v && typeof v === "object") Object.values(v).forEach(all); }; all(PR);

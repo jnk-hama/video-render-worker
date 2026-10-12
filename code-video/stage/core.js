@@ -77,6 +77,8 @@ const CORE = {
     window.READY = (async () => {
       const im = new Image(); im.src = `${DIR}${P.hero.cutout}`; await im.decode();
       buildHero(im.naturalWidth / 4, im.naturalHeight / 4);
+      // #315 大きな文字に句点を付けない（prompt-motion の作り込んだ指示「No full stops in on-screen text」・オーナー「2で進めて」）。読み上げ（say）と※の注記はそのまま
+      P.beats.forEach((b) => { if (Array.isArray(b.head)) b.head = b.head.map((h) => typeof h === "string" ? h.replace(/。/g, "") : h); if (typeof b.tag === "string") b.tag = b.tag.replace(/。/g, ""); });
       P.beats.forEach((b, i) => { if (!kinds[b.kind]) throw new Error(`この型（${P.template}）に無いカット: ${b.kind}`); kinds[b.kind](b, i, B[i]); });
       K.sort((a, b) => a.t - b.t);
       await Promise.all([...document.images].map((i) => i.decode().catch(() => 0))); await Promise.all(BRF.map((i) => i.decode().catch(() => 0)));

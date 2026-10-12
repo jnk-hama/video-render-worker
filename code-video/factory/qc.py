@@ -31,6 +31,13 @@ R["出るべき文字が見える"] = {"ok": not tx["missing"] and tx["prRatio"]
 # 3) 黒いコマ・止まったコマ
 e = subprocess.run([FF, "-hide_banner", "-i", V, "-vf", "blackdetect=d=0.05:pix_th=0.03,freezedetect=n=0.0005:d=0.5", "-an", "-f", "null", "-"], capture_output=True, text=True).stderr
 R["黒いコマ"] = {"ok": "black_start" not in e}; R["止まったコマ"] = {"ok": "freeze_start" not in e}
+# #315 1コマだけ飛び出すコマ（前と後ろは似ているのに間の1コマだけ違う＝描き損じ）。prompt-motion の作り込んだ指示の点検（前後の差の3倍）を、切り替え（前後とも違う）と区別できる形にした
+import numpy as np
+raw = subprocess.run([FF, "-v", "error", "-i", V, "-vf", "scale=72:128,format=gray", "-f", "rawvideo", "-"], capture_output=True).stdout
+fr = np.frombuffer(raw, np.uint8).reshape(-1, 128, 72).astype(np.float32)
+da, db, dc = (np.abs(fr[1:-1] - fr[:-2]).mean((1, 2)), np.abs(fr[2:] - fr[1:-1]).mean((1, 2)), np.abs(fr[2:] - fr[:-2]).mean((1, 2)))
+pops = (np.nonzero((da > 4) & (db > 4) & (dc < 0.35 * np.minimum(da, db)))[0] + 1).tolist()
+R["1コマだけ飛び出すコマ"] = {"ok": not pops, "コマ（60fps）": pops[:10]}
 # 4) 音量・声と背景の差・長さ
 e = subprocess.run([FF, "-hide_banner", "-i", V, "-vn", "-af", "loudnorm=print_format=summary", "-f", "null", "-"], capture_output=True, text=True).stderr
 I = float(re.search(r"Input Integrated:\s+(-?[0-9.]+)", e).group(1)); TP = float(re.search(r"Input True Peak:\s+(-?[0-9.]+)", e).group(1))
