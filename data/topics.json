@@ -1,12 +1,12 @@
 {
- "generated_at": "2026-10-11T10:12:29+00:00",
+ "generated_at": "2026-10-12T11:05:29+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1wzdp64",
-    "title": "Brazilians practicing futbol",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzdp64/brazilians_practicing_futbol/",
+    "id": "t3_1x3dzhv",
+    "title": "This is the best apology in the history of sports",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x3dzhv/this_is_the_best_apology_in_the_history_of_sports/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -22,18 +22,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wzse1q",
-    "title": "British adventurer Karl Bushby has finally completed his 28 year journey around the world. Today he reached the finish line in Hull, England after walking more than 30,000 miles without flying or using motorized transport.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzse1q/british_adventurer_karl_bushby_has_finally/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wyqzfv",
-    "title": "Diorama of NY in 1997",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wyqzfv/diorama_of_ny_in_1997/",
+    "id": "t3_1wzdp64",
+    "title": "Brazilians practicing futbol",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzdp64/brazilians_practicing_futbol/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -49,46 +40,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wyphc3",
-    "title": "10 F1 cars suddenly limited to 30 km/h because of a software bug",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wyphc3/10_f1_cars_suddenly_limited_to_30_kmh_because_of/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x123d6",
-    "title": "This is Fingal’s Cave in Scotland, where nature formed thousands of hexagonal basalt columns that look almost too perfect to be real",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x123d6/this_is_fingals_cave_in_scotland_where_nature/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1wzz6or",
-    "title": "The process of making badminton shuttlecocks from raw feathers",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1wzz6or/the_process_of_making_badminton_shuttlecocks_from/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x2kdyw",
-    "title": "Nashville man who made world's thinnest road-legal car has now turned a tiny Ford Festiva into a bizarre 10-foot-wide highway monster",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x2kdyw/nashville_man_who_made_worlds_thinnest_roadlegal/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x2e9k2",
-    "title": "Incredible close up footage of a fast flowing river of lava rushing from Hawaii's Kilauea volcano",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x2e9k2/incredible_close_up_footage_of_a_fast_flowing/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1wzse1q",
+    "title": "British adventurer Karl Bushby has finally completed his 28 year journey around the world. Today he reached the finish line in Hull, England after walking more than 30,000 miles without flying or using motorized transport.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzse1q/british_adventurer_karl_bushby_has_finally/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -112,18 +67,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x0hoso",
-    "title": "When you mess with the bull, you get the horns!",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x0hoso/when_you_mess_with_the_bull_you_get_the_horns/",
+    "id": "t3_1x3bmze",
+    "title": "Camera caught what you did bro!",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x3bmze/camera_caught_what_you_did_bro/",
     "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wxsyfm",
-    "title": "playing with nature is a bad choice",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wxsyfm/playing_with_nature_is_a_bad_choice/",
+    "id": "t3_1x0hoso",
+    "title": "When you mess with the bull, you get the horns!",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x0hoso/when_you_mess_with_the_bull_you_get_the_horns/",
     "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
@@ -134,6 +89,51 @@
     "title": "Fucking around with an electric fence",
     "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1wzlvph/fucking_around_with_an_electric_fence/",
     "subreddit": "WinStupidPrizes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x23svp",
+    "title": "HMB Priorities: Saving the booze during today's earthquake in Panama.",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1x23svp/hmb_priorities_saving_the_booze_during_todays/",
+    "subreddit": "holdmybeer",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x039gm",
+    "title": "HMB while I wrestle with a bear",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1x039gm/hmb_while_i_wrestle_with_a_bear/",
+    "subreddit": "holdmybeer",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wymsod",
+    "title": "Underwater Ceramic Technician",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wymsod/underwater_ceramic_technician/",
+    "subreddit": "ContagiousLaughter",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x2joo5",
+    "title": "She's drunk on orange juice",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1x2joo5/shes_drunk_on_orange_juice/",
+    "subreddit": "ContagiousLaughter",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1wz5k43",
+    "title": "Tubi movies for the win",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1wz5k43/tubi_movies_for_the_win/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -159,15 +159,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wxoru7",
-    "title": "Miriko from My Hero Academia",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wxoru7/miriko_from_my_hero_academia/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1wzsvx3",
     "title": "Homemade Silent Hill Nurse cosplay for Halloween",
     "url": "https://www.reddit.com/r/cosplay/comments/1wzsvx3/homemade_silent_hill_nurse_cosplay_for_halloween/",
@@ -186,9 +177,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wxzyys",
-    "title": "Few clips from my first con experience, as Spider-Man",
-    "url": "https://www.reddit.com/r/cosplay/comments/1wxzyys/few_clips_from_my_first_con_experience_as/",
+    "id": "t3_1x2fr2h",
+    "title": "My witch Mercy Cosplay from Overwatch",
+    "url": "https://www.reddit.com/r/cosplay/comments/1x2fr2h/my_witch_mercy_cosplay_from_overwatch/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x0tb1y",
+    "title": "Sharing my Remielle cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1x0tb1y/sharing_my_remielle_cosplay/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
