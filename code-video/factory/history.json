@@ -62,5 +62,23 @@
    "accent": "#5B4FA6"
   },
   "seed": 227300
+ },
+ {
+  "product_key": "recolte-potduo-carre",
+  "theme": "dark",
+  "kinds": [
+   "orbit",
+   "orbit",
+   "orbit",
+   "orbit",
+   "cascade",
+   "finale3d"
+  ],
+  "style": {
+   "theme": "dark",
+   "palette": "amber",
+   "lux": true
+  },
+  "seed": null
  }
 ]
