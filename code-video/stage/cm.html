@@ -226,7 +226,8 @@ const ROWS = new Map();
 function prodRow(list, top, h, hn, t0, per) {
   const key = list.join("|") + top; if (ROWS.has(key)) return ROWS.get(key);
   const sh = "opacity:0;filter:drop-shadow(0 30px 34px rgba(0,0,0,.55))";
-  let r; if (list.length <= 2) r = list.map((im, k) => prodImg(im, `left:${k ? 556 : 420 + (top < 900 ? 4 : 0)}px;top:${top}px;height:${h}px;${sh}`, $("prodlayer"), t0 + k * 0.45, per));
+  // 2個の時は細長い商品向けの位置。横長の商品（鍋等）は pair_h を書くと中央に並べる（右端からはみ出さない）
+  let r; if (list.length <= 2 && !hn) r = list.map((im, k) => prodImg(im, `left:${k ? 556 : 420 + (top < 900 ? 4 : 0)}px;top:${top}px;height:${h}px;${sh}`, $("prodlayer"), t0 + k * 0.45, per));
   else { const row = el("div", { class: "abs", style: `left:0;top:${top}px;width:1080px;display:flex;justify-content:center;align-items:flex-start` }, "", $("prodlayer"));
     r = list.map((im, k) => prodImg(im, `position:relative;height:${hn || h}px;margin:0 -24px;${sh}`, row, t0 + k * 0.3, per)); }
   ROWS.set(key, r); return r;
@@ -656,7 +657,7 @@ const KINDS = {
       U.push((t) => { const a = clamp((t - t0 - 0.05) / 0.5); cone.style.opacity = String(a * (0.85 + 0.15 * Math.sin(t * 2.1))); floor.style.opacity = String(a); }); }
     const big = el("div", { class: `abs${LUX ? " gold" : ""}`, style: `left:0;top:560px;width:1080px;text-align:center;font:500 300px/1 'Cormorant Garamond';letter-spacing:.06em;${LUX ? "" : "color:#E7D2BA;"}opacity:0` }, b.big || "", $("under"));
     maskLine("min", "left:0;top:300px;width:1080px;text-align:center", b.tag || "", t0 + 0.05, 999, `font-size:96px;${LUX ? "color:var(--tx)" : ""}`);
-    const pair = (b.pair || []).map((im, k) => LUX ? prodRow(b.pair, 470, 660, b.pair_h, t0 + 0.7, 2.4)[k]
+    const pair = (b.pair || []).map((im, k) => LUX ? prodRow(b.pair, b.pair_top || 470, 660, b.pair_h, t0 + 0.7, 2.4)[k]
       : el("img", { src: `${DIR}${im}`, class: "abs", style: `left:${k ? 560 : 420}px;top:480px;height:720px;opacity:0;filter:drop-shadow(0 30px 34px rgba(60,35,15,.28))` }, "", $("prodlayer")));
     const rv = el("div", { class: "abs", style: `left:0;top:1250px;width:1080px;text-align:center;opacity:0;line-height:1;${LUX ? "color:var(--tx)" : ""}` }, `<span class="gar" style="font-size:150px">0</span><span style="font:900 44px/1 'Noto Sans JP';margin-left:10px">件のレビュー</span><span style="font:900 44px/1 'Noto Sans JP';color:${LUX ? "var(--hi)" : "#9A4A12"};margin-left:22px">★${b.rating.toFixed(2)}</span>`);
     const dt = el("div", { class: "note", style: "left:0;top:1410px;width:1080px;text-align:center;opacity:0" }, b.date);

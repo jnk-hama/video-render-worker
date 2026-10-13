@@ -35,7 +35,7 @@ await p.goto("file://" + path.join(root, process.env.PAGE)); await p.evaluate(()
 
 // 画面のその時刻に「欠けずに見えている」字を DOM の順に並べる（1字ずつ動く見出しも1行として読める）
 const sample = () => {
-  const roots = [...document.querySelectorAll("#ui, #behind")];
+  const roots = [...document.querySelectorAll("#ui, #behind, #under")];   // #under＝商品の後ろの大きな文字（締めの Carré 等）。前は読んでおらず、商品名に同じ語がある時だけ偶然合格していた
   const texts = [], vb = []; let pr = false;
   const g = (window.__qg ||= document.createElement("canvas").getContext("2d"));
   const effOpacity = (e) => { let o = 1; for (let x = e; x && x !== document.body; x = x.parentElement) { const cs = getComputedStyle(x); if (cs.display === "none" || cs.visibility === "hidden") return 0; o *= +cs.opacity; } return o; };
@@ -51,7 +51,8 @@ const sample = () => {
   roots.forEach((rt) => { const w = document.createTreeWalker(rt, NodeFilter.SHOW_TEXT); let n;
     while ((n = w.nextNode())) { const s = n.textContent; if (!s.trim()) continue; const e = n.parentElement, boxes = inkBoxes(e, n);
       const ca = getComputedStyle(e).color.match(/[\d.]+/g).map(Number), ok = boxes.length > 0 && effOpacity(e) >= 0.9 && (ca.length < 4 || ca[3] >= 0.9) && boxes.every((r) => r.left >= 8 && r.right <= 1072 && r.top >= 8 && r.bottom <= 1912 && !clipped(e, r));
-      if (ok) { const m = getComputedStyle(e).color.match(/[\d.]+/g).map(Number), u = boxes.reduce((q, r) => ({ x0: Math.min(q.x0, r.left), y0: Math.min(q.y0, r.top), x1: Math.max(q.x1, r.right), y1: Math.max(q.y1, r.bottom) }), { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 });
+      if (ok && !e.closest("#under")) {   // 明るさの差（下の 4)）は #ui/#behind だけ：文字を消して撮る処理がその2つしか消さない
+        const m = getComputedStyle(e).color.match(/[\d.]+/g).map(Number), u = boxes.reduce((q, r) => ({ x0: Math.min(q.x0, r.left), y0: Math.min(q.y0, r.top), x1: Math.max(q.x1, r.right), y1: Math.max(q.y1, r.bottom) }), { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 });
         vb.push({ text: s.trim().slice(0, 14), c: m.slice(0, 3), x0: Math.max(0, u.x0), y0: Math.max(0, u.y0), x1: Math.min(1080, u.x1), y1: Math.min(1920, u.y1) }); }
       if (e.closest("#pr")) { pr = pr || ok; continue; }
       if (ok) texts.push(s); } });
@@ -61,7 +62,7 @@ const sample = () => {
 const glyphs = await p.evaluate(async (end) => {
   const used = new Map();   // "family|weight|style" → 字の集合
   for (let t = 0; t <= end; t += 0.25) { window.seek(t);
-    document.querySelectorAll("#ui *, #behind *").forEach((e) => { [...e.childNodes].forEach((n) => { if (n.nodeType !== 3 || !n.textContent.trim()) return;
+    document.querySelectorAll("#ui *, #behind *, #under *").forEach((e) => { [...e.childNodes].forEach((n) => { if (n.nodeType !== 3 || !n.textContent.trim()) return;
       const cs = getComputedStyle(e), key = `${cs.fontFamily}|${cs.fontWeight}|${cs.fontStyle}`; if (!used.has(key)) used.set(key, new Set()); [...n.textContent].forEach((c) => c.trim() && used.get(key).add(c)); }); }); }
   const faces = [...document.fonts]; const parse = (ur) => ur.split(",").map((x) => x.trim().replace(/^U\+/i, "")).map((x) => { const [a, b2] = x.includes("-") ? x.split("-") : [x, x]; return x.includes("?") ? [parseInt(x.replace(/\?/g, "0"), 16), parseInt(x.replace(/\?/g, "F"), 16)] : [parseInt(a, 16), parseInt(b2, 16)]; });
   const wIn = (fw, w) => { const [a, b2] = String(fw).split(" ").map(Number); return b2 ? w >= a && w <= b2 : a === w; };

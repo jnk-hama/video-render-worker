@@ -1,0 +1,287 @@
+{
+ "product_key": "recolte-potduo-carre",
+ "template": "cm",
+ "name": "レコルト ポットデュオ キャレ",
+ "sub": "卓上マルチクッカー（電気鍋）",
+ "item_code": "plywood:10013891",
+ "genre": "kitchen",
+ "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00pzd8n.sdgff0f9.g00pzd8n.sdgfg7b9/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fplywood%2F20149095%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fplywood%2Fi%2F10013891%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
+ "brief": {
+  "ask": "オーナー「3」（候補表から選択）→ 計画に「OK」",
+  "facts": [
+   "1台で「煮る、蒸す、焼く、揚げる、炊く」の5つの調理",
+   "1〜2人にちょうどいいコンパクトなサイズ感",
+   "キャレ＝フランス語でスクエア型・角丸の四角いフォルム",
+   "テーブル上で美味しく出来立てを",
+   "セットサイズ 約 幅20×奥行20×高さ17.5cm（ハンドル込み）・最大容量 約1.3L・650W",
+   "揚げ物は MAX ライン（約0.65L）まで",
+   "4色：レッド／クリームホワイト／ブラック／グレイッシュピンク（数量限定）",
+   "レビュー363件・★4.62（楽天 plywood・2026-10-12）"
+  ],
+  "missing": [
+   "蒸す・揚げる・炊く・グリルプレートの実写真が無い → 5つの調理は文字だけで見せる（描かない）",
+   "フタを立てて置いた写真が無い → 計画にあった『フタは、立てて置ける』は外し『出来たてを、そのまま食卓へ』（説明文：テーブル上で美味しく出来立てを）に替えた"
+  ]
+ },
+ "target": {
+  "who": "1〜2人で暮らす人に",
+  "source": "説明文：1〜2人にちょうどいいコンパクトなサイズ感"
+ },
+ "readings": {
+  "1〜2人": "ひとり、ふたり",
+  "蒸す": "むす"
+ },
+ "hero": {
+  "cutout": "red.png",
+  "focus": {
+   "body": [
+    125,
+    110
+   ],
+   "top": [
+    100,
+    0
+   ],
+   "base_y": 226
+  }
+ },
+ "style": {
+  "lux": true,
+  "palette": "amber"
+ },
+ "music": {
+  "sync": true
+ },
+ "post": {
+  "tags": [
+   "#電気鍋",
+   "#レコルト",
+   "#ひとり鍋"
+  ],
+  "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00pzd8n.sdgff0f9.g00pzd8n.sdgfg7b9/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fplywood%2F20149095%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fplywood%2Fi%2F10013891%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b"
+ },
+ "excluded": [
+  "楽天1位（商品名・画像2枚目）：条件の書いていない順位",
+  "ポイント10倍・¥0包装・特典：お金とおまけの話",
+  "価格"
+ ],
+ "ring_extra": [
+  {
+   "image": "colors.jpg",
+   "bg": "#fff"
+  },
+  {
+   "hero": true,
+   "bg": "radial-gradient(circle at 50% 40%,#7A3A26,#1E0E0A 75%)"
+  }
+ ],
+ "prep": {
+  "images": [
+   "product/recolte-potduo-carre.jpg",
+   "product/recolte-potduo-carre-1.jpg",
+   "product/recolte-potduo-carre-2.jpg",
+   "product/recolte-potduo-carre-x-aqua.jpg",
+   "product/recolte-potduo-carre-x-aqua-1.jpg",
+   "product/recolte-potduo-carre-x-aqua-2.jpg",
+   "product/recolte-potduo-carre-x-hotch.jpg",
+   "product/recolte-potduo-carre-x-hotch-1.jpg",
+   "product/recolte-potduo-carre-x-hotch-2.jpg"
+  ],
+  "why": "使う：img0（クリームホワイト・グラタン・フタを持ち上げた手＝実写）・img2（4色）・img3（レッド・野菜のロースト）・img6（レッド・トマトのスープ）。使わない：img1（ランキングの札）・img4/img7/img8（特典の案内）・img5（発送の予定）",
+  "cutouts": [
+   {
+    "out": "red.png",
+    "src": "img2",
+    "crop": [
+     12,
+     0,
+     264,
+     244
+    ],
+    "why": "4色の写真のレッド（フタから台座・ダイヤルまで。下の色名・コードの丸は入れない）"
+   },
+   {
+    "out": "cream.png",
+    "src": "img2",
+    "crop": [
+     266,
+     0,
+     514,
+     244
+    ],
+    "why": "同：クリームホワイト"
+   }
+  ],
+  "plates": [
+   {
+    "out": "soup.jpg",
+    "src": "img6",
+    "crop": [
+     100,
+     150,
+     420,
+     440
+    ],
+    "sr": true,
+    "why": "別のお店B：トマトのスープとロールキャベツ（左上・右上の札、右の色見本、左下の特典は入れない）"
+   },
+   {
+    "out": "gratin.jpg",
+    "src": "img0",
+    "crop": [
+     100,
+     100,
+     370,
+     450
+    ],
+    "sr": true,
+    "why": "自分のリンク先：グラタンとフタを持ち上げた手（上の札・下の札は入れない）"
+   },
+   {
+    "out": "veg.jpg",
+    "src": "img3",
+    "crop": [
+     150,
+     90,
+     460,
+     440
+    ],
+    "sr": true,
+    "why": "別のお店A：野菜のロースト（左の札・左下の色見本・下の札は入れない）"
+   },
+   {
+    "out": "colors.jpg",
+    "src": "img2",
+    "sr": true,
+    "why": "自分のリンク先：4色の写真（色名入り）"
+   }
+  ],
+  "voice": "voicevox:WhiteCUL",
+  "speed": 0.95
+ },
+ "beats": [
+  {
+   "kind": "orbit",
+   "voice": "line0.mp3",
+   "say": "鍋も、揚げ物も、これ1台。",
+   "head": [
+    "鍋も、揚げ物も、",
+    "これ1台。"
+   ],
+   "card": {
+    "image": "soup.jpg",
+    "pos": "50% 55%"
+   },
+   "note": "※写真は同じ商品の別のお店の販売ページの物です。",
+   "source": "説明文：これ1台で「煮る、蒸す、焼く、揚げる、炊く」の5つの調理が可能（1シーン目＝つかみ・本物の料理の写真 #311）"
+  },
+  {
+   "kind": "orbit",
+   "voice": "line1.mp3",
+   "say": "1〜2人に、ちょうどいい。",
+   "head": [
+    "1〜2人に、",
+    "ちょうどいい。"
+   ],
+   "card": {
+    "image": "gratin.jpg"
+   },
+   "nums": [
+    [
+     "幅・奥行 約",
+     20,
+     "cm"
+    ]
+   ],
+   "note": "※セットサイズ：約 幅20×奥行20×高さ17.5cm（ハンドル込み）・最大容量 約1.3L（販売ページの記載）。",
+   "source": "説明文：1〜2人にちょうどいいコンパクトなサイズ感・セットサイズ（約）幅20×奥行20×高さ17.5cm"
+  },
+  {
+   "kind": "orbit",
+   "voice": "line2.mp3",
+   "say": "角の丸い、四角いかたち。",
+   "head": [
+    "角の丸い、",
+    "四角いかたち。"
+   ],
+   "card": {
+    "hero": true,
+    "bg": "radial-gradient(circle at 50% 40%,#7A3A26,#1E0E0A 75%)"
+   },
+   "note": "※キャレはフランス語でスクエア型の意味（販売ページの記載）。",
+   "source": "説明文：フランス語でスクエア型を意味するキャレ。角丸の四角いフォルムが特長的なデザイン"
+  },
+  {
+   "kind": "orbit",
+   "voice": "line3.mp3",
+   "say": "出来たてを、そのまま食卓へ。",
+   "head": [
+    "出来たてを、",
+    "そのまま食卓へ。"
+   ],
+   "card": {
+    "image": "veg.jpg"
+   },
+   "note": "※写真は同じ商品の別のお店の販売ページの物です。",
+   "source": "説明文：テーブル上で美味しく出来立てを"
+  },
+  {
+   "kind": "cascade",
+   "voice": "line4.mp3",
+   "say": "煮る、蒸す、焼く、揚げる、炊く。",
+   "words": [
+    {
+     "t": "煮る"
+    },
+    {
+     "t": "蒸す"
+    },
+    {
+     "t": "焼く"
+    },
+    {
+     "t": "揚げる"
+    },
+    {
+     "t": "炊く",
+     "sub": "1台で5役",
+     "pair": true
+    }
+   ],
+   "stream": [
+    "soup.jpg",
+    "red.png",
+    "gratin.jpg",
+    "colors.jpg",
+    "veg.jpg",
+    "cream.png"
+   ],
+   "pair": [
+    "red.png",
+    "cream.png"
+   ],
+   "note": "※1台で「煮る、蒸す、焼く、揚げる、炊く」の5つの調理（販売ページの記載）。揚げ物の油は約0.65Lまで。",
+   "source": "説明文：これ1台で「煮る、蒸す、焼く、揚げる、炊く」の5つの調理が可能・揚げ物をする際は MAX ラインの位置を超える油（約0.65L）を入れないでください",
+   "pair_h": 380
+  },
+  {
+   "kind": "finale3d",
+   "voice": "line5.mp3",
+   "say": "4色から選べる。リンクはプロフィールへ。",
+   "big": "Carré",
+   "tag": "1台で5役",
+   "rating": 4.62,
+   "reviews": 363,
+   "date": "楽天市場 2026年10月12日時点",
+   "cta": "プロフィールのリンクへ",
+   "pair": [
+    "red.png",
+    "cream.png"
+   ],
+   "note": "※4色：レッド／クリームホワイト／ブラック／グレイッシュピンク（数量限定）。価格・在庫・最新情報はリンク先でご確認ください。写真は販売ページ（同じ商品の別のお店を含む）の物です。",
+   "tail": 1.0,
+   "pair_h": 400,
+   "pair_top": 820
+  }
+ ]
+}

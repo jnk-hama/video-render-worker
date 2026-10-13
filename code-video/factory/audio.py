@@ -9,7 +9,9 @@ P = json.load(open(product)); TL = json.load(open(tl_path)); Bs, END = TL["beats
 N = int((END + 0.6) * SR)
 def stereo(): return np.zeros((2, N))
 def put(bus, x, t, gain=1.0, pan=0.0):
-    i = int(t * SR); x = x[: max(0, N - i)] * gain
+    i = int(t * SR)
+    if i < 0: x, i = x[-i:], 0   # 1場面目の「前から来る音」（t0-0.42 等）は0秒より前を切って頭から鳴らす
+    x = x[: max(0, N - i)] * gain
     bus[0, i:i + len(x)] += x * (1 - max(0, pan)); bus[1, i:i + len(x)] += x * (1 + min(0, pan))
 def decode(path, tempo):
     raw = subprocess.run([FF, "-v", "error", "-i", path, "-af", f"atempo={tempo},highpass=f=70,acompressor=threshold=-20dB:ratio=3:attack=5:release=80",
