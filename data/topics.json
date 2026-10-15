@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-14T08:55:28+00:00",
+ "generated_at": "2026-10-15T08:29:56+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -31,15 +31,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wzse1q",
-    "title": "British adventurer Karl Bushby has finally completed his 28 year journey around the world. Today he reached the finish line in Hull, England after walking more than 30,000 miles without flying or using motorized transport.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1wzse1q/british_adventurer_karl_bushby_has_finally/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1x45hxt",
     "title": "Hand-drawn paper flipbook animation of a traditional dance",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x45hxt/handdrawn_paper_flipbook_animation_of_a/",
@@ -49,18 +40,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x33lvr",
-    "title": "Rain Above water vs under water",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1x33lvr/rain_above_water_vs_under_water/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1x3eo7l",
+    "title": "Swedish security guard handles a public fight between two men.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x3eo7l/swedish_security_guard_handles_a_public_fight/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x0jhgp",
-    "title": "Girl gets rescue parrot to fly to her for the first time.",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1x0jhgp/girl_gets_rescue_parrot_to_fly_to_her_for_the/",
+    "id": "t3_1x33lvr",
+    "title": "Rain Above water vs under water",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1x33lvr/rain_above_water_vs_under_water/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -94,28 +85,19 @@
     "source": "rss"
    },
    {
-    "id": "t3_1wzzz87",
-    "title": "Dude is looking Fly!",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1wzzz87/dude_is_looking_fly/",
-    "subreddit": "Unexpected",
+    "id": "t3_1x2eu7l",
+    "title": "This electric blue fiddler crab looks straight out of an alien planet",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1x2eu7l/this_electric_blue_fiddler_crab_looks_straight/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x450ta",
-    "title": "Casually hopping across a rock formation",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1x450ta/casually_hopping_across_a_rock_formation/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x2fscu",
-    "title": "Be careful when parking",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1x2fscu/be_careful_when_parking/",
-    "subreddit": "Unexpected",
+    "id": "t3_1x23svp",
+    "title": "HMB Priorities: Saving the booze during today's earthquake in Panama.",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1x23svp/hmb_priorities_saving_the_booze_during_todays/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -130,9 +112,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x029wz",
-    "title": "28 years ago, Karl Bushby left the UK in an attempt to become the first person to circumnavigate the world on foot. Yesterday, he arrived in Dover for the final leg of his journey to his mother’s home in Hull.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x029wz/28_years_ago_karl_bushby_left_the_uk_in_an/",
+    "id": "t3_1x1cn0k",
+    "title": "The Queen of Thailand flew a fighter solo today, becoming the first and only queen in the world to pilot a fighter jet",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x1cn0k/the_queen_of_thailand_flew_a_fighter_solo_today/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x0tcdd",
+    "title": "Father throws a chair at a judge after the driver who killed his 2 year old daughter and both of her grandparents was sentenced to just 120 hours of community service",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x0tcdd/father_throws_a_chair_at_a_judge_after_the_driver/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x4hfge",
+    "title": "Sheep Getting Cleaned",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x4hfge/sheep_getting_cleaned/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -141,37 +141,46 @@
   ],
   "B": [
    {
-    "id": "t3_1x0qmj5",
-    "title": "The virgin reboot vs The CHAD FanFictions.",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x0qmj5/the_virgin_reboot_vs_the_chad_fanfictions/",
-    "subreddit": "Animemes",
+    "id": "t3_1x4sdvy",
+    "title": "Spoiled nepo baby CC [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x4sdvy/spoiled_nepo_baby_cc_hololive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x3ftif",
-    "title": "Is that a sacrifice you're willing to make?",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x3ftif/is_that_a_sacrifice_youre_willing_to_make/",
-    "subreddit": "Animemes",
+    "id": "t3_1x45t61",
+    "title": "Baggy pants by 甘味処curly [Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x45t61/baggy_pants_by_甘味処curly_original/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x2glzn",
-    "title": "Lord Voldemort actually ships them too",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x2glzn/lord_voldemort_actually_ships_them_too/",
-    "subreddit": "Animemes",
+    "id": "t3_1x19c8o",
+    "title": "Casual Asuna [Blue Archive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x19c8o/casual_asuna_blue_archive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wztj89",
-    "title": "New Serotonin drug in circulation's hit just right",
-    "url": "https://www.reddit.com/r/Animemes/comments/1wztj89/new_serotonin_drug_in_circulations_hit_just_right/",
-    "subreddit": "Animemes",
+    "id": "t3_1x3wl6n",
+    "title": "Wife Anya [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x3wl6n/wife_anya_hololive/",
+    "subreddit": "awwnime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x0xokx",
+    "title": "Perlica's many expressions by 千夜QYS3 [Arknights Endfield]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x0xokx/perlicas_many_expressions_by_千夜qys3_arknights/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -180,15 +189,6 @@
     "id": "t3_1x2oqrw",
     "title": "Introducing yourself to the veterans [@ayunyan_pere]",
     "url": "https://www.reddit.com/r/animegifs/comments/1x2oqrw/introducing_yourself_to_the_veterans_ayunyan_pere/",
-    "subreddit": "animegifs",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x0wff8",
-    "title": "Looks like a saint — But a saint she ain’t",
-    "url": "https://www.reddit.com/r/animegifs/comments/1x0wff8/looks_like_a_saint_but_a_saint_she_aint/",
     "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
@@ -204,73 +204,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x4ctml",
-    "title": "[WDYWT] 2 days of cold weather in a row ?!!!",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x4ctml/wdywt_2_days_of_cold_weather_in_a_row/",
-    "subreddit": "streetwear",
+    "id": "t3_1x0wff8",
+    "title": "Looks like a saint — But a saint she ain’t",
+    "url": "https://www.reddit.com/r/animegifs/comments/1x0wff8/looks_like_a_saint_but_a_saint_she_aint/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x09svy",
-    "title": "Chilly day in Berlin [WDYWT]",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x09svy/chilly_day_in_berlin_wdywt/",
-    "subreddit": "streetwear",
+    "id": "t3_1x3geq3",
+    "title": "The Debut Of Dragon Ball Super Beerus Has Crashed Crunchyroll And Other Streaming Services",
+    "url": "https://www.reddit.com/r/anime/comments/1x3geq3/the_debut_of_dragon_ball_super_beerus_has_crashed/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x1x9cp",
-    "title": "The higher the socks the downer the foo",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x1x9cp/the_higher_the_socks_the_downer_the_foo/",
-    "subreddit": "streetwear",
+    "id": "t3_1x1gfay",
+    "title": "How Not to Summon a Demon Lord ULT | Teaser Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1x1gfay/how_not_to_summon_a_demon_lord_ult_teaser_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x3ogj4",
-    "title": "[WDYWT] FINALLY one colder day in SoCal",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x3ogj4/wdywt_finally_one_colder_day_in_socal/",
-    "subreddit": "streetwear",
+    "id": "t3_1x359h3",
+    "title": "Full metal Alchemist Edward and Nina",
+    "url": "https://www.reddit.com/r/anime/comments/1x359h3/full_metal_alchemist_edward_and_nina/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x143wx",
-    "title": "[ART] Cool girl - Mikoto-chan Doesn't Want to Be Hated!",
-    "url": "https://www.reddit.com/r/manga/comments/1x143wx/art_cool_girl_mikotochan_doesnt_want_to_be_hated/",
-    "subreddit": "manga",
+    "id": "t3_1x51hks",
+    "title": "Crunchyroll CEO Rules Out AI-Powered Anime Translation to Preserve Characters’ Intended Meaning",
+    "url": "https://www.reddit.com/r/anime/comments/1x51hks/crunchyroll_ceo_rules_out_aipowered_anime/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1wzzhuq",
-    "title": "[DISC] Wolf - Oneshot by @ka92",
-    "url": "https://www.reddit.com/r/manga/comments/1wzzhuq/disc_wolf_oneshot_by_ka92/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x56x2j",
-    "title": "Found this from IG. What manga is this?",
-    "url": "https://www.reddit.com/r/manga/comments/1x56x2j/found_this_from_ig_what_manga_is_this/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x1bp2n",
-    "title": "[ART] - Princess Zelda is way too easy (The Legend of Zelda: Breath of the Wild)",
-    "url": "https://www.reddit.com/r/manga/comments/1x1bp2n/art_princess_zelda_is_way_too_easy_the_legend_of/",
-    "subreddit": "manga",
+    "id": "t3_1x5kz36",
+    "title": "‘Cyberpunk: Edgerunners 2’ New Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1x5kz36/cyberpunk_edgerunners_2_new_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
