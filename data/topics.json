@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-15T08:29:56+00:00",
+ "generated_at": "2026-10-16T08:23:11+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,15 +7,6 @@
     "id": "t3_1x3dzhv",
     "title": "This is the best apology in the history of sports",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x3dzhv/this_is_the_best_apology_in_the_history_of_sports/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x0piuk",
-    "title": "Grey car driver has probably been driving around with that extinguisher for five years just waiting for this exact moment.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x0piuk/grey_car_driver_has_probably_been_driving_around/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -34,6 +25,15 @@
     "id": "t3_1x45hxt",
     "title": "Hand-drawn paper flipbook animation of a traditional dance",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x45hxt/handdrawn_paper_flipbook_animation_of_a/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x5vjuv",
+    "title": "The athlete with Down syndrome, noticing the sadness of his defeated opponent, immediately ran up to him and raised his hand up.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x5vjuv/the_athlete_with_down_syndrome_noticing_the/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -112,27 +112,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x1cn0k",
-    "title": "The Queen of Thailand flew a fighter solo today, becoming the first and only queen in the world to pilot a fighter jet",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x1cn0k/the_queen_of_thailand_flew_a_fighter_solo_today/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x0tcdd",
-    "title": "Father throws a chair at a judge after the driver who killed his 2 year old daughter and both of her grandparents was sentenced to just 120 hours of community service",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x0tcdd/father_throws_a_chair_at_a_judge_after_the_driver/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1x4hfge",
     "title": "Sheep Getting Cleaned",
     "url": "https://www.reddit.com/r/interestingasfuck/comments/1x4hfge/sheep_getting_cleaned/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x31e15",
+    "title": "German farmers use specially designed vehicles that let them work lying down, reducing back strain while making their work more efficient.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x31e15/german_farmers_use_specially_designed_vehicles/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x6pu5p",
+    "title": "\"Telescope ranches\" in Texas. People pay to store $10K+ telescope rigs in the middle of nowhere to escape light pollution. The warehouse roofs roll off each night, and owners remote in from anywhere in the world",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x6pu5p/telescope_ranches_in_texas_people_pay_to_store/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -159,15 +159,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x19c8o",
-    "title": "Casual Asuna [Blue Archive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1x19c8o/casual_asuna_blue_archive/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1x3wl6n",
     "title": "Wife Anya [Hololive]",
     "url": "https://www.reddit.com/r/awwnime/comments/1x3wl6n/wife_anya_hololive/",
@@ -177,9 +168,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x0xokx",
-    "title": "Perlica's many expressions by 千夜QYS3 [Arknights Endfield]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1x0xokx/perlicas_many_expressions_by_千夜qys3_arknights/",
+    "id": "t3_1x5w0wd",
+    "title": "Achichi Mela [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x5w0wd/achichi_mela_hololive/",
+    "subreddit": "awwnime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x504zq",
+    "title": "Furina [Genshin Impact]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1x504zq/furina_genshin_impact/",
     "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
@@ -204,55 +204,73 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x0wff8",
-    "title": "Looks like a saint — But a saint she ain’t",
-    "url": "https://www.reddit.com/r/animegifs/comments/1x0wff8/looks_like_a_saint_but_a_saint_she_aint/",
-    "subreddit": "animegifs",
+    "id": "t3_1x4ctml",
+    "title": "[WDYWT] 2 days of cold weather in a row ?!!!",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x4ctml/wdywt_2_days_of_cold_weather_in_a_row/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x3geq3",
-    "title": "The Debut Of Dragon Ball Super Beerus Has Crashed Crunchyroll And Other Streaming Services",
-    "url": "https://www.reddit.com/r/anime/comments/1x3geq3/the_debut_of_dragon_ball_super_beerus_has_crashed/",
-    "subreddit": "anime",
+    "id": "t3_1x1x9cp",
+    "title": "The higher the socks the downer the foo",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x1x9cp/the_higher_the_socks_the_downer_the_foo/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x1gfay",
-    "title": "How Not to Summon a Demon Lord ULT | Teaser Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1x1gfay/how_not_to_summon_a_demon_lord_ult_teaser_visual/",
-    "subreddit": "anime",
+    "id": "t3_1x3ogj4",
+    "title": "[WDYWT] FINALLY one colder day in SoCal",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x3ogj4/wdywt_finally_one_colder_day_in_socal/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x359h3",
-    "title": "Full metal Alchemist Edward and Nina",
-    "url": "https://www.reddit.com/r/anime/comments/1x359h3/full_metal_alchemist_edward_and_nina/",
-    "subreddit": "anime",
+    "id": "t3_1x6wef8",
+    "title": "wearing painted hoodie",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x6wef8/wearing_painted_hoodie/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x51hks",
-    "title": "Crunchyroll CEO Rules Out AI-Powered Anime Translation to Preserve Characters’ Intended Meaning",
-    "url": "https://www.reddit.com/r/anime/comments/1x51hks/crunchyroll_ceo_rules_out_aipowered_anime/",
-    "subreddit": "anime",
+    "id": "t3_1x4osli",
+    "title": "Imagine falling off so hard you're not even in your own team😭",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x4osli/imagine_falling_off_so_hard_youre_not_even_in/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x5kz36",
-    "title": "‘Cyberpunk: Edgerunners 2’ New Key Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1x5kz36/cyberpunk_edgerunners_2_new_key_visual/",
-    "subreddit": "anime",
+    "id": "t3_1x36ajm",
+    "title": "Very remarkable indeed",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x36ajm/very_remarkable_indeed/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x5hgwp",
+    "title": "I found this chair for free. Looks to be in pretty good shape. Any reason to not keep it?",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x5hgwp/i_found_this_chair_for_free_looks_to_be_in_pretty/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x4sure",
+    "title": "Happy Birthday Furina!",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x4sure/happy_birthday_furina/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
