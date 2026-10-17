@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-16T08:23:11+00:00",
+ "generated_at": "2026-10-17T07:58:59+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -22,18 +22,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x45hxt",
-    "title": "Hand-drawn paper flipbook animation of a traditional dance",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x45hxt/handdrawn_paper_flipbook_animation_of_a/",
+    "id": "t3_1x5vjuv",
+    "title": "The athlete with Down syndrome, noticing the sadness of his defeated opponent, immediately ran up to him and raised his hand up.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x5vjuv/the_athlete_with_down_syndrome_noticing_the/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x5vjuv",
-    "title": "The athlete with Down syndrome, noticing the sadness of his defeated opponent, immediately ran up to him and raised his hand up.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x5vjuv/the_athlete_with_down_syndrome_noticing_the/",
+    "id": "t3_1x45hxt",
+    "title": "Hand-drawn paper flipbook animation of a traditional dance",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x45hxt/handdrawn_paper_flipbook_animation_of_a/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -94,46 +94,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x23svp",
-    "title": "HMB Priorities: Saving the booze during today's earthquake in Panama.",
-    "url": "https://www.reddit.com/r/holdmybeer/comments/1x23svp/hmb_priorities_saving_the_booze_during_todays/",
+    "id": "t3_1x7vvoj",
+    "title": "HMB while I have a smoke.",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1x7vvoj/hmb_while_i_have_a_smoke/",
     "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x27cvi",
-    "title": "This video captured after a man accidentally knocked his phone to the bottom of the sea",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x27cvi/this_video_captured_after_a_man_accidentally/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1x4xa2u",
+    "title": "That didn't go according plan.",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1x4xa2u/that_didnt_go_according_plan/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x4hfge",
-    "title": "Sheep Getting Cleaned",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x4hfge/sheep_getting_cleaned/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1x2joo5",
+    "title": "She's drunk on orange juice",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1x2joo5/shes_drunk_on_orange_juice/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x31e15",
-    "title": "German farmers use specially designed vehicles that let them work lying down, reducing back strain while making their work more efficient.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x31e15/german_farmers_use_specially_designed_vehicles/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x6pu5p",
-    "title": "\"Telescope ranches\" in Texas. People pay to store $10K+ telescope rigs in the middle of nowhere to escape light pollution. The warehouse roofs roll off each night, and owners remote in from anywhere in the world",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x6pu5p/telescope_ranches_in_texas_people_pay_to_store/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1x5t99y",
+    "title": "that flex 💪 was an invite to fight 🤣",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1x5t99y/that_flex_was_an_invite_to_fight/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -186,93 +177,84 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x2oqrw",
-    "title": "Introducing yourself to the veterans [@ayunyan_pere]",
-    "url": "https://www.reddit.com/r/animegifs/comments/1x2oqrw/introducing_yourself_to_the_veterans_ayunyan_pere/",
-    "subreddit": "animegifs",
+    "id": "t3_1x5c7o6",
+    "title": "NYCC 2026 - Saturday Selects",
+    "url": "https://www.reddit.com/r/cosplay/comments/1x5c7o6/nycc_2026_saturday_selects/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x49jox",
-    "title": "Rear-Entry Biometric Access",
-    "url": "https://www.reddit.com/r/animegifs/comments/1x49jox/rearentry_biometric_access/",
-    "subreddit": "animegifs",
+    "id": "t3_1x4j5ij",
+    "title": "Akasha - Queen of the Damned",
+    "url": "https://www.reddit.com/r/cosplay/comments/1x4j5ij/akasha_queen_of_the_damned/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x4ctml",
-    "title": "[WDYWT] 2 days of cold weather in a row ?!!!",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x4ctml/wdywt_2_days_of_cold_weather_in_a_row/",
-    "subreddit": "streetwear",
+    "id": "t3_1x4agaz",
+    "title": "Lilith Diablo cosplay by DariaHime, photos by Pugoffka",
+    "url": "https://www.reddit.com/r/cosplay/comments/1x4agaz/lilith_diablo_cosplay_by_dariahime_photos_by/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x1x9cp",
-    "title": "The higher the socks the downer the foo",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x1x9cp/the_higher_the_socks_the_downer_the_foo/",
-    "subreddit": "streetwear",
+    "id": "t3_1x3rpf4",
+    "title": "Took some amazing photos of these cosplayers!",
+    "url": "https://www.reddit.com/r/cosplay/comments/1x3rpf4/took_some_amazing_photos_of_these_cosplayers/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x3ogj4",
-    "title": "[WDYWT] FINALLY one colder day in SoCal",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x3ogj4/wdywt_finally_one_colder_day_in_socal/",
-    "subreddit": "streetwear",
+    "id": "t3_1x3geq3",
+    "title": "The Debut Of Dragon Ball Super Beerus Has Crashed Crunchyroll And Other Streaming Services",
+    "url": "https://www.reddit.com/r/anime/comments/1x3geq3/the_debut_of_dragon_ball_super_beerus_has_crashed/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x6wef8",
-    "title": "wearing painted hoodie",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x6wef8/wearing_painted_hoodie/",
-    "subreddit": "streetwear",
+    "id": "t3_1x5kz36",
+    "title": "‘Cyberpunk: Edgerunners 2’ New Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1x5kz36/cyberpunk_edgerunners_2_new_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x4osli",
-    "title": "Imagine falling off so hard you're not even in your own team😭",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x4osli/imagine_falling_off_so_hard_youre_not_even_in/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1x359h3",
+    "title": "Full metal Alchemist Edward and Nina",
+    "url": "https://www.reddit.com/r/anime/comments/1x359h3/full_metal_alchemist_edward_and_nina/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x36ajm",
-    "title": "Very remarkable indeed",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x36ajm/very_remarkable_indeed/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1x51hks",
+    "title": "Crunchyroll CEO Rules Out AI-Powered Anime Translation to Preserve Characters’ Intended Meaning",
+    "url": "https://www.reddit.com/r/anime/comments/1x51hks/crunchyroll_ceo_rules_out_aipowered_anime/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x5hgwp",
-    "title": "I found this chair for free. Looks to be in pretty good shape. Any reason to not keep it?",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x5hgwp/i_found_this_chair_for_free_looks_to_be_in_pretty/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1x6jv83",
+    "title": "‘Cyberpunk: Edgerunners’ creator received \"dozens\" of DMs a day about bringing David back, but he's sure \"you don't really want that\"",
+    "url": "https://www.reddit.com/r/anime/comments/1x6jv83/cyberpunk_edgerunners_creator_received_dozens_of/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x4sure",
-    "title": "Happy Birthday Furina!",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x4sure/happy_birthday_furina/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    }
   ]
