@@ -1,17 +1,8 @@
 {
- "generated_at": "2026-10-18T08:13:31+00:00",
+ "generated_at": "2026-10-19T09:06:33+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
-   {
-    "id": "t3_1x3dzhv",
-    "title": "This is the best apology in the history of sports",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x3dzhv/this_is_the_best_apology_in_the_history_of_sports/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1x5vjuv",
     "title": "The athlete with Down syndrome, noticing the sadness of his defeated opponent, immediately ran up to him and raised his hand up.",
@@ -40,55 +31,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x3eo7l",
-    "title": "Swedish security guard handles a public fight between two men.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x3eo7l/swedish_security_guard_handles_a_public_fight/",
+    "id": "t3_1x5o2lb",
+    "title": "A lion dance performance builds suspense.🦁",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x5o2lb/a_lion_dance_performance_builds_suspense/",
     "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x3dfbp",
-    "title": "Two photographers aimed their camera at a galaxy 2.5 million light-years away, went to sleep, and woke up to this.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x3dfbp/two_photographers_aimed_their_camera_at_a_galaxy/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x7l26v",
-    "title": "A 3,300-year-old mummified foot of an upland moa bird discovered in a New Zealand cave in 1987, showing intact skin, claws, and feathers running all the way down to its ankles, preserved by dry cave breezes",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x7l26v/a_3300yearold_mummified_foot_of_an_upland_moa/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x7ee07",
-    "title": "Explosion captured by live weather radar",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x7ee07/explosion_captured_by_live_weather_radar/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x3c6n2",
-    "title": "EU has created a system that bypasses payment processing services like visa or mastercard",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x3c6n2/eu_has_created_a_system_that_bypasses_payment/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x45ojr",
-    "title": "Photographer Maria Passer captured the ice-covered empty buildings of Vorkuta, where winter temperatures drop as low as minus 58 degrees Fahrenheit. As residents leave the city, snow and ice completely encrust former living rooms, offices, and bedrooms",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x45ojr/photographer_maria_passer_captured_the_icecovered/",
-    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -103,18 +49,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x3bmze",
-    "title": "Camera caught what you did bro!",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x3bmze/camera_caught_what_you_did_bro/",
+    "id": "t3_1x5c7p4",
+    "title": "Street Racing on a Crowded Highway",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x5c7p4/street_racing_on_a_crowded_highway/",
     "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x5c7p4",
-    "title": "Street Racing on a Crowded Highway",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x5c7p4/street_racing_on_a_crowded_highway/",
+    "id": "t3_1x3xvmu",
+    "title": "Trying to ride an escalator on a scooter",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x3xvmu/trying_to_ride_an_escalator_on_a_scooter/",
     "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
@@ -137,54 +83,54 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
+   },
+   {
+    "id": "t3_1x4p19j",
+    "title": "Paper Pepper is a Korean papercraft artist known for creative paper (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1x4p19j/paper_pepper_is_a_korean_papercraft_artist_known/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x97a9a",
+    "title": "This kid is incredible (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1x97a9a/this_kid_is_incredible_source_link_in_description/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x9p7n7",
+    "title": "This woman's painting technique and use of color. (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1x9p7n7/this_womans_painting_technique_and_use_of_color/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x4xa2u",
+    "title": "That didn't go according plan.",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1x4xa2u/that_didnt_go_according_plan/",
+    "subreddit": "ContagiousLaughter",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x74zw2",
+    "title": "Parents try to make serious video message for daughter",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1x74zw2/parents_try_to_make_serious_video_message_for/",
+    "subreddit": "ContagiousLaughter",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1x3ftif",
-    "title": "Is that a sacrifice you're willing to make?",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x3ftif/is_that_a_sacrifice_youre_willing_to_make/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x52qk4",
-    "title": "Beautiful art everywhere I look",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x52qk4/beautiful_art_everywhere_i_look/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x785x8",
-    "title": "From Nichijou -> Shingeki Kyojin -> Berserk",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x785x8/from_nichijou_shingeki_kyojin_berserk/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x34zc6",
-    "title": "We're all Waiting for it, Right?",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x34zc6/were_all_waiting_for_it_right/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x7rmey",
-    "title": "Genderbending Popular Characters",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x7rmey/genderbending_popular_characters/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1x7na3s",
     "title": "Any idea on who did this sequence?",
@@ -240,19 +186,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x3ogj4",
-    "title": "[WDYWT] FINALLY one colder day in SoCal",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x3ogj4/wdywt_finally_one_colder_day_in_socal/",
+    "id": "t3_1x95wc5",
+    "title": "32nd lap around the sun, lowkey felt like a 30 second run 🏃🏿💨",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x95wc5/32nd_lap_around_the_sun_lowkey_felt_like_a_30/",
     "subreddit": "streetwear",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x6g78n",
-    "title": "[DISC] - I ruined it. - Oneshot by @Medatarou1",
-    "url": "https://www.reddit.com/r/manga/comments/1x6g78n/disc_i_ruined_it_oneshot_by_medatarou1/",
-    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -267,12 +204,39 @@
     "source": "rss"
    },
    {
+    "id": "t3_1x6g78n",
+    "title": "[DISC] - I ruined it. - Oneshot by @Medatarou1",
+    "url": "https://www.reddit.com/r/manga/comments/1x6g78n/disc_i_ruined_it_oneshot_by_medatarou1/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1x7c3hi",
     "title": "What Manga/Doujin is this?",
     "url": "https://www.reddit.com/r/manga/comments/1x7c3hi/what_mangadoujin_is_this/",
     "subreddit": "manga",
     "views": 0,
     "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x9hqdh",
+    "title": "[ART] Happy Halloween🎃 - It's a Little Late, but I've Fallen in Love with My Childhood Friend.",
+    "url": "https://www.reddit.com/r/manga/comments/1x9hqdh/art_happy_halloween_its_a_little_late_but_ive/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x6o3sz",
+    "title": "[DISC] The Story of a Girl Who Can Read Minds - Ch. 10",
+    "url": "https://www.reddit.com/r/manga/comments/1x6o3sz/disc_the_story_of_a_girl_who_can_read_minds_ch_10/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
