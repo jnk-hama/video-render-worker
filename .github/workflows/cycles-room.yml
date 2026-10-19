@@ -1,0 +1,100 @@
+# 実物と間違えるほどの 3D のリビングを Blender Cycles で描く口（jmas-ai-os #337・オーナー「リアルと間違えるほどに」）。
+#
+# 【なぜここで描くか】
+# Cycles は光の跳ね返りを本当に計算するので1コマに数分かかる（4コアで約7分×約200コマ）。
+# このリポジトリは公開なので Actions の分数は無料。matrix で 20 台に分けて同時に描く。
+# 絵には第三者の商品写真を入れない（部屋は CG・素材は Poly Haven の CC0）＝公開の場所で描いてよい。
+#
+# 【使い方】cycles-room ブランチの cycles/ を更新して push する
+#   cycles/cycles_room.py   … 場面を組む本体（jmas-ai-os の samples/motion/engine/cycles_room.py と同じ物。SOURCE.sha256 で照合）
+#   cycles/jobs_day.json / jobs_night.json … 1コマずつのカメラ（jmas-ai-os の humid.html の CYCLES_JOBS が出した物）
+#   描いた絵は Release「cycles-room」の cycles-frames.tar に置く
+name: cycles-room
+
+on:
+  push:
+    branches: [cycles-room]
+    paths: [cycles/**]
+
+permissions:
+  contents: write
+
+env:
+  SHARDS: 20
+  SAMPLES: 24
+
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: 本体が jmas-ai-os の物と同じか（写した物がずれていたら描かない）
+        run: echo "$(cat cycles/SOURCE.sha256)  cycles/cycles_room.py" | sha256sum -c -
+      - name: 素材を1回だけ取る（Poly Haven・CC0。API の規約どおり固有の User-Agent）
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, pathlib, subprocess
+          UA = "video-render-worker-cycles-room/1.0 (+https://github.com/jnk-hama/video-render-worker)"
+          get = lambda u: urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA}), timeout=120).read()
+          need = json.loads(subprocess.check_output(["python3", "cycles/cycles_room.py", "--print-needs"]))
+          out = pathlib.Path("cg")
+          def save(u, p):
+              q = out / p; q.parent.mkdir(parents=True, exist_ok=True); q.write_bytes(get(u)); print("got", p, q.stat().st_size)
+          for kind, ids in need.items():
+              for aid in ids:
+                  f = json.loads(get(f"https://api.polyhaven.com/files/{aid}"))
+                  if kind == "hdris": save(f["hdri"]["2k"]["hdr"]["url"], f"hdris/{aid}.hdr"); continue
+                  b = f["blend"]["2k"]
+                  save(b["blend"]["url"], f"{kind}/{aid}/{aid}.blend")
+                  for rel, inc in (b["blend"].get("include") or {}).items(): save(inc["url"], f"{kind}/{aid}/{rel}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with: { name: cg, path: cg, retention-days: 3 }
+
+  render:
+    needs: assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: cg, path: cg }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Blender（Python 版・版は固定）
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libxfixes3 libgl1 libsm6 >/dev/null
+          pip install -q bpy==4.2.0
+      - name: 描く（k 台目は k, k+20, k+40… のコマ）
+        run: |
+          mkdir -p frames
+          for m in day night; do
+            python cycles/cycles_room.py --assets cg --mode $m --frames cycles/jobs_$m.json --dir frames --shard ${{ matrix.shard }}/$SHARDS --samples $SAMPLES 2>&1 | grep -E "^wrote|^asset|rror|Traceback"
+          done
+          ls frames | wc -l
+      - uses: actions/upload-artifact@v4
+        with: { name: "frames-${{ matrix.shard }}", path: frames, retention-days: 3 }
+
+  collect:
+    needs: render
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { pattern: "frames-*", path: frames, merge-multiple: true }
+      - name: 全部そろったか数えてから Release に置く
+        run: |
+          want=$(python3 -c "import json;print(sum(len(json.load(open(f'cycles/jobs_{m}.json'))) for m in ('day','night')))")
+          got=$(ls frames/*.png | wc -l); echo "コマ $got / $want"
+          [ "$got" = "$want" ] || { echo "コマが足りない"; exit 1; }
+          cp cycles/SOURCE.sha256 cycles/jobs_day.json cycles/jobs_night.json frames/   # 受け取る側（jmas-ai-os）が同じ本体・同じカメラかを照合する
+          tar cf cycles-frames.tar -C frames .
+          gh release view cycles-room >/dev/null 2>&1 || gh release create cycles-room --title "Cycles room frames" --notes "jmas-ai-os #337 の 3D のリビング（CG・Poly Haven CC0）" --prerelease
+          gh release upload cycles-room cycles-frames.tar --clobber
