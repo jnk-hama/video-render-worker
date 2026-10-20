@@ -5,7 +5,7 @@ import argparse, json, math, os, sys
 # この絵に要る素材（Poly Haven・CC0）。描く側（video-render-worker の cycles-room）はこれを読んで1回だけ取る＝素材の一覧はここ1か所
 NEEDS = {"models": ["coffee_table_round_01", "potted_plant_01", "hanging_picture_frame_01", "wooden_display_shelves_01", "ceramic_vase_01", "potted_plant_04",
                     "throw_pillows_01", "side_table_01", "ceramic_vase_02", "standing_picture_frame_01", "wicker_basket_02"],
-         "textures": ["wood_floor", "white_stucco", "polar_fleece", "curly_teddy_natural"], "hdris": ["garden_nook"]}
+         "textures": ["wood_floor", "white_stucco", "polar_fleece", "curly_teddy_natural", "cotton_jersey"], "hdris": ["garden_nook"]}
 if "--print-needs" in sys.argv: print(json.dumps(NEEDS)); sys.exit(0)
 import bpy, bmesh
 from mathutils import Vector
@@ -125,7 +125,8 @@ nt.links.new(df.outputs[0], mx1.inputs[1]); nt.links.new(tr.outputs[0], mx1.inpu
 M["curtain"] = cur
 # 本物の材質（Poly Haven の写真から作った PBR・CC0）：床＝オークのフローリング、壁＝漆喰、ソファ＝毛足の短いフリース、ラグ＝カーリーのボア
 if AS:
-    for k, tid, metres, tint, sh in [("floor", "wood_floor", 2.0, (0.55, 1.65), 0), ("wall", "white_stucco", 1.5, (0.6, 1.12), 0), ("sofa", "polar_fleece", 0.5, (0.22, 1.12), 0.5), ("rug", "curly_teddy_natural", 0.6, (0.55, 1.05), 0.6)]:
+    for k, tid, metres, tint, sh in [("floor", "wood_floor", 2.0, (0.55, 1.65), 0), ("wall", "white_stucco", 1.5, (0.6, 1.12), 0), ("sofa", "polar_fleece", 0.5, (0.22, 1.12), 0.5), ("rug", "curly_teddy_natural", 0.6, (0.55, 1.05), 0.6),
+                                    ("throwK", "cotton_jersey", 0.3, (0.45, 1.35), 0.6)]:
         mm = asset_mat(tid, metres, tint, sh)
         if mm: M[k] = mm
 
@@ -164,23 +165,61 @@ et.links.new(esep.outputs["Y"], skyc.inputs["Fac"]); et.links.new(skyc.outputs["
 et.links.new(mixo.outputs["Result"], ee.inputs["Color"]); et.links.new(ee.outputs[0], eo.inputs["Surface"]); ext.data.materials.append(em)
 if AS: ext.hide_render = True   # 本物の庭の全天球写真（HDRI）を窓の外に見せる
 # 薄いカーテン（ひだ＝波の変形）
+CURT = []   # (物, 元の頂点) ＝コマの時刻でゆっくり揺らす（下ほど大きく・上の端は留まる）
 for xc in (WIN["x0"] + 0.25, WIN["x1"] - 0.15):
     bpy.ops.mesh.primitive_plane_add(size=1, location=B(xc, 1.2, ZB + 0.12)); c = bpy.context.object; c.scale = (0.9, 2.15, 1); c.rotation_euler = (math.pi / 2, 0, 0)
     bpy.ops.object.transform_apply(scale=True, rotation=True); sd = c.modifiers.new("s", "SUBSURF"); sd.levels = 0; sd.subdivision_type = "SIMPLE"
     bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.subdivide(number_cuts=60); bpy.ops.object.mode_set(mode="OBJECT")
     for v in c.data.vertices: v.co.y += 0.07 * math.sin(v.co.x * 24) + 0.025 * math.sin(v.co.x * 61)
-    bpy.ops.object.shade_smooth(); c.data.materials.append(M["curtain"])
+    bpy.ops.object.shade_smooth(); c.data.materials.append(M["curtain"]); CURT.append((c, [v.co.copy() for v in c.data.vertices]))
+def curtains_at(t):
+    for c, base in CURT:
+        top = max(v.z for v in base); h = top - min(v.z for v in base)
+        for v, b in zip(c.data.vertices, base):
+            w = ((top - b.z) / h) ** 1.5   # 下ほど揺れる
+            v.co.y = b.y + w * (0.018 * math.sin(1.1 * t + 2.6 * b.x) + 0.008 * math.sin(2.3 * t + 5.1 * b.x + 1.0))
+            v.co.x = b.x + w * 0.006 * math.sin(0.9 * t + 3.0 * b.x)
+        c.data.update()
 
 # ---------- 家具 ----------
 SX, SZ = X0 + 0.55, -2.7
-box("sofaBase", B(SX, 0.2, SZ), (0.95, 2.3, 0.22), M["sofa"], 0.04)
-for dz in (-0.53, 0.53):
-    box("seat", B(SX + 0.08, 0.39, SZ + dz), (0.72, 1.02, 0.16), M["sofa"], 0.06, 4); box("back", B(SX - 0.33, 0.68, SZ + dz), (0.24, 1.02, 0.5), M["sofa"], 0.09, 4)
-for dz in (-1.08, 1.08): box("arm", B(SX, 0.42, SZ + dz), (0.95, 0.18, 0.42), M["sofa"], 0.07, 4)
+# ソファ（#338・オーナー「ソファもリアルに」）：布の計算で作る。座面・背もたれのクッションは中から押してふくらませ（角が丸く・縫い目の際にしわ）、
+#   ブランケットは上から落としてひじ掛けに掛ける。どちらも計算の手順が同じなら毎回同じ形（乱数なし）。台と肘は角を丸めた箱＋細分割
+def soft(o, levels=2):
+    md = o.modifiers.new("sub", "SUBSURF"); md.levels = md.render_levels = levels; bpy.ops.object.shade_smooth(); return o
+def cloth_settle(objs, frames, colliders=()):
+    for c in colliders: c.modifiers.new("col", "COLLISION").settings.thickness_outer = 0.004
+    sc.frame_start, sc.frame_end = 1, frames
+    for f in range(1, frames + 1): sc.frame_set(f)
+    dg = bpy.context.evaluated_depsgraph_get()
+    for o in objs:   # 計算の結果を形として固める（描く時に布の計算をしない）
+        me = bpy.data.meshes.new_from_object(o.evaluated_get(dg)); o.modifiers.clear(); o.data = me
+    for c in colliders: c.modifiers.remove(c.modifiers["col"])
+    sc.frame_set(1)
+def pillow(name, c, size, m, press=4.0, rot=(0, 0, 0)):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=c, rotation=rot); o = bpy.context.object; o.name = name; o.scale = size; bpy.ops.object.transform_apply(scale=True)
+    bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.subdivide(number_cuts=9); bpy.ops.object.mode_set(mode="OBJECT")
+    cl = o.modifiers.new("cloth", "CLOTH").settings; cl.quality = 6; cl.mass = 0.25; cl.tension_stiffness = cl.compression_stiffness = 12; cl.shear_stiffness = 4; cl.bending_stiffness = 0.6
+    cl.use_pressure = True; cl.uniform_pressure_force = press; cl.effector_weights.gravity = 0; cl.shrink_min = 0.03   # 少し縮めて張らせる＝縫い目の際にしわ
+    o.data.materials.append(m); return o
+SOFA = dict(L=2.3, D=0.95)
+base = soft(box("sofaBase", B(SX + 0.02, 0.2, SZ), (0.9, SOFA["L"] - 0.36, 0.2), M["sofa"], 0.02))
+backf = soft(box("sofaBack", B(X0 + 0.16, 0.56, SZ), (0.2, SOFA["L"] - 0.02, 0.52), M["sofa"], 0.05))
+arms = [soft(box("sofaArm", B(SX, 0.36, SZ + dz * (SOFA["L"] / 2 - 0.1)), (SOFA["D"], 0.2, 0.5), M["sofa"], 0.07)) for dz in (-1, 1)]
+seats = [pillow("seatC", B(SX + 0.09, 0.39, SZ + dz * 0.64), (0.7, 0.62, 0.17), M["sofa"], 3.0) for dz in (-1, 0, 1)]
+backs = [pillow("backC", B(X0 + 0.38, 0.69, SZ + dz * 0.64), (0.2, 0.62, 0.46), M["sofa"], 3.5, rot=(0, math.radians(-10), 0)) for dz in (-1, 0, 1)]
+cloth_settle(seats + backs, 18)
+for o in seats + backs: soft(o, 1)
+# ブランケット：手前のひじ掛けの上から落とす（ひじ掛けと座面に当たって垂れる）
+bpy.ops.mesh.primitive_plane_add(size=1, location=B(SX + 0.05, 0.95, SZ + SOFA["L"] / 2 - 0.25)); bl = bpy.context.object; bl.name = "throwBlanket"; bl.scale = (0.75, 1.25, 1); bl.rotation_euler = (0, 0, math.radians(8))
+bpy.ops.object.transform_apply(scale=True, rotation=True); bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.subdivide(number_cuts=40); bpy.ops.object.mode_set(mode="OBJECT")
+cm_ = bl.modifiers.new("cloth", "CLOTH"); cb = cm_.settings; cb.quality = 8; cb.mass = 0.4; cb.bending_stiffness = 0.15; cm_.collision_settings.use_self_collision = True; cm_.collision_settings.distance_min = 0.004
+cloth_settle([bl], 70, colliders=arms + seats + [base])
+sol = bl.modifiers.new("t", "SOLIDIFY"); sol.thickness = 0.008; soft(bl, 1); bl.data.materials.append(M.get("throwK") or M["throw"])
 for (x, y, z, ry, m) in [(SX - 0.13, 0.6, SZ - 0.62, 0.25, M["cushA"]), (SX - 0.13, 0.6, SZ + 0.55, -0.2, M["cushB"]), (SX - 0.1, 0.58, SZ + 0.05, 0.05, M["throw"])]:
     box("cushion", B(x, y, z), (0.15, 0.4, 0.4), m, 0.07, 4, rot=(0, -0.3, -ry))
 for dz in (-1, 1):
-    for dx in (-0.38, 0.38): cyl("foot", B(SX + dx, 0.045, SZ + dz * 1.05), 0.02, 0.09, M["brass"], 0.015)
+    for dx in (-0.36, 0.38): cyl("foot", B(SX + dx, 0.05, SZ + dz * 1.0), 0.022, 0.1, M["ash"], 0.016)   # 明るい木の細い脚
 box("rug", B(-1.75, 0.008, SZ), (2.0, 2.6, 0.016), M["rug"], 0.006)
 cyl("tableTop", B(-1.65, 0.4, SZ), 0.45, 0.04, M["white"])
 for i in range(4):
@@ -230,11 +269,27 @@ if AS:
     asset("hanging_picture_frame_01", (X0 + 0.03, SZ, 1.05), rot=math.pi / 2)
     asset("wooden_display_shelves_01", (0.75, ZB + 0.2))
     asset("ceramic_vase_01", (0.55, ZB + 0.2, 1.56)); asset("potted_plant_04", (0.98, ZB + 0.22, 1.56), scale=1.2)
-    asset("throw_pillows_01", (SX - 0.12, SZ - 0.15, 0.47), rot=math.pi / 2, scale=0.95)
+    asset("throw_pillows_01", (SX - 0.02, SZ - 0.35, 0.5), rot=math.pi / 2, scale=0.95)
     asset("side_table_01", (X0 + 0.45, SZ + 1.5), rot=math.pi / 2, scale=0.9)
     asset("ceramic_vase_02", (X0 + 0.45, SZ + 1.55, 0.495)); asset("standing_picture_frame_01", (X0 + 0.4, SZ + 1.35, 0.495), rot=math.pi / 2 + 0.3)
     asset("wicker_basket_02", (X0 + 1.05, SZ + 1.55), rot=0.4)
     cyl("cup", B(-1.5, 0.375, SZ - 0.12), 0.045, 0.09, M["white"], 0.04); box("bookT", B(-1.82, 0.355, SZ + 0.1), (0.22, 0.3, 0.035), M["book"], 0.004, rot=(0, 0, 0.3))
+
+SUN_D = Vector((3.2, -8.3, -3.0))   # 西日の向き（Blender の座標）：窓の左上から入り、手前右の床とラグに落ちる（逆向きは窓の周りで遮られた・#338 の試し）
+# 光の筋の中を舞う埃：窓から太陽の向きに伸びる柱の中に置き、時刻でゆっくり漂わせる（乱数は種つき）
+import random as _r
+_RD = _r.Random(338); DUST = []
+dmat = mat("dust", "#FFFFFF", 0.6)
+dmesh = bpy.data.meshes.new("dust"); _bm = bmesh.new(); bmesh.ops.create_icosphere(_bm, subdivisions=1, radius=0.0012); _bm.to_mesh(dmesh); dmesh.materials.append(dmat)
+_sund = SUN_D.normalized()
+for i in range(260):
+    p0 = B(WIN["x0"] + (WIN["x1"] - WIN["x0"]) * _RD.random(), WIN["y0"] + (WIN["y1"] - WIN["y0"]) * _RD.random(), ZB + 0.05) + _sund * (0.3 + 3.2 * _RD.random())
+    if p0.z < 0.15: continue
+    o = bpy.data.objects.new("dust", dmesh); sc.collection.objects.link(o); o.visible_shadow = False; DUST.append((o, p0, _RD.random() * 6.28, 0.5 + _RD.random()))
+def dust_at(t):
+    for o, p0, ph, sp in DUST:
+        o.location = p0 + Vector((0.03 * math.sin(0.4 * sp * t + ph), 0.03 * math.cos(0.33 * sp * t + 2 * ph), 0.012 * sp * t + 0.02 * math.sin(0.5 * t + ph)))
+# 部屋の空気（散乱）は試して外した：部屋全体が暗くなり、この画角では光の筋も見えなかった（#338）
 
 # ---------- 光 ----------
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True; wn = w.node_tree; bg = wn.nodes["Background"]
@@ -244,7 +299,7 @@ if AS:   # 空と庭は本物の全天球写真（garden_nook・CC0）。窓の�
     env = wn.nodes.new("ShaderNodeTexEnvironment"); env.image = bpy.data.images.load(f"{AS}/hdris/garden_nook.hdr")
     em_ = wn.nodes.new("ShaderNodeMapping"); tco = wn.nodes.new("ShaderNodeTexCoord"); em_.inputs["Rotation"].default_value = (0, 0, math.radians(150))
     wn.links.new(tco.outputs["Generated"], em_.inputs["Vector"]); wn.links.new(em_.outputs["Vector"], env.inputs["Vector"]); wn.links.new(env.outputs["Color"], bg.inputs["Color"])
-sun_d = Vector((3.2, -8.3, -3.0)).normalized()   # room3d.js の太陽の向き（three：(-4.2,3,-10.5)→(-1,0,-2.2)）を Blender へ
+sun_d = SUN_D.normalized()
 bpy.ops.object.light_add(type="SUN"); sun = bpy.context.object; sun.rotation_mode = "QUATERNION"; sun.rotation_quaternion = (-sun_d).to_track_quat("Z", "Y")
 sun.data.angle = math.radians(1.2); sun.data.color = (1.0, 0.86, 0.68)
 bpy.ops.object.light_add(type="POINT", location=B(LX, 1.5, LZ)); lamp = bpy.context.object; lamp.data.shadow_soft_size = 0.08; lamp.data.color = (1.0, 0.72, 0.42)
@@ -260,17 +315,24 @@ else:
 cd = bpy.data.cameras.new("cam"); cam = bpy.data.objects.new("cam", cd); sc.collection.objects.link(cam); sc.camera = cam
 cd.sensor_fit = "VERTICAL"; cd.clip_start = 0.05
 cd.dof.use_dof = True; cd.dof.aperture_fstop = 1.4   # 写真の被写界深度：外の緑と手前がぼける
-def aim(c, l, fov):
+def pose(c, l, fov):
     # 建築写真の撮り方：カメラは水平のまま、見下ろす分はレンズのシフトで（縦の線がまっすぐ＝CG らしさが消える）
     d = B(*l) - B(*c); flat = Vector((d.x, d.y, 0)); pitch = math.atan2(d.z, flat.length)
     cam.location = B(*c); cam.rotation_mode = "QUATERNION"; cam.rotation_quaternion = flat.to_track_quat("-Z", "Y")
     cd.angle_y = math.radians(fov); cd.shift_y = math.tan(pitch) / (2 * math.tan(math.radians(fov) / 2)); cd.shift_x = 0
     cd.dof.focus_distance = d.length * 0.62
+def aim(c, l, fov, c2=None, l2=None):
+    # 動きのぶれ：このコマ（1）と次のコマ（2）のカメラに鍵を打ち、シャッター 180°（半コマ）ぶんだけぶらす＝映画のカメラと同じ
+    cam.animation_data_clear(); cd.animation_data_clear()
+    for f, (cc, ll) in ((1, (c, l)), (2, (c2 or c, l2 or l))):
+        pose(cc, ll, fov); cam.keyframe_insert("location", frame=f); cam.keyframe_insert("rotation_quaternion", frame=f); cd.keyframe_insert("shift_y", frame=f)
+    sc.frame_set(1)
 sc.render.engine = "CYCLES"; cy = sc.cycles; cy.device = "CPU"; cy.samples = A.samples; cy.use_denoising = True; cy.denoiser = "OPENIMAGEDENOISE"
 cy.seed = 21; cy.use_animated_seed = False; cy.max_bounces = 6; cy.diffuse_bounces = 4; cy.glossy_bounces = 3; cy.transmission_bounces = 6; cy.caustics_reflective = False; cy.caustics_refractive = False
+sc.render.use_motion_blur = True; sc.render.motion_blur_shutter = 0.5; sc.render.motion_blur_position = "START"
 cy.adaptive_threshold = 0.02; sc.render.use_persistent_data = True   # 何コマも描く時は場面の組み立てを1回だけ
 sc.render.resolution_x, sc.render.resolution_y = int(1080 * A.res), int(1920 * A.res); sc.render.resolution_percentage = 100
-sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"; sc.view_settings.exposure = (0.75 if AS else 0.45) if A.mode == "day" else -0.6
+sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"; sc.view_settings.exposure = (0.9 if AS else 0.45) if A.mode == "day" else -0.6
 sc.render.image_settings.file_format = "PNG"; sc.render.threads_mode = "AUTO"
 # レンズの癖（合成ノード）：明るい所のにじみ（窓・ランプ）と、ごく弱い歪みと色ずれ。粒子と周辺減光は画面側（humid.html）で足す
 sc.use_nodes = True; ct = sc.node_tree; ct.nodes.clear()
@@ -280,5 +342,5 @@ co = ct.nodes.new("CompositorNodeComposite"); ct.links.new(rl.outputs["Image"], 
 k_, n_ = map(int, A.shard.split("/"))   # matrix の k 台目／n 台：k, k+n, k+2n… のコマだけ描く
 jobs = json.load(open(A.frames))[k_::n_] if A.frames else [{"cam": [float(v) for v in A.cam.split(",")], "look": [float(v) for v in A.look.split(",")], "fov": A.fov, "out": A.out}]
 for j in jobs:   # 1つの起動で何コマも（場面を毎回組み直さない）
-    aim(j["cam"], j["look"], j.get("fov", A.fov)); sc.render.filepath = os.path.join(A.dir, j["out"]) if A.dir else j["out"]
+    aim(j["cam"], j["look"], j.get("fov", A.fov), j.get("cam2"), j.get("look2")); curtains_at(j.get("t", 0)); dust_at(j.get("t", 0)); sc.render.filepath = os.path.join(A.dir, j["out"]) if A.dir else j["out"]
     bpy.ops.render.render(write_still=True); print("wrote", sc.render.filepath, flush=True)

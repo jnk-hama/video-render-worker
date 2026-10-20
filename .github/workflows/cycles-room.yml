@@ -21,7 +21,7 @@ permissions:
 
 env:
   SHARDS: 20
-  SAMPLES: 24
+  SAMPLES: 48
 
 jobs:
   assets:
