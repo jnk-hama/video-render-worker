@@ -308,6 +308,10 @@ if A.mode == "night":
     wn.links.remove(bg.inputs["Color"].links[0]); bg.inputs["Color"].default_value = hexc("#1B2440"); bg.inputs["Strength"].default_value = 0.35
     sun.data.energy = 0.08; sun.data.color = (0.6, 0.7, 1.0); lamp.data.energy = 28; M["shade"].node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 1.2
     gr.color_ramp.elements[0].color = hexc("#0B1220"); gr.color_ramp.elements[1].color = hexc("#162238"); mixo.inputs["B"].default_value = hexc("#1E2B48"); ee.inputs["Strength"].default_value = 0.5   # 窓の外は夜
+elif A.mode == "cold":   # 加湿する前（#339）：乾いた冬の朝。日は差さず、空の光だけが青白く冷たい（同じ部屋・同じカメラで光だけ替える）
+    tint = wn.nodes.new("ShaderNodeMix"); tint.data_type = "RGBA"; tint.blend_type = "MULTIPLY"; tint.inputs["Factor"].default_value = 1.0; tint.inputs["B"].default_value = (0.62, 0.74, 1.0, 1)
+    src = bg.inputs["Color"].links[0].from_socket; wn.links.new(src, tint.inputs["A"]); wn.links.new(tint.outputs["Result"], bg.inputs["Color"])
+    bg.inputs["Strength"].default_value = 1.15; sun.data.energy = 0.0; lamp.data.energy = 0
 else:
     bg.inputs["Strength"].default_value = 0.55; sun.data.energy = 6.5; lamp.data.energy = 0
 
@@ -332,7 +336,7 @@ cy.seed = 21; cy.use_animated_seed = False; cy.max_bounces = 6; cy.diffuse_bounc
 sc.render.use_motion_blur = True; sc.render.motion_blur_shutter = 0.5; sc.render.motion_blur_position = "START"
 cy.adaptive_threshold = 0.02; sc.render.use_persistent_data = True   # 何コマも描く時は場面の組み立てを1回だけ
 sc.render.resolution_x, sc.render.resolution_y = int(1080 * A.res), int(1920 * A.res); sc.render.resolution_percentage = 100
-sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"; sc.view_settings.exposure = (0.9 if AS else 0.45) if A.mode == "day" else -0.6
+sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"; sc.view_settings.exposure = {"day": 0.9 if AS else 0.45, "cold": 1.0, "night": -0.6}[A.mode]
 sc.render.image_settings.file_format = "PNG"; sc.render.threads_mode = "AUTO"
 # レンズの癖（合成ノード）：明るい所のにじみ（窓・ランプ）と、ごく弱い歪みと色ずれ。粒子と周辺減光は画面側（humid.html）で足す
 sc.use_nodes = True; ct = sc.node_tree; ct.nodes.clear()
