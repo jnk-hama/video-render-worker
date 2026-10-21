@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-20T08:45:01+00:00",
+ "generated_at": "2026-10-21T08:46:06+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -40,37 +40,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x96jkk",
-    "title": "Hero turtles rush to save struggling friend",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1x96jkk/hero_turtles_rush_to_save_struggling_friend/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1x93ykl",
+    "title": "Approximately 1,400 individual satellites as seen in the New Zealand night sky. This is a composite image made up of 578 individual 8-second exposures, captured by photographer Brendan Larsen.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x93ykl/approximately_1400_individual_satellites_as_seen/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x914p7",
-    "title": "Tony Hawk (58) showing off his skills in an event in NYC",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1x914p7/tony_hawk_58_showing_off_his_skills_in_an_event/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1x7l26v",
+    "title": "A 3,300-year-old mummified foot of an upland moa bird discovered in a New Zealand cave in 1987, showing intact skin, claws, and feathers running all the way down to its ankles, preserved by dry cave breezes",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x7l26v/a_3300yearold_mummified_foot_of_an_upland_moa/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x8kszq",
-    "title": "impressive is an understatement 🤸‍♀️",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1x8kszq/impressive_is_an_understatement/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1x7ee07",
+    "title": "Explosion captured by live weather radar",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x7ee07/explosion_captured_by_live_weather_radar/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x51h5z",
-    "title": "Dog-sitter in Luxembourg tests which language the dog understands",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1x51h5z/dogsitter_in_luxembourg_tests_which_language_the/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1x9ujmf",
+    "title": "The world's only known surviving white giraffe is a lone adult male living in the Ishaqbini Hirola Community Conservancy in northeastern Kenya.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x9ujmf/the_worlds_only_known_surviving_white_giraffe_is/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x6knlk",
+    "title": "A local street art collective in Philly built a pink companion to follow and 'flirt' with corporate Uber Eats delivery units.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x6knlk/a_local_street_art_collective_in_philly_built_a/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -103,6 +112,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1xafo7x",
+    "title": "Beavers stop chewing every few seconds to listen for cracking sounds in the tree so they don't get crushed",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xafo7x/beavers_stop_chewing_every_few_seconds_to_listen/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1x89kj4",
     "title": "Baby goes viral for his extreme relaxation minutes after being born.",
     "url": "https://www.reddit.com/r/interestingasfuck/comments/1x89kj4/baby_goes_viral_for_his_extreme_relaxation/",
@@ -119,36 +137,9 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
-   },
-   {
-    "id": "t3_1x6pu5p",
-    "title": "\"Telescope ranches\" in Texas. People pay to store $10K+ telescope rigs in the middle of nowhere to escape light pollution. The warehouse roofs roll off each night, and owners remote in from anywhere in the world",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x6pu5p/telescope_ranches_in_texas_people_pay_to_store/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x7fz0p",
-    "title": "The last moments of a PlayStation 2 after 20 years of gaming",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x7fz0p/the_last_moments_of_a_playstation_2_after_20/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1x52qk4",
-    "title": "Beautiful art everywhere I look",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x52qk4/beautiful_art_everywhere_i_look/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1x785x8",
     "title": "From Nichijou -> Shingeki Kyojin -> Berserk",
@@ -177,6 +168,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1x93ych",
+    "title": "Duality of cat ownership",
+    "url": "https://www.reddit.com/r/Animemes/comments/1x93ych/duality_of_cat_ownership/",
+    "subreddit": "Animemes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1x6oi4d",
     "title": "All that just from holding hands ?",
     "url": "https://www.reddit.com/r/animegifs/comments/1x6oi4d/all_that_just_from_holding_hands/",
@@ -195,48 +195,57 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x6wef8",
-    "title": "wearing painted hoodie",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x6wef8/wearing_painted_hoodie/",
-    "subreddit": "streetwear",
+    "id": "t3_1xai269",
+    "title": "Voice Actor Hiroshi Tsuchida has passed away at age 54 due to heart failure",
+    "url": "https://www.reddit.com/r/anime/comments/1xai269/voice_actor_hiroshi_tsuchida_has_passed_away_at/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x95wc5",
-    "title": "32nd lap around the sun, lowkey felt like a 30 second run 🏃🏿💨",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x95wc5/32nd_lap_around_the_sun_lowkey_felt_like_a_30/",
-    "subreddit": "streetwear",
+    "id": "t3_1x8c9vk",
+    "title": "Cyberpunk: Edgerunners season 2 director searched Cyberpunk 2077 with a \"virtual camera\" to find the best Night City spots to use in the anime",
+    "url": "https://www.reddit.com/r/anime/comments/1x8c9vk/cyberpunk_edgerunners_season_2_director_searched/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x9gzwd",
-    "title": "Osaka oniikei inspired",
-    "url": "https://www.reddit.com/r/streetwear/comments/1x9gzwd/osaka_oniikei_inspired/",
-    "subreddit": "streetwear",
+    "id": "t3_1xa5d8k",
+    "title": "Japan Actors Union reveals new guidelines to combat unauthorized AI voice cloning, including strict ban on copying voices of deceased seiyuu",
+    "url": "https://www.reddit.com/r/anime/comments/1xa5d8k/japan_actors_union_reveals_new_guidelines_to/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x5hgwp",
-    "title": "I found this chair for free. Looks to be in pretty good shape. Any reason to not keep it?",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x5hgwp/i_found_this_chair_for_free_looks_to_be_in_pretty/",
+    "id": "t3_1x775xt",
+    "title": "Who would win in a fight?",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x775xt/who_would_win_in_a_fight/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x4sure",
-    "title": "Happy Birthday Furina!",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x4sure/happy_birthday_furina/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1x6jv83",
+    "title": "‘Cyberpunk: Edgerunners’ creator received \"dozens\" of DMs a day about bringing David back, but he's sure \"you don't really want that\"",
+    "url": "https://www.reddit.com/r/anime/comments/1x6jv83/cyberpunk_edgerunners_creator_received_dozens_of/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x9q5bx",
+    "title": "Jun Maeda (writer of Angel Beats, Charlotte, original author of Clannad, Kanon and AIR) has been diagnosed with throat cancer.",
+    "url": "https://www.reddit.com/r/anime/comments/1x9q5bx/jun_maeda_writer_of_angel_beats_charlotte/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    },
    {
