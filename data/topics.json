@@ -1,30 +1,12 @@
 {
- "generated_at": "2026-10-21T08:46:06+00:00",
+ "generated_at": "2026-10-22T08:48:10+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1x5vjuv",
-    "title": "The athlete with Down syndrome, noticing the sadness of his defeated opponent, immediately ran up to him and raised his hand up.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x5vjuv/the_athlete_with_down_syndrome_noticing_the/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x5s2zl",
-    "title": "Intricate woodworking that makes solid wood look like fluid",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x5s2zl/intricate_woodworking_that_makes_solid_wood_look/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x5o2lb",
-    "title": "A lion dance performance builds suspense.🦁",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1x5o2lb/a_lion_dance_performance_builds_suspense/",
+    "id": "t3_1xag7lv",
+    "title": "Deep Underwater Mask Change",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xag7lv/deep_underwater_mask_change/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,100 +22,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x93ykl",
-    "title": "Approximately 1,400 individual satellites as seen in the New Zealand night sky. This is a composite image made up of 578 individual 8-second exposures, captured by photographer Brendan Larsen.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x93ykl/approximately_1400_individual_satellites_as_seen/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xam7fc",
+    "title": "One of the best improvs at a standup- by Gary Owen",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xam7fc/one_of_the_best_improvs_at_a_standup_by_gary_owen/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x7l26v",
-    "title": "A 3,300-year-old mummified foot of an upland moa bird discovered in a New Zealand cave in 1987, showing intact skin, claws, and feathers running all the way down to its ankles, preserved by dry cave breezes",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x7l26v/a_3300yearold_mummified_foot_of_an_upland_moa/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xaveux",
+    "title": "Imagine next day at school.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xaveux/imagine_next_day_at_school/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x7ee07",
-    "title": "Explosion captured by live weather radar",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x7ee07/explosion_captured_by_live_weather_radar/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1x6md2i",
+    "title": "Man draws and trains a handgun a motorist during a road range incident. Is caught, arrested, and shown the footage after denying it.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1x6md2i/man_draws_and_trains_a_handgun_a_motorist_during/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x9ujmf",
-    "title": "The world's only known surviving white giraffe is a lone adult male living in the Ishaqbini Hirola Community Conservancy in northeastern Kenya.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x9ujmf/the_worlds_only_known_surviving_white_giraffe_is/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xbykic",
+    "title": "A Russian tourist who harassed women working on the streets in Thailand was beaten.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xbykic/a_russian_tourist_who_harassed_women_working_on/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x6knlk",
-    "title": "A local street art collective in Philly built a pink companion to follow and 'flirt' with corporate Uber Eats delivery units.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x6knlk/a_local_street_art_collective_in_philly_built_a/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xazukq",
+    "title": "Driver tries brake checking this semi-truck",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xazukq/driver_tries_brake_checking_this_semitruck/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x7858z",
-    "title": "The hotel requires you to wake up at 5 AM sharp",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1x7858z/the_hotel_requires_you_to_wake_up_at_5_am_sharp/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xbbwkh",
+    "title": "Trying to steal a vehicle at gunpoint",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xbbwkh/trying_to_steal_a_vehicle_at_gunpoint/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x6gzd6",
-    "title": "Never let them know your next move",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1x6gzd6/never_let_them_know_your_next_move/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xbjif5",
+    "title": "The art of waves, its difficult to paints a curl of water that clean (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xbjif5/the_art_of_waves_its_difficult_to_paints_a_curl/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x9052g",
-    "title": "Falling asleep while getting her nails done",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1x9052g/falling_asleep_while_getting_her_nails_done/",
-    "subreddit": "Unexpected",
+    "id": "t3_1x9sezh",
+    "title": "Thought it was Edward Furlong when he started penciling (Source Link in Description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1x9sezh/thought_it_was_edward_furlong_when_he_started/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xafo7x",
-    "title": "Beavers stop chewing every few seconds to listen for cracking sounds in the tree so they don't get crushed",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xafo7x/beavers_stop_chewing_every_few_seconds_to_listen/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1x97a9a",
+    "title": "This kid is incredible (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1x97a9a/this_kid_is_incredible_source_link_in_description/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x89kj4",
-    "title": "Baby goes viral for his extreme relaxation minutes after being born.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x89kj4/baby_goes_viral_for_his_extreme_relaxation/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x95lpd",
-    "title": "Male suspect breaks through a wall and escapes the interrogation room",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1x95lpd/male_suspect_breaks_through_a_wall_and_escapes/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1x9jurl",
+    "title": "10 year old Thai girl tries the notoriously hard Guitar Hero solo (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1x9jurl/10_year_old_thai_girl_tries_the_notoriously_hard/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -150,18 +123,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x7rmey",
-    "title": "Genderbending Popular Characters",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x7rmey/genderbending_popular_characters/",
+    "id": "t3_1x8qvz9",
+    "title": "Manga vs anime vs webtoon",
+    "url": "https://www.reddit.com/r/Animemes/comments/1x8qvz9/manga_vs_anime_vs_webtoon/",
     "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x8qvz9",
-    "title": "Manga vs anime vs webtoon",
-    "url": "https://www.reddit.com/r/Animemes/comments/1x8qvz9/manga_vs_anime_vs_webtoon/",
+    "id": "t3_1x7rmey",
+    "title": "Genderbending Popular Characters",
+    "url": "https://www.reddit.com/r/Animemes/comments/1x7rmey/genderbending_popular_characters/",
     "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
@@ -177,46 +150,82 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x6oi4d",
-    "title": "All that just from holding hands ?",
-    "url": "https://www.reddit.com/r/animegifs/comments/1x6oi4d/all_that_just_from_holding_hands/",
-    "subreddit": "animegifs",
+    "id": "t3_1x7na3s",
+    "title": "Any idea on who did this sequence?",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1x7na3s/any_idea_on_who_did_this_sequence/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x5p5rm",
-    "title": "Don't you know it's rude to stare ?!",
-    "url": "https://www.reddit.com/r/animegifs/comments/1x5p5rm/dont_you_know_its_rude_to_stare/",
-    "subreddit": "animegifs",
+    "id": "t3_1x6w5np",
+    "title": "detective conan (ep1216, 2026)",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1x6w5np/detective_conan_ep1216_2026/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xai269",
-    "title": "Voice Actor Hiroshi Tsuchida has passed away at age 54 due to heart failure",
-    "url": "https://www.reddit.com/r/anime/comments/1xai269/voice_actor_hiroshi_tsuchida_has_passed_away_at/",
-    "subreddit": "anime",
+    "id": "t3_1x7pumo",
+    "title": "Bleach The Last Trailer",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1x7pumo/bleach_the_last_trailer/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x8c9vk",
-    "title": "Cyberpunk: Edgerunners season 2 director searched Cyberpunk 2077 with a \"virtual camera\" to find the best Night City spots to use in the anime",
-    "url": "https://www.reddit.com/r/anime/comments/1x8c9vk/cyberpunk_edgerunners_season_2_director_searched/",
-    "subreddit": "anime",
+    "id": "t3_1xa8gmd",
+    "title": "Yen BM Genga Showreel 2023-2026",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xa8gmd/yen_bm_genga_showreel_20232026/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xa5d8k",
-    "title": "Japan Actors Union reveals new guidelines to combat unauthorized AI voice cloning, including strict ban on copying voices of deceased seiyuu",
-    "url": "https://www.reddit.com/r/anime/comments/1xa5d8k/japan_actors_union_reveals_new_guidelines_to/",
-    "subreddit": "anime",
+    "id": "t3_1x6wef8",
+    "title": "wearing painted hoodie",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x6wef8/wearing_painted_hoodie/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x9gzwd",
+    "title": "Osaka oniikei inspired",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x9gzwd/osaka_oniikei_inspired/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1x95wc5",
+    "title": "32nd lap around the sun, lowkey felt like a 30 second run 🏃🏿💨",
+    "url": "https://www.reddit.com/r/streetwear/comments/1x95wc5/32nd_lap_around_the_sun_lowkey_felt_like_a_30/",
+    "subreddit": "streetwear",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xb9xwt",
+    "title": "it can't be that simil... wait",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xb9xwt/it_cant_be_that_simil_wait/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xagdo6",
+    "title": "Ronova larping as Snezhnaya cast",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xagdo6/ronova_larping_as_snezhnaya_cast/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -231,30 +240,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x6jv83",
-    "title": "‘Cyberpunk: Edgerunners’ creator received \"dozens\" of DMs a day about bringing David back, but he's sure \"you don't really want that\"",
-    "url": "https://www.reddit.com/r/anime/comments/1x6jv83/cyberpunk_edgerunners_creator_received_dozens_of/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x9q5bx",
-    "title": "Jun Maeda (writer of Angel Beats, Charlotte, original author of Clannad, Kanon and AIR) has been diagnosed with throat cancer.",
-    "url": "https://www.reddit.com/r/anime/comments/1x9q5bx/jun_maeda_writer_of_angel_beats_charlotte/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1x5pac3",
-    "title": "With friends like these, who needs enemies.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x5pac3/with_friends_like_these_who_needs_enemies/",
+    "id": "t3_1x8bc07",
+    "title": "Be honest ! Do you like the Tsaritsa design ?",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1x8bc07/be_honest_do_you_like_the_tsaritsa_design/",
     "subreddit": "Genshin_Impact",
     "views": 0,
-    "has_media": false,
+    "has_media": true,
     "source": "rss"
    }
   ]
