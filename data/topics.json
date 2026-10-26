@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-25T08:37:39+00:00",
+ "generated_at": "2026-10-26T09:09:55+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,15 +7,6 @@
     "id": "t3_1xag7lv",
     "title": "Deep Underwater Mask Change",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xag7lv/deep_underwater_mask_change/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xc61gh",
-    "title": "Incredible shot of a flying fish",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xc61gh/incredible_shot_of_a_flying_fish/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,100 +31,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xd88yl",
-    "title": "The \"Duck\" in Avenida Place hotel, Barcelona, Spain.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xd88yl/the_duck_in_avenida_place_hotel_barcelona_spain/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xdz6o9",
+    "title": "Albina Shagimuratova. All reactions are reasonable.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xdz6o9/albina_shagimuratova_all_reactions_are_reasonable/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xbgez7",
-    "title": "Copper cable and a single optical fiber that replaced it with the same capacity",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xbgez7/copper_cable_and_a_single_optical_fiber_that/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xbykic",
+    "title": "A Russian tourist who harassed women working on the streets in Thailand was beaten.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xbykic/a_russian_tourist_who_harassed_women_working_on/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x93ykl",
-    "title": "Approximately 1,400 individual satellites as seen in the New Zealand night sky. This is a composite image made up of 578 individual 8-second exposures, captured by photographer Brendan Larsen.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1x93ykl/approximately_1400_individual_satellites_as_seen/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xdbgqg",
+    "title": "Man tries to fly off a cliff",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xdbgqg/man_tries_to_fly_off_a_cliff/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xb9f7h",
-    "title": "Creating two screens on phone using a mirror.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xb9f7h/creating_two_screens_on_phone_using_a_mirror/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xazukq",
+    "title": "Driver tries brake checking this semi-truck",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xazukq/driver_tries_brake_checking_this_semitruck/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xcprhz",
-    "title": "Abraham Lincoln is in the National Wrestling Hall of Fame. He had one recorded loss in 300 recorded matches and was known for his strength and grappling skills.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xcprhz/abraham_lincoln_is_in_the_national_wrestling_hall/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xdasqc",
+    "title": "Man inflates life jacket during airline safety demo",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xdasqc/man_inflates_life_jacket_during_airline_safety/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x9052g",
-    "title": "Falling asleep while getting her nails done",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1x9052g/falling_asleep_while_getting_her_nails_done/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xbbwkh",
+    "title": "Trying to steal a vehicle at gunpoint",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xbbwkh/trying_to_steal_a_vehicle_at_gunpoint/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x9po0w",
-    "title": "Some Crazy Woodworking",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1x9po0w/some_crazy_woodworking/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xb8juc",
+    "title": "HMB while I stop this boat",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1xb8juc/hmb_while_i_stop_this_boat/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xbnfy4",
-    "title": "How to cross a busy road in Vietnam with lots of bikes and cars",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xbnfy4/how_to_cross_a_busy_road_in_vietnam_with_lots_of/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xahoio",
+    "title": "Ngl Spider-Man killed it 😂",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xahoio/ngl_spiderman_killed_it/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xarqlq",
-    "title": "Throwing out the trash but remembering the state of the world right now",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xarqlq/throwing_out_the_trash_but_remembering_the_state/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xahsa0",
+    "title": "Kermit and a 4 year old girl",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xahsa0/kermit_and_a_4_year_old_girl/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xcwt3p",
-    "title": "Toddler can group same colored blocks \" (source link in description)\"",
-    "url": "https://www.reddit.com/r/toptalent/comments/1xcwt3p/toddler_can_group_same_colored_blocks_source_link/",
-    "subreddit": "toptalent",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xdxwft",
-    "title": "‘Bringing you love’ this Halloween (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1xdxwft/bringing_you_love_this_halloween_source_link_in/",
-    "subreddit": "toptalent",
+    "id": "t3_1xdazi7",
+    "title": "Failed successfully.",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xdazi7/failed_successfully/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -159,9 +141,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x9ow0s",
-    "title": "Just finished my Pokemon Galvantula drider cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1x9ow0s/just_finished_my_pokemon_galvantula_drider_cosplay/",
+    "id": "t3_1xfbfb9",
+    "title": "The Forgotten Disney Animator Behind Disney's Scariest Chase",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xfbfb9/the_forgotten_disney_animator_behind_disneys/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xf0cnf",
+    "title": "my Silent Hill nurse cosplay!~ finished just in time for Halloween",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xf0cnf/my_silent_hill_nurse_cosplay_finished_just_in/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
@@ -186,15 +177,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x9lo6e",
-    "title": "Ada Wong & Leon S Kennedy-resident evil",
-    "url": "https://www.reddit.com/r/cosplay/comments/1x9lo6e/ada_wong_leon_s_kennedyresident_evil/",
-    "subreddit": "cosplay",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xbg7c0",
     "title": "Piranha Plant from mario",
     "url": "https://www.reddit.com/r/cosplay/comments/1xbg7c0/piranha_plant_from_mario/",
@@ -204,46 +186,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1x9xko2",
-    "title": "[ART] Misdirection Magic - Mikoto-chan Doesn't Want to Be Hated!",
-    "url": "https://www.reddit.com/r/manga/comments/1x9xko2/art_misdirection_magic_mikotochan_doesnt_want_to/",
-    "subreddit": "manga",
+    "id": "t3_1xar882",
+    "title": "Cosplay Lich king with my friend as Jaina from World of Warcraft at Blizzcon.",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xar882/cosplay_lich_king_with_my_friend_as_jaina_from/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1x9hqdh",
-    "title": "[ART] Happy Halloween🎃 - It's a Little Late, but I've Fallen in Love with My Childhood Friend.",
-    "url": "https://www.reddit.com/r/manga/comments/1x9hqdh/art_happy_halloween_its_a_little_late_but_ive/",
-    "subreddit": "manga",
+    "id": "t3_1xai269",
+    "title": "Voice Actor Hiroshi Tsuchida has passed away at age 54 due to heart failure",
+    "url": "https://www.reddit.com/r/anime/comments/1xai269/voice_actor_hiroshi_tsuchida_has_passed_away_at/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xbozs3",
-    "title": "[ART] Heating up the night - Mikoto-chan Doesn't Want to Be Hated!",
-    "url": "https://www.reddit.com/r/manga/comments/1xbozs3/art_heating_up_the_night_mikotochan_doesnt_want/",
-    "subreddit": "manga",
+    "id": "t3_1xa5d8k",
+    "title": "Japan Actors Union reveals new guidelines to combat unauthorized AI voice cloning, including strict ban on copying voices of deceased seiyuu",
+    "url": "https://www.reddit.com/r/anime/comments/1xa5d8k/japan_actors_union_reveals_new_guidelines_to/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xd8rf9",
-    "title": "[DISC] - The panic of a store manager in her late 20s - Oneshot by @Medatarou1",
-    "url": "https://www.reddit.com/r/manga/comments/1xd8rf9/disc_the_panic_of_a_store_manager_in_her_late_20s/",
-    "subreddit": "manga",
+    "id": "t3_1xcfy8h",
+    "title": "The Apothecary Diaries: The Late Lady's Treasure | Movie Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xcfy8h/the_apothecary_diaries_the_late_ladys_treasure/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xax84b",
-    "title": "[DISC] Why Did I, a Onee-san Enthusiast, Fall for Tiny You? - Chapter 1",
-    "url": "https://www.reddit.com/r/manga/comments/1xax84b/disc_why_did_i_a_oneesan_enthusiast_fall_for_tiny/",
-    "subreddit": "manga",
+    "id": "t3_1xe4b01",
+    "title": "Lesbians getting intimate in the bath [Botan Kamiina Fully Blossoms When Drunk]",
+    "url": "https://www.reddit.com/r/anime/comments/1xe4b01/lesbians_getting_intimate_in_the_bath_botan/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xd2ma0",
+    "title": "Made in Abyss: Mezameru Shinpi | New Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xd2ma0/made_in_abyss_mezameru_shinpi_new_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
