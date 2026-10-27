@@ -188,8 +188,10 @@ def _vv_words(text, query, speed):
     for n, c in enumerate(body):
         if c in _SMALL and units and units[-1][1] == 'k':
             units[-1][0] += c
-        elif c in '.,' and 0 < n < len(body) - 1 and body[n - 1].isdigit() and body[n + 1].isdigit():
-            units.append([c, 'd'])   # 4.74 の点は音を持たないが字には残す
+        elif units and units[-1][1] == 'n' and (c.isdigit() or (c in '.,' and n + 1 < len(body) and body[n + 1].isdigit())):
+            units[-1][0] += c   # 4.74 は1つの数（読みが文節をまたいでも割らない・2026-10-27 実走で「4.7｜4」と割れた）
+        elif c.isdigit():
+            units.append([c, 'n'])
         else:
             units.append([c, 'p' if c in _PUNCT else ('k' if ('\u3041' <= c <= '\u30ff' or c == 'ー') else 'x')])
     N, M = len(units), len(mo)
@@ -219,32 +221,40 @@ def _vv_words(text, query, speed):
                         steps.append((i + 1, j + 1, 0.0 if ku == mm else (0.3 if same else 1.0)))
                 else:
                     steps.append((i + 1, j, 1.0))
-                    for n in range(1, 5):
+                    for n in range(1, 4 * len(u) + 3 if kind == 'n' else 5):
                         if j + n <= M:
                             steps.append((i + 1, j + n, 0.1 * n))
             for i2, j2, c in steps:
                 if c0 + c < cost[i2][j2]:
                     cost[i2][j2] = c0 + c; back[i2][j2] = (i, j)
-    first = [None] * N   # 字ごとに受け持った最初の音
+    span = [None] * N   # 字ごとに受け持った音の範囲 [最初, 最後]
     i, j = N, M
     while (i, j) != (0, 0):
         pi, pj = back[i][j]
         if pi < i and pj < j:
-            first[pi] = pj
+            span[pi] = (pj, j - 1)
         i, j = pi, pj
-    words, last = [], 0
-    for (u, kind), f in zip(units, first):
-        k = ph[f] if f is not None else last
-        if kind != 'p':
-            if words and words[-1]['k'] == k:
-                words[-1]['text'] += u
-            else:
-                words.append({'k': k, 'text': u})
-        last = k
+    words, k = [], 0
+    for (u, kind), sp in zip(units, span):
+        if sp:
+            k = ph[sp[0]]
+        if kind == 'p':
+            continue
+        if not words or (sp and k != words[-1]['k'] and sp[0] > words[-1]['b']):
+            words.append({'k': k, 'text': '', 'a': sp[0] if sp else None, 'b': -1})
+        w = words[-1]
+        w['text'] += u
+        if sp:
+            w['a'] = sp[0] if w['a'] is None else w['a']
+            w['b'] = max(w['b'], sp[1])
     out = []
     for w in words:
-        idx = [m for m in range(M) if ph[m] == w['k']]
-        out.append({'text': w['text'], 'start': round(times[idx[0]][0] / speed, 3), 'end': round(times[idx[-1]][1] / speed, 3)})
+        a = w['a'] if w['a'] is not None else 0
+        b = max(w['b'], a)
+        # 文節の頭から終わりまで（数のように文節をまたぐ語は、またいだ先の終わりまで）
+        a0 = min(m for m in range(M) if ph[m] == ph[a])
+        b1 = max(m for m in range(M) if ph[m] == ph[b])
+        out.append({'text': w['text'], 'start': round(times[a0][0] / speed, 3), 'end': round(times[b1][1] / speed, 3)})
     return out
 
 
