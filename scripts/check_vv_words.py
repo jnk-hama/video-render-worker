@@ -18,36 +18,36 @@ def expect(cond, msg):
         fails.append(msg)
 
 
-def mora(n, d=0.1):
-    return [{'consonant_length': 0.0, 'vowel_length': d} for _ in range(n)]
+def q(phrases, pre=0.1, d=0.1, pause=None):
+    """読み「ヨナカニ/ゴミ」の形から audio_query を作る（1音 d 秒・pause は文節の後の間）"""
+    import re
+    aps = []
+    for k, p in enumerate(phrases):
+        ms = re.findall(r'.[ャュョァィゥェォヮ]?', p)
+        aps.append({'moras': [{'text': m, 'consonant_length': 0.0, 'vowel_length': d} for m in ms],
+                    'pause_mora': {'vowel_length': pause[k]} if pause and pause.get(k) else None})
+    return {'prePhonemeLength': pre, 'accent_phrases': aps}
 
-
-# 「夜中に、光る。」= ヨ・ナ・カ・ニ（4音）＋間 0.3 ＋ ヒ・カ・ル（3音）。頭の無音 0.1
-query = {'prePhonemeLength': 0.1, 'accent_phrases': [
-    {'moras': mora(4), 'pause_mora': {'vowel_length': 0.3}},
-    {'moras': mora(3), 'pause_mora': None},
-]}
 
 print('語の時刻（速さ 1.0）')
-w = tts._vv_words('夜中に、光る。', query, 1.0)
+w = tts._vv_words('夜中に、光る。', q(['ヨナカニ', 'ヒカル'], pause={0: 0.3}), 1.0)
 expect([x['text'] for x in w] == ['夜中に', '光る'], '文節ごとに台本の字が入る: %s' % w)
 expect(abs(w[0]['start'] - 0.1) < 1e-6 and abs(w[0]['end'] - 0.5) < 1e-6, '1つ目は頭の無音の後から最後の音まで（0.1〜0.5・句読点の間は含めない）')
 expect(abs(w[1]['start'] - 0.8) < 1e-6 and abs(w[1]['end'] - 1.1) < 1e-6, '2つ目は間の後から最後の音まで（0.8〜1.1）')
+f = tts._vv_words('夜中に、光る。', q(['ヨナカニ', 'ヒカル'], pause={0: 0.3}), 1.25)
+expect(abs(f[-1]['end'] - 1.1 / 1.25) < 1e-6, '速さ 1.25 なら全体が 1/1.25（最後の語の終わりが 0.88 秒）')
 
-print('速さ 1.25（音の長さはエンジンの値・全体が 1/1.25 になる）')
-f = tts._vv_words('夜中に、光る。', query, 1.25)
-expect(abs(f[-1]['end'] - 1.1 / 1.25) < 1e-6, '最後の語の終わりが 0.88 秒')
-
-print('小さい字・句読点は音を持たない')
-q2 = {'prePhonemeLength': 0.0, 'accent_phrases': [{'moras': mora(2)}, {'moras': mora(2)}]}
-w2 = tts._vv_words('きょう、あさ', q2, 1.0)   # キョ・ウ / ア・サ
-expect([x['text'] for x in w2] == ['きょう', 'あさ'], '「ょ」で次の文節へずれない: %s' % w2)
-
-print('字が余っても捨てない（読みが台本より短い時）')
-q3 = {'prePhonemeLength': 0.0, 'accent_phrases': [{'moras': mora(2)}]}
-w3 = tts._vv_words('光る光', q3, 1.0)
-expect(''.join(x['text'] for x in w3) == '光る光', '台本の字が全部どこかの語に入る: %s' % w3)
-expect(tts._vv_words('', q3, 1.0) == [] and tts._vv_words('あ', {'accent_phrases': []}, 1.0) == [], '空なら空を返す')
+print('2026-10-27 Actions の実走で出た読み（音の数の等分では文節をまたいだ）')
+w = tts._vv_words('夜中にゴミ捨てへ行くの、正直しんどくない？',
+                  q(['ヨナカニ', 'ゴミステエ', 'イク', 'ノ', 'ショオジキ', 'シンドクナイ']), 1.0)
+expect([x['text'] for x in w] == ['夜中に', 'ゴミ捨てへ', '行く', 'の', '正直', 'しんどくない'], '「へ」を「エ」と読んでも合う: %s' % [x['text'] for x in w])
+w = tts._vv_words('正確な値段はプロフに載せといたよ。', q(['セエカクナ', 'ネダンワ', 'プロフニ', 'ノセトイタヨ']), 1.0)
+expect([x['text'] for x in w] == ['正確な', '値段は', 'プロフに', '載せといたよ'], '「は」を「ワ」と読んでも合う: %s' % [x['text'] for x in w])
+w = tts._vv_words('きょう、あさ', q(['キョオ', 'アサ']), 1.0)
+expect([x['text'] for x in w] == ['きょう', 'あさ'], '小さい字は前の字と1音・「う」を「オ」と読んでも合う: %s' % w)
+w = tts._vv_words('4.74点', q(['ヨンテンナナジュウヨンテン']), 1.0)
+expect(''.join(x['text'] for x in w) == '4.74点', '数字だけの文も字を捨てない: %s' % w)
+expect(tts._vv_words('', q(['ア']), 1.0) == [] and tts._vv_words('あ', {'accent_phrases': []}, 1.0) == [], '空なら空を返す')
 
 print('声の振り分け')
 expect(tts._vv_spec('ja-JP-NanamiNeural') == ('WhiteCUL', 'ノーマル'), '日本語の edge-tts の声は VOICEVOX へ')
