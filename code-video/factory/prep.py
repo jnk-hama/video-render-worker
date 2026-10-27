@@ -178,14 +178,11 @@ def fetch(P):
     for i, u in enumerate(pr.get("videos", [])):
         if not re.fullmatch(r"https://videos\.pexels\.com/video-files/\d+/[\w-]+\.mp4", u): sys.exit(f"bad video url: {u}")
         subprocess.run(["curl", "-fsSL", "-o", os.path.join(S, f"vid{i}.mp4"), u], check=True)   # Pexels は Python の urllib を 403 で断る（curl は通る・2026-10-05 実測）
-    import time
     for i, (say, _) in enumerate(voices(P)):
         d = vv_line(tts_text(say, P), pr)
         if d: vv_synth(d, os.path.join(S, f"line{i}.mp3")); continue
-        for k in range(3):   # edge-tts は相手側の 500 で時々落ちる（2026-10-05 実測）。間を空けて3回まで
-            if subprocess.run(["edge-tts", "--voice", pr.get("voice", "ja-JP-NanamiNeural"), f"--rate={pr.get('rate', '+8%')}", "--text", tts_text(say, P), "--write-media", os.path.join(S, f"line{i}.mp3")]).returncode == 0: break
-            if k == 2: sys.exit(f"edge-tts が3回とも失敗: line{i}")
-            time.sleep(10 * (k + 1))
+        # ★2026-10-27 edge-tts は商用の許可が公式に無い（jmas #352/#353）。日本語の語りは VOICEVOX だけで作る（黙って edge-tts へ落ちない）
+        sys.exit(f"line{i}: 声が VOICEVOX ではない（prep.voice に \"voicevox:WhiteCUL/ノーマル\" を書く・jmas #353）")
     print("取得:", len(pr["images"]), "画像", len(pr.get("videos", [])), "動画", len(voices(P)), "声")
 
 def assets(P):

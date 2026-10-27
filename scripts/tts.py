@@ -125,6 +125,116 @@ class TtsUnavailable(Exception):
     """edge-tts が使えない。呼び出し側は字幕なしへ降りる。"""
 
 
+"""
+★★2026-10-27、日本語の声を edge-tts から VOICEVOX（WhiteCUL）へ（jmas #353・オーナー OK）。
+
+【なぜ】edge-tts（Edge の読み上げ）は、Microsoft が商用の利用を公式に認めた文書が無い
+  （Microsoft Q&A：2024-10「Azure の契約なしの商用利用は規約違反になりうる」／2026-06「商用の権利をはっきり書いた公開文書は無い」・jmas #352）。
+  VOICEVOX の WhiteCUL は「VOICEVOX:WhiteCUL」と表記すれば商用・非商用で使える（エンジンが返した規約・jmas #308）。
+【どこで切り替えるか】_synth の入口の1か所。日本語の声（ja-JP-…）と "voicevox:話者/型" は VOICEVOX へ回す。
+  英語の声は edge-tts のまま（VOICEVOX は日本語だけ。英語は別に判断する・jmas #353）。
+【語の時刻】VOICEVOX は語ごとの時刻を返さない。返すのは文節（アクセント句）と1音（モーラ）ずつの長さ。
+  文節を「語」とし、台本の字を音の数で文節へ割り当てる（_vv_words）。かなは1音（小さいゃゅょは0）、漢字などは残りの音を等分。
+  文節の時刻そのものはエンジンの値＝推定ではない。字の割り当てだけが近似。
+【表記】使った声の表記を CREDITS に残し、render_video / make_narration が広告表記の横に出す（規約の条件）。
+"""
+VOICEVOX_URL = os.environ.get('VOICEVOX_URL', 'http://localhost:50021')
+JA_VOICEVOX = 'voicevox:WhiteCUL/ノーマル'
+CREDITS = []
+_PUNCT = set('、。！？!?,.，．「」『』（）()…・ 　\n')
+_SMALL = set('ゃゅょぁぃぅぇぉゎャュョァィゥェォヮ')
+
+
+def _vv_spec(voice, text=''):
+    """VOICEVOX で読む時は (話者, 型)。edge-tts のままなら None"""
+    v = str(voice or '')
+    if v.startswith('ja-JP') or (not v and _is_cjk(text)):
+        v = JA_VOICEVOX
+    if not v.startswith('voicevox:'):
+        return None
+    name, _, style = v[len('voicevox:'):].partition('/')
+    return name, style or 'ノーマル'
+
+
+def _pct(x, default=0.0):
+    m = re.match(r'\s*([+-]?\d+(?:\.\d+)?)', str(x or ''))
+    return float(m.group(1)) if m else default
+
+
+def _vv_words(text, query, speed):
+    """
+    VOICEVOX の文節を、台本の字の語にする。@return [{'text','start','end'}]（音の頭から・秒）
+    ★音の数で割り当てる：かな＝1音（小さいゃゅょは前の字と1音）・句読点＝0・それ以外（漢字・英数字）は残りの音を等分
+    """
+    times, phrases, t = [], [], float(query.get('prePhonemeLength', 0.1))
+    for ap in query.get('accent_phrases') or []:
+        a = len(times)
+        for m in ap.get('moras') or []:
+            d = float(m.get('consonant_length') or 0) + float(m.get('vowel_length') or 0)
+            times.append((t, t + d)); t += d
+        phrases.append((a, len(times)))
+        if ap.get('pause_mora'):
+            t += float(ap['pause_mora'].get('vowel_length') or 0)
+    n = len(times)
+    chars = [c for c in str(text) if not c.isspace()]
+    if not n or not chars:
+        return []
+    w = [0.0 if c in _PUNCT or c in _SMALL else (1.0 if ('\u3041' <= c <= '\u30ff' or c == 'ー') else None) for c in chars]
+    unk = [i for i, x in enumerate(w) if x is None]
+    rest = max(n - sum(x for x in w if x), 0.0)
+    for i in unk:
+        w[i] = rest / len(unk) if rest > 0 else 0.5
+    k = n / max(sum(w), 1e-9)   # 合計を音の数に合わせる（読みの差を全体で吸収）
+    at = lambda x: (lambda i: times[i][0] + (x - i) * (times[i][1] - times[i][0]))(min(int(x), n - 1)) / speed
+    words, pos = [], 0.0
+    spans = []
+    for c, x in zip(chars, w):
+        spans.append((c, pos, pos + x * k)); pos += x * k
+    for a, b in phrases:
+        txt = ''.join(c for c, p0, p1 in spans if c not in _PUNCT and a <= (p0 + p1) / 2 < b)
+        if txt:
+            words.append({'text': txt, 'start': round(at(a), 3), 'end': round(times[b - 1][1] / speed, 3)})
+        elif words:
+            words[-1]['end'] = round(times[b - 1][1] / speed, 3)
+    left = ''.join(c for c, p0, p1 in spans if c not in _PUNCT and (p0 + p1) / 2 >= n)
+    if left and words:
+        words[-1]['text'] += left
+    return words
+
+
+def _synth_vv(text, spec, out_path, rate, pitch, volume):
+    """VOICEVOX（Actions の中で起動したエンジン）で1回分を合成し、文節ごとの時刻を返す"""
+    import json
+    import urllib.parse
+    import urllib.request
+    api = lambda path, data=None: urllib.request.urlopen(urllib.request.Request(
+        VOICEVOX_URL + path, data=data, headers={'Content-Type': 'application/json'}), timeout=120).read()
+    try:
+        sp = next((s for s in json.loads(api('/speakers')) if s['name'] == spec[0]), None)
+    except Exception as e:
+        raise TtsUnavailable('VOICEVOX に繋がりません（%s）: %s' % (VOICEVOX_URL, e))
+    st = sp and next((x for x in sp['styles'] if x['name'] == spec[1]), None)
+    if not st:
+        raise TtsUnavailable('VOICEVOX に無い話者・型: %s / %s' % spec)
+    q = json.loads(api('/audio_query?speaker=%d&text=%s' % (st['id'], urllib.parse.quote(text)), b''))
+    # edge-tts の設定をそのまま写す：速さ（rate %）→ speedScale・強さ（volume %）→ volumeScale。
+    #   高さ（pitch Hz）は声の同一性を守るため音程を動かさず、抑揚の大きさ（intonationScale）へ（+10Hz → 1.2）
+    speed = max(0.5, 1 + _pct(rate) / 100)
+    q['speedScale'] = speed
+    q['volumeScale'] = max(0.5, 1 + _pct(volume) / 100)
+    q['intonationScale'] = 1 + max(0.0, _pct(pitch)) / 50
+    wav = out_path + '.vv.wav'
+    with open(wav, 'wb') as f:
+        f.write(api('/synthesis?speaker=%d' % st['id'], json.dumps(q).encode()))
+    _run(['ffmpeg', '-v', 'error', '-y', '-i', wav, '-c:a', 'libmp3lame', '-q:a', '4', out_path])
+    os.remove(wav)
+    credit = 'VOICEVOX:%s' % spec[0]
+    if credit not in CREDITS:
+        CREDITS.append(credit)
+    print('  VOICEVOX %s/%s 速さ%.2f 抑揚%.2f 読み: %s' % (spec[0], spec[1], speed, q['intonationScale'], q.get('kana', '')), flush=True)
+    return _vv_words(text, q, speed)
+
+
 def _require_edge_tts():
     try:
         import edge_tts  # noqa: F401
@@ -140,6 +250,9 @@ async def _synth(text, voice, rate, out_path, pitch=DEFAULT_PITCH,
 
     ★stream() を使う。save() だと音声しか得られず、単語の時刻が捨てられる。
     """
+    spec = _vv_spec(voice, text)
+    if spec:
+        return _synth_vv(text, spec, out_path, rate, pitch, volume)
     edge_tts = _require_edge_tts()
     """
     ★★2026-08-28、GitHub Actionsで初めて実走させて発見した。
@@ -304,7 +417,9 @@ def synthesize(text, out_path, voice=None, rate=None, prosody=True):
     if not body:
         raise TtsUnavailable('読み上げる本文が空です。')
 
-    _require_edge_tts()
+    if not _vv_spec(voice, body):
+        _require_edge_tts()
+    voice = voice or (JA_VOICEVOX if _vv_spec(None, body) else None)   # 日本語の本文で声の指定が無い時は英語の既定へ落とさない
 
     sentences = split_sentences(body) if prosody else []
     can_join = bool(shutil.which('ffmpeg')) and bool(shutil.which('ffprobe'))

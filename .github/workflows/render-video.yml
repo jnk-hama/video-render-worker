@@ -110,6 +110,15 @@ jobs:
           python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt edge-tts
           python3 -c "import edge_tts; print('edge-tts ready')"
 
+      # ★2026-10-27 日本語の声は VOICEVOX（WhiteCUL・商用は表記で可）。edge-tts は商用の許可が公式に無い（jmas #352/#353）。
+      #   エンジンはこのジョブの中で起動する（無料・オープンソース）。版は固定（エイリアス禁止）。英語の声は edge-tts のまま
+      - name: VOICEVOX を起動
+        run: |
+          set -euo pipefail
+          docker run -d -p 50021:50021 voicevox/voicevox_engine:cpu-amd64-ubuntu22.04-0.25.2
+          for i in $(seq 90); do curl -fsS localhost:50021/version && exit 0; sleep 2; done
+          echo "::error::VOICEVOX が起動しませんでした（日本語の語りを作れない）"; exit 1
+
       # ★★2026-09-01、切り抜きと合成のための依存。**すべてCPUで動く。**
       #   onnxruntime は CPUExecutionProvider のみ（GPU版は入れない）。
       #   これで「GPU推論に依存しない」を守ったまま、

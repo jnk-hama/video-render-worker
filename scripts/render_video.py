@@ -1782,6 +1782,13 @@ def cta_arrow_events(start, end, x, y, accent):
     return out
 
 
+def with_credits(text):
+    """広告表記の後ろに、この回で使った声の表記（tts.CREDITS）を足す。tts を読み込んでいない回はそのまま"""
+    t = sys.modules.get('tts')
+    cs = list(dict.fromkeys(getattr(t, 'CREDITS', None) or [])) if t else []
+    return '  '.join([str(text)] + cs) if cs and text else (text or '  '.join(cs) or None)
+
+
 def build_ass(captions, w, h, font_size, center=False,
               font_name='DejaVu Sans', ratio=None, font_dir=None,
               theme=None, disclosure=None, safe=None, cards=None, panel=None, cta_arrow=None):
@@ -3178,8 +3185,9 @@ def main():
                               theme=build_theme(job.get('design_tokens'),
                                                 job.get('highlight_words')),
                               # ★指定が無ければ部門の既定（PR / #ad）。無表示にしない（#178）
-                              disclosure=(job.get('disclosure')
-                                          or DEFAULT_DISCLOSURE.get(market)),
+                              # ★VOICEVOX の声を使った時は、規約の表記（VOICEVOX:話者）を同じ行へ足す（jmas #353）
+                              disclosure=with_credits(job.get('disclosure')
+                                                      or DEFAULT_DISCLOSURE.get(market)),
                               cards=job.get('info_cards'),
                               panel=job.get('product_panel'),
                               cta_arrow=job.get('cta_arrow'),

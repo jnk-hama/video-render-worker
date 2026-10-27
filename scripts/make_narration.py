@@ -21,7 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from tts import JA_CHARS_PER_CHUNK, TtsUnavailable, group_words, synthesize  # noqa: E402
+from tts import CREDITS, JA_CHARS_PER_CHUNK, TtsUnavailable, group_words, synthesize  # noqa: E402
 
 
 def log(msg):
@@ -96,6 +96,9 @@ def main():
             % len(captions))
 
     job["narrationUrl"] = args.audio
+    # ★VOICEVOX の声は「VOICEVOX:話者」の表記が使う条件（jmas #353）。広告表記の行へ足して画面に出す
+    if CREDITS:
+        job["disclosure"] = "  ".join([job.get("disclosure") or "PR"] + [c for c in CREDITS if c not in str(job.get("disclosure") or "")])
     job["captions"] = captions
 
     # シーンの尺を音声に合わせて引き伸ばす。合計が音声より短いと絵が先に終わる

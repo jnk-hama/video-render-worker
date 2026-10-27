@@ -41,6 +41,14 @@ jobs:
           python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt \
             edge-tts rembg onnxruntime
 
+      # ★日本語の語りは VOICEVOX（jmas #353）。render-video と同じ版をこのジョブの中で起動する
+      - name: VOICEVOX を起動
+        run: |
+          set -euo pipefail
+          docker run -d -p 50021:50021 voicevox/voicevox_engine:cpu-amd64-ubuntu22.04-0.25.2
+          for i in $(seq 90); do curl -fsS localhost:50021/version && exit 0; sleep 2; done
+          echo "::error::VOICEVOX が起動しませんでした"; exit 1
+
       - name: Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
         with:
