@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-29T10:13:00+00:00",
+ "generated_at": "2026-10-30T10:15:11+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -31,15 +31,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xe1xry",
-    "title": "This dog always makes sure his blind buddy gets a treat before he does",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xe1xry/this_dog_always_makes_sure_his_blind_buddy_gets_a/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xgk85d",
     "title": "People who put their own safety aside to help an animal are truly special.",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xgk85d/people_who_put_their_own_safety_aside_to_help_an/",
@@ -49,106 +40,106 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xd88yl",
-    "title": "The \"Duck\" in Avenida Place hotel, Barcelona, Spain.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xd88yl/the_duck_in_avenida_place_hotel_barcelona_spain/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xe1xry",
+    "title": "This dog always makes sure his blind buddy gets a treat before he does",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xe1xry/this_dog_always_makes_sure_his_blind_buddy_gets_a/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xcprhz",
-    "title": "Abraham Lincoln is in the National Wrestling Hall of Fame. He had one recorded loss in 300 recorded matches and was known for his strength and grappling skills.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xcprhz/abraham_lincoln_is_in_the_national_wrestling_hall/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xe98lz",
+    "title": "Terry Crews drawing Sofía Vergara is oddly satisfying to watch",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xe98lz/terry_crews_drawing_sofía_vergara_is_oddly/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfa78c",
-    "title": "This is Spiny butterfly ray, an IUCN listed globally endangered species.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xfa78c/this_is_spiny_butterfly_ray_an_iucn_listed/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xdxxrd",
+    "title": "‘Bringing you love’ this halloween",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xdxxrd/bringing_you_love_this_halloween/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xd2pz4",
-    "title": "Zooming in on the Moon and Saturn using an Orion XT8 Dobsonian telescope",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xd2pz4/zooming_in_on_the_moon_and_saturn_using_an_orion/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xhsbof",
+    "title": "Time Lapse of Pregnancy",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xhsbof/time_lapse_of_pregnancy/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xhjr75",
-    "title": "This image highlights the surgical scars on Captain Smit Machchhar’s head, sustained during his heroic efforts to control Flydubai flight FZ1073, as he arrives to be honored by the Crown Prince of Dubai.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xhjr75/this_image_highlights_the_surgical_scars_on/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xipc3j",
+    "title": "Crows leaving bread on a balcony because they think their human friend has run out of food is a remarkable display of intelligence",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xipc3j/crows_leaving_bread_on_a_balcony_because_they/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfeyv2",
-    "title": "Someone yeeted a can of greenbeans at her",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xfeyv2/someone_yeeted_a_can_of_greenbeans_at_her/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xg8brv",
+    "title": "Guardian dog wakes up after watching over the goats all night",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xg8brv/guardian_dog_wakes_up_after_watching_over_the/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xdbgqg",
-    "title": "Man tries to fly off a cliff",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xdbgqg/man_tries_to_fly_off_a_cliff/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xis6n2",
+    "title": "HMB while I do a wheelie on a surron",
+    "url": "https://www.reddit.com/r/holdmybeer/comments/1xis6n2/hmb_while_i_do_a_wheelie_on_a_surron/",
+    "subreddit": "holdmybeer",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xdasqc",
-    "title": "Man inflates life jacket during airline safety demo",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xdasqc/man_inflates_life_jacket_during_airline_safety/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xdgr7s",
+    "title": "The defensive posture of a wild hamster",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xdgr7s/the_defensive_posture_of_a_wild_hamster/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xgp94p",
-    "title": "Man throws a can at a group",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xgp94p/man_throws_a_can_at_a_group/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xdo1wf",
+    "title": "A women was attacked by her pet cat, who'd been friendly for years.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xdo1wf/a_women_was_attacked_by_her_pet_cat_whod_been/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfl41j",
-    "title": "asshat passing on the right",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xfl41j/asshat_passing_on_the_right/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xel9t8",
+    "title": "In 2012 a UC San Diego student was left handcuffed in a holding cell for five days with no food or water, never charged, and later received a $4.1 million settlement.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xel9t8/in_2012_a_uc_san_diego_student_was_left/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xfuzpv",
+    "title": "Sheriff accidentally euthanize a snake worth a ton of money",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xfuzpv/sheriff_accidentally_euthanize_a_snake_worth_a/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1xd8we4",
-    "title": "Sleepy Yuzuha [StelLive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xd8we4/sleepy_yuzuha_stellive/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1xe81zl",
     "title": "Yasumori Minori [Blue Archive]",
@@ -168,82 +159,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xf0cnf",
-    "title": "my Silent Hill nurse cosplay!~ finished just in time for Halloween",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xf0cnf/my_silent_hill_nurse_cosplay_finished_just_in/",
-    "subreddit": "cosplay",
+    "id": "t3_1xgfq3t",
+    "title": "Summer Vacation [Artist's Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xgfq3t/summer_vacation_artists_original/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xf3ccu",
-    "title": "My Black Lagoon Revy Cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xf3ccu/my_black_lagoon_revy_cosplay/",
-    "subreddit": "cosplay",
+    "id": "t3_1xi4god",
+    "title": "The art of seduction",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xi4god/the_art_of_seduction/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xdiszj",
-    "title": "cosplayed L for the first time",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xdiszj/cosplayed_l_for_the_first_time/",
-    "subreddit": "cosplay",
+    "id": "t3_1xfax6a",
+    "title": "They lied as naturally as they breathed",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xfax6a/they_lied_as_naturally_as_they_breathed/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xghawz",
-    "title": "My Zhao cosplay from Zenless Zone Zero at San Japan!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xghawz/my_zhao_cosplay_from_zenless_zone_zero_at_san/",
-    "subreddit": "cosplay",
+    "id": "t3_1xe87kv",
+    "title": "A very simple fit for today",
+    "url": "https://www.reddit.com/r/streetwear/comments/1xe87kv/a_very_simple_fit_for_today/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xcfy8h",
-    "title": "The Apothecary Diaries: The Late Lady's Treasure | Movie Key Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1xcfy8h/the_apothecary_diaries_the_late_ladys_treasure/",
-    "subreddit": "anime",
+    "id": "t3_1xg4i3r",
+    "title": "[wdywt] layering szn in full effect",
+    "url": "https://www.reddit.com/r/streetwear/comments/1xg4i3r/wdywt_layering_szn_in_full_effect/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xe4b01",
-    "title": "Lesbians getting intimate in the bath [Botan Kamiina Fully Blossoms When Drunk]",
-    "url": "https://www.reddit.com/r/anime/comments/1xe4b01/lesbians_getting_intimate_in_the_bath_botan/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xhvrul",
-    "title": "Ufotable, this is a slice-of-life Anime ok? Ufotable: [Today's Menu for the Emiya Family]",
-    "url": "https://www.reddit.com/r/anime/comments/1xhvrul/ufotable_this_is_a_sliceoflife_anime_ok_ufotable/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xd2ma0",
-    "title": "Made in Abyss: Mezameru Shinpi | New Key Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1xd2ma0/made_in_abyss_mezameru_shinpi_new_key_visual/",
-    "subreddit": "anime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xd9tg9",
-    "title": "High-definition, restored of the \"Tabletop Troupe\" series",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xd9tg9/highdefinition_restored_of_the_tabletop_troupe/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xdrgo0",
+    "title": "[wdywt] denim + leather just works",
+    "url": "https://www.reddit.com/r/streetwear/comments/1xdrgo0/wdywt_denim_leather_just_works/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -267,12 +231,12 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xhaogh",
-    "title": "Cyberpunk: Edgerunners 2 debuted with 4.6 million views on Netflix Top 10 Non-English Shows October 19th-25th",
-    "url": "https://www.reddit.com/r/anime/comments/1xhaogh/cyberpunk_edgerunners_2_debuted_with_46_million/",
-    "subreddit": "anime",
+    "id": "t3_1xhq5jd",
+    "title": "New Game Genshin Impact Releases Tomorrow",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xhq5jd/new_game_genshin_impact_releases_tomorrow/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
-    "has_media": false,
+    "has_media": true,
     "source": "rss"
    }
   ]
