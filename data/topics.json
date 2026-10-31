@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-30T10:15:11+00:00",
+ "generated_at": "2026-10-31T09:50:39+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -22,9 +22,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xdz6o9",
-    "title": "Albina Shagimuratova. All reactions are reasonable.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xdz6o9/albina_shagimuratova_all_reactions_are_reasonable/",
+    "id": "t3_1xjetj5",
+    "title": "Raven asks for water in scorching heat",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xjetj5/raven_asks_for_water_in_scorching_heat/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,27 +40,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xe1xry",
-    "title": "This dog always makes sure his blind buddy gets a treat before he does",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xe1xry/this_dog_always_makes_sure_his_blind_buddy_gets_a/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xe98lz",
     "title": "Terry Crews drawing Sofía Vergara is oddly satisfying to watch",
     "url": "https://www.reddit.com/r/BeAmazed/comments/1xe98lz/terry_crews_drawing_sofía_vergara_is_oddly/",
-    "subreddit": "BeAmazed",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xdxxrd",
-    "title": "‘Bringing you love’ this halloween",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xdxxrd/bringing_you_love_this_halloween/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -103,37 +85,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xdgr7s",
-    "title": "The defensive posture of a wild hamster",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xdgr7s/the_defensive_posture_of_a_wild_hamster/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1xhm79j",
+    "title": "He forgot what to say",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xhm79j/he_forgot_what_to_say/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xdo1wf",
-    "title": "A women was attacked by her pet cat, who'd been friendly for years.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xdo1wf/a_women_was_attacked_by_her_pet_cat_whod_been/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1xgfxfi",
+    "title": "I Heard The Chair Crack, Derrick 🤣",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xgfxfi/i_heard_the_chair_crack_derrick/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xel9t8",
-    "title": "In 2012 a UC San Diego student was left handcuffed in a holding cell for five days with no food or water, never charged, and later received a $4.1 million settlement.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xel9t8/in_2012_a_uc_san_diego_student_was_left/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1xhvkjq",
+    "title": "Bill Hader and Team Struggle Through An Interview [0:03]",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xhvkjq/bill_hader_and_team_struggle_through_an_interview/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfuzpv",
-    "title": "Sheriff accidentally euthanize a snake worth a ton of money",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xfuzpv/sheriff_accidentally_euthanize_a_snake_worth_a/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1xgqmf2",
+    "title": "GTA Shenanigans (from HutchMF)",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xgqmf2/gta_shenanigans_from_hutchmf/",
+    "subreddit": "ContagiousLaughter",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,102 +123,120 @@
   ],
   "B": [
    {
-    "id": "t3_1xe81zl",
-    "title": "Yasumori Minori [Blue Archive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xe81zl/yasumori_minori_blue_archive/",
-    "subreddit": "awwnime",
+    "id": "t3_1xk326w",
+    "title": "Avatar: Seven Havens Ep. 13 - Pavi's Stand",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xk326w/avatar_seven_havens_ep_13_pavis_stand/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xdrsmz",
-    "title": "Suoming [Wuthering Waves]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xdrsmz/suoming_wuthering_waves/",
-    "subreddit": "awwnime",
+    "id": "t3_1xfbfb9",
+    "title": "The Forgotten Disney Animator Behind Disney's Scariest Chase",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xfbfb9/the_forgotten_disney_animator_behind_disneys/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xgfq3t",
-    "title": "Summer Vacation [Artist's Original]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xgfq3t/summer_vacation_artists_original/",
-    "subreddit": "awwnime",
+    "id": "t3_1xjijn1",
+    "title": "5 Tips to Keep Your Drawings on Model - Dong Chang",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xjijn1/5_tips_to_keep_your_drawings_on_model_dong_chang/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xi4god",
-    "title": "The art of seduction",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xi4god/the_art_of_seduction/",
-    "subreddit": "animegifs",
+    "id": "t3_1xf0cnf",
+    "title": "my Silent Hill nurse cosplay!~ finished just in time for Halloween",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xf0cnf/my_silent_hill_nurse_cosplay_finished_just_in/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfax6a",
-    "title": "They lied as naturally as they breathed",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xfax6a/they_lied_as_naturally_as_they_breathed/",
-    "subreddit": "animegifs",
+    "id": "t3_1xjkkla",
+    "title": "Home Made Hex Girl Thorn from Scooby Doo cosplay!",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xjkkla/home_made_hex_girl_thorn_from_scooby_doo_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xe87kv",
-    "title": "A very simple fit for today",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xe87kv/a_very_simple_fit_for_today/",
-    "subreddit": "streetwear",
+    "id": "t3_1xf3ccu",
+    "title": "My Black Lagoon Revy Cosplay",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xf3ccu/my_black_lagoon_revy_cosplay/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xg4i3r",
-    "title": "[wdywt] layering szn in full effect",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xg4i3r/wdywt_layering_szn_in_full_effect/",
-    "subreddit": "streetwear",
+    "id": "t3_1xghawz",
+    "title": "My Zhao cosplay from Zenless Zone Zero at San Japan!",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xghawz/my_zhao_cosplay_from_zenless_zone_zero_at_san/",
+    "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xdrgo0",
-    "title": "[wdywt] denim + leather just works",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xdrgo0/wdywt_denim_leather_just_works/",
-    "subreddit": "streetwear",
+    "id": "t3_1xg8i86",
+    "title": "[ART] Begging - Mikoto-chan Doesn't Want to Be Hated!",
+    "url": "https://www.reddit.com/r/manga/comments/1xg8i86/art_begging_mikotochan_doesnt_want_to_be_hated/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xh6uov",
-    "title": "The Last thing Tusurmi Islanders Saw Before Reset",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xh6uov/the_last_thing_tusurmi_islanders_saw_before_reset/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xghic1",
+    "title": "[News] Tetsuya Chiba, the artist for Ashita no Joe, has passed away at 87",
+    "url": "https://www.reddit.com/r/manga/comments/1xghic1/news_tetsuya_chiba_the_artist_for_ashita_no_joe/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xhhnmm",
-    "title": "Why is there two banners of same character.",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xhhnmm/why_is_there_two_banners_of_same_character/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xfwlt6",
+    "title": "[DISC] Since I'm Interested In Your Hair - Chapter 6",
+    "url": "https://www.reddit.com/r/manga/comments/1xfwlt6/disc_since_im_interested_in_your_hair_chapter_6/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xhq5jd",
-    "title": "New Game Genshin Impact Releases Tomorrow",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xhq5jd/new_game_genshin_impact_releases_tomorrow/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xjpz83",
+    "title": "[DISC] My Lovely Daughter and Her Girlfriend are Such a Cute Couple - Ch. 1",
+    "url": "https://www.reddit.com/r/manga/comments/1xjpz83/disc_my_lovely_daughter_and_her_girlfriend_are/",
+    "subreddit": "manga",
     "views": 0,
     "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xefovi",
+    "title": "I'm trying to find the name of the manga in this image?",
+    "url": "https://www.reddit.com/r/manga/comments/1xefovi/im_trying_to_find_the_name_of_the_manga_in_this/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xg8x1h",
+    "title": "Bleach: Thousand-Year Blood War Arc - Final Episode Special ED",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xg8x1h/bleach_thousandyear_blood_war_arc_final_episode/",
+    "subreddit": "AnimeSakuga",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
