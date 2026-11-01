@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-31T09:50:39+00:00",
+ "generated_at": "2026-11-01T10:41:01+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -7,15 +7,6 @@
     "id": "t3_1xg8vle",
     "title": "Second woman to ever lift the dinnie stones side by side - Angelica Jardine.",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xg8vle/second_woman_to_ever_lift_the_dinnie_stones_side/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xfz3vy",
-    "title": "Delivering an perfect worm",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xfz3vy/delivering_an_perfect_worm/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -31,19 +22,28 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xgk85d",
-    "title": "People who put their own safety aside to help an animal are truly special.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xgk85d/people_who_put_their_own_safety_aside_to_help_an/",
+    "id": "t3_1xfz3vy",
+    "title": "Delivering an perfect worm",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xfz3vy/delivering_an_perfect_worm/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xe98lz",
-    "title": "Terry Crews drawing Sofía Vergara is oddly satisfying to watch",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xe98lz/terry_crews_drawing_sofía_vergara_is_oddly/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xkaq8q",
+    "title": "This tall Halloween cosplay",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xkaq8q/this_tall_halloween_cosplay/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xipylo",
+    "title": "Guy shows up at Trump Rally for a great reason and shares it live for all Fox News viewers to hear",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xipylo/guy_shows_up_at_trump_rally_for_a_great_reason/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -61,6 +61,15 @@
     "id": "t3_1xipc3j",
     "title": "Crows leaving bread on a balcony because they think their human friend has run out of food is a remarkable display of intelligence",
     "url": "https://www.reddit.com/r/BeAmazed/comments/1xipc3j/crows_leaving_bread_on_a_balcony_because_they/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xgxg57",
+    "title": "The backwards progression of cgi needs to be studied, this was 18 years ago",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xgxg57/the_backwards_progression_of_cgi_needs_to_be/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
@@ -112,6 +121,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1xk6ait",
+    "title": "\"I don't know, Jeff...\" (from 0:12)",
+    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xk6ait/i_dont_know_jeff_from_012/",
+    "subreddit": "ContagiousLaughter",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1xgqmf2",
     "title": "GTA Shenanigans (from HutchMF)",
     "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xgqmf2/gta_shenanigans_from_hutchmf/",
@@ -123,37 +141,28 @@
   ],
   "B": [
    {
-    "id": "t3_1xk326w",
-    "title": "Avatar: Seven Havens Ep. 13 - Pavi's Stand",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xk326w/avatar_seven_havens_ep_13_pavis_stand/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1xjzzvi",
+    "title": "Sparxie [Honkai: Star Rail]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xjzzvi/sparxie_honkai_star_rail/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfbfb9",
-    "title": "The Forgotten Disney Animator Behind Disney's Scariest Chase",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xfbfb9/the_forgotten_disney_animator_behind_disneys/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1xitcxf",
+    "title": "Waiting in the Shade [Artist's Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xitcxf/waiting_in_the_shade_artists_original/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xjijn1",
-    "title": "5 Tips to Keep Your Drawings on Model - Dong Chang",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xjijn1/5_tips_to_keep_your_drawings_on_model_dong_chang/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xf0cnf",
-    "title": "my Silent Hill nurse cosplay!~ finished just in time for Halloween",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xf0cnf/my_silent_hill_nurse_cosplay_finished_just_in/",
-    "subreddit": "cosplay",
+    "id": "t3_1xgfq3t",
+    "title": "Summer Vacation [Artist's Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xgfq3t/summer_vacation_artists_original/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -162,6 +171,15 @@
     "id": "t3_1xjkkla",
     "title": "Home Made Hex Girl Thorn from Scooby Doo cosplay!",
     "url": "https://www.reddit.com/r/cosplay/comments/1xjkkla/home_made_hex_girl_thorn_from_scooby_doo_cosplay/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xf0cnf",
+    "title": "my Silent Hill nurse cosplay!~ finished just in time for Halloween",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xf0cnf/my_silent_hill_nurse_cosplay_finished_just_in/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
@@ -177,66 +195,84 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xghawz",
-    "title": "My Zhao cosplay from Zenless Zone Zero at San Japan!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xghawz/my_zhao_cosplay_from_zenless_zone_zero_at_san/",
+    "id": "t3_1xk1qrr",
+    "title": "My Nina & Alexander Cosplay (Fullmetal Alchemist)",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xk1qrr/my_nina_alexander_cosplay_fullmetal_alchemist/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xg8i86",
-    "title": "[ART] Begging - Mikoto-chan Doesn't Want to Be Hated!",
-    "url": "https://www.reddit.com/r/manga/comments/1xg8i86/art_begging_mikotochan_doesnt_want_to_be_hated/",
-    "subreddit": "manga",
+    "id": "t3_1xiqph1",
+    "title": "Spooky Scary [Too Many Losing Heroines!]",
+    "url": "https://www.reddit.com/r/anime/comments/1xiqph1/spooky_scary_too_many_losing_heroines/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xghic1",
-    "title": "[News] Tetsuya Chiba, the artist for Ashita no Joe, has passed away at 87",
-    "url": "https://www.reddit.com/r/manga/comments/1xghic1/news_tetsuya_chiba_the_artist_for_ashita_no_joe/",
-    "subreddit": "manga",
+    "id": "t3_1xk2chr",
+    "title": "Me as Yor Forger from Spy x Family",
+    "url": "https://www.reddit.com/r/anime/comments/1xk2chr/me_as_yor_forger_from_spy_x_family/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfwlt6",
-    "title": "[DISC] Since I'm Interested In Your Hair - Chapter 6",
-    "url": "https://www.reddit.com/r/manga/comments/1xfwlt6/disc_since_im_interested_in_your_hair_chapter_6/",
-    "subreddit": "manga",
+    "id": "t3_1xhvrul",
+    "title": "Ufotable, this is a slice-of-life Anime ok? Ufotable: [Today's Menu for the Emiya Family]",
+    "url": "https://www.reddit.com/r/anime/comments/1xhvrul/ufotable_this_is_a_sliceoflife_anime_ok_ufotable/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xjpz83",
-    "title": "[DISC] My Lovely Daughter and Her Girlfriend are Such a Cute Couple - Ch. 1",
-    "url": "https://www.reddit.com/r/manga/comments/1xjpz83/disc_my_lovely_daughter_and_her_girlfriend_are/",
-    "subreddit": "manga",
+    "id": "t3_1xj2fqp",
+    "title": "‘DEATH STRANDING ISOLATIONS’ Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xj2fqp/death_stranding_isolations_key_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xefovi",
-    "title": "I'm trying to find the name of the manga in this image?",
-    "url": "https://www.reddit.com/r/manga/comments/1xefovi/im_trying_to_find_the_name_of_the_manga_in_this/",
-    "subreddit": "manga",
+    "id": "t3_1xhq5jd",
+    "title": "New Game Genshin Impact Releases Tomorrow",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xhq5jd/new_game_genshin_impact_releases_tomorrow/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xg8x1h",
-    "title": "Bleach: Thousand-Year Blood War Arc - Final Episode Special ED",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xg8x1h/bleach_thousandyear_blood_war_arc_final_episode/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1xhhnmm",
+    "title": "Why is there two banners of same character.",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xhhnmm/why_is_there_two_banners_of_same_character/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
-    "has_media": false,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xh6uov",
+    "title": "The Last thing Tusurmi Islanders Saw Before Reset",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xh6uov/the_last_thing_tusurmi_islanders_saw_before_reset/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xjmn49",
+    "title": "6 years and the ministry still hasn't fixed this bridge btw",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xjmn49/6_years_and_the_ministry_still_hasnt_fixed_this/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
     "source": "rss"
    }
   ]
