@@ -29,7 +29,7 @@ jobs:
       cancel-in-progress: false
     env:
       KEY: ${{ inputs.product_key }}
-      W: ${{ runner.temp }}/w
+      W: /tmp/edge-w   # job の env では runner の値が読めない（422）ので固定の場所
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
 
@@ -75,9 +75,9 @@ jobs:
         with:
           name: edge-video-${{ inputs.product_key }}
           path: |
-            ${{ runner.temp }}/w/stage/p/${{ inputs.product_key }}/out/final.mp4
-            ${{ runner.temp }}/w/stage/p/${{ inputs.product_key }}/out/qc.json
-            ${{ runner.temp }}/w/stage/p/${{ inputs.product_key }}/out/post.json
+            /tmp/edge-w/stage/p/${{ inputs.product_key }}/out/final.mp4
+            /tmp/edge-w/stage/p/${{ inputs.product_key }}/out/qc.json
+            /tmp/edge-w/stage/p/${{ inputs.product_key }}/out/post.json
           retention-days: 7
 
       - name: 届ける（Storage・LINE・Release）
