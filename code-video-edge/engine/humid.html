@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- SwitchBot 気化式加湿器（#335）。r6：オーナー「没入感が少ない／リアルなリビングをコードで／ブラウンは汚い」。
+     S2（昼）と S4（夜）は Blender Cycles で描いた 3D のリビング（cycles_room.py・本物の素材は Poly Haven CC0・#337）。色は茶色を使わず、生成りの白・柿色・夜の紺。
+     時刻は timing.json（window.TIMELINE）の events、文字は設計書（window.PRODUCT）。すべての値は時刻 T の関数（タイマー・乱数なし）。
+     #world＝3D の部屋／#over＝線と図（重なり検査の対象外）／.prod＝実写真／#ui＝文字 -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ground:#FBF7F1; --ink:#26272B; --graphite:#66625E; --acc:#C8412A; --plan:#C8412A; --night:#161B2A; --moon:#FFE3BC; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--ground); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  .abs { position:absolute; }
+  #bg { position:absolute; inset:0; background:var(--ground); }
+  #world, #prodlayer, #ui { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+  #over { position:absolute; left:0; top:0; }
+  .plate { position:absolute; overflow:hidden; border-radius:22px; box-shadow:0 28px 56px rgba(30,32,38,.14), 0 0 0 1px rgba(30,32,38,.06); }
+  .plate img, .bare img { display:block; width:100%; height:100%; }
+  .bare { position:absolute; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln > .in { display:block; }
+  .num { font-weight:300; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.01em; }
+  .note { position:absolute; left:64px; width:836px; font:400 24px/1.45 "Noto Sans JP"; color:var(--graphite); opacity:0; }
+  .note.w { color:#FFFFFF; }
+  .note.k { color:var(--ink); }
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:var(--ink); border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ground); z-index:3; }
+  #credit { position:absolute; left:156px; top:184px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; opacity:.5; color:var(--ink); z-index:3; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="world"></div>
+<div id="prodlayer" class="prod"></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<div id="ui"><div id="pr">PR</div></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, { E, clamp, lerp, breathe } = EDGE, { el, sv, ln, reveal, note, f2, $ } = SK;
+const ev = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b])), S = Object.fromEntries(TL.scenes.map((s) => [s.id, s]));
+const DIR = "p/switchbot-humid/", U = SK.U, T = () => SK.T;
+const photo = (src, x, y, w, h, cls, origin) => SK.photo(DIR, src, x, y, w, h, cls, origin);
+// r13（#343・21人会議「本体が一度も本物の部屋で生きて映っていない」・オーナー「コード動画は無料で」）：
+//   販売ページの実写真を、Actions で推定した奥行き（Depth Anything V2 Small・Apache-2.0）でずらし、カメラが寄る・回り込む映像にする。
+//   写真は描き変えない（画素を奥行きに応じて少し動かすだけ）。動きは小さく（大きいと縁が伸びる）。値は時刻の関数＝毎回同じ。
+//   画素ごとに「この画素はどこから来たか」を奥行きで8回たどる（近い物ほど大きく動く＝本物の視差）
+//   ★ブラウザの中で毎コマ計算すると（CPU の WebGL）、画面全体の描画まで遅くなり 3,500秒で打ち切られた（r13 の1回目）。
+//     そこで 3D の部屋と同じ形にした：カメラの式はここ1か所 → DEPTH_JOBS で一覧を書き出す → factory/depthwarp.py が1コマずつ JPEG に → ここは差し替えて見せるだけ
+const DEPTH = {};   // 名前 → { ph, a, b, cam(u) → [dx, dy, zoom, focus] }
+const depthPlate = (ph, name, a, b, cam) => {   // a〜b 秒の間を 30コマ/秒の連番で見せる。dx・dy：写真の幅に対するカメラのずれ／zoom：寄り／focus：動かない奥行き（0＝奥・1＝手前）
+  DEPTH[name] = { ph, a, b, cam };
+  const im = el("img", { class: "dp", style: "position:absolute;left:0;top:0;width:100%;height:100%;display:block" }, "", ph);
+  return (t) => { const n = Math.ceil((b - a) * FPS3D) + 1, i = Math.max(0, Math.min(n - 1, Math.floor((t - a) * FPS3D + 1e-6))), src = `${DIR}dp/${name}_${String(i).padStart(4, "0")}.jpg`;
+    if (im.getAttribute("src") !== src) { im.setAttribute("src", src); WAITS.push(im.decode().catch(() => {})); } };
+};
+window.DEPTH_JOBS = () => Object.fromEntries(Object.entries(DEPTH).map(([name, d]) => { const n = Math.ceil((d.b - d.a) * FPS3D) + 1;
+  return [name, Array.from({ length: n }, (_, i) => { const [dx, dy, zoom, focus] = d.cam(clamp(i / (n - 1)));
+    return { src: `${name}.png`, depth: `${name}_d.png`, w: parseInt(d.ph.style.width), h: parseInt(d.ph.style.height), dx, dy, zoom, focus, out: `${name}_${String(i).padStart(4, "0")}.jpg` }; })]; }));
+const C = { ground: "#FBF7F1", ink: "#26272B", acc: "#C8412A", plan: "#C8412A", night: "#161B2A", moon: "#FFE3BC", white: "#FFFFFF" };
+// #308 VOICEVOX の声は規約で「VOICEVOX:話者名」の記載が条件（オーナー「表記は小さく透過」）。PR の札の右
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+// 地の色：場面ごと（転換の覆いが満ちきった所で地を替える＝覆いの下で切り替わる）
+const groundAt = (t) => (t < S.S3.t0 ? C.ground : t < S.S4.t0 ? C.plan : t < S.S5.t0 ? C.night : C.ground);   // S2・S4 は 3D の部屋が地を覆う（S2 の PR の札は明るい地）
+const inkAt = (t) => (t >= S.S3.t0 && t < S.S5.t0 ? C.white : C.ink);   // S2 は明るい天井の上＝濃い字
+U.push(() => { const t = T(), g = groundAt(t); $("bg").style.background = g; $("pr").style.background = g; $("pr").style.color = $("pr").style.borderColor = inkAt(t); const cr = $("credit"); if (cr) cr.style.color = inkAt(t); });
+const cover = SK.coverLayer();
+// 3D のリビング（#337）：Blender Cycles で描いた連番の絵（cycles_room.py・30コマ/秒）を1枚ずつ差し替える。
+//   絵の中身（カメラの動き）はこの下の CAM が決め、CYCLES_JOBS で描く側へ渡す＝カメラの決め所は1か所
+const FPS3D = 30;
+const room3d = el("img", { id: "room3d", class: "m", "data-backdrop": "1", style: "position:absolute;left:0;top:0;width:1080px;height:1920px;opacity:0" }, "", $("world"));
+const mistCv = el("canvas", { class: "m", "data-backdrop": "1", width: 1080, height: 1920, style: "position:absolute;left:0;top:0;width:1080px;height:1920px;opacity:0" }, "", $("world"));
+// 撮影の粒子（フィルムグレイン）：3D の場面だけ、本物のカメラの映像に近いごく弱いざらつき。種つきの模様4枚をコマごとに替える（乱数なし）
+const GRAIN = Array.from({ length: 4 }, (_, k) => { const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d"), im = g.createImageData(256, 256);
+  for (let i = 0; i < 256 * 256; i++) { const x = Math.sin((i + 1) * 12.9898 + (k + 1) * 78.233) * 43758.5453, v = 128 + ((x - Math.floor(x)) - 0.5) * 120; im.data[i * 4] = im.data[i * 4 + 1] = im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; }
+  g.putImageData(im, 0, 0); return c.toDataURL(); });
+const grain = el("div", { class: "m", "data-backdrop": "1", style: "position:absolute;left:0;top:0;width:1080px;height:1920px;opacity:0;mix-blend-mode:overlay;background-size:256px 256px" }, "", $("world"));
+// r12（#342・7人会議「前半の部屋と後半のカードが別の作品に見える」・オーナー「もっともっとグラフィックへの没入感」）：
+//   後半（S5〜S8）も同じリビングの中。Cycles で描いた同じ部屋を、ピントをカメラのすぐ前に置いて大きくぼかした4枚（bk5〜bk8・cycles_room.py は変えない）。
+//   場面ごとに向きが変わり、ゆっくり寄る。字の下には曇りガラスの板を置く（字は忙しい絵の上に載せない・#341）。
+//   絵は露出を上げて明るく、上の幕は薄く（生成りの幕を厚くすると灰色がかったベージュ＝茶色に寄った・r12 の試し描き）
+const BK = ["S5", "S6", "S7", "S8"].map((id, k) => el("img", { class: "m", "data-backdrop": "1", src: `${DIR}cy/bk${k + 5}.png`, style: "position:absolute;left:0;top:0;width:1080px;height:1920px;opacity:0;transform-origin:50% 45%;filter:brightness(1.22) saturate(1.08)" }, "", $("world")));
+const bkVeil = el("div", { class: "m", "data-backdrop": "1", style: "position:absolute;left:0;top:0;width:1080px;height:1920px;opacity:0;background:rgba(255,249,240,.22)" }, "", $("world"));
+U.push(() => { const t = T(); let any = 0;
+  BK.forEach((im, k) => { const s = S[["S5", "S6", "S7", "S8"][k]], a = clamp((t - (s.t0 - 0.3)) / 0.35) * (k === 3 ? 1 : 1 - clamp((t - (s.t1 - 0.05)) / 0.35));
+    im.style.opacity = a.toFixed(3); any = Math.max(any, a);
+    im.style.transform = `translate(${f2(-14 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0)))}px,0) scale(${(1.08 - 0.06 * E.inOutCubic((t - (s.t0 - 0.3)) / (s.t1 - s.t0 + 0.3))).toFixed(4)})`; });
+  bkVeil.style.opacity = any.toFixed(3); });
+// 曇りガラスの板（字の下だけ）：地の色を 84% ＋背景を 18px ぼかす。場面の頭で少し下から上がる
+const glass = (sid, x, y, w, h, tIn = 0, tOut = 0, alpha = 0.84) => { const e = el("div", { class: "m", "data-backdrop": "1", style: `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-radius:36px;background:rgba(251,247,241,${alpha});backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.65);box-shadow:0 22px 50px rgba(30,32,38,.10);opacity:0` }, "", $("world"));
+  U.push(() => { const t = T(), s = S[sid], a = clamp((t - (s.t0 + tIn - 0.15)) / 0.3) * (sid === "S8" ? 1 : 1 - clamp((t - (s.t1 - 0.28 + tOut)) / 0.22));
+    e.style.opacity = a.toFixed(3); e.style.transform = `translateY(${f2((1 - E.outExpo((t - (s.t0 + tIn - 0.15)) / 0.5)) * 40)}px)`; }); return e; };
+const NOTEBAR = ["S5", "S6", "S7", "S8"].map((sid) => glass(sid, 40, 1416, 1000, 118, 0, 0.3, 0.93));   // ※の帯：※より後まで残し、濃くする（r12 の点検で ※ が 4.3:1・帯が先に消えていた）
+const WAITS = [];   // 差し替えた絵の読み込み待ち（seek がこれを返す＝撮る前に必ず絵が出ている）。3D の部屋と奥行きの写真の両方
+const roomShow = (src) => { if (room3d.getAttribute("src") !== src) { room3d.setAttribute("src", src); WAITS.push(room3d.decode().catch(() => {})); } };
+
+// =====================================================================
+// S1 BEFORE→AFTER（#339・会議の結論）：同じ部屋・同じカメラで、乾いた冬の朝（加湿の前）→ 暖かい部屋（後）。光だけが変わる。
+//   1コマ目から販売ページの写真（本体のあるリビング）を札で見せ（#303・「1コマ目に商品」）、問いかけ「冬の乾燥、気になる？」から入る。
+//   後の絵は S2 の最初のコマ（day_0000）と同じ物＝S1 の終わりから S2 の動きへ切れ目なくつながる。部屋は CG（※に書く）
+//   r10（#340）：21畳は S2 へ移した（750ml/h の「だから」として見せる）。S1 は問いかけと前→後だけ
+// =====================================================================
+const ROOM = { w: 1230, h: 684 };   // 販売ページの写真の画素
+{
+  const c = COPY.S1, s = S.S1, hand = s.t1 - 0.4;   // hand＝S2 の動く絵へ渡す時刻
+  const cold = el("img", { class: "m", "data-backdrop": "1", src: `${DIR}cy/cold_0000.png`, style: "position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:50% 55%" }, "", $("world"));
+  const warm = el("img", { class: "m", "data-backdrop": "1", src: `${DIR}cy/day_0000.png`, style: "position:absolute;left:0;top:0;width:1080px;height:1920px;opacity:0;transform-origin:50% 55%" }, "", $("world"));
+  // r12（#342・トップクリエイター「1コマ目は字が先に出ているだけで動きが弱い」）：窓から差す冷たい光の筋が2本、ゆっくり横へ動く。暖まると消える（光だけ・#339）
+  const beams = [0, 1].map((k) => el("div", { class: "m", "data-backdrop": "1", style: `position:absolute;left:-200px;top:0;width:1480px;height:1920px;opacity:0;mix-blend-mode:screen;background:linear-gradient(${104 + k * 7}deg, rgba(190,215,255,0) ${38 + k * 14}%, rgba(205,226,255,.55) ${44 + k * 14}%, rgba(190,215,255,0) ${50 + k * 14}%)` }, "", $("world")));
+  const veil = el("div", { class: "abs m", "data-backdrop": "1", style: "left:0;top:0;width:1080px;height:1920px;background:linear-gradient(to bottom, var(--ground) 0, var(--ground) 33%, rgba(251,247,241,0) 45%, rgba(251,247,241,0) 70%, rgba(251,247,241,.82) 76%, rgba(251,247,241,.82) 81%, rgba(251,247,241,0) 87%)" }, "", $("world"));   // 上の字の下は地の色そのもの（透かすと 4.5:1 を割った・r9）＋※の下だけ明るい帯（暗い冬の床の上で ※ が 2.0:1 だった）
+  const W = 952, H = Math.round((ROOM.h / ROOM.w) * W), PY = 1430 - H;
+  const ph = photo("sb/room.png", 64, PY, W, H, "plate");   // 販売ページの写真（描き変えない・回さない #304）
+  const room = depthPlate(ph, "room", 0, s.t1, (u) => { u = E.inOutCubic(u); return [lerp(-0.018, 0.018, u), 0.004, 1.06 + 0.04 * u, 0.35]; });   // r13：横へ回り込む（部屋の奥が手前より遅く動く）
+  const hk1 = ln("left:64px;top:300px;font:700 132px/1.12 'Noto Sans JP';color:var(--acc)", c.hook);
+  const hk2 = ln("left:64px;top:452px;font:700 132px/1.12 'Noto Sans JP';color:var(--acc)", c.hook2);
+  note(c.note, 1486, -1, s.t1 - 0.45, "note k");
+  U.push(() => {
+    const t = T(), wv = ev("warm"), k = (1.05 - 0.05 * E.inOutCubic(clamp(t / hand))).toFixed(4);   // ゆっくり引いて、渡す時にちょうど 1.0
+    const on = t < hand + 0.4;
+    cold.style.opacity = on ? 1 : 0; warm.style.opacity = on ? E.inOutCubic(clamp((t - wv) / Math.min(0.9, s.t1 - wv))).toFixed(3) : 0;   // 「気になる？」の終わりから S2 の頭までに暖まる
+    cold.style.transform = warm.style.transform = `scale(${k})`;
+    if (t < s.t1 + 0.1) room(t);
+    beams.forEach((b, i) => { b.style.opacity = on ? ((0.55 - 0.15 * i) * (1 - E.inOutCubic((t - wv) / 0.7))).toFixed(3) : 0; b.style.transform = `translateX(${f2((i ? -1 : 1) * 30 + 70 * Math.sin(0.9 * t + i * 2))}px)`; });
+    veil.style.opacity = t < hand ? 1 : (1 - clamp((t - hand) / 0.4)).toFixed(3);
+    ph.style.opacity = (1 - clamp((t - (hand - 0.35)) / 0.3)).toFixed(3); ph.style.transform = `translateY(${f2(1.5 * Math.sin(t * 1.6) + 60 * E.inCubic(clamp((t - (hand - 0.35)) / 0.3)))}px)`;
+    reveal(hk1, -0.8, s.t1 - 0.45); reveal(hk2, -0.7, s.t1 - 0.42);
+  });
+}
+
+// =====================================================================
+// S2 ROOM：Cycles で描いた 3D のリビング（昼）。画面の左の外（壁ぎわの加湿器）から湿りの粒が部屋じゅうへ広がる。「750」で 750ml/h
+//   オーナー「没入感が少ない／リアルなリビングをコードで」（r6）。部屋は CG のイメージ（※に書く）。商品は 3D にしない（#068）
+// =====================================================================
+const TANK = { x: 120, y: 660, w: 300, h: 560, r: 36 };
+// 500ml のペットボトルの線画（100×258 の箱）。S2 の「1本半」と S3 の「9本」で同じ形＝同じ物差し（#340・数字は換算だけ）
+const BOTTLE = { w: 100, h: 258, body: "M38 18 L38 40 C38 55 10 60 10 85 L10 240 Q10 258 28 258 L72 258 Q90 258 90 240 L90 85 C90 60 62 55 62 40 L62 18 Z", cap: "M34 0 H66 V18 H34 Z" };
+let bottleN = 0;
+const bottle = (x, y, k, stroke, water) => {   // 線と水（水位 0〜1）。水は胴の形で切る
+  const g = sv("g", { opacity: 0 }), id = `btl${bottleN++}`, gi = sv("g", { transform: `translate(${x} ${y}) scale(${k})` }, g);   // 外＝出入りの動き（CSS）・内＝置き場所（CSS の transform が SVG の transform を上書きするので分ける）
+  sv("path", { d: BOTTLE.body }, sv("clipPath", { id }, sv("defs", {}, gi)));
+  const w = sv("rect", { x: 0, width: BOTTLE.w, fill: water, "clip-path": `url(#${id})` }, gi);
+  sv("path", { d: BOTTLE.body, fill: "none", stroke, "stroke-width": 4 / k, "stroke-linejoin": "round" }, gi); sv("path", { d: BOTTLE.cap, fill: stroke }, gi);
+  return { g, level: (u) => { const top = 40 + (BOTTLE.h - 40) * (1 - clamp(u)); w.setAttribute("y", f2(top)); w.setAttribute("height", f2(BOTTLE.h - top)); } };
+};   // S3 のタンクの外形（右に暦と判子を置くため左へ）
+// カメラ：昼はソファと窓へゆっくり寄る／夜は低く、ランプと窓の方へ（同じ部屋を別の角度で＝#302 の「同じ場面にしない」）
+//   手持ちのごく小さな揺れ（数ミリ・周期の違う正弦波の和＝乱数なし）を足す：三脚で止めた CG らしさを消す
+const sway = (t, k) => [0.004 * Math.sin(1.7 * t + k) + 0.002 * Math.sin(4.3 * t + 2 * k), 0.003 * Math.sin(2.3 * t + 3 * k) + 0.0015 * Math.sin(5.9 * t + k), 0.003 * Math.sin(1.3 * t + 5 * k)];
+const CAM = {
+  day: (u, t) => { const w = sway(t, 0.3); return { cam: [1.25 - 0.35 * u + w[0], 1.05 - 0.04 * u + w[1], -0.8 - 0.25 * u + w[2]], look: [-1.9, 0.6, -3.65], fov: 62 }; },   // ソファと日だまりの両方が入る向き（#338）
+  night: (u, t) => { const w = sway(t, 1.1); return { cam: [0.7 - 0.25 * u + w[0], 0.95 + w[1], -0.9 - 0.2 * u + w[2]], look: [-2.6, 1.2, -3.6], fov: 56 }; },   // 少し見上げる＝ランプの光が大きな字（18dB）の下に来る
+};
+const SPAN = () => ({ day: [S.S1.t1 - 0.4, S.S2.t1], night: [S.S4.t0, S.S4.t1] });
+const SWAY0 = { day: 2.6, night: 9.5 };   // 揺れの位相の起点（r8 で描いた絵と同じ。S1 の長さが変わってもカメラの一覧を変えない）
+const camAt = (mode, i) => { const [a, b] = SPAN()[mode], t = a + i / FPS3D; return CAM[mode](clamp((t - a) / (b - a)), SWAY0[mode] + i / FPS3D); };
+// 描く側（cycles_room.py --frames）へ渡すコマの一覧：{ day: [{cam, look, fov, out}], night: [...] }
+window.CYCLES_JOBS = () => Object.fromEntries(["day", "night"].map((m) => { const [a, b] = SPAN()[m], n = Math.ceil((b - a) * FPS3D + 1e-6);
+  return [m, Array.from({ length: n }, (_, i) => { const c2 = camAt(m, i + 1);   // 次のコマのカメラ＝動きのぶれ用・t＝カーテンの揺れと埃用
+    return { ...camAt(m, i), cam2: c2.cam, look2: c2.look, t: +(i / FPS3D).toFixed(4), out: `${m}_${String(i).padStart(4, "0")}.png` }; })]; }));
+// 湿りの粒（2D）：絵と同じカメラで 3D の点を画面へ写す（水平のカメラ＋レンズシフト＝cycles_room.py の aim と同じ式）
+const project = (c, P) => {
+  const d = [c.look[0] - c.cam[0], c.look[1] - c.cam[1], c.look[2] - c.cam[2]], fl = Math.hypot(d[0], d[2]), f = [d[0] / fl, 0, d[2] / fl], r = [-f[2], 0, f[0]];
+  const v = [P[0] - c.cam[0], P[1] - c.cam[1], P[2] - c.cam[2]], z = v[0] * f[0] + v[2] * f[2]; if (z < 0.1) return null;
+  const th = Math.tan((c.fov * Math.PI) / 360), pitch = Math.atan2(d[1], fl);
+  return [((v[0] * r[0] + v[2] * r[2]) / z / (th * (1080 / 1920)) + 1) * 540, (1 - (v[1] / z - Math.tan(pitch)) / th) * 960, z];
+};
+const DROPS = Array.from({ length: 300 }, (_, i) => { const h = (k) => { const x = Math.sin((i + 1) * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }; return [h(1), h(2), h(3), h(4)]; });
+const drawMist = (c, mt, reach, amt) => {
+  const g = mistCv.getContext("2d"); g.clearRect(0, 0, 1080, 1920); if (amt <= 0) return;
+  g.globalCompositeOperation = "lighter";
+  for (const [a, b, cc, dd] of DROPS) {   // 加湿器（左の壁ぎわ・画面の外）から扇状に、奥と右へ。少し上がって消える
+    const u = (mt * (0.35 + 0.25 * cc) + a) % 1, ang = -0.25 + 1.6 * b, dist = 0.2 + 6.2 * u * (0.6 + 0.4 * dd); if (dist / 6.4 > reach) continue;
+    const P = [-3.3 + Math.cos(ang) * dist * 0.8 + 0.08 * Math.sin(mt * 1.3 + dd * 20), 0.7 + 0.9 * u * cc + 0.12 * Math.sin(mt * 0.9 + a * 30), -0.9 - Math.sin(ang) * dist * 0.75];
+    const p = project(c, P); if (!p || p[0] < -20 || p[0] > 1100 || p[1] < -20 || p[1] > 1940) continue;
+    const rad = Math.max(1.0, 6 / p[2]), al = amt * 0.2 * Math.sin(Math.PI * u);   // 気化式は湯気が見えない＝粒はごく控えめ（#339）
+    const gr = g.createRadialGradient(p[0], p[1], 0, p[0], p[1], rad * 2.2); gr.addColorStop(0, `rgba(255,252,246,${al.toFixed(3)})`); gr.addColorStop(1, "rgba(255,252,246,0)");
+    g.fillStyle = gr; g.fillRect(p[0] - rad * 2.2, p[1] - rad * 2.2, rad * 4.4, rad * 4.4);
+  }
+};
+{
+  const c = COPY.S2, s = S.S2, s1 = S.S1, s4 = S.S4;
+  // r10（#340・オーナー「750 気化するからなんだと言うのだ？」）：750ml/h は脇に小さく。主役は手で持ったことのある物（ペットボトル1本半）と、その結果（21畳）
+  const lab = ln("left:64px;top:240px;font:700 44px/1.2 'Noto Sans JP'", `${c.label}<span class="num" style="font-weight:400;margin-left:24px">${c.head}${c.unit}</span>`);   // 文字は6段（250・132・64・44・30・24・#342）
+  const B1 = bottle(64, 334, 1.02, C.ink, C.acc), B2 = bottle(194, 334, 1.02, C.ink, C.acc);   // 1本と、半分入った1本
+  const per = ln("left:340px;top:350px;font:500 44px/1.2 'Noto Sans JP'", c.per);
+  const btl = ln("left:340px;top:410px;font:700 64px/1.15 'Noto Sans JP'", c.bottle.replace(/1本半ぶん$/, ""));
+  const han = ln("left:336px;top:470px;font:700 132px/1 'Noto Sans JP'", `<span class="num">1</span>本半<span style="font-size:64px">ぶん</span>`);
+  const jo = ln("left:64px;top:310px;font-size:250px;line-height:1;color:var(--acc)", `<span class="num">${c.jo.replace("畳", "")}</span><span style="font-weight:700;font-size:130px;margin-left:10px">畳</span>`);
+  const sub = ln("left:72px;top:580px;font:700 64px/1.15 'Noto Sans JP'", c.sub);
+  note(c.note, 1442, s.t0, s.t1 - 0.4, "note k"); note(c.note2, 1478, s.t0, s.t1 - 0.4, "note k");
+  const shade = el("div", { class: "abs m", "data-backdrop": "1", style: "left:0;top:0;width:1080px;height:1920px;opacity:0;background:linear-gradient(to bottom, rgba(10,12,22,.78) 0, rgba(10,12,22,.6) 30%, rgba(10,12,22,0) 46%, rgba(10,12,22,0) 58%, rgba(10,12,22,.65) 100%)" }, "", $("world"));   // 夜：字と目盛りの下を少し暗く
+  // 昼：上の字（気化式・750ml/h）の下だけ柔らかく明るく（写真の天井と壁は中間の明るさで、濃い字の差が 2.4:1 しかなかった）
+  //   r10：ボトルと字が 31% まで下りたので、上は地の色そのものに（透かすと 4.5:1 を割る・S1 と同じ）。※が2行になったので下の帯も広げた
+  const haze = el("div", { class: "abs m", "data-backdrop": "1", style: "left:0;top:0;width:1080px;height:1920px;opacity:0;background:linear-gradient(to bottom, var(--ground) 0, var(--ground) 31%, rgba(251,247,241,0) 43%, rgba(251,247,241,0) 68%, rgba(251,247,241,.78) 74%, rgba(251,247,241,.78) 79.5%, rgba(251,247,241,0) 86%)" }, "", $("world"));
+  U.push(() => {
+    const t = T();
+    haze.style.opacity = t >= s1.t1 - 0.4 && t < s.t1 ? clamp((t - (s1.t1 - 0.4)) / 0.4).toFixed(3) : 0;
+    reveal(lab, ev("kika") - 0.1, s.t1 - 0.45);
+    // ボトル：「ペットボトル」で出て、「1本半」の後まで水が減る（減った分が部屋の空気へ）。「21畳」で退いて 21畳 が出る
+    const pet = ev("pet"), jt = ev("jo"), drain = E.inOutCubic(clamp((t - pet - 0.15) / (ev("han") + 0.5 - pet - 0.15)));
+    const bo = t < s.t0 ? 0 : clamp((t - (pet - 0.1)) / 0.3) * (1 - clamp((t - (jt - 0.3)) / 0.25));
+    B1.level(1 - drain); B2.level(0.5 * (1 - drain));
+    [B1, B2].forEach((b, i) => { b.g.setAttribute("opacity", bo.toFixed(3)); b.g.style.transform = `translateY(${f2((1 - E.outExpo(clamp((t - pet - i * 0.08) / 0.5))) * 40)}px)`; });
+    reveal(per, s.t0 + 0.05, jt - 0.3); reveal(btl, pet - 0.05, jt - 0.28); reveal(han, ev("han") - 0.05, jt - 0.26, 0.5);
+    reveal(jo, jt, s.t1 - 0.43, 0.5); reveal(sub, ev("mura") - 0.1, s.t1 - 0.4);
+    jo.style.transformOrigin = "0 100%"; jo.style.transform = `scale(${(1.05 - 0.05 * E.outExpo((t - jt) / 0.45)).toFixed(4)})`;
+    const day = t >= s1.t1 - 0.4 && t < s.t1, night = t >= s4.t0 && t < s4.t1;
+    room3d.style.opacity = day ? clamp((t - (s1.t1 - 0.4)) / 0.4).toFixed(3) : night ? 1 : 0;
+    shade.style.opacity = night ? 1 : 0; mistCv.style.opacity = day ? 1 : 0;
+    const fr = Math.floor(t * FPS3D + 1e-6); grain.style.opacity = day || night ? (night ? 0.14 : 0.09) : t >= S.S5.t0 ? 0.08 : 0;   // 後半のぼけた部屋にも同じ粒子＝動画全体を同じ「撮った質感」に揃える（#341・r12 で 0.05→0.08）
+    grain.style.backgroundImage = `url(${GRAIN[fr % 4]})`; grain.style.backgroundPosition = `${(fr * 37) % 256}px ${(fr * 91) % 256}px`;
+    if (!(day || night)) return;
+    const mode = day ? "day" : "night", [a] = SPAN()[mode], n = window.CYCLES_N[mode], i = Math.min(n - 1, Math.floor((t - a) * FPS3D + 1e-6));
+    roomShow(`${DIR}cy/${mode}_${String(i).padStart(4, "0")}.png`);
+    // 粒：ボトルの水が減るほど増え、「21畳」でちょうど部屋の隅まで届く（数字の結果を絵で見せる・#340）
+    if (day) { const pet = ev("pet"); drawMist(camAt("day", i), t - s.t0, 0.12 + 0.88 * E.outQuart(clamp((t - pet) / (ev("jo") - pet))), 0.35 + 0.65 * clamp((t - pet) / 0.5)); }
+  });
+  // S2→S3（r12・#342「場面と場面を1つの物でつなぐ」）：ボトルから出た水が、画面の下から水面ごと満ちて S3 のタンクの地になる（0.45秒・波は時刻だけ）
+  const flood = sv("path", { fill: C.plan, opacity: 0 }, cover);
+  U.push(() => { const t = T(), u = (t - (s.t1 - 0.45)) / 0.45;
+    if (u < 0 || t >= s.t1 + 0.05) { flood.setAttribute("opacity", 0); return; }
+    const top = 1940 - 2000 * E.inOutCubic(u), amp = 34 * Math.sin(Math.PI * clamp(u)); let d = `M0 1920 L0 ${f2(top)} `;
+    for (let i = 0; i <= 18; i++) { const x = (1080 * i) / 18; d += `L${f2(x)} ${f2(top + amp * Math.sin(i / 2.2 + t * 9))} `; }
+    flood.setAttribute("opacity", 1); flood.setAttribute("d", d + "L1080 1920Z"); });
+}
+
+// =====================================================================
+// S3 TANK：柿色の地のタンク。「4.5」で水が満ち、「3日」で 3日目に給水の判子（1日8時間の場合）
+// =====================================================================
+{
+  const c = COPY.S3, s = S.S3;
+  const big = ln("left:64px;top:290px;font-size:250px;line-height:1;color:#FFFFFF", `<span class="num">${c.head.replace("L", "")}</span><span class="num" style="font-size:120px;margin-left:8px">L</span>`);
+  const sub = ln("left:64px;top:1290px;font:700 64px/1.15 'Noto Sans JP';color:#FFFFFF", c.sub);
+  note(c.note, 1486, s.t0, s.t1 - 0.4, "note w");
+  const nine = Array.from({ length: 9 }, (_, i) => bottle(64 + i * 50, 548, 0.36, "#FFFFFF", "#FFF4EC"));   // S2 と同じボトル＝同じ物差し（#340）
+  const nineT = ln("left:530px;top:548px;font:700 44px/1.15 'Noto Sans JP';color:#FFFFFF", c.bottles.replace("ペットボトル", "ペットボトル<br>"));   // 1行だと右の操作列（SAFE.x1＝900）にかかった
+  // 柿色の地の方眼とタンクの外形（線が自分を描く）
+  const grid = sv("g", { stroke: "#FFFFFF", "stroke-width": 1, opacity: 0 });
+  for (let x = 0; x <= 1080; x += 60) sv("line", { x1: x, y1: 0, x2: x, y2: 1920, "stroke-opacity": x % 300 ? 0.08 : 0.16 }, grid);
+  for (let y = 0; y <= 1920; y += 60) sv("line", { x1: 0, y1: y, x2: 1080, y2: y, "stroke-opacity": y % 300 ? 0.08 : 0.16 }, grid);
+  const tank = sv("rect", { x: TANK.x, y: TANK.y, width: TANK.w, height: TANK.h, rx: TANK.r, fill: "none", stroke: "#FFFFFF", "stroke-width": 4, pathLength: 1, "stroke-dasharray": "1 1", opacity: 0 });
+  U.push(() => { const t = T(), on = t >= s.t0 && t < s.t1, o = on ? 1 - clamp((t - (s.t1 - 0.3)) / 0.2) : 0;
+    grid.setAttribute("opacity", on ? 1 : 0); tank.setAttribute("opacity", o.toFixed(3)); tank.setAttribute("stroke-dashoffset", f2(1 - E.outQuart((t - s.t0) / 0.6))); });
+  const clip = sv("clipPath", { id: "tankclip" }, sv("defs")); sv("rect", { x: TANK.x, y: TANK.y, width: TANK.w, height: TANK.h, rx: TANK.r }, clip);
+  const water = sv("path", { fill: "#FFF4EC", "fill-opacity": 0.95, "clip-path": "url(#tankclip)", opacity: 0 });
+  // 水の中を上る泡：満ちきってから判子までの間も画面が止まらない（暖色にして水面の揺れだけでは静止の点検に落ちた・r4 で 0.72秒）
+  const bubbles = [0, 1, 2, 3, 4, 5, 6, 7].map(() => sv("circle", { fill: C.plan, opacity: 0, "clip-path": "url(#tankclip)" }));
+  const CX = 500, CW = 260, days = c.days.map((d, i) => {
+    const y = 700 + i * 170, box = sv("rect", { x: CX, y, width: CW, height: 130, rx: 14, fill: "none", stroke: "#FFFFFF", "stroke-width": 3, opacity: 0 });
+    const txt = el("div", { class: "abs", style: `left:${CX}px;top:${y + 26}px;width:${CW}px;text-align:center;font:700 34px/1.2 'Noto Sans JP';color:#FFFFFF;opacity:0` }, d);
+    const h8 = el("div", { class: "abs", style: `left:${CX}px;top:${y + 76}px;width:${CW}px;text-align:center;font:500 26px/1.2 'Noto Sans JP';color:#FFFFFF;opacity:0` }, c.hours);
+    return { box, txt, h8, y };
+  });
+  const stamp = el("div", { class: "abs", style: `left:${CX + CW + 20}px;top:${days[2].y + 8}px;width:110px;height:110px;box-sizing:border-box;border:6px solid #FFFFFF;border-radius:50%;display:flex;align-items:center;justify-content:center;font:900 36px/1 'Noto Sans JP';color:#FFFFFF;opacity:0` }, c.stamp);
+  U.push(() => {
+    const t = T(), out = clamp((t - (s.t1 - 0.35)) / 0.2);
+    reveal(big, s.t0 + 0.1, s.t1 - 0.42, 0.5); reveal(sub, ev("stamp") - 0.15, s.t1 - 0.38); reveal(nineT, s.t0 + 0.5, s.t1 - 0.4);
+    nine.forEach((b, i) => { const a = t >= s.t0 && t < s.t1 ? clamp((t - (s.t0 + 0.25 + i * 0.05)) / 0.2) * (1 - out) : 0; b.g.setAttribute("opacity", a.toFixed(3)); b.level(clamp((t - (s.t0 + 0.3 + i * 0.05)) / 0.3)); });
+    // 水：t0 から満ち始め「イチニチ」で満ちきる。上の面は小さな波（位相は時刻だけ）
+    const p = E.inOutCubic((t - s.t0 - 0.1) / Math.max(0.3, ev("full") - s.t0 - 0.1)), top = TANK.y + TANK.h - (TANK.h - 40) * p;
+    let d = `M${TANK.x} ${TANK.y + TANK.h} L${TANK.x} ${f2(top)} `;
+    for (let i = 0; i <= 24; i++) { const x = TANK.x + (TANK.w * i) / 24; d += `L${f2(x)} ${f2(top + 6 * Math.sin(i / 3 + t * 5))} `; }
+    water.setAttribute("d", d + `L${TANK.x + TANK.w} ${TANK.y + TANK.h}Z`); water.setAttribute("opacity", t >= s.t0 && t < s.t1 ? (1 - out).toFixed(3) : 0);
+    bubbles.forEach((b, i) => { const ph = ((t - s.t0) / 1.4 + i / 8) % 1, y = TANK.y + TANK.h - 30 - ph * (TANK.y + TANK.h - 30 - top);   // 1.4秒で底から水面まで（位相は時刻だけ）
+      b.setAttribute("cx", f2(TANK.x + 50 + ((i * 97) % 200) + 10 * Math.sin(t * 3 + i))); b.setAttribute("cy", f2(y)); b.setAttribute("r", f2(10 + (i % 3) * 4));
+      b.setAttribute("opacity", t >= s.t0 + 0.3 && t < s.t1 && y > top + 12 ? (0.55 * (1 - out) * Math.sin(Math.PI * ph)).toFixed(3) : 0); });
+    const d0 = ev("water") + 0.25;   // 暦は語りの「1日8時間」と一緒に（満ちきるのを待つと語りより遅れた・批評 R1）
+    days.forEach((dd, i) => { const a = clamp((t - (d0 + i * 0.12)) / 0.25) * (1 - out);
+      dd.box.setAttribute("opacity", a.toFixed(3)); dd.txt.style.opacity = dd.h8.style.opacity = a.toFixed(3);
+      dd.box.setAttribute("transform", `translate(0 ${f2((1 - E.outExpo((t - (d0 + i * 0.12)) / 0.4)) * 30)})`); });
+    // 判子：拍で押す（1.35→1 に臨界減衰で着く・少し傾ける）
+    const sp = MK.cd(t - ev("stamp"), 24);
+    stamp.style.opacity = t >= ev("stamp") ? (1 - out).toFixed(3) : 0;
+    stamp.style.transform = `rotate(-10deg) scale(${(1.35 - 0.35 * sp).toFixed(4)})`;
+  });
+}
+
+// =====================================================================
+// S4 NIGHT：走査線が下りて夜。音量の目盛りの針が下りて、「18」で 18dB の印に着く（山場＝静けさ）
+// =====================================================================
+{
+  const c = COPY.S4, s = S.S4;
+  const who = ln("left:64px;top:240px;font:500 30px/1.2 'Noto Sans JP';color:var(--moon)", c.who);   // 誰に刺さるか（#283）＝説明文の「乾燥が気になる冬の夜」
+  const lab = ln("left:64px;top:290px;font:700 44px/1.2 'Noto Sans JP';color:var(--moon)", c.label);
+  const big = ln("left:64px;top:372px;font-size:250px;line-height:1;color:#FFFFFF", `<span class="num">${c.head}</span><span class="num" style="font-size:132px;margin-left:10px">${c.unit}</span><span style="font:700 64px/1 'Noto Sans JP';margin-left:18px">${c.sub}</span>`);
+  note(c.note, 1486, s.t0 + 0.2, s.t1 - 0.4, "note w");
+  const G = { cx: 540, cy: 1420, r: 280 }, A0 = Math.PI, A1 = 2 * Math.PI, aT = A0 + 0.16 * Math.PI;   // 左＝静か／右＝大きい。18dB の印は左寄り
+  const pt = (a, r) => [G.cx + r * Math.cos(a), G.cy + r * Math.sin(a)];
+  const arc = sv("path", { fill: "none", stroke: C.moon, "stroke-width": 4, "stroke-linecap": "round", opacity: 0 });
+  const ticks = sv("g", { stroke: C.moon, "stroke-width": 3, "stroke-linecap": "round", opacity: 0 });
+  for (let i = 0; i <= 12; i++) { const a = A0 + (Math.PI * i) / 12, [x0, y0] = pt(a, G.r - (i % 3 ? 22 : 40)), [x1, y1] = pt(a, G.r); sv("line", { x1: f2(x0), y1: f2(y0), x2: f2(x1), y2: f2(y1) }, ticks); }
+  const mark = sv("path", { fill: "none", stroke: "#FFFFFF", "stroke-width": 10, "stroke-linecap": "round", opacity: 0 });
+  const needle = sv("line", { stroke: "#FFFFFF", "stroke-width": 6, "stroke-linecap": "round", opacity: 0 });
+  const hub = sv("circle", { r: 14, fill: "#FFFFFF", opacity: 0 });
+  const scan = sv("rect", { x: 0, width: 1080, fill: C.night, opacity: 0 }, cover), scanL = sv("rect", { x: 0, width: 1080, height: 4, fill: C.moon, opacity: 0 }, cover);
+  U.push(() => {
+    const t = T(), on = t >= s.t0 && t < s.t1, o = on ? (1 - clamp((t - (s.t1 - 0.3)) / 0.2)).toFixed(3) : 0;
+    reveal(who, s.t0 + 0.1, s.t1 - 0.44); reveal(lab, s.t0 + 0.2, s.t1 - 0.42); reveal(big, ev("quiet") - 0.05, s.t1 - 0.4, 0.5);
+    big.style.transformOrigin = "0 100%"; big.style.transform = `scale(${(1 + 0.04 * E.inOutCubic((t - ev("quiet")) / (s.t1 - ev("quiet")))).toFixed(4)})`;   // 針が着いた後の静かな間も止めない
+    arc.setAttribute("d", `M${f2(pt(A0, G.r)[0])} ${G.cy} A${G.r} ${G.r} 0 0 1 ${f2(pt(A1, G.r)[0])} ${G.cy}`); arc.setAttribute("opacity", o); ticks.setAttribute("opacity", o);
+    // 針：場面の頭は右（大きい）→「18」の拍に臨界減衰で着く（行き過ぎない＝静かに止まる）。手前の 0.3秒は溜め
+    const a = lerp(A0 + 0.82 * Math.PI, aT, E.inOutCubic((t - (s.t0 + 0.3)) / (ev("quiet") - s.t0 - 0.3)));   // ちょうど「ジュウハチ」（鈴）で着く（v1 は 18 フレーム遅れた・批評 R1）
+    const [nx, ny] = pt(a, G.r - 60); needle.setAttribute("x1", G.cx); needle.setAttribute("y1", G.cy); needle.setAttribute("x2", f2(nx)); needle.setAttribute("y2", f2(ny));
+    needle.setAttribute("opacity", o); hub.setAttribute("cx", G.cx); hub.setAttribute("cy", G.cy); hub.setAttribute("opacity", o);
+    const mk = clamp((t - ev("quiet")) / 0.25), [mx0, my0] = pt(aT - 0.05, G.r + 18), [mx1, my1] = pt(aT + 0.05, G.r + 18);
+    mark.setAttribute("d", `M${f2(mx0)} ${f2(my0)} A${G.r + 18} ${G.r + 18} 0 0 1 ${f2(mx1)} ${f2(my1)}`); mark.setAttribute("opacity", on && t >= ev("quiet") ? (mk * o).toFixed(3) : 0);
+    // 走査線：S3→S4 は上から下へ（線の上が夜）。S4→S5 は下から上へ（線の下が朝）。各 0.4秒・柔らかい出だし
+    const d1 = E.inOutCubic((t - (s.t0 - 0.4)) / 0.4), d2 = E.inOutCubic((t - (s.t1 - 0.4)) / 0.4);
+    if (t >= s.t0 - 0.4 && t < s.t0) { scan.setAttribute("y", 0); scan.setAttribute("height", f2(1920 * d1)); scanL.setAttribute("y", f2(1920 * d1 - 2)); scan.setAttribute("opacity", 1); scanL.setAttribute("opacity", 1); }
+    else if (t >= s.t0 && t < s.t0 + 0.35) { scan.setAttribute("y", 0); scan.setAttribute("height", 1920); scan.setAttribute("opacity", (1 - E.inOutCubic((t - s.t0) / 0.35)).toFixed(3)); scanL.setAttribute("opacity", 0); }   // 紺から夜の部屋が浮かぶ（切ると1コマで画面の 77% が変わった）
+    else if (t >= s.t1 - 0.4 && t < s.t1) { scan.setAttribute("fill", C.ground); scan.setAttribute("y", f2(1920 * (1 - d2))); scan.setAttribute("height", f2(1920 * d2)); scanL.setAttribute("y", f2(1920 * (1 - d2) - 2)); scan.setAttribute("opacity", 1); scanL.setAttribute("opacity", 1); }
+    else if (t >= s.t1 && t < s.t1 + 0.35) { scan.setAttribute("fill", C.ground); scan.setAttribute("y", 0); scan.setAttribute("height", 1920); scan.setAttribute("opacity", (1 - E.inOutCubic((t - s.t1) / 0.35)).toFixed(3)); scanL.setAttribute("opacity", 0); }   // 生成りの幕からぼけた部屋が浮かぶ（r12：切ると1コマで画面の 95% が変わった）
+    else { scan.setAttribute("opacity", 0); scanL.setAttribute("opacity", 0); scan.setAttribute("fill", C.night); }
+  });
+}
+
+// =====================================================================
+// S5 WASH：丸洗いの実写真＋チェック（輪が描かれ、中にチェックが描かれる）
+// =====================================================================
+const checkRow = (x, y, text, tAt, tOut) => {
+  const ring = sv("circle", { cx: x + 30, cy: y + 34, r: 26, fill: "none", stroke: C.acc, "stroke-width": 5, "stroke-dasharray": 164, opacity: 0 });
+  const tick = sv("path", { d: `M${x + 17} ${y + 35} L${x + 27} ${y + 46} L${x + 45} ${y + 23}`, fill: "none", stroke: C.acc, "stroke-width": 6, "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-dasharray": 40, opacity: 0 });
+  const txt = ln(`left:${x + 80}px;top:${y - 2}px;font:700 64px/1.2 'Noto Sans JP'`, text);
+  U.push(() => { const t = T(), r = E.outQuart((t - tAt) / 0.3), k = E.outQuart((t - tAt - 0.18) / 0.22), o = t >= tAt ? (1 - clamp((t - tOut) / 0.2)).toFixed(3) : 0;
+    ring.setAttribute("stroke-dashoffset", f2(164 * (1 - r))); tick.setAttribute("stroke-dashoffset", f2(40 * (1 - k))); ring.setAttribute("opacity", o); tick.setAttribute("opacity", o);
+    reveal(txt, tAt + 0.05, tOut); });
+};
+{
+  const c = COPY.S5, s = S.S5, W = 952, Hh = Math.round((911 / 1230) * W), X = 64, Y = 400;   // 重心を下げた（下3割が空いていた・#342）
+  glass("S5", 40, 1150, 1000, 230, ev("maru") - s.t0);
+  const ph = photo("sb/wash.png", X, Y, W, Hh, "plate");
+  note(c.note, 1486, s.t0, s.t1 - 0.3);
+  checkRow(64, 1170, c.checks[0], ev("maru"), s.t1 - 0.32); checkRow(64, 1280, c.checks[1], ev("sentaku"), s.t1 - 0.3);
+  U.push(() => { const t = T(), inn = E.outExpo((t - s.t0) / 0.5), out = E.inCubic((t - (s.t1 - 0.3)) / 0.22);
+    ph.style.opacity = (clamp((t - s.t0) / 0.15) * (1 - clamp(out * 1.5))).toFixed(3);
+    ph.style.transform = `translateY(${f2((1 - inn) * 90 - out * 60)}px)`; ph.firstElementChild.style.transform = `scale(${(1.02 + 0.04 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4)})`; });
+}
+
+// =====================================================================
+// S6 SMART：アプリを持つ手の実写真。「アプリ」「声」の札、「水切れを通知」で鈴の印が揺れる
+// =====================================================================
+{
+  const c = COPY.S6, s = S.S6, W = 952, Hh = Math.round((688 / 1230) * W), X = 64, Y = 620;
+  glass("S6", 40, 330, 1000, 150, ev("app") - s.t0);
+  const ph = photo("sb/phone.png", X, Y, W, Hh, "plate");
+  const phone = depthPlate(ph, "phone", s.t0 - 0.1, s.t1 + 0.1, (u) => { u = E.inOutCubic(u); return [lerp(0.009, -0.008, u), -0.004 * u, 1.04 + 0.08 * u, 0.75]; });   // r13：手と画面へ寄る（奥の緑が遅れて流れる）。横の動きは小さく（指の縁に白い縁取りが出た）
+  // r12（#342 コピーライター「アプリ・声・で操作の順に出て文として読みにくい」）：1行のかたまり「［アプリ］と［声］で操作」。札は墨色の線（柿色は縁の光と通知の印に譲る）
+  const row = el("div", { class: "abs", style: "left:64px;top:356px;display:flex;align-items:center;gap:14px;font:700 64px/1 'Noto Sans JP'" },
+    `<span style="padding:12px 30px;border:4px solid var(--ink);border-radius:999px">${c.chips[0]}</span><span>${c.join}</span><span style="padding:12px 30px;border:4px solid var(--ink);border-radius:999px">${c.chips[1]}</span><span>${c.head}</span>`);
+  const parts = [...row.children], partAt = () => [ev("app"), ev("koe") - 0.12, ev("koe"), ev("koe") + 0.12];
+  // r11（#341・60fps の Opal / Uber の縁の光・toast）：「アプリ」で写真の縁を柿色の光が一周する。光は写真の外側だけ（写真の上に色を載せない）
+  const glow = el("div", { class: "m", "data-backdrop": "1", style: `position:absolute;left:${X - 9}px;top:${Y - 9}px;width:${W + 18}px;height:${Hh + 18}px;box-sizing:border-box;padding:7px;border-radius:30px;opacity:0;filter:blur(1.5px);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude` }, "", $("world"));
+  //   「水切れを通知」は通知の札：上からばねで降りて止まる。鈴は札の中の印で揺れる（言葉は設計書の sub のまま）
+  const toast = el("div", { class: "abs", style: "left:64px;top:1210px;width:952px;height:136px;box-sizing:border-box;border-radius:32px;background:#FFFFFF;box-shadow:0 20px 44px rgba(30,32,38,.14),0 0 0 1px rgba(30,32,38,.06);opacity:0" });
+  const icon = el("div", { class: "abs", style: "left:28px;top:30px;width:76px;height:76px;border-radius:20px;background:var(--acc)" }, `<svg width="76" height="76" viewBox="-38 -38 76 76"><path d="M-14 9 Q-14 -14 0 -16 Q14 -14 14 9 L18 14 L-18 14 Z M-5 18 Q0 23 5 18" fill="#FFFFFF"/></svg>`, toast);
+  const sub = el("div", { class: "abs", style: "left:132px;top:40px;font:700 52px/1.1 'Noto Sans JP';color:var(--ink)" }, c.sub, toast);
+  note(c.note, 1440, s.t0, s.t1 - 0.3);
+  U.push(() => { const t = T(), inn = E.outExpo((t - s.t0) / 0.5), out = E.inCubic((t - (s.t1 - 0.3)) / 0.22);
+    ph.style.opacity = (clamp((t - s.t0) / 0.15) * (1 - clamp(out * 1.5))).toFixed(3);
+    ph.style.transform = `translateY(${f2((1 - inn) * 90 - out * 60)}px)`;
+    if (t >= s.t0 - 0.2 && t < s.t1 + 0.2) phone(t);
+    const pa = partAt(); parts.forEach((e, i) => { const k = MK.cd(t - pa[i], 22); e.style.opacity = t >= pa[i] ? (1 - clamp((t - (s.t1 - 0.35)) / 0.2)).toFixed(3) : 0; e.style.transform = `translateY(${f2((1 - k) * 24)}px) scale(${(0.85 + 0.15 * k).toFixed(4)})`; });
+    const ap = t - ev("app"), go = t >= ev("app") ? clamp(ap / 0.25) * (1 - clamp((ap - 1.0) / 0.4)) * (1 - clamp(out * 1.5)) : 0;   // 縁の光：1.1秒で1周して消える（通知の印と柿色を2つ同時に出さない・#342）
+    glow.style.opacity = go.toFixed(3); glow.style.transform = ph.style.transform;
+    glow.style.background = `conic-gradient(from ${f2(-90 + 330 * E.outQuart(ap / 1.1))}deg, rgba(200,65,42,0) 0deg, rgba(200,65,42,.95) 70deg, rgba(255,227,188,.9) 96deg, rgba(200,65,42,0) 160deg, rgba(200,65,42,.18) 360deg)`;
+    const u = t - ev("tsuchi"), sp = E.spring(u);   // 着地のばね（行き過ぎ 1.5%・弾ませない #334）
+    toast.style.opacity = t >= ev("tsuchi") - 0.02 ? (clamp(u / 0.12) * (1 - clamp((t - (s.t1 - 0.3)) / 0.2))).toFixed(3) : 0;
+    toast.style.transform = `translateY(${f2((1 - sp) * -36)}px)`;   // 降りる途中も写真（下端 y＝1152）に重ねない（r11 の点検で 17.50秒に重なった）
+    icon.firstElementChild.style.transform = `rotate(${f2(u > 0 ? 18 * Math.exp(-u * 5) * Math.sin(u * 22) : 0)}deg)`; });
+}
+
+// =====================================================================
+// S7 PROOF：星5つの輪郭を「評価は」で描き、「4.55」で 4.55 まで満ちる（取得日つき）
+// =====================================================================
+{
+  const c = COPY.S7, s = S.S7, val = parseFloat(c.score), SZ = 150, X0 = 64, Y = 760;   // 星も左 64 の線に揃える（数字と字は左なのに星だけ中央だった・#342）
+  glass("S7", 40, 290, 1000, 880);
+  const SG = sv("g"), PT = { x: 540, y: 640 };   // 星を束ねる入れ物：終わりに S8 の本体の位置へ集まる
+  const star = "M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.9 6.2 20.1l1.4-6.4L2.7 9.3l6.5-.7z";
+  const defs = sv("defs"), stars = [0, 1, 2, 3, 4].map((i) => {
+    // 塗りは「拡大しない入れ物」に切り抜きを付ける（拡大した座標の中だと切り抜きの四角も拡大されてずれる）
+    const x = X0 + i * (SZ + 14), cp = sv("clipPath", { id: `sc${i}` }, defs), cr = sv("rect", { x, y: Y, height: SZ, width: 0 }, cp);
+    const ol = sv("path", { d: star, fill: "none", stroke: C.acc, "stroke-width": 1, pathLength: 1, "stroke-dasharray": 1, opacity: 0 }, sv("g", { transform: `translate(${x} ${Y}) scale(${SZ / 24})` }, SG));
+    const wrap = sv("g", { "clip-path": `url(#sc${i})` }, SG), fl = sv("path", { d: star, fill: C.acc, opacity: 0 }, sv("g", { transform: `translate(${x} ${Y}) scale(${SZ / 24})` }, wrap));
+    return { x, ol, fl, cr };
+  });
+  // r11（#341・motionin の Apple Keynote の数字の場面）：数字は星が満ちるのと同じ時間で 0.00 から数え上がる（桁の幅は揃える＝揺れない）
+  const big = ln("left:64px;top:330px;font-size:250px;line-height:1", `<span class="num">${c.score}</span>`), bigN = big.firstElementChild.firstElementChild;
+  const cnt = ln("left:64px;top:1000px;font:700 64px/1.2 'Noto Sans JP'", c.count_label);
+  const date = ln("left:64px;top:1084px;font:500 30px/1 'Noto Sans JP';color:var(--graphite)", `<span style="display:inline-block;padding:10px 18px;border:2px solid rgba(102,98,94,.5);border-radius:999px;letter-spacing:.04em">${c.date}</span>`);   // 出典の札（数字の出どころを小さく添える）
+  note(c.note, 1486, s.t0, s.t1 - 0.24);
+  U.push(() => { const t = T(), o = t >= s.t0 ? (1 - clamp((t - (s.t1 - 0.22)) / 0.2)).toFixed(3) : 0;
+    const dr = E.inOutCubic((t - ev("hyoka")) / Math.max(0.3, ev("star") - ev("hyoka"))), fillU = E.inOutCubic((t - ev("star")) / 0.45) * val;
+    bigN.textContent = fillU.toFixed(2);
+    const so = t >= s.t1 - 0.02 ? 0 : 1;   // 星は消えずに集まる（S7→S8 を1つの物でつなぐ・#342）
+    stars.forEach((st, i) => { st.ol.setAttribute("stroke-dashoffset", (1 - clamp(dr * 1.6 - i * 0.15)).toFixed(4)); st.ol.setAttribute("opacity", t >= ev("hyoka") ? so : 0);
+      st.cr.setAttribute("width", f2(SZ * clamp(fillU - i))); st.fl.setAttribute("opacity", t >= ev("star") ? so : 0); });
+    const cv = E.inCubic((t - (s.t1 - 0.32)) / 0.3), cx = X0 + (5 * SZ + 4 * 14) / 2, cy = Y + SZ / 2, k = 1 - 0.92 * cv;   // 0.32秒前まで止めて溜め、そこから1点へ
+    SG.setAttribute("transform", `translate(${f2(lerp(cx, PT.x, cv))} ${f2(lerp(cy, PT.y, cv))}) scale(${k.toFixed(4)}) translate(${f2(-cx)} ${f2(-cy)})`);
+    reveal(big, ev("star"), s.t1 - 0.24); reveal(cnt, s.t0 - 0.1, s.t1 - 0.23); reveal(date, s.t0, s.t1 - 0.22);   // 語りが終わるまで残す・前の場面との間を空けない（批評 R1）
+    big.style.transformOrigin = "0 100%"; big.style.transform = `scale(${(1 + 0.04 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4)})`; });
+}
+
+// =====================================================================
+// S8 END：木の棚の上の本体＋名前。「詳しくは」から下線が伸びて「リンク」で着く。接地影は無し（棚の写真に影がある）
+// =====================================================================
+{
+  const c = COPY.S8, s = S.S8, Hh = 780, W = Math.round((800 / 1090) * Hh), X = (1080 - W) / 2, Y = 230;
+  const ph = photo("sb/shelf.png", X, Y, W, Hh, "plate");
+  const shelf = depthPlate(ph, "shelf", s.t0 - 0.1, s.t1, (u) => { u = E.inOutCubic(u); return [lerp(0.016, -0.012, u), 0.004, 1.02 + 0.09 * u, 0.85]; });   // r13：主役。寄りながら少し回り込む（本体が手前・壁の光が奥）
+  glass("S8", 100, 1030, 880, 370, ev("name") - s.t0);
+  // r12（#342 トップクリエイター「最後に主役の瞬間が無い」）：S7 の星が集まった点から暖かい光が広がり（最前面の覆い）、その中から本体が現れる。写真の上を光が1筋走る（写真は描き変えない・光を重ねるだけ）
+  const burst = el("div", { class: "scrim", style: "position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none;opacity:0;z-index:2;background:radial-gradient(circle at 540px 640px, rgba(255,250,238,1) 0, rgba(255,236,206,.85) 14%, rgba(255,236,206,0) 46%)" });
+  const sweep = el("div", { style: "position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(105deg, rgba(255,250,240,0) 35%, rgba(255,250,240,.5) 50%, rgba(255,250,240,0) 65%);background-size:300% 100%" }, "", ph);
+  const ctr = "left:0;width:1080px;text-align:center;";
+  // r11（#341）：名前は1字ずつ、少し小さく・ぼけて・下から入る（motionin の letter-by-letter）
+  const name = el("div", { class: "abs", style: ctr + "top:1046px;font:700 132px/1.15 'Noto Sans JP'" }, [...c.head].map((ch) => `<span style="display:inline-block">${ch}</span>`).join(""));
+  const sub = ln(ctr + "top:1204px;font:500 44px/1.2 'Noto Sans JP'", c.sub);
+  // 「詳しくはリンクから」は押せる形の札（cta.gallery）：柿色の丸い札＋白い丸の矢印。「リンク」で押されて沈み、波紋が広がる
+  const cta = el("div", { class: "abs", style: "left:0;top:1280px;width:1080px;display:flex;justify-content:center;opacity:0" },
+    `<span style="display:inline-flex;align-items:center;gap:20px;padding:16px 18px 16px 40px;border-radius:999px;background:var(--acc);color:#FFFFFF;font:700 44px/1 'Noto Sans JP';box-shadow:0 16px 34px rgba(200,65,42,.28)">${c.cta}<span style="display:inline-flex;width:60px;height:60px;border-radius:50%;background:#FFFFFF;color:var(--acc);align-items:center;justify-content:center;font:700 34px/1 'Noto Sans JP'">→</span></span>`);
+  const pill = cta.firstElementChild, arrow = pill.lastElementChild;
+  // 締めの下に大きな名前を地の色にかすかに敷く（footer.design の Wordmark Bleed）。飾りなので #over に置き、字の点検（#ui）には入れない＝読ませる名前は上の安全域の中にある
+  const mark = sv("text", { x: 540, y: 1975, "text-anchor": "middle", "font-family": "Noto Sans JP", "font-weight": 700, "font-size": 236, fill: C.acc, opacity: 0 }); mark.textContent = c.head;
+  note(c.note, 1430, s.t0 + 0.3, 99); note(c.note2, 1466, s.t0 + 0.3, 99);
+  const ring = sv("rect", { fill: "none", stroke: C.acc, "stroke-width": 4, opacity: 0 });
+  U.push(() => { const t = T(), land = MK.cd(t - (s.t0 - 0.05), 14);
+    ph.style.opacity = clamp((t - (s.t0 - 0.05)) / 0.2).toFixed(3);
+    const bu = t - (s.t0 - 0.06); burst.style.opacity = bu < 0 ? 0 : (Math.min(1, bu / 0.1) * (1 - clamp((bu - 0.12) / 0.45))).toFixed(3);
+    burst.style.transform = `scale(${(0.6 + 0.9 * E.outExpo(bu / 0.5)).toFixed(4)})`; burst.style.transformOrigin = "540px 640px";
+    sweep.style.backgroundPosition = `${f2(130 - 160 * E.inOutCubic((t - (s.t0 + 0.35)) / 0.9))}% 0`;
+    if (t >= s.t0 - 0.2) shelf(t);
+    ph.style.transform = `translateY(${f2((1 - land) * 120 + breathe(t, 4))}px) scale(${(1 + 0.05 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4)})`;
+    [...name.children].forEach((sp, i) => { const a = E.outExpo((t - (ev("name") + i * 0.035)) / 0.5);
+      sp.style.opacity = a.toFixed(3); sp.style.filter = `blur(${f2((1 - a) * 10)}px)`; sp.style.transform = `translateY(${f2((1 - a) * 46)}px) scale(${(0.9 + 0.1 * a).toFixed(4)})`; });
+    reveal(sub, ev("name") + 0.12, 99);
+    const ci = MK.cd(t - ev("cta"), 18), pr = t >= ev("under") ? Math.sin(Math.PI * clamp((t - ev("under")) / 0.22)) : 0;   // 出る：ばね／押す：0.22秒で沈んで戻る
+    cta.style.opacity = t >= ev("cta") ? clamp((t - ev("cta")) / 0.12).toFixed(3) : 0;
+    pill.style.transform = `translateY(${f2((1 - ci) * 40)}px) scale(${(0.92 + 0.08 * ci - 0.05 * pr).toFixed(4)})`;
+    arrow.style.transform = `translateX(${f2(t >= ev("under") ? 8 * Math.sin((t - ev("under")) * 6) : 0)}px)`;
+    const rb = pill.getBoundingClientRect(), ru = clamp((t - ev("under")) / 0.6), gw = 34 * E.outQuart(ru);   // 押した所から波紋が広がって消える
+    ring.setAttribute("x", f2(rb.left - gw)); ring.setAttribute("y", f2(rb.top - gw)); ring.setAttribute("width", f2(rb.width + 2 * gw)); ring.setAttribute("height", f2(rb.height + 2 * gw));
+    ring.setAttribute("rx", f2(rb.height / 2 + gw)); ring.setAttribute("opacity", t >= ev("under") ? (0.7 * (1 - ru)).toFixed(3) : 0);
+    mark.setAttribute("opacity", (0.07 * clamp((t - s.t0) / 0.6)).toFixed(3)); mark.setAttribute("transform", `translate(0 ${f2(30 * (1 - E.outQuart((t - s.t0) / 1.2)))})`); });
+}
+
+SK.boot();
+// 3D の部屋の用意（下の module）も READY に含める＝点検と描画は部屋ができてから始まる
+// seek は差し替えた絵の読み込みを待てるように Promise を返す（描画と点検は evaluate で待つ）
+window.CYCLES_N = Object.fromEntries(Object.entries(window.CYCLES_JOBS()).map(([m, j]) => [m, j.length]));
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+</script>
+</body></html>

@@ -1,0 +1,88 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。asp_images の順が asp0, asp1… になる。lines の i が line<i>.mp3。prep は1つの処理で BiRefNet を2回呼ぶと 14GB まで膨らんで落ちるので、呼ぶ組を分ける",
+ "asp_images": [
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/50_100sum.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/t100.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/tatsuzin2-50.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/tatsuzin3.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/tatsuzin4-3.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/tatsuzin5-2.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/tatsuzin6-2.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/tatsuzin7.jpg",
+  "https://image.rakuten.co.jp/nagomilab/cabinet/shohin01/tg11550r.jpg"
+ ],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "断水したら、トイレはどうする？",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "袋をかぶせて、固めて、捨てるだけ。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "1人1日5回なら、7日で35回分。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "防災士と、災害備蓄管理士が監修。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "国産製造で、15年保管できます。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "評価は、4.50。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "防災のミカタ、ちょうしょうしゅう簡易トイレ。リンクはプロフィールから。",
+   "speed": 0.95,
+   "pause": 0.5
+  }
+ ],
+ "prep": [
+  [
+   "front",
+   "top",
+   "left",
+   "white",
+   "sachet",
+   "one"
+  ],
+  [
+   "tissue"
+  ],
+  [
+   "black"
+  ]
+ ]
+}

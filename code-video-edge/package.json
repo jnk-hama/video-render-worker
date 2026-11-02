@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "matter-js": "0.20.0",
+    "playwright-core": "1.56.1",
+    "three": "0.170.0"
+  }
+}

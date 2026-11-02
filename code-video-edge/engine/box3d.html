@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- 箱の商品そのものの 3D（#359・台本は works/nagomilab-toilet/TREATMENT.md）：販売ページの写真の正面・上・左の面を四隅で長方形に戻し、本物の箱の形に貼る。
+     右・後ろ・底の写真は無い＝カメラは正面から左へだけ回る（0°〜−40°）・箱の下へは行かない。写真の画素は描き変えない（光の計算をしない材質・#068）。
+     中身（黒い袋・凝固剤・白い防臭袋・ティッシュ）は販売ページの写真の切り抜き。数える場面の凝固剤は同じ写真の写しを、販売ページの数字の数だけ並べる。
+     床・影は CG。字は DOM（#ui）＝点検 23項目がそのまま読む。点検の「写真の層」は QC_PRODUCT_ONLY で商品だけを描き直して撮る。
+     時刻は timing.json（window.TIMELINE）の events、文字は設計書（window.PRODUCT）。すべての値は時刻 T の関数（タイマー・乱数なし） -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ground:#EDF1F5; --ink:#13233A; --dim:#4F5E70; --acc:#1D4FB8; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--ground); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  .abs { position:absolute; }
+  #bg { position:absolute; inset:0; background:var(--ground); }
+  #world, #ui { position:absolute; left:0; top:0; width:1080px; height:1920px; overflow:hidden; }
+  #world canvas { position:absolute; left:0; top:0; width:1080px; height:1920px; display:block; }
+  #over { position:absolute; left:0; top:0; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln > .in { display:block; }
+  .num { font-weight:300; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.01em; }
+  .note { position:absolute; left:64px; width:836px; font:400 24px/1.45 "Noto Sans JP"; color:var(--dim); opacity:0; }
+  .tag { position:absolute; font:700 30px/1 "Noto Sans JP"; color:var(--ink); white-space:nowrap; opacity:0; }
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:var(--ink); border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ground); z-index:3; }
+  #credit { position:absolute; left:156px; top:184px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; opacity:.6; color:var(--ink); z-index:3; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="world"><canvas id="gl" width="1080" height="1920" data-product="1"></canvas></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<div id="ui"><div id="pr">PR</div></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, { E, clamp, lerp } = EDGE, { el, sv, ln, reveal, note, f2, $ } = SK;
+const ev = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b])), S = Object.fromEntries(TL.scenes.map((s) => [s.id, s]));
+const DIR = `p/${P.product_key}/b3d/`, U = SK.U, T = () => SK.T;
+const C = { ground: "#EDF1F5", ink: "#13233A", acc: "#1D4FB8" };
+// #308 VOICEVOX の声は規約で「VOICEVOX:話者名」の記載が条件（PR の札の右・小さく透過）
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+const calm = (e, tin, tout) => { const t = T();
+  e.style.visibility = t < tin || t > tout + 0.2 ? "hidden" : "visible"; e.firstElementChild.style.transform = "none";
+  e.style.opacity = (clamp((t - tin) / 0.18) * (1 - clamp((t - tout) / 0.18))).toFixed(3); };
+const scrimDiv = (style) => { const e = el("div", { class: "scrim", style: `position:absolute;pointer-events:none;opacity:0;${style}` }); $("ui").insertBefore(e, $("pr")); return e; };
+const GRAIN = Array.from({ length: 4 }, (_, k) => { const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d"), im = g.createImageData(256, 256);
+  for (let i = 0; i < 256 * 256; i++) { const x = Math.sin((i + 1) * 12.9898 + (k + 1) * 78.233) * 43758.5453, v = 128 + ((x - Math.floor(x)) - 0.5) * 90; im.data[i * 4] = im.data[i * 4 + 1] = im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; }
+  g.putImageData(im, 0, 0); return c.toDataURL(); });
+const grain = scrimDiv("left:0;top:0;width:1080px;height:1920px;mix-blend-mode:soft-light;background-size:256px 256px");
+U.push(() => { grain.style.backgroundImage = `url(${GRAIN[Math.floor(T() * 24) % 4]})`; grain.style.opacity = 0.14; });
+
+// =====================================================================
+// 箱と中身の置き場所とカメラ。単位は m。箱の幅を 0.30m とする（大きさは写真の比だけ・動画では寸法を言わない）
+//   SH(th, r, h, ay, cx, cy, ax, az)：点 (ax, ay, az) を中心に th° 回り込み（負＝左へ・左の面が見える）、距離 r・高さ h から見て、その点を画面の (cx, cy) に置く
+// =====================================================================
+const FOV = 28, BW = 0.30;
+const SH = (th, r, h, ay, cx = 540, cy = 960, ax = 0, az = 0) => ({ th, r, h, ay, cx, cy, ax, az });
+const s1 = S.S1, s2 = S.S2, s3 = S.S3, s4 = S.S4, s5 = S.S5, s6 = S.S6, s7 = S.S7;
+let BH = 0.333, BD = 0.255;   // 読み込み後に box.json の比で決め直す
+const GX = 0, GZ = 1.4, GY = 0.004;    // 凝固剤を並べる格子の手前の床の位置（S3）。箱から離す（近いと箱が画面の上をふさいだ）
+const KEYS = [
+  [0, SH(-14, 2.5, 0.6, 0.17, 540, 1040)],                                // S1：箱が落ちてくる所を低く。左の面が少し見える
+  [s1.t1 - 0.1, SH(-26, 2.35, 0.55, 0.17, 540, 1040)],                     // 着いた箱の周りを左へ回る（立体と分かる）
+  [s2.t0 + 0.5, SH(-6, 3.2, 1.0, 0.12, 480, 820)],                       // S2：正面寄り・少し上から。中身が箱の上から出て手前に並ぶ（上からなら手前の中身が箱の印刷に重ならない）
+  [s2.t1, SH(-3, 3.1, 1.0, 0.12, 480, 820)],
+  [s3.t0 + 0.6, SH(-6, 1.0, 1.75, 0.0, 540, 900, GX, GZ)],              // S3：手前の床の凝固剤の格子を上から見下ろす（箱は画面の上の外）
+  [s3.t1, SH(-1, 0.9, 1.7, 0.0, 540, 900, GX, GZ)],
+  [s4.t0 + 0.6, SH(-36, 2.4, 0.45, 0.17, 540, 1000)],                    // S4：大きく左へ回り込み、左の面（災害・断水…）と正面の「監修」
+  [s4.t1, SH(-30, 2.2, 0.42, 0.16, 540, 1000)],
+  [s5.t0 + 0.6, SH(-8, 1.35, 0.25, 0.1, 560, 1250)],                     // S5：正面の下へ寄る（日本製・15年）。箱は画面の下寄り＝上は空ける
+  [s5.t1, SH(-3, 1.25, 0.24, 0.1, 560, 1260)],
+  [s6.t0 + 0.5, SH(-18, 3.7, 0.95, 0.12, 540, 860, 0.05, 0.1)],           // S6：引いて、箱と中身が並ぶ（大きな数字と件数の間）
+  [s6.t1, SH(-13, 3.5, 0.9, 0.12, 540, 860, 0.05, 0.1)],
+  [ev("name") - 0.1, SH(-26, 2.7, 0.62, 0.17, 540, 620)],                 // S7：箱を上半分に。最後まで回り続ける
+  [TL.end, SH(-6, 2.45, 0.6, 0.17, 540, 620)]];
+const shotAt = (t) => { let i = KEYS.findIndex((k) => k[0] > t); if (i === -1) return { ...KEYS.at(-1)[1] }; if (i === 0) return { ...KEYS[0][1] };
+  const [ta, a] = KEYS[i - 1], [tb, b] = KEYS[i], u = E.inOutCubic((t - ta) / (tb - ta));
+  return Object.fromEntries(Object.keys(a).map((k) => [k, a[k] + (b[k] - a[k]) * u])); };
+// 箱が落ちてきて着く（S1 の頭）：高さは跳ね返りの小さいばね（MK.springBD）。着いた瞬間に影が濃くなる
+const dropAt = (t) => { const u = clamp(t / 0.9); return (1 - MK.springBD(t, 0.9, 0.18)) * 0.13 * (u < 1 ? 1 : 0); };   // 高さ 0.13m：高くから落とすと箱が見出しを横切った（字が箱の上で 3.0:1）
+// 中身の置き場所（床の上・箱の手前）。出る時刻は S2 の言葉（かぶせて・固めて・捨てる）
+const ITEMS = [
+  { id: "black", cue: "kabuse", to: [-0.18, 0, 0.55], tag: 0 },
+  { id: "sachet", cue: "katame", to: [0, 0, 0.57], tag: 1 },
+  { id: "white", cue: "suteru", to: [0.18, 0, 0.55], tag: 2 },
+  { id: "tissue", cue: "suteru", to: [0.24, 0, 0.3], tag: -1, lag: 0.25 }];
+
+// ---------- three.js（読み込みが済むまで seek は待つ） ----------
+const T3 = {};
+T3.ready = import("./vendor/three.module.min.js").then(async (THREE) => {
+  const J = await (await fetch(DIR + "box.json")).json(), ld = new THREE.TextureLoader();
+  BH = BW * J.box.h / J.box.w; BD = BW * J.box.d / J.box.w;
+  const tex = async (n) => { const t = await ld.loadAsync(DIR + n + ".png"); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+  const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(FOV, 1080 / 1920, 0.02, 40);
+  const photo = (t) => new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.02, side: THREE.DoubleSide });
+  const hidden = new THREE.MeshBasicMaterial({ color: 0x1b3d8f, transparent: true });   // 右・底・後ろ：写真が無い面。カメラの回る範囲では見えない（0°〜−40°・上から）
+  // BoxGeometry の面の順：右・左・上・底・正面・後ろ
+  const topT = await tex("top"); topT.center.set(0.5, 0.5); topT.rotation = Math.PI;   // 上の面の向き：箱の上の UV は奥と手前が逆（そのままでは字が逆さだった）
+  const box = new THREE.Mesh(new THREE.BoxGeometry(BW, BH, BD), [hidden, photo(await tex("left")), photo(topT), hidden, photo(await tex("front")), hidden]);
+  box.renderOrder = 4; const boxG = new THREE.Group(); boxG.add(box); box.position.y = BH / 2; sc.add(boxG);
+  const radial = (stops) => { const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d"), r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+    for (const [o, col] of stops) r.addColorStop(o, col); g.fillStyle = r; g.fillRect(0, 0, 256, 256); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };
+  const shTex = radial([[0, "rgba(19,35,58,0.55)"], [0.55, "rgba(19,35,58,0.22)"], [1, "rgba(19,35,58,0)"]]);
+  const shadow = (w, d) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.renderOrder = 1; sc.add(m); return m; };
+  const boxSh = shadow(BW * 1.9, BD * 2.0);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshBasicMaterial({ color: C.ground, depthWrite: false })); floor.rotation.x = -Math.PI / 2; floor.renderOrder = 0; sc.add(floor);
+  // 中身：写真の切り抜きを床に寝かせずに少し起こして置く（袋は平たい物＝板でよい）。箱の正面の縮尺（asp8 の 1137px＝0.30m）の 1.5倍（同じ縮尺では小さく読めなかった）
+  const PXM = BW / J.box.w * 1.5, items = {};
+  for (const it of ITEMS) { const p = J.parts[it.id], m = new THREE.Mesh(new THREE.PlaneGeometry(p.w * PXM, p.h * PXM), photo(await tex(it.id))); m.renderOrder = 5; sc.add(m);
+    items[it.id] = { it, m, w: p.w * PXM, h: p.h * PXM, sh: shadow(p.w * PXM * 1.3, 0.06) }; }
+  // 凝固剤の1袋の写し（S3 の格子）：7日 × 5回 = 35
+  const oneT = await tex("one"), ow = J.parts.one.w * PXM * 0.5, oh = J.parts.one.h * PXM * 0.5;   // one.png は 4倍に引き伸ばしてある。元の縮尺の3倍＝数を見せる図（元のままでは 1袋 約50px で数えられなかった）
+  const grid = Array.from({ length: 35 }, () => { const m = new THREE.Mesh(new THREE.PlaneGeometry(ow, oh), photo(oneT)); m.renderOrder = 6; sc.add(m); return m; });
+  // 袋が入る枠（CG の点線）：箱が消えてから1行目が降りるまで約1秒、床だけで止まって見えた＝先に35の枠を並べて「これから埋まる」を見せる
+  const slotC = document.createElement("canvas"); slotC.width = 196; slotC.height = 268; { const g = slotC.getContext("2d"); g.strokeStyle = "rgba(29,79,184,0.55)"; g.lineWidth = 8; g.setLineDash([18, 12]); g.beginPath(); g.roundRect(8, 8, 180, 252, 22); g.stroke(); }
+  const slotT = new THREE.CanvasTexture(slotC); slotT.colorSpace = THREE.SRGBColorSpace;
+  const slots = Array.from({ length: 35 }, () => { const m = new THREE.Mesh(new THREE.PlaneGeometry(ow, oh), new THREE.MeshBasicMaterial({ map: slotT, transparent: true, depthWrite: false })); m.renderOrder = 2; sc.add(m); return m; });
+  const rd = new THREE.WebGLRenderer({ canvas: $("gl"), alpha: true, antialias: true, preserveDrawingBuffer: true });
+  rd.setPixelRatio(1); rd.setSize(1080, 1920, false); rd.outputColorSpace = THREE.SRGBColorSpace; rd.toneMapping = THREE.NoToneMapping;
+  Object.assign(T3, { THREE, rd, sc, cam, box, boxG, boxSh, floor, items, grid, slots, ow, oh, ok: true });
+});
+// 中身の時刻：箱の上から出て（弧）、床の置き場所へ着く
+const itemAt = (it, t) => { const t0 = ev(it.cue) + (it.lag || 0) - 0.1, u = E.inOutCubic((t - t0) / 0.75), s = MK.springBD(t - t0, 0.75, 0.15);
+  const from = [0, BH + 0.02, 0], to = it.to, arc = Math.sin(Math.PI * clamp(u)) * 0.16;
+  return { on: t >= t0, p: [lerp(from[0], to[0], u), lerp(from[1], to[1], s) + arc + (t >= t0 ? 0 : 0), lerp(from[2], to[2], u)] }; };
+// 格子の i 番目（行＝日・列＝回）：S3 の「5回」で1行目、「7日」で残りが降りてくる
+const gridAt = (i, t) => { const row = Math.floor(i / 5), col = i % 5, t0 = (row === 0 ? ev("goka") : ev("nanoka")) + (row === 0 ? col * 0.06 : (row - 1) * 0.07 + col * 0.02);
+  const a = MK.springBD(t - t0, 0.45, 0.2), x = GX + (col - 2) * 0.06, z = GZ + (row - 3) * 0.06;
+  return { on: t >= t0 - 0.01 && t < s4.t0 + 0.2, p: [x, GY + (1 - a) * 0.08, z], a }; };
+const aim = (t) => { if (T3.aimed === t) return; T3.aimed = t;
+  const s = shotAt(t), cam = T3.cam, a = (s.th * Math.PI) / 180;
+  cam.position.set(s.ax + s.r * Math.sin(a), s.h, s.az + s.r * Math.cos(a)); cam.lookAt(s.ax, s.ay, s.az);
+  cam.setViewOffset(1080, 1920, 540 - s.cx, 960 - s.cy, 1080, 1920); cam.updateMatrixWorld();
+  T3.boxG.position.y = dropAt(t); T3.boxG.rotation.y = 0.35 * (1 - MK.springBD(t, 0.9, 0.1)); T3.boxG.updateMatrixWorld(true); };   // 落ちながら正面が右を向いた所から戻る＝左の面が見える側（右の面は写真が無い）
+// 箱の正面の点（写真の中の 0〜1 の位置）を画面の px に
+const frontPx = (u, v) => { aim(T()); const p = new T3.THREE.Vector3((u - 0.5) * BW, BH / 2 - v * BH, BD / 2 + 0.001); p.applyMatrix4(T3.box.matrixWorld).project(T3.cam); return [(p.x + 1) * 540, (1 - p.y) * 960]; };
+const worldPx = (x, y, z) => { aim(T()); const p = new T3.THREE.Vector3(x, y, z).project(T3.cam); return [(p.x + 1) * 540, (1 - p.y) * 960]; };
+const STATE = {};
+// S3 の間だけ箱を消す：カメラが手前の床へ下を向く間、箱は画面の上へ抜けて PR と見出しを横切った＝溶かして消し、S4 の頭で戻す
+const boxA = (t) => 1 - clamp((t - (s3.t0 + 0.02)) / 0.25) + clamp((t - (s4.t0 + 0.25)) / 0.3);
+const draw3 = (t, productOnly = false) => {
+  aim(t); const h = T3.boxG.position.y, ba = clamp(boxA(t));
+  T3.box.material.forEach((m) => { m.opacity = ba; }); T3.box.visible = ba > 0.001;
+  T3.boxSh.position.set(0, 0.002, 0); T3.boxSh.scale.setScalar(1 + h * 0.8); T3.boxSh.material.opacity = (1 - clamp(h / 0.6)) * (productOnly ? 0 : ba);
+  for (const it of Object.values(T3.items)) { const q = itemAt(it.it, t); it.m.visible = q.on && ((t < s3.t0 + 0.3 && it.it.tag >= 0) || (t > s6.t0 && t < s7.t0));   // 中身は使い方（S2・札の付く3つ）と評価（S6・全部）だけ。寄る場面では箱の下の印刷を隠した
+    it.m.material.opacity = t < s4.t0 ? ba : 1; it.m.position.set(q.p[0], q.p[1] + it.h / 2 * 0.92, q.p[2]); it.m.rotation.set(-0.38, 0, 0);   // 少し後ろへ倒して置く（上から見ても読める）
+    it.sh.visible = it.m.visible && !productOnly; it.sh.position.set(q.p[0], 0.003, q.p[2] - 0.02); }
+  T3.grid.forEach((m, i) => { const g = gridAt(i, t); m.visible = g.on; m.position.set(...g.p); m.rotation.set(-Math.PI / 2, 0, 0);
+    const sl = T3.slots[i], k = clamp((t - (s3.t0 + 0.2 + (i % 5) * 0.05 + Math.floor(i / 5) * 0.07)) / 0.3) * (1 - clamp((t - (s4.t0 - 0.1)) / 0.25));   // 枠は列と行の順に波のように出る
+    sl.visible = k > 0.001 && !productOnly; sl.material.opacity = k; sl.position.set(g.p[0], GY - 0.001, g.p[2]); sl.rotation.set(-Math.PI / 2, 0, 0); sl.scale.setScalar(0.8 + 0.2 * E.outQuart(k)); });
+  T3.floor.visible = !productOnly;
+  const rd = T3.rd; rd.setClearColor(C.ground, productOnly ? 0 : 1); rd.clear(); rd.render(T3.sc, T3.cam);
+  rd.getContext().finish();   // 描き終わるまで待つ（点検は撮らずに何十回もめくる・#356）
+};
+window.QC_PRODUCT_ONLY = (on) => { if (T3.ok) draw3(T(), on); };   // 点検の「写真の層」：商品だけ（床・影は写真ではない）
+
+// 箱の印刷を囲む・下線を引く（線は箱に付いて動く）
+const MARKS = {};
+const pair = (tag, a) => [sv(tag, { ...a, stroke: C.ink, "stroke-width": a["stroke-width"] + 6 }), sv(tag, { ...a, stroke: "#FFD400" })];   // 黄の線に墨のふち：箱が青＝要の色の線は箱に沈んで見えなかった
+const setAll = (L, k, v) => L.forEach((e) => e.setAttribute(k, v));
+const ringOn = (key, u, v, ru, rv, tin, tout) => { if (!T3.ok) return; const L = MARKS[key] || (MARKS[key] = pair("path", { fill: "none", "stroke-width": 6, "stroke-linecap": "round", opacity: 0 }));
+  const g = E.inOutCubic((T() - tin) / 0.55) * (1 - clamp((T() - tout) / 0.2)); if (g <= 0.001) { setAll(L, "opacity", 0); return; }
+  const N = 40, pts = []; for (let i = 0; i <= Math.round(N * g); i++) { const a = -Math.PI / 2 + (i / N) * 2 * Math.PI; pts.push(frontPx(u + ru * Math.cos(a), v + rv * Math.sin(a))); }
+  setAll(L, "d", "M" + pts.map((p) => p.map(f2).join(",")).join("L")); setAll(L, "opacity", 0.95); };
+const lineOn = (key, u0, u1, v, tin, tout) => { if (!T3.ok) return; const L = MARKS[key] || (MARKS[key] = pair("line", { "stroke-width": 7, "stroke-linecap": "round", opacity: 0 }));
+  const g = E.inOutCubic((T() - tin) / 0.6) * (1 - clamp((T() - tout) / 0.2)); if (g <= 0.001) { setAll(L, "opacity", 0); return; }
+  const [x0, y0] = frontPx(u0, v), [x1, y1] = frontPx(lerp(u0, u1, g), v); setAll(L, "x1", f2(x0)); setAll(L, "y1", f2(y0)); setAll(L, "x2", f2(x1)); setAll(L, "y2", f2(y1)); setAll(L, "opacity", 0.95); };
+
+// =====================================================================
+// S1 HOOK：箱が落ちてきて着く。問い
+// =====================================================================
+{
+  const c = COPY.S1;
+  const who = ln("left:64px;top:238px;font:500 34px/1.2 'Noto Sans JP';color:var(--dim)", P.target.who);
+  const hk1 = ln("left:64px;top:290px;font:700 88px/1.12 'Noto Sans JP'", c.hook);
+  const hk2 = ln("left:64px;top:394px;font:700 88px/1.12 'Noto Sans JP';color:var(--acc)", c.hook2);
+  note(c.note, 1404, -1, s1.t1 - 0.3);
+  // 使う時（オーナー「1シーン目に使用する時を書くと想像しやすい・ナレーションで読まなくてもいい」）：字だけ。販売ページの「使用用途」の言葉のまま
+  const uses = ln("left:64px;top:526px", (c.uses || []).map((x) => `<span style="display:inline-block;margin-right:12px;padding:10px 20px;border:3px solid var(--acc);border-radius:999px;background:#fff;font:700 32px/1 'Noto Sans JP';color:var(--ink);opacity:0">${x}</span>`).join(""));
+  U.push(() => { reveal(who, -1, s1.t1 - 0.32); reveal(hk1, -1, s1.t1 - 0.3); reveal(hk2, -1, s1.t1 - 0.28);
+    const t = T(); uses.style.visibility = t < s1.t1 ? "visible" : "hidden"; [...uses.firstElementChild.children].forEach((e, i) => { const k = E.outQuart((t - (0.45 + i * 0.2)) / 0.35) * (1 - clamp((t - (s1.t1 - 0.26)) / 0.18));   // 1つずつ下から出る
+      e.style.opacity = k.toFixed(3); e.style.transform = `translateY(${f2((1 - k) * 16)}px)`; }); });
+}
+
+// =====================================================================
+// S2 STEPS：言葉に合わせて中身が箱から出て並ぶ。①袋をかぶせて ②固めて ③捨てるだけ（札は中身に付いて動く）
+// =====================================================================
+{
+  const c = COPY.S2, head = ln("left:64px;top:250px;font:700 104px/1.12 'Noto Sans JP'", c.head);
+  note(c.note, 396, s2.t0 + 0.2, s2.t1 - 0.3);   // 見出しの下（中身の札が下に来る）
+  const tags = c.steps.map((x, i) => el("div", { class: "tag" }, `<span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--acc);color:#fff;font:700 28px/1 'Noto Sans JP';margin-right:10px">${i + 1}</span>${x}`));
+  U.push(() => { const t = T(); calm(head, s2.t0 + 0.05, s2.t1 - 0.3);
+    if (!T3.ok) return;
+    ITEMS.filter((it) => it.tag >= 0).forEach((it) => { const e = tags[it.tag], q = itemAt(it, t), [x, y] = worldPx(it.to[0], 0, it.to[2] + 0.07), a = MK.cd(t - (ev(it.cue) + 0.3), 20);
+      e.style.left = f2(x - e.offsetWidth / 2) + "px"; e.style.top = f2(y + 18 + (1 - a) * 14) + "px";
+      e.style.opacity = (t >= ev(it.cue) + 0.3 ? Math.min(1, a * 1.4) * (1 - clamp((t - (s3.t0 + 0.1)) / 0.2)) : 0).toFixed(3); }); });   // 「捨てる」は S2 の終わり近く＝札を S3 の頭まで残す（0.1秒しか見えなかった）
+}
+
+// =====================================================================
+// S3 COUNT：1人 × 5回 × 7日 ＝ 35回分。凝固剤の写しが手前の床に 5列 × 7行で降りてくる
+// =====================================================================
+{
+  const c = COPY.S3;
+  const eq = ln("left:64px;top:250px;font:700 72px/1.12 'Noto Sans JP'", c.eq);
+  const big = ln("left:64px;top:350px;font:700 150px/1 'Noto Sans JP';color:var(--acc)", `<span class="num" style="font-weight:700">0</span><span style="font-size:72px">${c.unit}</span>`);
+  note(c.note, 1372, s3.t0 + 0.2, s3.t1 - 0.3);   // 2行＝下端 1440 に収める
+  U.push(() => { const t = T(); calm(eq, s3.t0 + 0.45, s3.t1 - 0.3); calm(big, ev("goka") - 0.1, s3.t1 - 0.28);
+    let n = 0; for (let i = 0; i < 35; i++) if (gridAt(i, Math.floor(t * 30 - 0.01) / 30).a > 0.85) n++;   // 着いた袋の数＝数字（コマの頭の値だけ）
+    big.firstElementChild.firstElementChild.textContent = String(n); });   // 式はカメラが下を向き終えてから（箱が上へ抜ける間は字を出さない）
+}
+
+// =====================================================================
+// S4 SUPERVISED：左へ回り込み、正面の「防災士・災害備蓄管理士 監修」の印刷に下線
+// =====================================================================
+{
+  const c = COPY.S4, head = ln("left:64px;top:250px;font:700 96px/1.12 'Noto Sans JP'", c.head), sub = ln("left:64px;top:372px;font:700 52px/1.2 'Noto Sans JP'", c.sub);
+  note(c.note, 1404, s4.t0 + 0.2, s4.t1 - 0.3);
+  U.push(() => { calm(head, s4.t0 + 0.05, s4.t1 - 0.3); calm(sub, s4.t0 + 0.5, s4.t1 - 0.28); lineOn("kanshu", 0.055, 0.70, 0.835, Math.min(ev("kanshu"), s4.t0 + 0.8), s4.t1 - 0.1); });
+}
+
+// =====================================================================
+// S5 MADE IN JAPAN / 15 YEARS：正面の下へ寄る。「国産」で日本製の印刷、「15年」で15年間の印刷を輪で囲む
+// =====================================================================
+{
+  const c = COPY.S5, head = ln("left:64px;top:250px;font:700 96px/1.12 'Noto Sans JP'", c.head), sub = ln("left:64px;top:372px;font:700 52px/1.2 'Noto Sans JP'", c.sub);
+  note(c.note, 446, s5.t0 + 0.2, s5.t1 - 0.3);   // 寄った箱は画面の下＝注意書きは見出しの下
+  U.push(() => { calm(head, s5.t0 + 0.05, s5.t1 - 0.3); calm(sub, ev("juugo") - 0.05, s5.t1 - 0.28);
+    ringOn("jp", 0.259, 0.577, 0.18, 0.065, ev("kokusan"), s5.t1 - 0.1); ringOn("y15", 0.128, 0.905, 0.07, 0.06, ev("juugo"), s5.t1 - 0.1); });
+}
+
+// =====================================================================
+// S6 PROOF：引いて箱と中身。上に大きな 4.50（数え上がる）・下にレビュー件数と取得日
+// =====================================================================
+{
+  const c = COPY.S6, val = parseFloat(c.score);
+  const big = ln("left:64px;top:230px;font-size:300px;line-height:1", `<span class="num">${c.score}</span>`);
+  const cnt = ln("left:64px;top:1236px;font:700 72px/1.2 'Noto Sans JP'", c.count_label);
+  const date = ln("left:64px;top:1340px;font:500 32px/1 'Noto Sans JP';color:var(--dim)", `<span style="display:inline-block;padding:10px 18px;border:2px solid rgba(79,94,112,.5);border-radius:999px;letter-spacing:.04em">${c.date}</span>`);
+  note(c.note, 1404, s6.t0 + 0.3, s6.t1 - 0.43);
+  U.push(() => { const t = T();
+    big.firstElementChild.firstElementChild.textContent = (E.inOutCubic((Math.floor(t * 30 - 0.01) / 30 - (s6.t0 + 0.12)) / (ev("dot") + 0.4 - (s6.t0 + 0.12))) * val).toFixed(2);   // 字はコマ（1/30秒）の頭の値だけ
+    calm(big, s6.t0 + 0.2, s6.t1 - 0.45); calm(cnt, s6.t0 + 0.25, s6.t1 - 0.44); calm(date, s6.t0 + 0.3, s6.t1 - 0.43); });
+}
+
+// =====================================================================
+// S7 END：箱を上半分に。名前・押せる札（左寄せ・字の置き場 64〜900）
+// =====================================================================
+{
+  const c = COPY.S7, ctr = "left:64px;width:836px;text-align:left;";
+  const brand = el("div", { class: "abs", style: ctr + "top:1010px;font:500 30px/1 'Noto Sans JP';letter-spacing:.12em;color:var(--dim);opacity:0" }, c.brand);
+  const name = el("div", { class: "abs", style: ctr + "top:1050px;font:700 80px/1.15 'Noto Sans JP';white-space:nowrap" }, [...c.head].map((ch) => `<span style="display:inline-block;opacity:0">${ch === " " ? "&nbsp;" : ch}</span>`).join(""));
+  const sub = ln(ctr + "top:1154px;font:500 40px/1.2 'Noto Sans JP'", c.sub);
+  const cta = el("div", { class: "abs", style: "left:64px;top:1236px;display:flex;opacity:0" },
+    `<span style="position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:20px;padding:20px 44px;border-radius:999px;background:var(--acc);color:#fff;font:700 42px/1 'Noto Sans JP';box-shadow:0 10px 30px rgba(19,35,58,.18)"><i style="position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,.35), rgba(255,255,255,0));transform:translateX(-120%)"></i>${c.cta}</span>`);
+  const pill = cta.firstElementChild, shine = pill.firstElementChild;
+  const tap = el("div", { class: "abs", style: "left:0;top:0;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:rgba(19,35,58,.85);box-shadow:0 0 0 6px rgba(19,35,58,.18),0 8px 24px rgba(0,0,0,.25);opacity:0" });
+  const ring = sv("rect", { fill: "none", stroke: C.acc, "stroke-width": 4, opacity: 0 });
+  note(c.note, 1368, s7.t0 + 0.3, 99); note(c.note2, 1401, s7.t0 + 0.3, 99);
+  U.push(() => { const t = T();
+    { const u = (t - (ev("cta") + 0.25)) / 0.7; if (u > 0 && u < 1) shine.style.transform = `translateX(${f2(-120 + 400 * E.inOutCubic(u))}%)`; }
+    if (t < ev("cta") + 0.25) shine.style.transform = "translateX(-120%)";
+    { const pb = pill.getBoundingClientRect(), tx = pb.left + pb.width * 0.62, ty = pb.top + pb.height * 0.62, a = E.inOutCubic((t - (ev("under") - 0.55)) / 0.5), pr2 = t >= ev("under") ? Math.sin(Math.PI * clamp((t - ev("under")) / 0.22)) : 0;
+      tap.style.left = f2(lerp(860, tx, a)) + "px"; tap.style.top = f2(lerp(1700, ty, a)) + "px"; tap.style.transform = `scale(${(1 - 0.25 * pr2).toFixed(4)})`;
+      tap.style.opacity = (clamp((t - (ev("under") - 0.55)) / 0.15) * (1 - clamp((t - (ev("under") + 0.35)) / 0.3))).toFixed(3); }
+    brand.style.opacity = clamp((t - (ev("name") - 0.2)) / 0.4).toFixed(3);
+    [...name.children].forEach((sp, i) => { const a = E.outExpo((t - (ev("name") + 0.15 + i * 0.04)) / 0.5);
+      sp.style.opacity = a.toFixed(3); sp.style.filter = `blur(${f2((1 - a) * 10)}px)`; sp.style.transform = `translateY(${f2((1 - a) * 46)}px)`; });
+    calm(sub, ev("name") + 0.35, 99);
+    const ci = MK.cd(t - ev("cta"), 18), pr = t >= ev("under") ? Math.sin(Math.PI * clamp((t - ev("under")) / 0.22)) : 0;
+    cta.style.opacity = t >= ev("cta") ? clamp((t - ev("cta")) / 0.12).toFixed(3) : 0;
+    pill.style.transform = `translateY(${f2((1 - ci) * 40)}px) scale(${(0.92 + 0.08 * ci - 0.05 * pr).toFixed(4)})`;
+    const rb = pill.getBoundingClientRect(), ru = clamp((t - ev("under")) / 0.6), gw = 34 * E.outQuart(ru);
+    ring.setAttribute("x", f2(rb.left - gw)); ring.setAttribute("y", f2(rb.top - gw)); ring.setAttribute("width", f2(rb.width + 2 * gw)); ring.setAttribute("height", f2(rb.height + 2 * gw));
+    ring.setAttribute("rx", f2(rb.height / 2 + gw)); ring.setAttribute("opacity", t >= ev("under") ? (0.7 * (1 - ru)).toFixed(3) : 0); });
+}
+
+// 3D は最後に描く。読み込み中なら seek はそれを待つ
+const WAITS = [];
+U.push(() => { const t = T(); if (T3.ok) draw3(t); else WAITS.push(T3.ready.then(() => draw3(t))); });
+SK.boot();
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+window.READY = window.READY.then(() => T3.ready).then(() => window.seek(0)).then(() => true);
+</script>
+</body></html>

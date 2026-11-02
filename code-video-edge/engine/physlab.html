@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- 技法見本 physlab（#354）：広告ではない。物理・アニメの部品が seek(t) の順に依らず動くことを1本で見せる。
+     上＝ばね（MK.springBD：弾み 0／0.15／0.3）・中＝2D の物理（Matter.js を先に焼いた表・works/physlab/orbs2d.mjs）・下＝格子のずらし（MK.stagger の真ん中から）。
+     すべての値は時刻 t の関数（タイマー・乱数なし）。Espresso の締め（3D の硬貨・Rapier）は lamp.html の S8 -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="motionkit.js"></script>
+<style>
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:#12151D; color:#FFF4E2; font-family:"Noto Sans JP",sans-serif; }
+  .lab { position:absolute; left:64px; font:500 30px/1 "Noto Sans JP"; color:#A9A398; }
+  canvas { position:absolute; left:0; top:0; }
+</style></head>
+<body>
+<div class="lab" style="top:176px;font:700 44px/1.2 'Noto Sans JP';color:#FFF4E2">技法見本：ばね・物理・ずらし</div>
+<div class="lab" style="top:250px">上 ばね　中 2D の物理（先に焼く）　下 ずらし</div>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const g = document.getElementById("c").getContext("2d"), { springBD, stagger, phys, clamp } = MK;
+let J = null;
+window.READY = fetch("p/physlab/orbs2d.json").then((r) => r.json()).then((j) => { J = j; });
+const orb = (x, y, r, a, glow) => {   // 灯りの粒（Espresso の色）。a＝回転（中の筋で転がりが見える）
+  const gr = g.createRadialGradient(x - r * 0.25, y - r * 0.3, r * 0.1, x, y, r); gr.addColorStop(0, "#FFE7BE"); gr.addColorStop(0.55, "#F7BB66"); gr.addColorStop(1, "#F2A54A");
+  g.save(); g.shadowColor = `rgba(242,165,74,${glow})`; g.shadowBlur = 30; g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fill(); g.restore();
+  g.strokeStyle = "rgba(255,244,226,.7)"; g.lineWidth = 3; g.beginPath(); g.moveTo(x + Math.cos(a) * r * 0.2, y + Math.sin(a) * r * 0.2); g.lineTo(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8); g.stroke();
+};
+window.seek = (t) => {
+  g.clearRect(0, 0, 1080, 1920);
+  // 上：同じ「感じる長さ」0.7 秒で、弾みだけ変えた3本（どれも行き過ぎは閉じた式＝コマの順に依らない）
+  [0, 0.15, 0.3].forEach((b, i) => {
+    const x = 200 + i * 300, base = 700, h = 330 * springBD(t - (0.3 + i * 0.12), 0.7, b);
+    g.fillStyle = "rgba(255,244,226,.12)"; g.fillRect(x - 50, base - 330, 100, 330);
+    g.fillStyle = "#F2A54A"; g.fillRect(x - 50, base - h, 100, h);
+    g.fillStyle = "#FFF4E2"; g.fillRect(x - 70, base - 332, 140, 4);
+    g.font = "500 30px 'Noto Sans JP'"; g.fillStyle = "#A9A398"; g.textAlign = "center"; g.fillText(`弾み ${b}`, x, base + 48);
+  });
+  // 中：受け皿と 7 つの粒（表を読むだけ）
+  const F = J.floor, R = J.r, L = 540 - 8.5 * R, Rr = 540 + 8.5 * R;
+  g.strokeStyle = "rgba(255,244,226,.5)"; g.lineWidth = 4; g.beginPath(); g.moveTo(L, F - 200); g.lineTo(L, F); g.lineTo(Rr, F); g.lineTo(Rr, F - 200); g.stroke();
+  g.save(); g.beginPath(); g.rect(0, 780, 1080, F - 780 + 4); g.clip();   // 粒は中段の枠の中だけ（上のばねの棒に重ねない）
+  for (const id of Object.keys(J.tracks)) { const s = phys(J.tracks[id], t - 0.9); if (s) orb(s[0], s[1], R, s[2], 0.5); }
+  g.restore();
+  // 下：9×5 の格子が真ん中から順に灯る（遅れ＝真ん中からの距離 × 0.06 秒）
+  for (let k = 0; k < 45; k++) {
+    const cx = 140 + (k % 9) * 100, cy = 1420 + Math.floor(k / 9) * 100, u = springBD(t - (3.2 + stagger(k, 45, 0.06, { from: "center", grid: [9, 5] })), 0.5, 0);
+    g.fillStyle = `rgba(242,165,74,${(0.15 + 0.85 * u).toFixed(3)})`; g.beginPath(); g.arc(cx, cy, 10 + 18 * u, 0, 2 * Math.PI); g.fill();
+  }
+  return Promise.resolve();
+};
+</script>
+</body></html>

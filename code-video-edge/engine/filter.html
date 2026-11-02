@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root { --paper:#F2EDE4; --ink:#17150F; --gold:#B2842F; --gold2:#D9B872; --mute:#6A645A; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--paper); }
+  body { position:relative; font-family:"Noto Sans JP",sans-serif; color:var(--ink); }
+  .abs { position:absolute; }
+  .dela { font-family:"Dela Gothic One",sans-serif; font-weight:400; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.10em .22em .26em .06em; margin:-.10em -.22em -.26em -.06em; }
+  .ln > .in { display:block; }
+  #bg { position:absolute; left:-60px; top:-60px; width:1200px; height:2040px;
+        background: radial-gradient(ellipse 1500px 1800px at 38% 20%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 38%, rgba(255,255,255,0) 100%),
+                    linear-gradient(180deg, #FAF7F1 0%, #F4EFE5 55%, #EBE3D5 100%); }
+  #vig { position:absolute; inset:0; mix-blend-mode:multiply;
+        background:radial-gradient(ellipse 1100px 1700px at 50% 44%, rgba(255,255,255,0) 40%, rgba(70,52,22,.05) 70%, rgba(70,52,22,.14) 100%); }
+  #world { position:absolute; left:0; top:0; width:720px; height:720px; transform-origin:0 0; }
+  #world img, #world .m { position:absolute; display:block; }
+  .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(28,20,8,.55) 0%, rgba(28,20,8,.25) 40%, rgba(28,20,8,0) 72%); }
+  .sweep { position:absolute; inset:0; mix-blend-mode:plus-lighter; opacity:0;
+        background:linear-gradient(103deg, rgba(255,255,255,0) 40%, rgba(255,246,222,.75) 50%, rgba(255,255,255,0) 60%);
+        background-size:320% 100%; background-position:100% 0; background-repeat:no-repeat; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mute); border:2px solid var(--mute); padding:5px 13px; border-radius:7px; letter-spacing:.06em; }
+  .tag { display:inline-block; font:900 34px/1 "Noto Sans JP"; padding:12px 20px; border-radius:12px; background:var(--ink); color:var(--paper); }
+  .note { position:absolute; font:500 26px/1.5 "Noto Sans JP"; color:var(--mute); }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<div id="world">
+  <div id="stationG" class="m" style="left:444px;top:234px;width:179px;height:407px">
+    <img src="station.png" style="left:0;top:0;width:179px;height:407px">
+  </div>
+  <div id="vacG" class="m" style="left:304px;top:11px;width:239px;height:709px">
+    <img src="vac.png" style="left:0;top:0;width:239px;height:709px">
+    <!-- カップを外した後の受け口：カップの形の暗い影（ボケの中なので形の作り込みはしない） -->
+    <div id="socket" class="m" style="left:162.5px;top:115px;width:47.5px;height:90px;opacity:0;background:#1d1a15;
+         -webkit-mask:url(cup.png) center/100% 100% no-repeat; mask:url(cup.png) center/100% 100% no-repeat"></div>
+  </div>
+  <!-- 外れて手前へ来るダストカップ（実画像の切り抜き） -->
+  <div id="cupG" class="m" style="left:466.5px;top:126px;width:47.5px;height:90px;transform-origin:50% 50%">
+    <div class="shadow" id="cupSh" style="left:-12px;top:84px;width:72px;height:16px;opacity:0"></div>
+    <img src="cup.png" style="left:0;top:0;width:47.5px;height:90px">
+  </div>
+</div>
+
+<!-- 主役：フィルター（実画像の切り抜き）。カップの縁から上へ出てくる -->
+<div id="filtWrap" class="abs" style="left:0;top:0;width:1080px;height:1920px;perspective:2400px">
+  <div id="filtClip" class="abs" style="left:0;top:0;width:1080px;height:1920px">
+    <div id="filtG" class="abs" style="left:0;top:0;width:520px;height:608px;transform-origin:50% 50%">
+      <div class="shadow" id="fSh" style="left:60px;top:560px;width:400px;height:70px;opacity:0"></div>
+      <img src="filter.png" style="position:absolute;left:0;top:0;width:520px;height:608px">
+      <div class="sweep" id="fSw" style="-webkit-mask:url(filter.png) center/100% 100% no-repeat; mask:url(filter.png) center/100% 100% no-repeat"></div>
+    </div>
+  </div>
+</div>
+
+<div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px">
+  <div id="pr" class="abs">PR</div>
+  <div class="abs" id="tg" style="left:60px;top:250px;opacity:0"><span class="tag">前モデルから改良</span></div>
+  <!-- 前モデル（販売ページの「改良前」の実画像。赤い線は販売ページの図のまま） -->
+  <div class="abs" id="oldTag" style="left:60px;top:690px;opacity:0"><span class="tag" style="background:#8A847A;font-size:30px;padding:10px 16px">前モデル</span></div>
+  <img id="oldImg" class="abs" src="filter_old.png" style="left:84px;top:760px;width:186px;height:301px;opacity:0">
+  <div class="abs noto" id="oldCap" style="left:60px;top:1080px;width:330px;font:700 30px/1.4 'Noto Sans JP';color:var(--mute);opacity:0">メッシュに<br>ゴミが絡まりやすい</div>
+  <svg id="arrow" class="abs" style="left:0;top:0" width="1080" height="1920"><path id="arP" d="M300,905 L452,905" pathLength="1" stroke="#B2842F" stroke-width="10" stroke-linecap="round" fill="none" stroke-dasharray="1" stroke-dashoffset="1"/><path id="arH" d="M428,880 L456,905 L428,930" stroke="#B2842F" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0"/></svg>
+  <div class="abs" id="newTag" style="left:610px;top:606px;opacity:0"><span class="tag" style="background:var(--gold)">2026年モデル</span></div>
+  <div class="ln noto" id="h1" style="left:60px;top:330px;height:84px;font:900 66px/1.2 'Noto Sans JP'"><span class="in">メッシュフィルター</span></div>
+  <div class="ln dela" id="h2" style="left:56px;top:420px;height:150px;font-size:128px;line-height:1.15"><span class="in">新形状</span></div>
+  <div class="ln noto" id="s1" style="left:60px;top:1290px;height:64px;font:900 46px/1.3 'Noto Sans JP'"><span class="in">ゴミが絡まりづらく、</span></div>
+  <div class="ln noto" id="s2" style="left:60px;top:1356px;height:64px;font:900 46px/1.3 'Noto Sans JP'"><span class="in"><span style="color:var(--gold)">下に落ちやすい</span>形に</span></div>
+  <div class="note" id="nt" style="left:60px;top:1446px;width:960px;font-size:23px;opacity:0">※分解の動きはイメージです。画像は販売ページの改良前・改良後のフィルターです。</div>
+</div>
+<div id="vig"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const outC = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const inOutC = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+function sp(t, w = 12, z = 1) { if (t <= 0) return 0; if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t);
+  const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t)); }
+let T = 0;
+function lineIn(id, tin, w = 13) { const el = $(id), a = sp(T - tin, w, 1); el.firstElementChild.style.transform = `translateY(${(1 - a) * 140}%)`; el.style.visibility = a <= 0.001 ? "hidden" : "visible"; }
+
+// カメラ：0〜1.0秒で本体の中ほどからダストカップへ寄る（ドリーイン）
+const CUP = [490, 171];                  // カップの中心（元画像px）
+const K0 = { F: [470, 300], A: [760, 980], z: 1.9 }, K1 = { F: CUP, A: [800, 1080], z: 5.2 };
+
+window.seek = function (t) {
+  T = t;
+  const k = inOutC(t / 1.05) * 0.92 + clamp((t - 1.05) / 3.4) * 0.08;      // 寄り切った後もごく僅かに寄り続ける
+  const F = [lerp(K0.F[0], K1.F[0], k), lerp(K0.F[1], K1.F[1], k)], A = [lerp(K0.A[0], K1.A[0], k), lerp(K0.A[1], K1.A[1], k)];
+  const z = Math.exp(lerp(Math.log(K0.z), Math.log(K1.z), k));
+  $("world").style.transform = `translate(${A[0]}px, ${A[1]}px) rotate(${Math.sin(Math.PI * clamp(t / 1.05)) * 1.2}deg) scale(${z}) translate(${-F[0]}px, ${-F[1]}px)`;
+
+  // 1.0〜1.6秒：カップが外れて手前へ（下へ抜けつつ大きく）。ピントはカップへ送られ、本体はボケて暗くなる
+  const sep = sp(t - 1.0, 9, 1);
+  $("cupG").style.transform = `translate(${-14 * sep}px, ${38 * sep}px) scale(${1 + 0.16 * sep})`;
+  $("cupSh").style.opacity = 0.8 * sep;
+  $("socket").style.opacity = 0.85 * clamp(sep * 1.3);
+  $("vacG").style.filter = `blur(${(7 * sep + 1.5) / z}px) brightness(${1 - 0.18 * sep})`;
+  $("stationG").style.filter = `blur(${10 / z}px) brightness(.9)`;
+  // カップ自体も、2.0秒からフィルターに主役を譲ってボケる
+  const hand = sp(t - 2.0, 8, 1);   // 2.0秒からフィルターへ主役を渡す
+  $("cupG").style.filter = `blur(${(5 * hand) / z}px) brightness(${1 - 0.15 * hand})`;
+
+  // 1.5秒〜：フィルターがカップの縁から上へ出て、左上の見せ場へ移る
+  const cupScreen = [A[0] + z * (CUP[0] - F[0]) - 14 * sep * z, A[1] + z * (CUP[1] - F[1]) + 38 * sep * z];   // 画面上のカップ中心
+  const rimY = cupScreen[1] - 0.5 * 90 * z * (1 + 0.16 * sep) + 20;
+  const rise = inOutC((t - 1.5) / 0.7), fly = inOutC((t - 2.05) / 0.85);
+  const w0 = 30 * z, w1 = 480;                                                    // カップの中の大きさ → 見せ場の大きさ
+  const fw = lerp(w0, w1, fly), fh = fw * 608 / 520;
+  const x0 = cupScreen[0] - w0 / 2, y0 = rimY - lerp(0.0, 0.9, rise) * w0 * 608 / 520;
+  const x1 = 470, y1 = 690;
+  const fx = lerp(x0, x1, fly), fy = lerp(y0, y1, fly);
+  const fg = $("filtG");
+  fg.style.width = fw + "px"; fg.style.height = fh + "px";
+  fg.style.left = fx + "px"; fg.style.top = fy + "px";
+  fg.style.opacity = t < 1.5 ? 0 : 1;
+  fg.style.transform = `rotateY(${lerp(0, -9, fly) + Math.sin((t - 2.9) * 0.9) * 3 * clamp(t - 2.9)}deg) rotate(${lerp(-4, 0, fly)}deg)`;
+  fg.querySelector("img").style.width = fw + "px"; fg.querySelector("img").style.height = fh + "px";
+  // 出てくる間は、カップの縁より下を隠す（カップの中から出てくる）
+  $("filtClip").style.clipPath = fly > 0.05 ? "none" : `inset(0 0 ${1920 - rimY}px 0)`;
+  $("fSh").style.opacity = 0.55 * fly; $("fSh").style.width = fw * 0.75 + "px"; $("fSh").style.left = fw * 0.12 + "px"; $("fSh").style.top = fh * 0.95 + "px"; $("fSh").style.height = fw * 0.13 + "px";
+  const sw = clamp((t - 2.75) / 0.9); $("fSw").style.opacity = sw > 0 && sw < 1 ? Math.sin(sw * Math.PI) * 0.9 : 0; $("fSw").style.backgroundPosition = `${lerp(100, 0, inOutC(sw))}% 0`;
+
+  // 文字
+  const pop = (id, t0, dy = 16) => { const a = sp(t - t0, 13, 0.8); $(id).style.opacity = clamp(a * 1.3); $(id).style.transform = `translateY(${(1 - a) * dy}px)`; };
+  pop("tg", 2.55); lineIn("h1", 2.65); lineIn("h2", 2.8, 12);
+  // 前モデル：左から小さく入る（主役より控えめ）
+  const ol = sp(t - 3.35, 11, 1);
+  $("oldImg").style.opacity = clamp(ol * 1.2) * 0.92; $("oldImg").style.transform = `translateX(${(1 - ol) * -60}px)`;
+  pop("oldTag", 3.3); pop("oldCap", 3.65);
+  // 矢印：前モデル → 2026年モデル
+  const ar = inOutC((t - 4.0) / 0.4); $("arP").setAttribute("stroke-dashoffset", String(1 - ar)); $("arH").setAttribute("opacity", ar > 0.9 ? 1 : 0);
+  pop("newTag", 4.3);
+  lineIn("s1", 4.45); lineIn("s2", 4.6);
+  $("nt").style.opacity = outC((t - 4.8) / 0.3);
+};
+window.READY = (async () => { await Promise.all([...document.images].map((i) => i.decode().catch(() => 0))); await document.fonts.ready; })();
+window.seek(0);
+</script>
+</body>
+</html>

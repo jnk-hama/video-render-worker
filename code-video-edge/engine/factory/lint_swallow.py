@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# 行の途中の「//」の後ろにコードが残っていないかを見る（#354）：python3 factory/lint_swallow.py <型や部品のファイル…>
+#   直しを足す時に、コードの後ろへ「// 理由」を書き、さらにその後ろへ元のコードが続くと、そのコードは注釈に飲まれて動かない。
+#   r6（S5 の d(t)）・r9（影の床の sc.add・光の向きの target）で3回起きた。人の注意で防がず、描く前にここで止める。
+#   見る形：注釈の中に「; の後ろに名前」「); 」「const/let/return」「名前.名前(…);」が出る行。見つけたら行番号を出して exit 1
+import re
+import sys
+
+CODE = re.compile(r";\s*[A-Za-z_$][\w$.]*\s*[(=.\[]|\)\s*;|\b(const|let|var|return)\s+[A-Za-z_$]|\b[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*\([^)]*\)\s*;")
+bad, n = [], 0
+for path in sys.argv[1:]:
+    for i, line in enumerate(open(path, encoding="utf-8"), 1):
+        n += 1
+        s = line.strip()
+        if s.startswith("//") or s.startswith("*") or s.startswith("<!--"):
+            continue
+        m = re.search(r"(?<![:\"'\\])//(.*)$", line)   # http:// や文字列の中の // は除く
+        if m and CODE.search(m.group(1)):
+            bad.append(f"{path}:{i}: {s[:140]}")
+if not n:
+    sys.exit("1行も読めなかった（ファイルの指定を確かめる）")
+print(f"注釈に飲まれたコードの検査：{len(sys.argv) - 1} ファイル {n} 行" + ("・見つかった 0" if not bad else f"・見つかった {len(bad)}"))
+for b in bad:
+    print("  " + b)
+sys.exit(1 if bad else 0)

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- 3D の舞台（#356・台本は works/aws-espresso/TREATMENT-3D.md）：夜の展示室に販売ページの写真を額装した版画として並べ、
+     カメラが1本の長回しで版画から版画へ滑る。版画は光の計算をしない材質＝画素は販売ページのまま（#068）。
+     カメラはいつも正面を向いたまま位置だけ動く＝写真を撮った角度から回さない（#304）。床の映り込み・壁の光・床の光だまりは足し算の板（決定論・速い）。
+     字は DOM（#ui）＝点検 23項目がそのまま読む。点検の「写真の層」は QC_PRODUCT_ONLY で版画だけを描き直して撮る。
+     時刻は timing.json（window.TIMELINE）の events、文字は設計書（window.PRODUCT）。すべての値は時刻 T の関数（タイマー・乱数なし） -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ground:#12151D; --ink:#FFF4E2; --dim:#A9A398; --acc:#F2A54A; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--ground); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  .abs { position:absolute; }
+  #bg { position:absolute; inset:0; background:var(--ground); }
+  #world, #ui { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+  #world canvas { position:absolute; left:0; top:0; width:1080px; height:1920px; display:block; }
+  #over { position:absolute; left:0; top:0; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln > .in { display:block; }
+  .num { font-weight:300; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.01em; }
+  .note { position:absolute; left:64px; width:836px; font:400 24px/1.45 "Noto Sans JP"; color:var(--dim); opacity:0; }
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:var(--ink); border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ground); z-index:3; }
+  #credit { position:absolute; left:156px; top:184px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; opacity:.5; color:var(--ink); z-index:3; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="world"><canvas id="gl" width="1080" height="1920" data-product="1"></canvas></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<div id="ui"><div id="pr">PR</div></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, { E, clamp, lerp } = EDGE, { el, sv, ln, reveal, note, f2, $ } = SK;
+const ev = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b])), S = Object.fromEntries(TL.scenes.map((s) => [s.id, s]));
+const DIR = "p/aws-espresso/", U = SK.U, T = () => SK.T;
+const C = { ground: "#12151D", ink: "#FFF4E2", acc: "#F2A54A" };
+// #308 VOICEVOX の声は規約で「VOICEVOX:話者名」の記載が条件（PR の札の右・小さく透過）
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+const ctr = "left:0;width:1080px;text-align:center;";
+const calm = (e, tin, tout) => { const t = T();
+  e.style.visibility = t < tin || t > tout + 0.2 ? "hidden" : "visible"; e.firstElementChild.style.transform = "none";
+  e.style.opacity = (clamp((t - tin) / 0.18) * (1 - clamp((t - tout) / 0.18))).toFixed(3); };
+const scrimDiv = (style) => { const e = el("div", { class: "scrim", style: `position:absolute;pointer-events:none;opacity:0;${style}` }); $("ui").insertBefore(e, $("pr")); return e; };
+// フィルムの粒（種つき4枚をコマごとに・乱数なし）
+const GRAIN = Array.from({ length: 4 }, (_, k) => { const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d"), im = g.createImageData(256, 256);
+  for (let i = 0; i < 256 * 256; i++) { const x = Math.sin((i + 1) * 12.9898 + (k + 1) * 78.233) * 43758.5453, v = 128 + ((x - Math.floor(x)) - 0.5) * 120; im.data[i * 4] = im.data[i * 4 + 1] = im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; }
+  g.putImageData(im, 0, 0); return c.toDataURL(); });
+const grain = scrimDiv("left:0;top:0;width:1080px;height:1920px;mix-blend-mode:overlay;background-size:256px 256px");
+U.push(() => { grain.style.backgroundImage = `url(${GRAIN[Math.floor(T() * 24) % 4]})`; grain.style.opacity = 0.09; });
+// UI の部品：ON/OFF のトグル（lamp.html と同じ）
+const toggle = (x, y) => { const tr = el("div", { class: "abs", style: `left:${x}px;top:${y}px;width:124px;height:68px;box-sizing:border-box;border-radius:999px;border:3px solid rgba(255,244,226,.6);opacity:0` });
+  const fillE = el("div", { style: "position:absolute;inset:-3px;border-radius:999px;background:var(--acc);opacity:0" }, "", tr);
+  const knob = el("div", { style: "position:absolute;left:5px;top:5px;width:52px;height:52px;border-radius:50%;background:var(--ink);box-shadow:0 4px 10px rgba(0,0,0,.35)" }, "", tr);
+  return (tin, ton, tout) => { const t = T(), k = MK.cd(t - ton, 26);
+    tr.style.opacity = (clamp((t - tin) / 0.2) * (1 - clamp((t - tout) / 0.2))).toFixed(3); tr.style.transform = `scale(${(0.9 + 0.1 * MK.cd(t - tin, 20)).toFixed(4)})`;
+    knob.style.transform = `translateX(${f2(56 * (t >= ton ? k : 0))}px) scale(${(1 - 0.12 * Math.sin(Math.PI * clamp((t - ton + 0.08) / 0.2))).toFixed(4)})`;
+    fillE.style.opacity = (t >= ton ? k : 0).toFixed(3); tr.style.boxShadow = t >= ton ? `0 0 ${f2(36 * k)}px rgba(242,165,74,${(0.45 * k).toFixed(3)})` : "none"; }; };
+
+// =====================================================================
+// 展示室（3D）：版画の置き場所とカメラ
+// =====================================================================
+//   単位は m。版画の中心の高さ YC。カメラはいつも -z を向く（正面）＝位置だけで構図を決める
+const FOV = 30, TAN = Math.tan((FOV / 2) * Math.PI / 180), YC = 1.75;
+const PRINTS = {
+  room:  { srcs: ["off", "pull", "on"], w: 3.2, ar: 1081 / 1374, x: 0, z: 0 },
+  shade: { srcs: ["shade"], w: 2.9, ar: 944 / 1200, x: 4.8, z: -0.4 },
+  linen: { srcs: ["linenv"], w: 2.0, ar: 1070 / 837, x: 8.9, z: -0.2 },
+  legs:  { srcs: ["legsv"], w: 1.0, ar: 1070 / 390, x: 11.9, z: -0.5 },
+  white: { srcs: ["woff", "won"], w: 3.2, ar: 1081 / 1374, x: 15.6, z: 0 },
+  end:   { srcs: ["end"], w: 3.2, ar: 1081 / 1374, x: 20.0, z: 0 } };
+for (const p of Object.values(PRINTS)) p.h = p.w * p.ar;
+// 構図：版画 id を、画面の高さ hPx（または幅 wPx）で、中心を (cx, cy) に置くカメラの位置
+const ppu = (d) => 1920 / (2 * d * TAN);
+const frame = (id, { hPx, wPx, cx = 540, cy = 955 }) => { const p = PRINTS[id], d = wPx ? (p.w * 1920) / (wPx * 2 * TAN) : (p.h * 1920) / (hPx * 2 * TAN), k = ppu(d);
+  return [p.x - (cx - 540) / k, YC + (cy - 960) / k, p.z + d]; };
+// カメラの道：[時刻, 位置]。隣どうしは内外とも緩める（着く時はゆっくり着く・行き過ぎ無し）
+// 字の帯の間（上の見出しの下 545・下の注意書きの上 1392）に、額（生成りの余白 0.08m）ごと収まる版画の高さ（px）。寄りの上限はこれ（S1 の寄りで額が見出しにかかった）
+const BAND3 = { top: 545, bot: 1392 }, FIT = (id) => (BAND3.bot - BAND3.top) / (1 + 0.16 / PRINTS[id].h), CY = (BAND3.top + BAND3.bot) / 2;
+const fit = (id, k = 1) => frame(id, { hPx: FIT(id) * k, cy: CY });
+const s1 = S.S1, s2 = S.S2, s3 = S.S3, s4 = S.S4, s5 = S.S5, s6 = S.S6, s7 = S.S7, s8 = S.S8;
+const G8 = { x: 75, y: 250, w: 930, h: 732 };
+const PUSH8 = 1.04;   // 締めの版画の枠（r9 の硬貨の時刻表・影の面と同じ）
+const KEYS = [
+  [0, fit("room", 0.86)],                                  // S1：引いた所から（展示室・床の映り込み）問いの間に寄る
+  [ev("click") - 0.05, fit("room")],                   // カチッで止まる＝山場の前の静けさ
+  [ev("bloom") + 0.5, fit("room")],
+  [s2.t1 - 0.4, fit("room", 0.78)],                          // 光が満ちたら引く：光だまりと展示室が見える
+  [s3.t0 + 0.35, fit("shade", 0.95)],                        // 次の版画へ滑る（0.6秒前後・ぶれで）
+  [s3.t1 - 0.3, fit("shade", 0.97)],
+  [s4.t0 + 0.35, fit("linen", 0.94)],
+  [s4.t1 - 0.3, fit("linen")],                         // 布へゆっくり寄る（透ける光の細部）
+  [s5.t0 + 0.4, frame("legs", { wPx: 700, cx: 760, cy: 960 })],        // 脚の上の端から（左の縦書きの見出しに額を重ねない）
+  [s5.t1 - 0.75, frame("legs", { wPx: 700, cx: 760, cy: 960 - 0.12 * 2 * 700 })],   // 下の端まで（カメラごと下がる＝ペデスタル）。次へ移るのは 1.1秒（0.65秒で 35%・0.9秒で 30.3%：大きな脚の版画が流れて 1コマで画面が変わり過ぎた）
+  [s6.t0 + 0.35, fit("white", 0.95)],
+  [s6.t1 - 0.3, fit("white")],
+  [s7.t0 + 0.3, [13.6, YC - 0.84, 30]],                               // 大きく引いて全景（ここまでの版画が1部屋に並ぶ）
+  [s7.t1 - 0.3, [13.9, YC - 0.76, 27.5]],   // 版画の列は大きな数字と件数の間（y 約 700〜1020）
+  [ev("name") - 0.15, frame("end", { wPx: G8.w, cx: G8.x + G8.w / 2, cy: G8.y + G8.h / 2 })],   // 締めの版画を r9 と同じ枠へ。ここから止める（硬貨が落ちる）
+  [TL.end, ((q) => [q[0], q[1], PRINTS.end.z + (q[2] - PRINTS.end.z) / PUSH8])(frame("end", { wPx: G8.w, cx: G8.x + G8.w / 2, cy: G8.y + G8.h / 2 }))]];   // 締めはゆっくり 4% 寄る（止めたままでは 18.4〜19.5秒が止まって見えた）。前へ進むだけ＝画面の中心を軸に大きくなる
+const camAt = (t) => { let i = KEYS.findIndex((k) => k[0] > t); if (i === -1) return KEYS.at(-1)[1].slice(); if (i === 0) return KEYS[0][1].slice();
+  const [ta, a] = KEYS[i - 1], [tb, b] = KEYS[i], u = E.inOutCubic((t - ta) / (tb - ta));
+  const pos = a.map((v, q) => v + (b[q] - v) * u);
+  // S3：「上にも」で光を追って上へ・「下にも」で下へ（ペデスタル。向きは正面のまま）
+  pos[1] += 0.11 * E.inOutCubic((t - (ev("up") - 0.05)) / 0.55) - 0.22 * E.inOutCubic((t - (ev("down") - 0.05)) / 0.6) + 0.11 * E.inOutCubic((t - (s3.t1 - 0.3)) / 0.5);   // 0.22m では版画の上の縁が副見出しに触れた
+  return pos; };
+// 床の光だまり・壁の光の強さ（版画ごと）：消灯の版画は弱く、点くと強く
+const litAt = (id, t) => id === "room" ? lerp(0.12, 1, E.inOutCubic((t - ev("bloom")) / 0.8)) : id === "white" ? lerp(0.12, 1, E.inOutCubic((t - ev("on")) / 0.7)) : 1;
+
+// ---------- three.js（読み込みが済むまで seek は待つ） ----------
+const T3 = {};
+const radial = (THREE, c0, c1) => { const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d"), r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  r.addColorStop(0, c0); r.addColorStop(1, c1); g.fillStyle = r; g.fillRect(0, 0, 256, 256); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx; };
+T3.ready = import("./vendor/three.module.min.js").then(async (THREE) => {
+  const rd = new THREE.WebGLRenderer({ canvas: $("gl"), alpha: true, antialias: true, preserveDrawingBuffer: true });
+  rd.setPixelRatio(1); rd.setSize(1080, 1920, false); rd.outputColorSpace = THREE.SRGBColorSpace; rd.toneMapping = THREE.NoToneMapping; rd.autoClear = false;
+  const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(FOV, 1080 / 1920, 0.1, 120);
+  const ld = new THREE.TextureLoader(), tex = {};
+  for (const n of [...new Set(Object.values(PRINTS).flatMap((p) => p.srcs))]) { const t = await ld.loadAsync(`${DIR}sb/${n}.png`); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; tex[n] = t; }
+  // 版画の材質：3枚を混ぜる（A→B の溶け・C を光の円で見せる）。光の計算はしない＝画素は写真のまま。映り込みは下ほど薄く消える
+  const VS = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }";
+  const FS = `uniform sampler2D A; uniform sampler2D B; uniform sampler2D Cc; uniform float ab; uniform vec3 circ; uniform float feather; uniform float aspect; uniform float alpha; uniform float refl; varying vec2 vUv;
+    void main(){ vec4 a = texture2D(A, vUv), b = texture2D(B, vUv), c = texture2D(Cc, vUv); vec3 col = mix(a.rgb, b.rgb, ab);
+      float dd = length((vUv - circ.xy) * vec2(aspect, 1.0)); float m = 1.0 - smoothstep(circ.z - feather, circ.z, dd); col = mix(col, c.rgb, circ.z > 0.0 ? m : 0.0);
+      float al = alpha * (refl > 0.5 ? (1.0 - smoothstep(0.0, 0.55, vUv.y)) : 1.0);
+      gl_FragColor = vec4(col, al);
+      #include <colorspace_fragment>
+    }`;
+  const printMat = (p, refl) => new THREE.ShaderMaterial({ vertexShader: VS, fragmentShader: FS, transparent: refl, depthTest: !refl, depthWrite: !refl, side: THREE.DoubleSide,
+    uniforms: { A: { value: tex[p.srcs[0]] }, B: { value: tex[p.srcs[1] || p.srcs[0]] }, Cc: { value: tex[p.srcs[2] || p.srcs[1] || p.srcs[0]] }, ab: { value: 0 }, circ: { value: new THREE.Vector3(0, 0, -1) }, feather: { value: 0.18 }, aspect: { value: p.w / p.h }, alpha: { value: refl ? 0.2 : 1 }, refl: { value: refl ? 1 : 0 } } });
+  const add = (o, order) => { o.renderOrder = order; sc.add(o); return o; };
+  const floor = add(new THREE.Mesh(new THREE.PlaneGeometry(200, 120), new THREE.MeshBasicMaterial({ color: 0x0c0e14, fog: true })), 0); floor.rotation.x = -Math.PI / 2; floor.position.set(10, 0, 0);
+  sc.fog = new THREE.Fog(C.ground, 28, 70);
+  const poolTex = radial(THREE, "rgba(242,165,74,0.55)", "rgba(242,165,74,0)"), haloTex = radial(THREE, "rgba(255,214,160,0.42)", "rgba(255,214,160,0)");
+  const glow = (tx, w, h) => new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tx, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, fog: false }));
+  T3.items = Object.fromEntries(Object.entries(PRINTS).map(([id, p]) => {
+    const halo = add(glow(haloTex, p.w * 2.1, p.h * 1.8), 1); halo.position.set(p.x, YC, p.z - 0.05);                                 // 壁の光（版画の後ろ）
+    const edge = add(new THREE.Mesh(new THREE.PlaneGeometry(p.w + 0.2, p.h + 0.2), new THREE.MeshBasicMaterial({ color: 0x17191f, fog: false })), 2); edge.position.set(p.x, YC, p.z - 0.012);   // 細い黒の額
+    const mat = add(new THREE.Mesh(new THREE.PlaneGeometry(p.w + 0.16, p.h + 0.16), new THREE.MeshBasicMaterial({ color: 0xd8cfbf, fog: false })), 3); mat.position.set(p.x, YC, p.z - 0.006);   // 生成りの余白
+    const pm = printMat(p, false), print = add(new THREE.Mesh(new THREE.PlaneGeometry(p.w, p.h), pm), 4); print.position.set(p.x, YC, p.z);
+    const rm = printMat(p, true), refl = add(new THREE.Mesh(new THREE.PlaneGeometry(p.w, p.h), rm), 1); refl.position.set(p.x, -YC, p.z); refl.scale.y = -1;   // 床の映り込み（逆さの写し・下ほど消える）
+    rm.uniforms.A = pm.uniforms.A; rm.uniforms.B = pm.uniforms.B; rm.uniforms.Cc = pm.uniforms.Cc; rm.uniforms.ab = pm.uniforms.ab; rm.uniforms.circ = pm.uniforms.circ;   // 写しは本体と同じ混ぜ方
+    const pool = add(glow(poolTex, p.w * 1.6, 2.6), 1); pool.rotation.x = -Math.PI / 2; pool.position.set(p.x, 0.002, p.z + 1.2);        // 床の光だまり
+    return [id, { p, print, pm, refl, halo, pool, mat, edge }]; }));
+  Object.assign(T3, { THREE, rd, sc, cam, floor, ok: true });
+});
+// 版画の中の点（u, v＝0〜1・左上が 0）を、今のカメラで画面の px に
+const projPx = (id, u, v) => { const p = PRINTS[id], c = T3.cam, w = new T3.THREE.Vector3(p.x + (u - 0.5) * p.w, YC + (0.5 - v) * p.h, p.z).project(c); return [(w.x + 1) * 540, (1 - w.y) * 960]; };
+const STATE = { room: { ab: 0, circ: [0, 0, -1] }, white: { ab: 0, circ: [0, 0, -1] } };   // 場面の側が毎コマ書く（下の S1・S2・S6）
+const draw3 = (t, productOnly = false) => {
+  const pos = camAt(t); T3.cam.position.set(...pos); T3.cam.lookAt(pos[0], pos[1], pos[2] - 1); T3.cam.updateMatrixWorld();
+  for (const [id, it] of Object.entries(T3.items)) { const L = litAt(id, t), st = STATE[id];
+    if (st) { it.pm.uniforms.ab.value = st.ab; it.pm.uniforms.circ.value.set(...st.circ); }
+    it.halo.material.opacity = 0.9 * L; it.pool.material.opacity = 0.6 * L;   // 0.85 では光だまりが注意書きの下で明るく、字の明るさの差が 4.4:1 だった
+    for (const o of [it.halo, it.pool, it.refl, it.mat, it.edge]) o.visible = !productOnly; }
+  T3.floor.visible = !productOnly;
+  const rd = T3.rd; rd.setClearColor(C.ground, productOnly ? 0 : 1); rd.clear(); rd.render(T3.sc, T3.cam);
+  if (!productOnly && T3.coins) drawCoins(t);
+  rd.getContext().finish();   // 描き終わるまで待つ：点検は撮らずに何十回もめくるので、CPU の WebGL に仕事が溜まり次の撮影が 30秒で時間切れになった
+};
+// 点検（ovl.mjs）の「写真の層」：版画だけを透明の地に描き直す（床・光・額・映り込み・硬貨は写真ではない）
+window.QC_PRODUCT_ONLY = (on) => { if (T3.ok) draw3(T(), on); };
+
+// =====================================================================
+// S1 HOOK＋S2 BLOOM：消灯の版画へ寄る → 問い → 手（引き紐）へ溶ける → カチッで止まる → 版画の中で光の円が開き点灯へ → 引く
+// =====================================================================
+const SHADE = { x: 798, y: 138 }, CHAIN = { x: 458, y: 0 }, BAND = { w: 1080, h: 850 };   // 写真の中の位置（帯 1080×850 の px・lamp.html と同じ）
+{
+  const c1 = COPY.S1, c2 = COPY.S2, tc = ev("bloom"), cut = s1.t1 - 0.95;
+  const who = ln("left:64px;top:238px;font:500 34px/1.2 'Noto Sans JP';color:var(--dim)", P.target.who);
+  const hk1 = ln("left:64px;top:290px;font:700 112px/1.12 'Noto Sans JP'", c1.hook);
+  const hk2 = ln("left:64px;top:416px;font:700 112px/1.12 'Noto Sans JP';color:var(--acc)", c1.hook2);
+  const h1 = ln("left:64px;top:250px;font:700 120px/1.12 'Noto Sans JP'", c2.head);
+  const h2 = ln("left:64px;top:390px;font:700 120px/1.12 'Noto Sans JP';color:var(--acc)", c2.head2);
+  note(c1.note, 1400, -1, s1.t1 - 0.3); note(c2.note, 1400, s2.t0 + 0.2, s2.t1 - 0.3);
+  const tg = toggle(772, 446);
+  const fl = scrimDiv("left:0;top:0;width:900px;height:900px;mix-blend-mode:screen;background:radial-gradient(circle, rgba(255,236,200,1) 0, rgba(255,196,120,.75) 18%, rgba(242,165,74,.25) 42%, rgba(242,165,74,0) 70%)");
+  U.push(() => { const t = T();
+    STATE.room.ab = clamp((t - cut) / 0.12);   // 0.12秒で手の写真へ溶ける（#334：1コマで画面の30%超を変えない）
+    { const u = (t - tc) / 0.9; STATE.room.circ = [CHAIN.x / BAND.w, 1 - CHAIN.y / BAND.h, u <= 0 ? -1 : 0.02 + 1.6 * Math.sqrt(E.inOutCubic(clamp(u)))]; }   // 半径は面積で緩める（出だしが跳ばない）
+    reveal(who, -1, s1.t1 - 0.32); reveal(hk1, -1, s1.t1 - 0.3); reveal(hk2, -1, s1.t1 - 0.28);
+    calm(h1, s2.t0 + 0.02, s2.t1 - 0.32); calm(h2, s2.t0 + 0.18, s2.t1 - 0.3);
+    tg(ev("ring") + 0.1, ev("click") + 0.06, s2.t1 - 0.3);
+    if (T3.ok) { const [x, y] = projPx("room", CHAIN.x / BAND.w, 0.02), u = t - tc; fl.style.left = f2(x - 450) + "px"; fl.style.top = f2(y - 450) + "px";
+      fl.style.opacity = u < 0 ? 0 : (Math.min(1, u / 0.08) * (1 - clamp((u - 0.1) / 0.7)) * 0.9).toFixed(3); fl.style.transform = `scale(${(0.5 + 0.8 * E.outExpo(u / 0.6)).toFixed(4)})`; } });
+}
+
+// =====================================================================
+// S3 UP/DOWN：シェードの版画へ滑る。「上にも」で上へ、「下にも」で下へ（camAt のペデスタル）
+// =====================================================================
+{
+  const c = COPY.S3, head = ln("left:64px;top:250px;font:700 120px/1.12 'Noto Sans JP'", c.label), sub = ln("left:64px;top:400px;font:700 56px/1.2 'Noto Sans JP'", c.sub);
+  note(c.note, 1400, s3.t0 + 0.1, s3.t1 - 0.3);
+  U.push(() => { const t = T(); calm(head, s3.t0 + 0.05, s3.t1 - 0.3); calm(sub, ev("up") + 0.1, s3.t1 - 0.28); });
+}
+
+// =====================================================================
+// S4 LINEN：布の版画へ滑って寄る。字「リネンコットン」は織り糸のように横の帯が左右交互に入る（lamp.html と同じ）
+// =====================================================================
+{
+  const c = COPY.S4, head = el("div", { class: "abs", style: "left:64px;top:262px;font:700 112px/1.15 'Noto Sans JP';white-space:nowrap;opacity:0" }, c.head);
+  const sub = ln("left:64px;top:410px;font:700 56px/1.2 'Noto Sans JP';color:var(--dim)", c.sub), ROWS = 8;
+  note(c.note, 1400, s4.t0 + 0.1, s4.t1 - 0.3);
+  U.push(() => { const t = T(), p = Array.from({ length: ROWS }, (_, k) => E.outQuart((t - (s4.t0 + 0.05 + k * 0.045)) / 0.5));
+    head.style.webkitMaskImage = head.style.maskImage = p.map(() => "linear-gradient(#000,#000)").join(",");
+    head.style.webkitMaskSize = head.style.maskSize = p.map((x) => `${f2(x * 100)}% ${100 / ROWS + 0.4}%`).join(",");
+    head.style.webkitMaskPosition = head.style.maskPosition = p.map((_, k) => `${k % 2 ? 100 : 0}% ${f2((k / (ROWS - 1)) * 100)}%`).join(",");
+    head.style.webkitMaskRepeat = head.style.maskRepeat = "no-repeat";
+    head.style.opacity = t >= s4.t0 ? (1 - clamp((t - (s4.t1 - 0.3)) / 0.2)).toFixed(3) : 0;
+    calm(sub, ev("weave"), s4.t1 - 0.28); });
+}
+
+// =====================================================================
+// S5 WOOD：脚の細長い版画を、上の端から下の端までカメラごと下がって見せる。見出しは左の地に縦書き
+// =====================================================================
+{
+  const c = COPY.S5, vt = "writing-mode:vertical-rl;text-orientation:upright;padding:.12em .22em .22em .3em;margin:-.12em -.22em -.22em -.3em;";
+  const head = ln(vt + "left:226px;top:250px;font:700 120px/1.0 'Noto Sans JP'", c.head), sub = ln(vt + "left:124px;top:262px;font:700 52px/1.0 'Noto Sans JP';color:var(--dim)", c.sub);
+  const under = sv("rect", { x: 358, y: 250, width: 7, height: 0, rx: 3.5, fill: C.ink, "fill-opacity": 0.6 });
+  { const n = note(c.note, 1130, s5.t0 + 0.15, s5.t1 - 0.8); n.style.width = "250px"; }
+  U.push(() => { const t = T(); calm(head, s5.t0 + 0.15, s5.t1 - 0.8); calm(sub, s5.t0 + 0.35, s5.t1 - 0.78);   // カメラが次へ動き出す（s5.t1−0.75）前に消す：脚の版画が左へ流れて縦書きに重なった
+    const hit = t - ev("wood"), bump = hit > 0 ? 0.035 * Math.exp(-hit * 9) * Math.sin(Math.min(Math.PI, hit * 30)) : 0;
+    head.style.transformOrigin = "50% 0"; head.style.scale = (1 + bump).toFixed(4);
+    under.setAttribute("height", f2(720 * E.outQuart((t - ev("wood")) / 0.4))); under.setAttribute("opacity", t >= ev("wood") ? (1 - clamp((t - (s5.t1 - 0.8)) / 0.18)).toFixed(3) : 0); });
+}
+
+// =====================================================================
+// S6 OFF/ON：白い型の版画。「点けても」で同じ光の円（山場の韻）。色は2色の札
+// =====================================================================
+const WSHADE = { x: 802, y: 135 };
+{
+  const c = COPY.S6, tc = ev("on");
+  const l1 = ln("left:64px;top:222px;font:700 110px/1.12 'Noto Sans JP'", c.off), l2 = ln("left:64px;top:345px;font:700 110px/1.12 'Noto Sans JP'", c.on);
+  const sw = { "ホワイト": "#F4F1EA", "ブラウン": "#6E665B" };
+  const seg = el("div", { class: "abs", style: "left:64px;top:474px;height:56px;padding:4px;box-sizing:border-box;display:flex;border-radius:999px;border:2px solid rgba(255,244,226,.4);font:500 32px/1 'Noto Sans JP';opacity:0" },
+    `<i style="position:absolute;left:4px;top:4px;bottom:4px;width:0;border-radius:999px;background:var(--acc)"></i>` + c.chips.map((x) => `<span style="position:relative;display:inline-flex;align-items:center;gap:10px;padding:0 22px 0 12px;border-radius:999px"><i style="display:inline-block;width:28px;height:28px;border-radius:50%;background:${sw[x]};box-shadow:0 0 0 2px rgba(255,244,226,.35)"></i>${x}</span>`).join(""));
+  const segPick = seg.firstElementChild, segW = seg.children[1], segLbl = [...seg.children].slice(1), tg = toggle(772, 372);
+  note(c.note, 1400, s6.t0 + 0.1, s6.t1 - 0.3);
+  U.push(() => { const t = T(), u = (t - tc) / 0.7;
+    STATE.white.circ = [WSHADE.x / BAND.w, 1 - WSHADE.y / BAND.h, u <= 0 ? -1 : 0.02 + 1.6 * Math.sqrt(E.inOutCubic(clamp(u)))];
+    tg(s6.t0 + 0.05, tc, s6.t1 - 0.56); calm(l1, ev("off"), s6.t1 - 0.56); calm(l2, tc, s6.t1 - 0.54);
+    const a = MK.cd(t - (tc + 0.25), 22), pk = MK.cd(t - (tc + 0.45), 18);
+    seg.style.opacity = t >= tc + 0.25 ? (Math.min(1, a * 1.5) * (1 - clamp((t - (s6.t1 - 0.56)) / 0.2))).toFixed(3) : 0; seg.style.transform = `translateY(${f2((1 - a) * 18)}px)`;
+    segPick.style.width = f2(segW.offsetWidth * pk) + "px"; segLbl[0].style.color = pk > 0.5 ? "var(--ground)" : "var(--ink)"; });
+}
+
+// =====================================================================
+// S7 PROOF：大きく引いて展示室の全景。上に大きな 4.74（数え上がる）・下にレビュー件数と取得日
+// =====================================================================
+{
+  const c = COPY.S7, val = parseFloat(c.score);
+  const big = ln("left:64px;top:300px;font-size:330px;line-height:1", `<span class="num">${c.score}</span>`);
+  const cnt = ln("left:64px;top:1150px;font:700 72px/1.2 'Noto Sans JP'", c.count_label);
+  const date = ln("left:64px;top:1256px;font:500 32px/1 'Noto Sans JP';color:var(--dim)", `<span style="display:inline-block;padding:10px 18px;border:2px solid rgba(169,163,152,.5);border-radius:999px;letter-spacing:.04em">${c.date}</span>`);
+  note(c.note, 1345, s7.t0 + 0.3, s7.t1 - 0.43);
+  U.push(() => { const t = T();
+    // 字はコマ（1/30秒）の頭の値だけ（動きのぶれの中で桁が二重に重ならない・r6）
+    big.firstElementChild.firstElementChild.textContent = (E.inOutCubic((Math.floor(t * 30 - 0.01) / 30 - (s7.t0 + 0.12)) / (ev("dot") + 0.4 - (s7.t0 + 0.12))) * val).toFixed(2);
+    calm(big, s7.t0 + 0.25, s7.t1 - 0.45); calm(cnt, s7.t0 + 0.25, s7.t1 - 0.44); calm(date, s7.t0 + 0.3, s7.t1 - 0.43); });   // 字はカメラが全景に着いてから出し、締めへ移る前に消す（移る途中の版画が大きな数字にかかった）
+}
+
+// =====================================================================
+// S8 END：締めの版画の前へ降りて止まる。名前・押せる札。見せてきた4つが投げられて並ぶ（r9 と同じ焼いた物理・同じ枠）
+// =====================================================================
+const drawCoins = (t) => { const tn = t - ev("name"), K = T3.coins;
+  { const d0 = KEYS.at(-2)[1][2] - PRINTS.end.z, d = T3.cam.position.z - PRINTS.end.z; K.cam.zoom = d0 / d; K.cam.updateProjectionMatrix(); }   // 版画と同じ倍率で硬貨の層も中心から大きくする（硬貨は版画の面の上）
+  for (const c of K.list) { const st = MK.phys(c.tr, tn); c.m.visible = !!st; if (!st) continue;
+    c.m.position.set(st[0], st[1], st[2]); c.m.quaternion.set(st[3], st[4], st[5], st[6]);
+    const op = clamp((tn - c.tr.t0) / 0.08); c.mats.forEach((mt) => (mt.opacity = op)); c.m.castShadow = op > 0.5; }
+  T3.rd.clearDepth(); T3.rd.render(K.sc, K.cam); };
+{
+  const c = COPY.S8, img = (src) => new Promise((ok, ng) => { const im = new Image(); im.onload = () => ok(im); im.onerror = ng; im.src = src; });
+  const faceTex = (THREE, draw) => { const cv = document.createElement("canvas"); cv.width = cv.height = 256; const g = cv.getContext("2d");
+    g.save(); g.beginPath(); g.arc(128, 128, 128, 0, 2 * Math.PI); g.clip(); draw(g); g.restore();
+    g.lineWidth = 8; g.strokeStyle = "rgba(255,244,226,.85)"; g.beginPath(); g.arc(128, 128, 124, 0, 2 * Math.PI); g.stroke();
+    const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4; tx.center.set(0.5, 0.5); tx.rotation = Math.PI / 2; return tx; };   // 円柱の蓋の UV は 90° 回っている（r9）
+  const cssBg = (im, sizePct, px, py) => (g) => { const w = 256 * sizePct / 100, h = w * im.height / im.width; g.drawImage(im, (256 - w) * px, (256 - h) * py, w, h); };
+  const TOKY = G8.y + G8.h - 28;
+  T3.coinsReady = T3.ready.then(() => Promise.all([fetch(DIR + "sb/tokens3d.json").then((r) => r.json()), img(DIR + "sb/linenv.png"), img(DIR + "sb/legsv.png")])).then(([J, lin, leg]) => {
+    const THREE = T3.THREE, rd = T3.rd; rd.shadowMap.enabled = true; rd.shadowMap.type = THREE.VSMShadowMap;
+    const sc = new THREE.Scene(), Zc = 20, cam = new THREE.PerspectiveCamera((2 * Math.atan(9.6 / Zc) * 180) / Math.PI, 1080 / 1920, 1, 60);
+    cam.position.set(5.4, -9.6, Zc); cam.lookAt(5.4, -9.6, 0);   // r9 と同じ：z=0 で 1単位＝100px（画面全体）
+    sc.add(new THREE.AmbientLight(0xffffff, 1.6));
+    const key = new THREE.DirectionalLight(0xffe7be, 1.6); key.position.set(4.2, -11.4, 40); key.target.position.set(5.4, -TOKY / 100, 0);   // 光はほぼ真上・少し左下から（r9）
+    key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 10; key.shadow.blurSamples = 16;
+    Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 90 }); key.shadow.camera.updateProjectionMatrix(); sc.add(key, key.target);
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(G8.w / 100, G8.h / 100), new THREE.ShadowMaterial({ opacity: 0.32 })); fl.position.set((G8.x + G8.w / 2) / 100, -(G8.y + G8.h / 2) / 100, 0); fl.receiveShadow = true; sc.add(fl);   // 影は版画の面にだけ
+    const faces = [faceTex(THREE, cssBg(lin, 260, 0.5, 0.45)), faceTex(THREE, cssBg(leg, 300, 0.5, 0.22)),
+      faceTex(THREE, (g) => { const r = g.createRadialGradient(128, 108, 0, 128, 128, 128); r.addColorStop(0, "#FFE7BE"); r.addColorStop(0.55, "#F7BB66"); r.addColorStop(1, "#F2A54A"); g.fillStyle = r; g.fillRect(0, 0, 256, 256); }),
+      faceTex(THREE, (g) => { g.fillStyle = "#F4F1EA"; g.fillRect(0, 0, 128, 256); g.fillStyle = "#6E665B"; g.fillRect(128, 0, 128, 256); })];
+    const list = ["linen", "legs", "bulb", "chips"].map((id, i) => {
+      const side = new THREE.MeshStandardMaterial({ color: 0xfff4e2, roughness: 0.45, transparent: true });
+      const face = new THREE.MeshStandardMaterial({ map: faces[i], roughness: 0.7, transparent: true, ...(i === 2 ? { emissive: 0xf2a54a, emissiveIntensity: 0.35 } : {}) });
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.08, 96), [side, face, face]); sc.add(m);
+      return { m, mats: [side, face], tr: J.tracks[id] }; });
+    T3.coins = { sc, cam, list };
+  });
+  const brand = el("div", { class: "abs", style: ctr + "top:1010px;font:500 30px/1 'Noto Sans JP';letter-spacing:.04em;color:var(--dim);opacity:0" }, c.brand);
+  const name = el("div", { class: "abs", style: ctr + "top:1050px;font:700 132px/1.15 'Noto Sans JP'" }, [...c.head].map((ch) => `<span style="display:inline-block;opacity:0">${ch}</span>`).join(""));
+  const sub = ln(ctr + "top:1212px;font:500 44px/1.2 'Noto Sans JP'", c.sub);
+  const cta = el("div", { class: "abs", style: "left:0;top:1282px;width:1080px;display:flex;justify-content:center;opacity:0" },
+    `<span style="position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:20px;padding:20px 44px;border-radius:999px;background:var(--acc);color:var(--ground);font:700 42px/1 'Noto Sans JP';box-shadow:0 0 44px rgba(242,165,74,.35)"><i style="position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0));transform:translateX(-120%)"></i>${c.cta}</span>`);
+  const pill = cta.firstElementChild, shine = pill.firstElementChild;
+  const tap = el("div", { class: "abs", style: "left:0;top:0;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:rgba(255,244,226,.9);box-shadow:0 0 0 6px rgba(255,244,226,.28),0 8px 24px rgba(0,0,0,.4);opacity:0" });
+  const ring = sv("rect", { fill: "none", stroke: C.acc, "stroke-width": 4, opacity: 0 });
+  note(c.note, 1368, s8.t0 + 0.3, 99); note(c.note2, 1401, s8.t0 + 0.3, 99);
+  U.push(() => { const t = T();
+    { const u = (t - (ev("cta") + 0.25)) / 0.7; if (u > 0 && u < 1) shine.style.transform = `translateX(${f2(-120 + 400 * E.inOutCubic(u))}%)`; }
+    if (t < ev("cta") + 0.25) shine.style.transform = "translateX(-120%)";
+    { const pb = pill.getBoundingClientRect(), tx = pb.left + pb.width * 0.62, ty = pb.top + pb.height * 0.62, a = E.inOutCubic((t - (ev("under") - 0.55)) / 0.5), pr2 = t >= ev("under") ? Math.sin(Math.PI * clamp((t - ev("under")) / 0.22)) : 0;
+      tap.style.left = f2(lerp(980, tx, a)) + "px"; tap.style.top = f2(lerp(1760, ty, a)) + "px"; tap.style.transform = `scale(${(1 - 0.25 * pr2).toFixed(4)})`;
+      tap.style.opacity = (clamp((t - (ev("under") - 0.55)) / 0.15) * (1 - clamp((t - (ev("under") + 0.35)) / 0.3))).toFixed(3); }
+    brand.style.opacity = clamp((t - (ev("name") - 0.2)) / 0.4).toFixed(3);
+    [...name.children].forEach((sp, i) => { const a = E.outExpo((t - (ev("name") + 0.15 + i * 0.045)) / 0.5);
+      sp.style.opacity = a.toFixed(3); sp.style.filter = `blur(${f2((1 - a) * 10)}px)`; sp.style.transform = `translateY(${f2((1 - a) * 46)}px)`; });
+    calm(sub, ev("name") + 0.35, 99);
+    const ci = MK.cd(t - ev("cta"), 18), pr = t >= ev("under") ? Math.sin(Math.PI * clamp((t - ev("under")) / 0.22)) : 0;
+    cta.style.opacity = t >= ev("cta") ? clamp((t - ev("cta")) / 0.12).toFixed(3) : 0;
+    pill.style.transform = `translateY(${f2((1 - ci) * 40)}px) scale(${(0.92 + 0.08 * ci - 0.05 * pr).toFixed(4)})`;
+    const rb = pill.getBoundingClientRect(), ru = clamp((t - ev("under")) / 0.6), gw = 34 * E.outQuart(ru);
+    ring.setAttribute("x", f2(rb.left - gw)); ring.setAttribute("y", f2(rb.top - gw)); ring.setAttribute("width", f2(rb.width + 2 * gw)); ring.setAttribute("height", f2(rb.height + 2 * gw));
+    ring.setAttribute("rx", f2(rb.height / 2 + gw)); ring.setAttribute("opacity", t >= ev("under") ? (0.7 * (1 - ru)).toFixed(3) : 0); });
+}
+
+// 3D は最後に描く（場面の側が STATE を書いた後）。読み込み中なら seek はそれを待つ
+const WAITS = [];
+U.push(() => { const t = T(); if (T3.ok && (T3.coins || t < ev("name") - 0.2)) draw3(t); else WAITS.push(Promise.all([T3.ready, T3.coinsReady]).then(() => draw3(t))); });
+SK.boot();
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+window.READY = window.READY.then(() => Promise.all([T3.ready, T3.coinsReady])).then(() => window.seek(0)).then(() => true);
+</script>
+</body></html>

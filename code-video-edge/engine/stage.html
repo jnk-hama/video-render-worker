@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root { --paper:#F2EDE4; --paper2:#E6DECF; --ink:#17150F; --gold:#B2842F; --gold2:#D9B872; --mute:#6A645A; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--paper); }
+  body { position:relative; font-family:"Noto Sans JP",sans-serif; color:var(--ink); }
+  .abs { position:absolute; }
+  .dela { font-family:"Dela Gothic One",sans-serif; font-weight:400; letter-spacing:-.01em; }
+  .noto { font-family:"Noto Sans JP",sans-serif; font-weight:900; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.10em .22em .26em .06em; margin:-.10em -.22em -.26em -.06em; }
+  .ln > .in { display:block; will-change:transform; }
+  #stage { position:absolute; inset:-30px; width:1140px; height:1980px; transform-origin:570px 990px; }
+  #stage > .frame { position:absolute; left:30px; top:30px; width:1080px; height:1920px; overflow:visible; }
+
+  /* ===== 背景：紙の背景に窓の光。装飾ではなく「自然光の部屋」を作るための明暗 ===== */
+  #bg { position:absolute; left:-60px; top:-60px; width:1200px; height:2040px;
+        background:
+          radial-gradient(ellipse 1500px 1800px at 38% 20%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 38%, rgba(255,255,255,.18) 66%, rgba(255,255,255,0) 100%),
+          linear-gradient(180deg, #FAF7F1 0%, #F4EFE5 55%, #EBE3D5 100%); }
+  .wl { position:absolute; top:-200px; height:2500px; background:linear-gradient(90deg, rgba(255,251,242,0), rgba(255,251,242,.62) 50%, rgba(255,251,242,0)); transform-origin:50% 0; }
+  #floorshade { position:absolute; left:-60px; top:1180px; width:1200px; height:860px;
+        background:linear-gradient(180deg, rgba(120,98,60,0) 0%, rgba(120,98,60,.06) 40%, rgba(120,98,60,.11) 100%); }
+  #vig { position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply;
+        background:radial-gradient(ellipse 1100px 1700px at 50% 44%, rgba(255,255,255,0) 40%, rgba(70,52,22,.05) 70%, rgba(70,52,22,.14) 100%); }
+  #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:multiply; opacity:.30; pointer-events:none; }
+
+  /* ===== 世界（商品） ===== */
+  #world { position:absolute; left:0; top:0; width:720px; height:720px; transform-origin:0 0; }
+  #world img, #world .m { position:absolute; display:block; }
+  .shadow { position:absolute; border-radius:50%;
+        background:radial-gradient(ellipse at 50% 50%, rgba(28,20,8,.62) 0%, rgba(28,20,8,.30) 38%, rgba(28,20,8,0) 72%); }
+  .refl { opacity:.16; -webkit-mask-image:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,0) 22%); mask-image:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,0) 22%); transform:scaleY(-1); transform-origin:50% 50%; }
+  .sweep { position:absolute; left:0; top:0; width:100%; height:100%; mix-blend-mode:plus-lighter; opacity:0;
+        background:linear-gradient(103deg, rgba(255,255,255,0) 42%, rgba(255,246,222,.55) 50%, rgba(255,255,255,0) 58%);
+        background-size:320% 100%; background-position:100% 0; background-repeat:no-repeat; }
+  #wsvg { position:absolute; left:0; top:0; width:720px; height:720px; overflow:visible; }
+
+  /* ===== 文字 ===== */
+  .hl { font-size:190px; line-height:1.0; }
+  .gold { color:var(--gold); }
+  .lab { font:900 54px/1 "Noto Sans JP"; letter-spacing:.02em; }
+  .tag { display:inline-block; font:900 34px/1 "Noto Sans JP"; padding:12px 20px; border-radius:12px; background:var(--ink); color:var(--paper); }
+  .note { position:absolute; font:500 26px/1.5 "Noto Sans JP"; color:var(--mute); letter-spacing:.01em; }
+  .digits { white-space:nowrap; }
+  .digits span { display:inline-block; text-align:center; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mute); border:2px solid var(--mute); padding:5px 13px; border-radius:7px; letter-spacing:.06em; }
+  .chip { position:absolute; left:56px; height:112px; width:350px; border-radius:24px; background:var(--ink); color:var(--paper);
+          display:flex; align-items:center; gap:20px; padding-left:28px; font:900 54px/1 "Noto Sans JP"; }
+  .chip .ck { width:54px; height:54px; border-radius:50%; background:var(--gold2); display:grid; place-items:center; flex:none; }
+  .chip .ck svg { width:30px; height:30px; }
+  .bar { position:absolute; height:84px; border-radius:20px; overflow:hidden; }
+  .bar > i { position:absolute; left:0; top:0; height:100%; border-radius:20px; display:block; }
+  .bar > b { position:absolute; left:28px; top:0; height:100%; display:flex; align-items:center; font:900 42px/1 "Noto Sans JP"; white-space:nowrap; }
+  #cta { left:60px; top:1110px; width:540px; height:124px; border-radius:62px; background:var(--gold); color:#fff; overflow:hidden;
+         display:flex; align-items:center; justify-content:center; gap:12px; font:900 40px/1 "Noto Sans JP"; letter-spacing:.02em; white-space:nowrap; }
+  #cta .sw { position:absolute; inset:0; mix-blend-mode:plus-lighter; background:linear-gradient(103deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 65%); background-size:300% 100%; background-position:100% 0; }
+</style>
+</head>
+<body>
+<div id="stage"><div class="frame">
+
+  <div id="bg">
+    <div class="wl" id="wl1" style="left:120px;width:420px;transform:skewX(-13deg)"></div>
+    <div class="wl" id="wl2" style="left:610px;width:250px;transform:skewX(-13deg);opacity:.7"></div>
+    <div id="floorshade"></div>
+  </div>
+
+  <!-- 商品の後ろに入る大見出し（冒頭だけ） -->
+  <div id="behind" class="abs" style="left:0;top:0;width:1080px;height:1920px">
+    <div class="ln dela hl" id="hA" style="left:60px;top:250px;height:140px;font-size:118px"><span class="in">ゴミ捨てが</span></div>
+    <div class="ln dela hl" id="hB" style="left:56px;top:390px;height:176px;font-size:146px"><span class="in">面倒な人</span></div>
+    <div class="ln dela hl gold" id="hC" style="left:56px;top:566px;height:176px;font-size:146px"><span class="in">全員見て!!</span></div>
+    <div id="hBar" class="abs" style="left:64px;top:742px;height:14px;width:560px;background:var(--ink);transform-origin:0 50%;transform:scaleX(0)"></div>
+  </div>
+
+  <div id="world">
+    <div id="stationG" class="m" style="left:444px;top:234px;width:179px;height:407px">
+      <div class="shadow" id="shSt" style="left:-34px;top:380px;width:232px;height:44px"></div>
+      <img id="reflSt" class="refl" src="station.png" style="left:0;top:408px;width:179px;height:407px">
+      <img src="station.png" style="left:0;top:0;width:179px;height:407px">
+      <div class="sweep" id="swSt" style="-webkit-mask:url(station_mask.png) center/100% 100% no-repeat; mask:url(station_mask.png) center/100% 100% no-repeat"></div>
+    </div>
+    <div id="vacG" class="m" style="left:304px;top:11px;width:239px;height:709px">
+      <div class="shadow" id="shVac" style="left:-33px;top:682px;width:230px;height:46px"></div>
+      <img id="reflVac" class="refl" src="vac.png" style="left:0;top:713px;width:239px;height:709px">
+      <img src="vac.png" style="left:0;top:0;width:239px;height:709px">
+      <div class="sweep" id="swVac" style="-webkit-mask:url(vac_mask.png) center/100% 100% no-repeat; mask:url(vac_mask.png) center/100% 100% no-repeat"></div>
+      <div class="sweep" id="swHead" style="clip-path:inset(618px 0 0 0);-webkit-mask:url(vac_mask.png) center/100% 100% no-repeat; mask:url(vac_mask.png) center/100% 100% no-repeat"></div>
+    </div>
+    <svg id="wsvg" viewBox="0 0 720 720">
+      <rect id="brk" x="432" y="4" width="122" height="248" rx="14" fill="none" stroke="#B2842F" stroke-width="3.2" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- 画面の文字（手前） -->
+  <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px">
+    <div id="pr" class="abs">PR</div>
+
+    <!-- C2 -->
+    <div class="ln dela" id="h2" style="left:56px;top:252px;height:170px;font-size:134px"><span class="in">置くだけ</span></div>
+    <div class="chip" id="chip0" style="top:560px"><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#17150F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>充電</div>
+    <div class="chip" id="chip1" style="top:700px"><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#17150F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>収納</div>
+    <div class="chip" id="chip2" style="top:840px"><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#17150F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>ゴミ回収</div>
+    <svg id="lead" class="abs" style="left:0;top:0" width="1080" height="1920"><g stroke="#B2842F" stroke-width="4" stroke-linecap="round" fill="none"><path id="ld0" d="" pathLength="1"/><path id="ld1" d="" pathLength="1"/><path id="ld2" d="" pathLength="1"/></g><g fill="#B2842F"><circle id="ldc0" r="9"/><circle id="ldc1" r="9"/><circle id="ldc2" r="9"/></g></svg>
+
+    <!-- C3 -->
+    <div class="ln noto" id="l3a" style="left:60px;top:250px;height:70px;font-size:56px"><span class="in">ゴミ捨て不要</span></div>
+    <div class="ln dela" id="n3" style="left:50px;top:326px;height:310px;font-size:236px"><span class="in digits" id="n3t">4〜5</span></div>
+    <div class="ln noto" id="l3b" style="left:60px;top:600px;height:130px;font-size:104px"><span class="in">か月<span style="font-size:50px;vertical-align:top;margin-left:6px">※1</span></span></div>
+    <div class="abs" id="rail" style="left:60px;top:860px;width:540px;height:340px">
+      <div class="abs dela cell" id="cell0" style="left:0px;top:118px;width:92px;height:92px;border-radius:20px;border:5px solid rgba(23,21,15,.28);display:grid;place-items:center;font-size:50px;color:rgba(23,21,15,.32)">1</div><div class="abs dela cell" id="cell1" style="left:104px;top:118px;width:92px;height:92px;border-radius:20px;border:5px solid rgba(23,21,15,.28);display:grid;place-items:center;font-size:50px;color:rgba(23,21,15,.32)">2</div><div class="abs dela cell" id="cell2" style="left:208px;top:118px;width:92px;height:92px;border-radius:20px;border:5px solid rgba(23,21,15,.28);display:grid;place-items:center;font-size:50px;color:rgba(23,21,15,.32)">3</div><div class="abs dela cell" id="cell3" style="left:312px;top:118px;width:92px;height:92px;border-radius:20px;border:5px solid rgba(23,21,15,.28);display:grid;place-items:center;font-size:50px;color:rgba(23,21,15,.32)">4</div><div class="abs dela cell" id="cell4" style="left:416px;top:118px;width:92px;height:92px;border-radius:20px;border:5px solid rgba(23,21,15,.28);display:grid;place-items:center;font-size:50px;color:rgba(23,21,15,.32)">5</div>
+      <div class="abs noto" id="rl0" style="left:0;top:232px;font-size:36px;color:var(--mute);font-weight:700">か月目</div>
+      <div class="abs noto" id="rbadge" style="left:0;top:-4px;width:508px;text-align:right;font-size:58px;line-height:1;opacity:0">ゴミ捨て<span class="gold dela" style="font-size:84px;margin:0 6px">1</span>回</div>
+    </div>
+    <div class="note" id="note1" style="left:60px;top:1290px;width:462px">※1 1日1回の掃除（1日分の試験ごみ1g）として計測。ごみの種類や量、環境や使い方により満杯になる日数は異なります。</div>
+
+    <!-- C4 -->
+    <div class="abs" id="l4a" style="left:60px;top:246px;opacity:0"><span class="tag">強モード</span></div>
+    <div class="ln noto" id="l4b" style="left:60px;top:326px;height:80px;font-size:62px"><span class="in">強力吸引</span></div>
+    <div class="ln dela" id="n4" style="left:50px;top:408px;height:220px;font-size:158px"><span class="in digits" id="n4t">0</span></div>
+    <div class="ln dela" id="u4" style="left:58px;top:600px;height:120px;font-size:92px"><span class="in">Pa<span class="noto" style="font-size:44px;vertical-align:top;margin-left:8px">※2</span></span></div>
+    <div class="abs noto" id="bl0" style="left:60px;top:772px;font-size:38px;line-height:1;opacity:0">通常モード <span class="dela" style="font-size:40px">10,000</span><span style="font-size:30px">Pa</span></div>
+    <div class="bar" id="b0" style="left:60px;top:828px;width:520px;height:46px;background:rgba(23,21,15,.10)"><i id="b0i" style="width:100%;background:var(--ink);transform-origin:0 50%;transform:scaleX(0)"></i></div>
+    <div class="abs noto" id="bl1" style="left:60px;top:906px;font-size:38px;line-height:1;opacity:0">強モード <span class="dela gold" style="font-size:40px">26,400</span><span style="font-size:30px" class="gold">Pa</span></div>
+    <div class="bar" id="b1" style="left:60px;top:962px;width:520px;height:46px;background:rgba(23,21,15,.10)"><i id="b1i" style="width:100%;background:var(--gold);transform-origin:0 50%;transform:scaleX(0)"></i></div>
+    <div class="note" id="note2" style="left:60px;top:1290px;width:462px">※2 真空度。第三者機関による国際規格IEC60312クリーナー真空性能試験での測定値で、モーターの性能評価です。環境や使い方によって異なります。</div>
+
+    <!-- C5 -->
+    <div class="abs" id="l5a" style="left:60px;top:246px;opacity:0"><span class="tag">ハンディ時</span></div>
+    <div class="ln noto" id="l5b" style="left:60px;top:326px;height:80px;font-size:62px"><span class="in">1キロ未満</span></div>
+    <div class="ln dela" id="n5" style="left:50px;top:408px;height:250px;font-size:176px"><span class="in digits" id="n5t">1.60</span></div>
+    <div class="ln noto" id="u5" style="left:60px;top:636px;height:110px;font-size:84px"><span class="in">kg</span></div>
+    <div class="ln noto" id="s5" style="left:60px;top:790px;height:70px;font-size:36px;line-height:1.5;color:var(--mute)"><span class="in" style="font-weight:700">ヘッド・パイプ込みは1.6kg</span></div>
+
+    <!-- C6 -->
+    <div class="ln noto" id="l6a" style="left:60px;top:250px;height:70px;font-size:56px"><span class="in">使用時間 最大</span></div>
+    <svg id="ring" class="abs" style="left:0;top:0" width="1080" height="1920">
+      <circle cx="318" cy="770" r="236" fill="none" stroke="rgba(23,21,15,.12)" stroke-width="44"/>
+      <g id="rticks" stroke="#17150F" stroke-width="5" stroke-linecap="round"></g>
+      <circle id="ringp" cx="318" cy="770" r="236" fill="none" stroke="#B2842F" stroke-width="44" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 318 770)"/>
+    </svg>
+    <div class="abs dela" id="n6" style="left:68px;top:706px;width:500px;text-align:center;font-size:124px;line-height:1;white-space:nowrap;opacity:0">約30</div>
+    <div class="abs noto" id="u6" style="left:68px;top:856px;width:500px;text-align:center;font-size:62px;line-height:1;opacity:0">分<span style="font-size:36px;vertical-align:top;margin-left:6px">※3</span></div>
+    <div class="abs" id="t6" style="left:60px;top:1060px;opacity:0"><span class="tag">標準モード</span></div>
+    <div class="note" id="note3" style="left:60px;top:1290px;width:462px">※3 満充電、バッテリー温度20℃の標準モード時。強モードは約13分。</div>
+
+    <!-- C7 -->
+    <div class="abs dela gold" id="star" style="left:46px;top:236px;font-size:150px;line-height:1;opacity:0">★</div>
+    <div class="ln dela" id="n7" style="left:218px;top:222px;height:280px;font-size:196px"><span class="in digits" id="n7t">0.00</span></div>
+    <div class="ln noto" id="r7a" style="left:60px;top:494px;height:80px;font-size:62px"><span class="in">レビュー</span></div>
+    <div class="ln dela" id="r7" style="left:56px;top:566px;height:180px;font-size:124px"><span class="in"><span class="digits" id="r7t">0</span><span style="font-family:'Noto Sans JP';font-weight:900;font-size:62px;margin-left:8px">件</span></span></div>
+    <div class="note" id="note7" style="left:60px;top:740px;width:520px">楽天市場 2026年10月2日時点<br>Orage RR35<br>コードレスサイクロンクリーナー</div>
+    <div class="note" id="note8" style="left:62px;top:1256px;width:520px;font-weight:700">価格・在庫・最新情報は<br>リンク先でご確認ください</div>
+    <div id="cta" class="abs"><span style="position:relative">プロフィールのリンクへ</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sw" id="ctasw"></div></div>
+  </div>
+
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="vig"></div>
+</div></div>
+
+<script>
+// ===================== 時間だけの関数。window.seek(t) が時刻 t のフレームを完全に決める =====================
+const TL = window.TIMELINE;
+const C = TL.cuts, EV = TL.ev, END = TL.end;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+// 閉形式のばね。z>=1 は臨界減衰（行き過ぎ無し）、z<1 は僅かな行き過ぎ（UIの部品だけに使う）
+function sp(t, w = 12, z = 1) {
+  if (t <= 0) return 0;
+  if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t);
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t));
+}
+const outC = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const inOutC = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+let T = 0;
+
+// ---- 固定幅の数字（数えている間に幅がブレない） ----
+let DW = 0.80;
+const COMMA = '<svg viewBox="0 0 10 20" style="display:inline-block;width:.30em;height:.60em;margin:0 .03em;vertical-align:baseline;position:relative;top:.12em" fill="currentColor"><circle cx="5.2" cy="5" r="4.4"/><path d="M8.6 6 C8.6 12.5 5.8 17 0.6 19.6 L-0.2 16.8 C3 15 4.4 12.4 4 8 Z"/></svg>';
+const DASH = '<svg viewBox="0 0 10 10" preserveAspectRatio="none" style="display:inline-block;width:.46em;height:.14em;margin:0 .10em;vertical-align:baseline;position:relative;top:-.30em" fill="currentColor"><rect x="0" y="0" width="10" height="10" rx="2"/></svg>';
+function setDigits(id, str) {
+  const el = $(id); if (el.dataset.v === str) return; el.dataset.v = str;
+  el.innerHTML = [...str].map((ch) => ch === "," ? COMMA : (ch === "." ? `<span style="font-family:'Noto Sans JP';font-weight:900;margin:0 .02em">.</span>` : (ch === "~" ? DASH : ch))).join("");
+}
+// ---- マスクの中から文字が立ち上がる ----
+function lineIn(id, tin, tout, w = 13) {
+  const el = $(id), inner = el.firstElementChild;
+  const a = sp(T - tin, w, 1), o = outC((T - tout) / 0.30);
+  const y = (1 - a) * 140 - o * 140;
+  inner.style.transform = `translateY(${y}%)`;
+  el.style.visibility = (a <= 0.001 || o >= 0.999) ? "hidden" : "visible";
+}
+function pop(id, tin, tout, { dy = 26, s0 = 0.96, w = 13, z = 1 } = {}) {
+  const el = $(id), a = sp(T - tin, w, z), o = outC((T - tout) / 0.28);
+  el.style.opacity = clamp(a * 1.2) * (1 - o);
+  el.style.transform = `translate(0px, ${(1 - a) * dy - o * 20}px) scale(${lerp(s0, 1, clamp(a)) })`;
+}
+
+// ---- カメラ ----
+// F: 画面の A に来る商品上の点（元画像のピクセル座標）、z: 元画像1pxが画面で何pxか
+// tr: カットの中で滑る量（元画像px・横移動＝トラック、縦＝クレーン）。文字が出ている間は小さく保つ
+// mv: 前のカットからの入り方。dur=移動の秒数・roll=移動中に傾ける最大角度
+//     pan=先に向きを変えてから寄る（パン→ドリー）・whip=速く振る・tilt=縦に振る
+const CAM = [
+  { F: [463, 366], A: [742, 800], z: 1.50, drift: 0.05 },
+  { F: [533, 438], A: [760, 870], z: 2.20, drift: 0.03, tr: [-16, 0], mv: { dur: 0.48, roll: 2.6, kind: "whip" } },
+  { F: [463, 366], A: [756, 900], z: 1.25, drift: 0.04, mv: { dur: 0.60, roll: -1.2, kind: "pull" } },
+  { F: [386, 688], A: [790, 1060], z: 2.20, drift: 0.03, tr: [-22, 0], mv: { dur: 0.60, roll: 1.8, kind: "pan" } },
+  { F: [492, 130], A: [790, 650], z: 2.40, drift: 0.04, mv: { dur: 0.60, roll: -1.5, kind: "tilt" } },
+  { F: [463, 366], A: [756, 900], z: 1.25, drift: 0.03, tr: [10, 0], mv: { dur: 0.60, roll: 1.2, kind: "pull" } },
+  { F: [463, 366], A: [786, 960], z: 1.25, drift: 0.05, mv: { dur: 0.60, roll: 0, kind: "pull" } },
+];
+// 冒頭：柄のアップから一気に引いて全体を見せる（0.65秒）
+const OPEN = { F: [492, 150], A: [742, 800], z: 3.1, roll: -2.5, dur: 0.85 };
+const q5 = (x) => inOutC(x);   // 5乗の山は1コマで動きすぎて残像が段々に見えた（実物のコマで確認）ので3乗にした
+// 画面上のぼけ量(px)。[ステーション, 掃除機]。C4/C5は掃除機が主役なので奥のステーションを落とす
+const BLUR = [[0, 0], [0, 0], [0, 0], [7, 0], [9, 0], [0, 0], [0, 0]];
+// カット i の中の姿勢（寄り続け＋滑り）。u=カット内の進み 0..1
+function restAt(i, u) {
+  const c = CAM[i], tr = c.tr || [0, 0];
+  return { F: [c.F[0] + tr[0] * u, c.F[1] + tr[1] * u], A: c.A, z: c.z * (1 + c.drift * u), r: 0 };
+}
+function camAt(t) {
+  // 移動はカットの境目の少し前から始まり、境目で一番速い
+  let i = 0; for (let k = 1; k < C.length; k++) if (t >= C[k] - CAM[k].mv.dur * 0.5) i = k;
+  const cur = CAM[i], nextCut = i + 1 < C.length ? C[i + 1] : END;
+  const uIn = clamp((t - C[i]) / (nextCut - C[i]));
+  const dtp = t - EV.wordC, punch = dtp > 0 ? 0.045 * Math.exp(-9 * dtp) * (1 - Math.exp(-70 * dtp)) : 0;
+  if (i === 0) {
+    const ko = q5(t / OPEN.dur), r = restAt(0, uIn);
+    return { F: [lerp(OPEN.F[0], r.F[0], ko), lerp(OPEN.F[1], r.F[1], ko)], A: r.A,
+             z: Math.exp(lerp(Math.log(OPEN.z), Math.log(r.z), ko)) * (1 + punch), r: OPEN.roll * (1 - ko), i, k: 1,
+             lin: [lerp(OPEN.F[0], r.F[0], clamp(t / OPEN.dur)), lerp(OPEN.F[1], r.F[1], clamp(t / OPEN.dur))] };
+  }
+  const m = cur.mv, t0 = C[i] - m.dur * 0.5, u = clamp((t - t0) / m.dur);
+  const p = restAt(i - 1, 1), r = restAt(i, uIn);
+  // pan：先に向き（F）を変え、遅れて寄る（z）。tilt：縦に振る＝F を先に・z は一緒。pull：引きながら向きを変える
+  const fk = m.kind === "pan" ? q5(u / 0.8) : q5(u), zk = m.kind === "pan" ? q5((u - 0.25) / 0.75) : (m.kind === "pull" ? q5(u * 1.1) : q5(u));
+  return {
+    F: [lerp(p.F[0], r.F[0], fk), lerp(p.F[1], r.F[1], fk)],
+    A: [lerp(p.A[0], r.A[0], fk), lerp(p.A[1], r.A[1], fk)],
+    z: Math.exp(lerp(Math.log(p.z), Math.log(r.z), zk)),
+    r: m.roll * Math.sin(Math.PI * u), i, k: u >= 1 ? 1 : fk,
+    lin: [lerp(p.F[0], r.F[0], u), lerp(p.F[1], r.F[1], u)],
+  };
+}
+function camAt_unused(t) {
+  let i = 0; for (let k = 0; k < C.length; k++) if (t >= C[k] - 0.10) i = k;
+  const cur = CAM[i];
+  const nextCut = i + 1 < C.length ? C[i + 1] : END;
+  const drift = 1 + cur.drift * clamp((t - C[i]) / (nextCut - C[i]));
+  // 『全員見て!!』が出る瞬間の一撃（音のヒットと同じ時刻）。速く入り、ゆっくり戻る
+  const dtp = t - EV.wordC, punch = dtp > 0 ? 0.045 * Math.exp(-9 * dtp) * (1 - Math.exp(-70 * dtp)) : 0;
+  if (i === 0) return { F: cur.F, A: cur.A, z: cur.z * drift * (1 + punch), i, k: 1 };
+  const p = CAM[i - 1];
+  const pEnd = p.z * (1 + p.drift);
+  const k = sp(t - (C[i] - 0.10), 8.0, 1);
+  return {
+    F: [lerp(p.F[0], cur.F[0], k), lerp(p.F[1], cur.F[1], k)],
+    A: [lerp(p.A[0], cur.A[0], k), lerp(p.A[1], cur.A[1], k)],
+    z: Math.exp(lerp(Math.log(pEnd), Math.log(cur.z * 1.0), k)) * (1 + (drift - 1) * k),
+    i, k,
+  };
+}
+
+// ---- ノイズ（乱数はseed固定） ----
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const gctx = $("grain").getContext("2d"); const gimg = gctx.createImageData(540, 960);
+function grain(seed) { const r = mulberry32(seed * 9301 + 49297), d = gimg.data; for (let i = 0; i < d.length; i += 4) { const v = 226 + Math.floor(r() * 29); d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; } gctx.putImageData(gimg, 0, 0); }
+
+// 輪の目盛り（30分を6つに）
+(function () { let s = ""; for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 - Math.PI / 2, r0 = 270, r1 = 288; s += `<line x1="${318 + Math.cos(a) * r0}" y1="${770 + Math.sin(a) * r0}" x2="${318 + Math.cos(a) * r1}" y2="${770 + Math.sin(a) * r1}"/>`; } $("rticks").innerHTML = s; })();
+
+function sweepAt(id, t0, dur, peak = 0.9) {
+  const p = clamp((T - t0) / dur), el = $(id);
+  el.style.opacity = (p <= 0 || p >= 1) ? 0 : Math.sin(p * Math.PI) * peak;
+  el.style.backgroundPosition = `${lerp(100, 0, inOutC(p))}% 0`;
+}
+
+window.seek = function (t) {
+  T = t;
+  const cam = camAt(t), base = CAM[0];
+  grain(Math.floor(t * 12));
+
+  // ---- ステージの手持ちの揺れ（ごくわずか） ----
+  const sw = $("stage");
+  sw.style.transform = `rotate(${Math.sin(t * 1.7) * 0.18}deg) translate(${Math.sin(t * 1.3) * 2.2}px, ${Math.cos(t * 1.1) * 2.2}px) scale(1.0)`;
+
+  // ---- 世界（商品） ----
+  $("world").style.transform = `translate(${cam.A[0]}px, ${cam.A[1]}px) rotate(${cam.r}deg) scale(${cam.z}) translate(${-cam.F[0]}px, ${-cam.F[1]}px)`;
+  { const c0 = camAt(Math.max(0, t - 1 / 120)), P = [463, 366], sx = (c) => [c.A[0] + c.z * (P[0] - c.F[0]), c.A[1] + c.z * (P[1] - c.F[1])];
+    const a = sx(cam), b = sx(c0), v = Math.hypot(a[0] - b[0], a[1] - b[1]) * 120 + Math.abs(Math.log(cam.z / c0.z)) * 120 * 900;
+    const mb = clamp(v / 700, 0, 7); $("world").style.filter = mb > 0.3 ? `blur(${mb / cam.z}px)` : "none"; }
+  // 背景の光は奥にあるので、カメラの動きに少しだけ遅れてついてくる
+  const dxF = (cam.F[0] - base.F[0]) * base.z, dyF = (cam.F[1] - base.F[1]) * base.z;
+  $("wl1").style.marginLeft = `${-dxF * 0.10 + Math.sin(t * 0.5) * 14}px`;
+  $("wl2").style.marginLeft = `${-dxF * 0.18 + Math.cos(t * 0.4) * 10}px`;
+  $("bg").style.transform = `translate(${-dxF * 0.05}px, ${-dyF * 0.05}px) scale(${1 + (cam.z / base.z - 1) * 0.08})`;
+
+  // 登場：下から。掃除機はステーションより手前（近い）ので少し速く動く
+  const eIn = sp(t + 0.12, 10, 1), eIn2 = sp(t + 0.05, 10, 1);
+  const k2 = q5((t - (C[1] - CAM[1].mv.dur * 0.5)) / CAM[1].mv.dur), k3 = q5((t - (C[2] - CAM[2].mv.dur * 0.5)) / CAM[2].mv.dur);
+  const vacDX = -440 * (k2 - k3);
+  $("vacG").style.transform = `translate(${vacDX}px, ${(1 - eIn) * 300}px) rotate(${(1 - eIn) * -2.2}deg)`;
+  const PF = 0.78, rest = cam.lin;                              // 奥の層はカメラ移動の78%だけ動く
+  const pdx = (1 - PF) * (cam.F[0] - rest[0]), pdy = (1 - PF) * (cam.F[1] - rest[1]);
+  $("stationG").style.transform = `translate(${pdx}px, ${(1 - eIn2) * 300 + pdy}px)`;
+  // ピント送り: 各カットの主役でない側をぼかす（CSSのblurは親の拡大に連動するので z で割る）
+  const prevB = cam.i > 0 ? BLUR[cam.i - 1] : BLUR[0], curB = BLUR[cam.i];
+  const bSt = lerp(prevB[0], curB[0], cam.k), bVac = lerp(prevB[1], curB[1], cam.k);
+  $("stationG").style.filter = bSt > 0.05 ? `blur(${bSt / cam.z}px)` : "none";
+  $("vacG").style.filter = bVac > 0.05 ? `blur(${bVac / cam.z}px)` : "none";
+  const shA = clamp(eIn * 1.1);
+  $("shVac").style.opacity = shA; $("shSt").style.opacity = clamp(eIn2 * 1.1);
+  $("reflVac").style.opacity = 0.16 * shA; $("reflSt").style.opacity = 0.16 * clamp(eIn2 * 1.1);
+
+  // 光の走りは冒頭・ヘッド（C4）・締めの3回だけ
+  if (t < C[3]) { sweepAt("swVac", EV.sweep1, 0.75, 0.85); sweepAt("swSt", EV.sweep1 + 0.12, 0.75, 0.7); }
+  else if (t > C[6]) { sweepAt("swVac", C[6] + 0.1, 0.9, 0.8); sweepAt("swSt", C[6] + 0.22, 0.9, 0.7); }
+  else { $("swVac").style.opacity = 0; $("swSt").style.opacity = 0; }
+  sweepAt("swHead", EV.c4_glint, 0.85, 1.0);
+
+  // ---- PR ----
+  $("pr").style.opacity = clamp(t / 0.3);
+
+  // ================= C1 冒頭 =================
+  lineIn("hA", EV.wordA - 0.16, C[1] - 0.30, 14);
+  lineIn("hB", EV.wordB - 0.20, C[1] - 0.30, 14);
+  lineIn("hC", EV.wordC, C[1] - 0.30, 15);
+  const bar = sp(t - (EV.wordC + 0.18), 12, 1), barO = outC((t - (C[1] - 0.30)) / 0.3);
+  const hb = bar * (1 - barO); $("hBar").style.transform = `scaleX(${hb})`; $("hBar").style.visibility = hb < 0.02 ? "hidden" : "visible";   // 縮み切る直前の細い棒を残さない
+  // 冒頭の引き（OPEN）の間は見出しを動かさない＝1コマ目（サムネイル）で見出しが欠けない
+  const cb = cam.i === 0 ? restAt(0, clamp(t / C[1])) : cam, bdx = (cb.F[0] - base.F[0]) * base.z, bdy = (cb.F[1] - base.F[1]) * base.z;
+  $("behind").style.transform = `translate(${-bdx * 0.35}px, ${-bdy * 0.35}px) scale(${1 + (cb.z / base.z - 1) * 0.35})`;
+  $("behind").style.transformOrigin = `${base.A[0]}px ${base.A[1]}px`;
+
+  // ================= C2 置くだけ =================
+  lineIn("h2", EV.c2_head, C[2] - 0.30, 13);
+  for (let i = 0; i < 3; i++) {
+    const tin = EV[`chip${i}`], el = $(`chip${i}`);
+    const a = sp(t - tin, 15, 0.78), o = outC((t - (C[2] - 0.30)) / 0.28);
+    el.style.opacity = clamp(a * 1.4) * (1 - o);
+    el.style.transform = `translate(${(1 - a) * -70 - o * 40}px, 0px)`;
+  }
+  // 札とステーションをつなぐ線（画面座標。カメラが落ち着いた後の位置）
+  (function () {
+    const ys = [616, 756, 896]; const tx = LEAD.tx, ty = LEAD.ty;
+    for (let i = 0; i < 3; i++) {
+      const g = outC((t - (EV.leader + i * 0.16)) / 0.4), o = outC((t - (C[2] - 0.30)) / 0.25);
+      const x0 = 56 + 350, y0 = ys[i];
+      $(`ld${i}`).setAttribute("d", `M${x0},${y0} L${lerp(x0, tx[i], g)},${lerp(y0, ty[i], g)}`);
+      $(`ldc${i}`).setAttribute("cx", lerp(x0, tx[i], g)); $(`ldc${i}`).setAttribute("cy", lerp(y0, ty[i], g));
+      const op = (g > 0 ? 1 : 0) * (1 - o); $(`ld${i}`).style.opacity = op; $(`ldc${i}`).style.opacity = op;
+    }
+  })();
+
+  // ================= C3 4〜5か月 =================
+  lineIn("l3a", EV.c3_label, C[3] - 0.30, 13);
+  setDigits("n3t", "4~5");
+  lineIn("n3", EV.c3_num, C[3] - 0.30, 12);
+  lineIn("l3b", EV.c3_num + 0.14, C[3] - 0.30, 12);
+  const rOut = outC((t - (C[3] - 0.30)) / 0.28);
+  $("rail").style.opacity = 1 - rOut;
+  for (let i = 0; i < 5; i++) {
+    const ti = EV.rail0 + i * ((EV.rail1 - EV.rail0) / 4.6);                // 1つずつ、拍に合わせて埋まる
+    const a = sp(t - ti, 15, 0.8), on = clamp(a), el = $(`cell${i}`);
+    const last = i === 4;
+    el.style.opacity = clamp(sp(t - (EV.rail0 - 0.35 + i * 0.05), 14, 1) * 1.4);
+    el.style.background = last ? `rgba(178,132,47,${on})` : `rgba(23,21,15,${on})`;
+    el.style.borderColor = last ? `rgba(178,132,47,${0.28 + 0.72 * on})` : `rgba(23,21,15,${0.28 + 0.72 * on})`;
+    el.style.color = on > 0.5 ? "#F2EDE4" : "rgba(23,21,15,.32)";
+    el.style.transform = `scale(${lerp(1, last ? 1.06 : 1.0, on)})`;
+  }
+  const eg = sp(t - EV.c3_badge, 11, 0.7);
+  $("rbadge").style.opacity = clamp(eg * 1.4); $("rbadge").style.transform = `translateY(${(1 - clamp(eg)) * 18}px)`;
+  $("rl0").style.opacity = clamp(sp(t - (EV.rail0 - 0.2), 12, 1));
+  const n1 = outC((t - (EV.c3_num + 0.6)) / 0.3), n1o = outC((t - (C[3] - 0.30)) / 0.28);
+  $("note1").style.opacity = n1 * (1 - n1o);
+
+  // ================= C4 強力吸引 =================
+  pop("l4a", EV.c4_label, C[4] - 0.30, { dy: 16, s0: 0.98 });
+  lineIn("l4b", EV.c4_label + 0.10, C[4] - 0.30, 13);
+  const cp = outC((t - EV.c4_cnt0) / (EV.c4_cnt1 - EV.c4_cnt0));
+  const vPa = Math.round((26400 * cp) / 100) * 100;          // 100刻み
+  setDigits("n4t", Math.max(vPa, 0).toLocaleString("en-US"));
+  lineIn("n4", EV.c4_cnt0 - 0.05, C[4] - 0.30, 12);
+  lineIn("u4", EV.c4_cnt0 + 0.05, C[4] - 0.30, 12);
+  const bo = outC((t - (C[4] - 0.30)) / 0.28);
+  const o0 = clamp(sp(t - EV.c4_bar0, 14, 1) * 1.3) * (1 - bo), o1 = clamp(sp(t - EV.c4_bar1, 14, 1) * 1.3) * (1 - bo);
+  $("b0").style.opacity = o0; $("bl0").style.opacity = o0; $("b1").style.opacity = o1; $("bl1").style.opacity = o1;
+  $("b0i").style.transform = `scaleX(${inOutC((t - EV.c4_bar0) / 0.5) * (10000 / 26400)})`;
+  $("b1i").style.transform = `scaleX(${inOutC((t - EV.c4_bar1) / 0.6)})`;
+  const n2 = outC((t - (EV.c4_cnt1)) / 0.3), n2o = outC((t - (C[4] - 0.30)) / 0.28);
+  $("note2").style.opacity = n2 * (1 - n2o);
+
+  // ================= C5 ハンディ =================
+  pop("l5a", EV.c5_label, C[5] - 0.30, { dy: 16, s0: 0.98 });
+  lineIn("l5b", EV.c5_label + 0.10, C[5] - 0.30, 13);
+  const wp = inOutC((t - EV.c5_num0) / (EV.c5_num1 - EV.c5_num0));
+  setDigits("n5t", (lerp(1.60, 0.97, wp)).toFixed(2));
+  lineIn("n5", EV.c5_num0 - 0.05, C[5] - 0.30, 12);
+  lineIn("u5", EV.c5_num0 + 0.05, C[5] - 0.30, 12);
+  lineIn("s5", EV.c5_sub, C[5] - 0.30, 13);
+  const bd = clamp((t - EV.c5_bracket) / 0.55), bdo = outC((t - (C[5] - 0.30)) / 0.25);
+  $("brk").setAttribute("stroke-dashoffset", String(1 - inOutC(bd)));
+  $("brk").style.opacity = 1 - bdo;
+
+  // ================= C6 30分 =================
+  lineIn("l6a", EV.c6_label, C[6] - 0.30, 13);
+  const rp = inOutC((t - EV.c6_ring0) / (EV.c6_ring1 - EV.c6_ring0));
+  $("ringp").setAttribute("stroke-dashoffset", String(1 - rp));
+  const ro = outC((t - (C[6] - 0.30)) / 0.28), rin = sp(t - (EV.c6_ring0 - 0.2), 12, 1);
+  $("ring").style.opacity = clamp(rin * 1.4) * (1 - ro);
+  const nIn = sp(t - (EV.c6_ring0 + 0.25), 12, 1);
+  $("n6").style.opacity = clamp(nIn * 1.3) * (1 - ro); $("n6").style.transform = `translateY(${(1 - nIn) * 30}px)`;
+  $("u6").style.opacity = clamp(nIn * 1.3) * (1 - ro); $("u6").style.transform = `translateY(${(1 - nIn) * 30}px)`;
+  pop("t6", EV.c6_note - 0.1, C[6] - 0.30, { dy: 16, s0: 0.98 });
+  const n3o = outC((t - (C[6] - 0.30)) / 0.28);
+  $("note3").style.opacity = outC((t - EV.c6_note) / 0.3) * (1 - n3o);
+
+  // ================= C7 レビューとCTA =================
+  const so = sp(t - EV.c7_star0, 12, 0.8);
+  $("star").style.opacity = clamp(so * 1.3); $("star").style.transform = `translateY(${(1 - so) * 30}px) scale(${lerp(0.9, 1, clamp(so))})`;
+  const sp7 = outC((t - EV.c7_star0) / (EV.c7_star1 - EV.c7_star0));
+  setDigits("n7t", (4.61 * sp7).toFixed(2));
+  lineIn("n7", EV.c7_star0, 999, 12);
+  lineIn("r7a", EV.c7_rev0 - 0.15, 999, 13);
+  const rv = outC((t - EV.c7_rev0) / (EV.c7_rev1 - EV.c7_rev0));
+  setDigits("r7t", Math.round(2059 * rv).toLocaleString("en-US"));
+  lineIn("r7", EV.c7_rev0, 999, 12);
+  $("note7").style.opacity = outC((t - EV.c7_rev1) / 0.4);
+  const cta = sp(t - EV.c7_cta, 14, 0.8);
+  $("cta").style.opacity = clamp(cta * 1.3); $("cta").style.transform = `translateY(${(1 - cta) * 50}px) scale(${lerp(0.94, 1, clamp(cta))})`;
+  $("note8").style.opacity = outC((t - (EV.c7_cta + 0.30)) / 0.4);
+  const cs = clamp((t - (EV.c7_cta + 0.35)) / 0.9);
+  $("ctasw").style.backgroundPosition = `${lerp(100, 0, inOutC(cs))}% 0`; $("ctasw").style.opacity = (cs > 0 && cs < 1) ? 1 : 0;
+};
+// ステーションの左の輪郭（画像の透明度を読む）に線の先を合わせる
+const LEAD = { tx: [0, 0, 0], ty: [0, 0, 0] };
+window.READY = (async () => {
+  const im = new Image(); im.src = "station.png"; await im.decode();
+  const cv = document.createElement("canvas"); cv.width = im.width; cv.height = im.height;
+  const cx = cv.getContext("2d"); cx.drawImage(im, 0, 0); const px = cx.getImageData(0, 0, im.width, im.height).data;
+  const k = im.width / 179; const cc = CAM[1];
+  const ysScreen = [650, 770, 900];
+  ysScreen.forEach((ys, i) => {
+    const ySrc = cc.F[1] + (ys - cc.A[1]) / cc.z; const row = Math.max(0, Math.min(im.height - 1, Math.round((ySrc - 234) * k)));
+    let x = 0; for (; x < im.width; x++) if (px[(row * im.width + x) * 4 + 3] > 140) break;
+    LEAD.tx[i] = cc.A[0] + cc.z * (444 + x / k - cc.F[0]) - 2; LEAD.ty[i] = ys;
+  });
+  await Promise.all([...document.images].map((i) => i.decode().catch(() => 0)));
+  await document.fonts.ready;
+  // 見出しの幅を実測で合わせ、行を積む
+  { const pr = document.createElement("span"); pr.className = "dela"; pr.style.cssText = "position:absolute;visibility:hidden;font-size:100px;white-space:nowrap"; document.body.appendChild(pr);
+    let mx = 0; for (const d of "0123456789") { pr.textContent = d; mx = Math.max(mx, pr.getBoundingClientRect().width); } DW = mx / 100 + 0.02; pr.remove(); }
+  const fit = (id, w) => { const el = $(id), inn = el.firstElementChild; el.style.fontSize = "100px"; el.style.width = "auto"; const cur = inn.getBoundingClientRect().width; el.style.fontSize = (100 * w / cur) + "px"; };
+  fit("hA", 540); fit("hB", 540); fit("hC", 560); fit("h2", 500);
+  let y = 262; for (const id of ["hA", "hB", "hC"]) { const el = $(id); const fs = parseFloat(el.style.fontSize); el.style.top = y + "px"; el.style.height = (fs * 1.12) + "px"; y += fs * 1.12 + 6; }
+  $("hBar").style.top = (y + 4) + "px"; $("hBar").style.width = "540px";
+  { const el = $("h2"); el.style.height = (parseFloat(el.style.fontSize) * 1.12) + "px"; }
+})();
+window.seek(0);
+</script>
+</body>
+</html>

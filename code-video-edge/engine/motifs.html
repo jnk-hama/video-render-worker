@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<style>
+  /* 数字の見せ方の見本帳（オーナー「バロメーター以外なんかない？全部そのデザインだと飽きがくる」）。1つ 3.2秒 × 6 */
+  :root { --bg:#F3EFE8; --ink:#1A1916; --acc:#B2842F; --mut:#6A645A; --blue:#3E6E8E; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--bg); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; }
+  .abs { position:absolute; }
+  .sec { position:absolute; inset:0; visibility:hidden; }
+  .dela { font-family:"Dela Gothic One",sans-serif; }
+  .jp { font-family:"Noto Sans JP",sans-serif; font-weight:900; }
+  .gar { font-family:"Cormorant Garamond","Shippori Mincho",serif; font-feature-settings:"lnum" 1; font-variant-numeric:lining-nums; }
+  .tag { position:absolute; left:64px; top:150px; font:700 30px/1 "Noto Sans JP"; letter-spacing:.12em; color:var(--mut); }
+  .title { position:absolute; left:64px; top:200px; font:900 64px/1.2 "Noto Sans JP"; }
+  .note { position:absolute; left:64px; top:1700px; width:952px; font:500 26px/1.5 "Noto Sans JP"; color:var(--mut); }
+  /* パタパタ */
+  .flap { position:absolute; width:128px; height:200px; perspective:900px; }
+  .flap .h { position:absolute; left:0; width:128px; height:100px; overflow:hidden; background:#22201C; color:#F3EFE8; font:400 150px/200px "Dela Gothic One"; text-align:center; }
+  .flap .t { top:0; border-radius:14px 14px 0 0; } .flap .b { top:100px; border-radius:0 0 14px 14px; }
+  .flap .b span { display:block; margin-top:-100px; } .flap .fl { transform-origin:50% 100%; z-index:2; }
+  .flap::after { content:""; position:absolute; left:0; top:99px; width:128px; height:2px; background:rgba(0,0,0,.6); z-index:3; }
+  /* カレンダー */
+  .cal { position:absolute; left:290px; top:560px; width:500px; height:560px; perspective:1600px; }
+  .page { position:absolute; inset:0; border-radius:28px; background:#fff; box-shadow:0 18px 40px rgba(40,30,10,.18); transform-origin:50% 0; backface-visibility:hidden; overflow:hidden; }
+  .page .hd { height:120px; background:var(--ink); color:#F3EFE8; font:900 46px/120px "Noto Sans JP"; text-align:center; letter-spacing:.1em; }
+  .page .n { font:400 300px/400px "Dela Gothic One"; text-align:center; }
+  .ring { position:absolute; top:-26px; width:22px; height:60px; border-radius:11px; background:#8A847A; z-index:9; }
+</style>
+</head>
+<body>
+<!-- 1 パタパタ -->
+<div class="sec" id="s0">
+  <div class="tag">01　パタパタ（スプリットフラップ）</div><div class="title">強モードの真空度</div>
+  <div id="flaps" class="abs" style="left:64px;top:620px"></div>
+  <div class="abs dela" style="left:840px;top:700px;font-size:100px">Pa</div>
+  <div class="note">※真空度（RR35・販売ページの記載）。駅の表示板のように数字がめくれて決まる＝「測った値」を見せる</div>
+</div>
+<!-- 2 倍率の大写し -->
+<div class="sec" id="s1">
+  <div class="tag">02　倍率の大写し</div><div class="title">通常モード → 強モード</div>
+  <div id="m1a" class="abs dela" style="left:64px;top:520px;font-size:90px;color:var(--mut)">10,000<span style="font-size:44px"> Pa</span></div>
+  <div id="m1b" class="abs dela" style="left:540px;top:980px;font-size:200px;transform-origin:50% 50%;white-space:nowrap">26,400</div>
+  <div id="m1c" class="abs" style="left:660px;top:500px;width:340px;height:340px;border-radius:50%;border:12px solid var(--acc);color:var(--acc);display:grid;place-items:center;transform:rotate(-12deg)"><div style="text-align:center"><div class="jp" style="font-size:44px">約</div><div class="dela" style="font-size:140px;line-height:.9">2.6<span style="font-size:70px">倍</span></div></div></div>
+  <div class="note">※倍率は販売ページの数値（10,000Pa・26,400Pa）からの計算値。小さい数字が画面いっぱいに迫り、判が押される</div>
+</div>
+<!-- 3 カレンダー -->
+<div class="sec" id="s2">
+  <div class="tag">03　カレンダーめくり</div><div class="title">ゴミ捨て不要 最大約</div>
+  <div class="cal" id="cal"></div>
+  <div id="stamp" class="abs" style="left:620px;top:1000px;width:300px;height:300px;border-radius:50%;border:12px solid var(--acc);color:var(--acc);display:grid;place-items:center;transform:rotate(-14deg)"><div class="jp" style="text-align:center;font-size:52px;line-height:1.2">ゴミ捨て<br><span class="dela" style="font-size:96px">1</span>回</div></div>
+  <div class="note">※1日1回の掃除（1日分の試験ごみ1g）として計測（RR35・販売ページの記載）。月がめくれていく＝時間の長さを体で感じる</div>
+</div>
+<!-- 4 計量カップ -->
+<div class="sec" id="s3">
+  <div class="tag">04　計量カップ</div><div class="title">最大容量</div>
+  <svg id="cup" class="abs" style="left:240px;top:470px" width="600" height="1000" viewBox="0 0 600 1000">
+    <defs><clipPath id="cc"><path d="M90,60 L510,60 L470,940 Q468,960 448,960 L152,960 Q132,960 130,940 Z"/></clipPath>
+      <linearGradient id="wg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7FB2CF"/><stop offset="1" stop-color="#3E6E8E"/></linearGradient></defs>
+    <g clip-path="url(#cc)"><rect x="0" y="0" width="600" height="1000" fill="#fff"/><path id="water" d="" fill="url(#wg)"/></g>
+    <path d="M90,60 L510,60 L470,940 Q468,960 448,960 L152,960 Q132,960 130,940 Z" fill="none" stroke="#1A1916" stroke-width="10" stroke-linejoin="round"/>
+    <g id="ticks" font-family="Cormorant Garamond" font-size="44" fill="#1A1916"></g>
+  </svg>
+  <div id="ml" class="abs dela" style="left:64px;top:330px;font-size:150px">0<span style="font-size:70px">ml</span></div>
+  <div class="note">※最大容量550ml（BALMUDA The Pot・販売ページの記載）。目盛りの中を水位が上がる＝量を実物の感覚で見せる</div>
+</div>
+<!-- 5 ドーナツ -->
+<div class="sec" id="s4">
+  <div class="tag">05　ドーナツ</div><div class="title">素材</div>
+  <svg class="abs" style="left:190px;top:480px" width="700" height="700" viewBox="0 0 700 700">
+    <circle cx="350" cy="350" r="250" fill="none" stroke="rgba(26,25,22,.1)" stroke-width="110"/>
+    <circle id="d1" cx="350" cy="350" r="250" fill="none" stroke="#1A1916" stroke-width="110" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 350 350)"/>
+    <circle id="d2" cx="350" cy="350" r="250" fill="none" stroke="#B2842F" stroke-width="110" pathLength="100" stroke-dasharray="0 100" transform="rotate(198 350 350)"/>
+  </svg>
+  <div class="abs" style="left:190px;top:700px;width:700px;text-align:center"><div id="pc" class="gar" style="font-size:190px;line-height:1">0<span style="font-size:90px">%</span></div><div class="jp" style="font-size:46px">綿</div></div>
+  <div id="lg" class="abs jp" style="left:64px;top:1290px;font-size:44px;line-height:1.7;opacity:0"><span style="display:inline-block;width:34px;height:34px;background:#1A1916;border-radius:8px;vertical-align:middle;margin-right:14px"></span>綿 80%　<span style="display:inline-block;width:34px;height:34px;background:#B2842F;border-radius:8px;vertical-align:middle;margin:0 14px 0 30px"></span>ポリエステル 20%</div>
+  <div class="note">※ヘザーグレー・チャコールは配合が異なる（パーカー・販売ページの記載）。割合は「面積」で見せると一瞬で分かる</div>
+</div>
+<!-- 6 サイズの人型 -->
+<div class="sec" id="s5">
+  <div class="tag">06　サイズの人型</div><div class="title">8サイズ</div>
+  <div id="figs" class="abs" style="left:0;top:0"></div>
+  <div class="abs" style="left:64px;top:1420px;width:952px;height:4px;background:var(--ink)"></div>
+  <div class="note">※表記サイズ S〜5XL（パーカー・販売ページの記載）。小さい順に影が並ぶ＝「自分のサイズがある」を一目で</div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k;
+const outC = (x) => 1 - Math.pow(1 - clamp(x), 3), inOutC = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+function sp(t, w = 12, z = 1) { if (t <= 0) return 0; if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t); const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t)); }
+const D = 3.2;
+// パタパタの枠（5桁＋カンマ）
+const DIG = "26400", fl = $("flaps"); let x = 0;
+[..."26,400"].forEach((c) => { if (c === ",") { fl.insertAdjacentHTML("beforeend", `<div class="abs dela" style="left:${x}px;top:100px;font-size:110px">,</div>`); x += 44; return; }
+  fl.insertAdjacentHTML("beforeend", `<div class="flap" style="left:${x}px;top:0"><div class="h t"><span></span></div><div class="h b"><span></span></div><div class="h t fl"><span></span></div></div>`); x += 142; });
+const flaps = [...fl.querySelectorAll(".flap")];
+// カレンダー（1〜5か月）
+for (let k = 5; k >= 1; k--) $("cal").insertAdjacentHTML("beforeend", `<div class="page" data-k="${k}"><div class="hd">${k}か月目</div><div class="n">${k}</div></div>`);
+[90, 200, 300, 390].forEach((l) => $("cal").insertAdjacentHTML("beforeend", `<div class="ring" style="left:${l}px"></div>`));
+const pages = [...$("cal").querySelectorAll(".page")].reverse();
+// 計量カップの目盛り（100mlごと・550 に金）
+let tk = ""; for (let m = 100; m <= 600; m += 100) { const y = 960 - (m / 600) * 900; tk += `<line x1="${135 + (960 - y) * 0.045}" y1="${y}" x2="${200 + (960 - y) * 0.045}" y2="${y}" stroke="#1A1916" stroke-width="6"/><text x="${215 + (960 - y) * 0.045}" y="${y + 14}">${m}</text>`; }
+const y550 = 960 - (550 / 600) * 900; tk += `<line x1="${110 + (960 - y550) * 0.045}" y1="${y550}" x2="${300}" y2="${y550}" stroke="#B2842F" stroke-width="8" stroke-dasharray="14 10"/>`; $("ticks").innerHTML = tk;
+// サイズの人型（8つ・小さい順）
+const SZ = ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
+$("figs").innerHTML = SZ.map((z, k) => { const s = 0.7 + k * 0.055, w = 108 * s, h = 300 * s, l = 64 + k * 120;
+  return `<div class="fig abs" style="left:${l}px;top:${1420 - h}px;width:${w}px;height:${h}px;opacity:0;transform-origin:50% 100%"><svg viewBox="0 0 108 300" width="${w}" height="${h}"><circle cx="54" cy="34" r="28" fill="#1A1916"/><path d="M14,80 Q54,62 94,80 L104,190 L84,190 L80,120 L76,300 L58,300 L54,200 L50,300 L32,300 L28,120 L24,190 L4,190 Z" fill="#1A1916"/></svg><div class="gar" style="position:absolute;left:-20px;top:${h + 18}px;width:${w + 40}px;text-align:center;font-size:44px">${z}</div></div>`; }).join("");
+const figs = [...document.querySelectorAll(".fig")];
+
+window.seek = function (t) {
+  const i = Math.min(5, Math.floor(t / D)), u = t - i * D;
+  document.querySelectorAll(".sec").forEach((e, k) => e.style.visibility = k === i ? "visible" : "hidden");
+  if (i === 0) {   // パタパタ：桁ごとに少しずつ遅れて止まる
+    flaps.forEach((f, k) => { const stop = 0.6 + k * 0.28, n = +DIG[k], spins = 6 + k * 2, [top, bot, flip] = f.children;
+      if (u >= stop) { top.firstChild.textContent = n; bot.firstChild.textContent = n; flip.style.display = "none"; }
+      else { const q = (u / stop) * spins, idx = Math.floor(q), ph = q - idx, cur = (n - spins + idx + 100) % 10, nxt = (cur + 1) % 10;
+        top.firstChild.textContent = nxt; bot.firstChild.textContent = cur; flip.firstChild.textContent = cur; flip.style.display = "block"; flip.style.transform = `rotateX(${-ph * 90}deg)`; }
+      const a = sp(u, 12, 1); f.style.transform = `translateY(${(1 - a) * 60}px)`; f.style.opacity = clamp(a * 1.4); });
+  }
+  if (i === 1) {
+    const a = sp(u - 0.1, 10, 1), b = inOutC((u - 0.6) / 0.9), st = sp(u - 1.7, 16, 0.5);
+    $("m1a").style.opacity = clamp(a * 1.3); $("m1b").style.transform = `translate(-50%, -50%) scale(${lerp(0.25, 1.15, b)})`; $("m1b").style.opacity = clamp(b * 2);
+    $("m1b").textContent = Math.round(lerp(10000, 26400, outC((u - 0.6) / 0.9)) / 100 * 100).toLocaleString("en-US");
+    $("m1c").style.opacity = clamp(st * 1.3); $("m1c").style.transform = `rotate(-12deg) scale(${lerp(2.2, 1, clamp(st, 0, 1.2))})`;
+  }
+  if (i === 2) {
+    pages.forEach((p, k) => { const f = inOutC((u - 0.35 - k * 0.36) / 0.32); p.style.transform = k < 4 ? `rotateX(${f * 178}deg)` : "none"; p.style.zIndex = 10 - k; p.style.opacity = k < 4 && f > 0.98 ? 0 : 1; });
+    const st = sp(u - 1.95, 16, 0.5); $("stamp").style.opacity = clamp(st * 1.3); $("stamp").style.transform = `rotate(-14deg) scale(${lerp(2.2, 1, clamp(st, 0, 1.2))})`;
+  }
+  if (i === 3) {
+    const f = inOutC((u - 0.3) / 1.6) * (550 / 600), y = 960 - f * 900, wv = Math.sin(u * 6) * 10 * (1 - outC((u - 1.9) / 0.8));
+    $("water").setAttribute("d", `M0,${y} Q150,${y - wv} 300,${y} T600,${y} L600,1000 L0,1000 Z`);
+    $("ml").firstChild.textContent = Math.round(f * 600 / 10) * 10;
+  }
+  if (i === 4) {
+    const a = inOutC((u - 0.3) / 1.0), b = inOutC((u - 1.1) / 0.5);
+    $("d1").setAttribute("stroke-dasharray", `${80 * a} 100`); $("d2").setAttribute("stroke-dasharray", `${20 * b} 100`);
+    $("pc").firstChild.textContent = Math.round(80 * a); $("lg").style.opacity = clamp((u - 1.6) / 0.3);
+  }
+  if (i === 5) figs.forEach((f, k) => { const a = sp(u - 0.3 - k * 0.14, 13, 0.7); f.style.opacity = clamp(a * 1.4); f.style.transform = `scaleY(${lerp(0.3, 1, clamp(a, 0, 1.15))})`; });
+};
+window.READY = (async () => { await document.fonts.ready; window.seek(0); })();
+</script>
+</body>
+</html>

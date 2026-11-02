@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<style>
+  /* 美容：ブラッシュの背景に SALONIA の赤。太い字・風の線・残像で「速さ」を見せる */
+  :root { --bg1:#F8EAE5; --bg2:#EED6CE; --ink:#2A1F1E; --red:#C8343F; --mut:#6B5450; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--bg1); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; }
+  .abs { position:absolute; }
+  .bk { font-family:"Noto Sans JP",sans-serif; font-weight:900; }
+  .gar { font-family:"Cormorant Garamond",serif; font-weight:500; font-feature-settings:"lnum" 1; font-variant-numeric:lining-nums; }
+  .note { position:absolute; font:500 27px/1.5 "Noto Sans JP"; color:var(--mut); }
+  .kin { position:absolute; white-space:nowrap; }
+  .kin > span { display:inline-block; }
+  #bg { position:absolute; inset:0; background:linear-gradient(170deg, var(--bg1) 0%, var(--bg2) 100%); }
+  #redbg { position:absolute; inset:0; background:linear-gradient(170deg, #B92C37 0%, #8E1E28 100%); clip-path:circle(0px at 800px 900px); }
+  .blob { position:absolute; border-radius:50%; filter:blur(10px); }
+  #world { position:absolute; left:0; top:0; width:600px; height:400px; transform-origin:0 0; }
+  #world .m, #world img { position:absolute; display:block; }
+  .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(90,40,35,.30) 0%, rgba(90,40,35,.12) 45%, rgba(90,40,35,0) 72%); }
+  .sweep { position:absolute; inset:0; mix-blend-mode:screen; opacity:0;
+        background:linear-gradient(105deg, rgba(255,255,255,0) 42%, rgba(255,245,240,.8) 50%, rgba(255,255,255,0) 58%);
+        background-size:340% 100%; background-position:100% 0; background-repeat:no-repeat; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:var(--mut); border:2px solid var(--mut); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }
+  #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:multiply; opacity:.08; pointer-events:none; }
+  .tagr { display:inline-block; font:900 36px/1 "Noto Sans JP"; padding:14px 22px; border-radius:14px; background:var(--red); color:#fff; letter-spacing:.06em; }
+  #cta { position:absolute; display:flex; align-items:center; gap:16px; height:116px; padding:0 46px; border-radius:58px; background:var(--red); color:#fff;
+         font:900 42px/1 "Noto Sans JP"; letter-spacing:.05em; white-space:nowrap; overflow:hidden; box-shadow:0 14px 30px rgba(200,52,63,.3); }
+</style>
+</head>
+<body>
+  <div id="bg"></div>
+  <div class="blob" id="bl0" style="width:760px;height:760px;background:radial-gradient(circle, rgba(255,255,255,.75) 0%, rgba(255,255,255,0) 70%)"></div>
+  <div class="blob" id="bl1" style="width:620px;height:620px;background:radial-gradient(circle, rgba(232,160,150,.45) 0%, rgba(232,160,150,0) 70%)"></div>
+  <div id="redbg"></div>
+
+  <!-- 風：吹き出し口から流れるシルクのリボン（線を飛ばすのではなく、素材の動きで空気を見せる） -->
+  <canvas id="silk" class="abs" style="left:0;top:0" width="1080" height="1920"></canvas>
+
+  <div id="world">
+    <div id="champG" class="m" style="left:0;top:0;width:262px;height:290px;transform-origin:120px 70px">
+      <div class="shadow" style="left:10px;top:270px;width:200px;height:30px"></div>
+      <img src="dryer_champ.png" style="left:0;top:0;width:262px;height:290px">
+      <div class="sweep" id="swC" style="-webkit-mask:url(dryer_champ.png) center/100% 100% no-repeat; mask:url(dryer_champ.png) center/100% 100% no-repeat"></div>
+    </div>
+    <div id="redG" class="m" style="left:380px;top:0;width:237px;height:282px;transform-origin:118px 60px;opacity:0">
+      <div class="shadow" style="left:10px;top:262px;width:190px;height:30px"></div>
+      <img src="dryer_red.png" style="left:0;top:0;width:237px;height:282px">
+      <div class="sweep" id="swR" style="-webkit-mask:url(dryer_red.png) center/100% 100% no-repeat; mask:url(dryer_red.png) center/100% 100% no-repeat"></div>
+    </div>
+  </div>
+
+  <!-- C1 後半：髪がなびく実写（Pexels・後ろ姿・顔と他社製品なし） -->
+  <div id="brWrap" class="abs" style="left:0;top:0;width:1080px;height:1920px;clip-path:circle(0px at 0 0)">
+    <canvas id="broll" class="abs" style="left:0;top:0" width="1080" height="1920"></canvas>
+    <!-- 他のカットと同じブラッシュの霞（上と下）。文字は同じ墨色で載る -->
+    <div class="abs" style="left:0;top:0;width:1080px;height:1920px;background:linear-gradient(180deg, rgba(248,234,229,.86) 0%, rgba(248,234,229,.55) 24%, rgba(248,234,229,0) 42%, rgba(248,234,229,0) 66%, rgba(238,214,206,.7) 86%, rgba(238,214,206,.9) 100%)"></div>
+    <div class="abs" style="left:0;top:0;width:1080px;height:1920px;background:rgba(232,170,160,.12);mix-blend-mode:soft-light"></div>
+  </div>
+  <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px">
+    <div id="pr" class="abs">PR</div>
+
+    <!-- C0：悩み -->
+    <div class="kin bk" id="a1" style="left:62px;top:250px;font-size:118px;letter-spacing:-.02em">髪を乾かす時間、</div>
+    <div class="kin bk" id="a2" style="left:62px;top:396px;font-size:150px;letter-spacing:-.02em"><span style="color:#C8343F">長</span><span style="color:#C8343F">す</span><span style="color:#C8343F">ぎ</span><span>な</span><span>い</span><span>？</span></div>
+    <div class="abs" id="a3" style="left:66px;top:600px;width:560px;opacity:0">
+      <div style="font:700 30px/1 'Noto Sans JP';color:var(--mut);letter-spacing:.08em">ドライ中…</div>
+      <div style="margin-top:16px;height:22px;border-radius:11px;background:rgba(42,31,30,.12);overflow:hidden"><div id="a3b" style="height:100%;width:0;background:var(--ink);border-radius:11px"></div></div>
+    </div>
+
+    <!-- C1：大風量・速乾 -->
+    <div class="kin bk" id="b1" style="left:58px;top:240px;font-size:190px;letter-spacing:-.04em">大風量</div>
+    <div class="abs bk" id="b2" style="left:58px;top:520px;font-size:210px;letter-spacing:-.04em;color:#C8343F;line-height:1;opacity:0">
+      <span class="abs" id="b2e2" style="left:0;top:0;opacity:.18">速乾</span><span class="abs" id="b2e1" style="left:0;top:0;opacity:.35">速乾</span><span style="position:relative">速乾</span><span style="font:900 54px/1 'Noto Sans JP';vertical-align:top;margin-left:6px;color:var(--ink)">※1</span>
+    </div>
+    <div class="note" id="b3" style="left:64px;top:1420px;opacity:0">※1 乾燥時間短縮による（販売ページの記載）<br>※イメージ映像です。</div>
+
+    <!-- C2：ダメージを斬る -->
+    <div class="abs bk" id="c1" style="left:58px;top:300px;font-size:186px;letter-spacing:-.04em;line-height:1;opacity:0">
+      <div id="c1top" style="position:absolute;left:0;top:0;clip-path:polygon(0 0,100% 0,100% 46%,0 62%)">ダメージ</div>
+      <div id="c1bot" style="position:absolute;left:0;top:0;clip-path:polygon(0 62%,100% 46%,100% 100%,0 100%)">ダメージ</div>
+      <div style="visibility:hidden">ダメージ</div>
+    </div>
+    <svg id="slash" class="abs" style="left:0;top:0" width="1080" height="1920"><line id="slashL" x1="20" y1="440" x2="900" y2="350" stroke="#C8343F" stroke-width="10" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>
+    <div class="kin bk" id="c2" style="left:58px;top:510px;font-size:186px;letter-spacing:-.04em;color:#C8343F">カット</div>
+    <div class="abs" id="c3" style="left:64px;top:740px;font:700 40px/1.5 'Noto Sans JP';opacity:0">乾かす時間が短いから<span style="font-size:26px;vertical-align:top">※1</span></div>
+    <div class="note" id="c4" style="left:64px;top:1440px;opacity:0">※1 乾燥時間短縮による（販売ページの記載）</div>
+
+    <!-- C3：色 -->
+    <div class="abs" id="d0" style="left:64px;top:250px;opacity:0;font:700 40px/1 'Noto Sans JP';letter-spacing:.1em">カラーは</div>
+    <div class="kin bk" id="d1" style="left:60px;top:310px;font-size:120px;letter-spacing:-.02em">定番色＋</div>
+    <div class="kin bk" id="d2" style="left:60px;top:456px;font-size:120px;letter-spacing:-.02em">限定カラー</div>
+    <div class="abs" id="d3" style="left:64px;top:1260px;opacity:0"><span class="tagr" id="d3t">シャンパン系</span></div>
+    <div class="note" id="d4" style="left:64px;top:1440px;opacity:0">※限定カラーは数量限定・無くなり次第終了（販売ページの記載）<br>※映像は限定カラーです。</div>
+
+    <!-- C4：評価と CTA -->
+    <div class="abs" id="e1" style="left:60px;top:250px;opacity:0;display:flex;align-items:flex-end;gap:12px">
+      <svg width="96" height="96" viewBox="0 0 24 24" style="margin-bottom:30px"><path d="M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.9 6.2 20.1l1.4-6.4L2.7 9.3l6.5-.7z" fill="#C8343F"/></svg>
+      <span class="gar" style="font-size:230px;line-height:1">4.18</span>
+    </div>
+    <div class="abs" id="e2" style="left:66px;top:500px;font:900 50px/1 'Noto Sans JP';letter-spacing:.04em;opacity:0">レビュー <span class="gar" id="e2t" style="font-size:80px;color:var(--red)">0</span> 件</div>
+    <div class="note" id="e3" style="left:66px;top:580px;opacity:0">楽天市場 2026年10月5日時点</div>
+    <div id="cta" style="left:60px;top:660px;opacity:0"><span style="position:relative">プロフィールのリンクへ</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sweep" id="ctasw" style="mix-blend-mode:plus-lighter"></div></div>
+    <div class="note" id="e4" style="left:66px;top:800px;opacity:0">価格・在庫・最新情報はリンク先でご確認ください</div>
+  </div>
+  <canvas id="grain" width="540" height="960"></canvas>
+
+<script>
+const TL = window.TIMELINE, C = TL.cuts, EV = TL.ev, END = TL.end;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const outC = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const inOutC = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+function sp(t, w = 12, z = 1) { if (t <= 0) return 0; if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t);
+  const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t)); }
+let T = 0;
+const OUT = (i) => (i + 1 < C.length ? C[i + 1] : 999) - 0.2;
+function splitKin(id) { const el = $(id); if (el.dataset.k) return; if (el.children.length) { el.dataset.k = 1; return; }
+  el.innerHTML = [...el.textContent].map((ch) => `<span>${ch}</span>`).join(""); el.dataset.k = 1; }
+// ポップ：1文字ずつ、少し大きく飛び出して収まる
+function kin(id, tin, tout, stag = 0.04) {
+  const el = $(id), kids = [...el.children], o = outC((T - tout) / 0.22);
+  kids.forEach((k, i) => { const a = sp(T - tin - i * stag, 14, 0.55); k.style.opacity = clamp(a * 1.6) * (1 - o); k.style.transform = `translateY(${(1 - clamp(a, -1, 2)) * 70 - o * 40}px) scale(${lerp(0.6, 1, a)})`; });
+  el.style.visibility = T < tin - 0.01 || o >= 0.999 ? "hidden" : "visible";
+}
+function fadeUp(id, tin, tout, dy = 22) { const el = $(id), a = sp(T - tin, 12, 0.8), o = outC((T - tout) / 0.22); el.style.opacity = clamp(a * 1.3) * (1 - o); el.style.transform = `translateY(${(1 - a) * dy}px)`; }
+
+// カメラ（世界：シャンパン 0,0 / 赤 300,0）。境目はすばやいホイップでつなぐ
+const K = [
+  { t: 0.00, F: [130, 140], A: [880, 1230], z: 2.9, r: 10 },   // 右から振り込んで入る
+  { t: 0.55, F: [130, 140], A: [700, 1200], z: 2.7, r: -4 },
+  { t: C[1] - 0.25, F: [130, 140], A: [690, 1190], z: 2.8, r: -3 },
+  { t: C[1] + 0.15, F: [60, 60], A: [820, 1000], z: 3.4, r: 6 },   // 吹き出し口へ寄る（大風量）
+  { t: C[2] - 0.25, F: [64, 62], A: [830, 1000], z: 3.6, r: 5 },
+  { t: C[2] + 0.2, F: [130, 160], A: [700, 1300], z: 2.4, r: -8 },  // 斜めに構える（ダメージを斬る）
+  { t: C[3] - 0.25, F: [130, 160], A: [700, 1290], z: 2.5, r: -6 },
+  { t: C[3] + 0.2, F: [130, 140], A: [580, 1050], z: 2.5, r: 0 },   // シャンパン
+  { t: EV.c3_swap - 0.15, F: [130, 140], A: [580, 1040], z: 2.55, r: 0 },
+  { t: EV.c3_swap + 0.3, F: [498, 140], A: [580, 1040], z: 2.55, r: 0 },  // 赤へ滑る
+  { t: C[4] - 0.25, F: [498, 140], A: [580, 1030], z: 2.6, r: 0 },
+  { t: C[4] + 0.35, F: [308, 150], A: [540, 1230], z: 1.38, r: 0 },  // 2色を並べる
+  { t: END, F: [308, 150], A: [540, 1230], z: 1.46, r: 0 },
+];
+function camAt(t) { let i = 0; while (i < K.length - 2 && t >= K[i + 1].t) i++; const a = K[i], b = K[i + 1], u = inOutC((t - a.t) / (b.t - a.t));
+  return { F: [lerp(a.F[0], b.F[0], u), lerp(a.F[1], b.F[1], u)], A: [lerp(a.A[0], b.A[0], u), lerp(a.A[1], b.A[1], u)], z: Math.exp(lerp(Math.log(a.z), Math.log(b.z), u)), r: lerp(a.r, b.r, u) }; }
+const toScreen = (cam, P) => { const x = (P[0] - cam.F[0]) * cam.z, y = (P[1] - cam.F[1]) * cam.z, r = cam.r * Math.PI / 180; return [cam.A[0] + x * Math.cos(r) - y * Math.sin(r), cam.A[1] + x * Math.sin(r) + y * Math.cos(r)]; };
+
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const gctx = $("grain").getContext("2d"), gimg = gctx.createImageData(540, 960);
+function grain(seed) { const r = mulberry32(seed * 7919 + 17), d = gimg.data; for (let i = 0; i < d.length; i += 4) { const v = 220 + Math.floor(r() * 35); d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; } gctx.putImageData(gimg, 0, 0); }
+// シルクのリボン 3本（波・ひねり・色は固定値。時刻だけで形が決まる）
+const SILK = [
+  { c: [236, 222, 204], a: 0.95, W: 120, A: 95, lam: 900, om: 3.4, ph: 0.0, tw: 820, om2: 1.9, ph2: 0.6, off: -14, curl: -90 },
+  { c: [206, 70, 82], a: 0.88, W: 92, A: 120, lam: 1050, om: 2.9, ph: 2.1, tw: 700, om2: 1.6, ph2: 2.0, off: 10, curl: 70 },
+  { c: [252, 247, 242], a: 0.70, W: 64, A: 70, lam: 780, om: 3.9, ph: 4.0, tw: 600, om2: 2.3, ph2: 3.1, off: 0, curl: -30 },
+];
+const sctx = () => $("silk").getContext("2d");
+// リボンは1本ずつ別の紙に「不透明」で描き（継ぎ目の縞を出さない）、長さ方向に溶かしてから重ねる
+const OFF = document.createElement("canvas"); OFF.width = 1080; OFF.height = 1920; const og = OFF.getContext("2d");
+function drawSilk(cam, power, t) {
+  const g = sctx(); g.clearRect(0, 0, 1080, 1920); if (power <= 0) return;
+  const n = toScreen(cam, [4, 44]), ang = (cam.r - 172) * Math.PI / 180, dx = Math.cos(ang), dy = Math.sin(ang), px = -dy, py = dx;
+  const L = 900 + 300 * power, k = Math.min(cam.z / 2.7, 1.3);
+  SILK.forEach((r) => {
+    og.clearRect(0, 0, 1080, 1920);
+    const pts = [];
+    for (let s = 0; s <= L; s += 6) {
+      const u = s / L, env = Math.pow(u, 0.75);
+      const o = r.off * k + r.A * env * Math.sin((2 * Math.PI * s) / r.lam - r.om * t + r.ph) + r.curl * u * u;
+      const tw = Math.cos((2 * Math.PI * s) / r.tw - r.om2 * t + r.ph2);
+      const w = r.W * k * (0.3 + 0.7 * Math.min(1, s / 90)) * (0.12 + 0.88 * Math.abs(tw)) * (1 - 0.35 * u);
+      pts.push({ x: n[0] + dx * s + px * o, y: n[1] + dy * s + py * o, w, tw });
+    }
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p = pts[i], q = pts[i + 1], spec = Math.pow(Math.abs(p.tw), 10) * 0.3, sh = 0.6 + 0.4 * Math.abs(p.tw) + spec, back = p.tw < 0 ? 0.84 : 1;
+      og.fillStyle = `rgb(${Math.min(255, Math.round(r.c[0] * sh * back))},${Math.min(255, Math.round(r.c[1] * sh * back))},${Math.min(255, Math.round(r.c[2] * sh * back))})`;
+      og.strokeStyle = og.fillStyle; og.lineWidth = 1.2;                 // 隣と少し重ねて隙間を消す
+      og.beginPath(); og.moveTo(p.x + px * p.w / 2, p.y + py * p.w / 2); og.lineTo(q.x + px * q.w / 2, q.y + py * q.w / 2);
+      og.lineTo(q.x - px * q.w / 2, q.y - py * q.w / 2); og.lineTo(p.x - px * p.w / 2, p.y - py * p.w / 2); og.closePath(); og.fill(); og.stroke();
+    }
+    // 長さ方向に溶かす（吹き出し口の近くは濃く、先は消える）
+    const gr = og.createLinearGradient(n[0], n[1], n[0] + dx * L, n[1] + dy * L);
+    gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(0.05, "rgba(0,0,0,1)"); gr.addColorStop(0.55, "rgba(0,0,0,.75)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    og.globalCompositeOperation = "destination-in"; og.fillStyle = gr; og.fillRect(0, 0, 1080, 1920); og.globalCompositeOperation = "source-over";
+    g.globalAlpha = r.a * power * 0.8; g.filter = "blur(2px)"; g.drawImage(OFF, 0, 0); g.filter = "none"; g.globalAlpha = 1;
+  });
+}
+function sweepAt(el, t0, dur, peak) { const p = clamp((T - t0) / dur); el.style.opacity = (p <= 0 || p >= 1) ? 0 : Math.sin(p * Math.PI) * peak; el.style.backgroundPosition = `${lerp(100, 0, inOutC(p))}% 0`; }
+["a1", "b1", "c2", "d1", "d2"].forEach(splitKin);
+
+window.seek = function (t) {
+  T = t; grain(Math.floor(t * 12));
+  const cam = camAt(t);
+  $("world").style.transform = `translate(${cam.A[0]}px, ${cam.A[1]}px) rotate(${cam.r}deg) scale(${cam.z}) translate(${-cam.F[0]}px, ${-cam.F[1]}px)`;
+  { const c0 = camAt(Math.max(0, t - 1 / 120)), a = toScreen(cam, [130, 140]), b = toScreen(c0, [130, 140]); const v = Math.hypot(a[0] - b[0], a[1] - b[1]) * 120, mb = clamp(v / 900, 0, 6);
+    $("world").style.filter = mb > 0.3 ? `blur(${mb / cam.z}px)` : "none"; }
+  $("bl0").style.transform = `translate(${-120 + Math.sin(t * 0.6) * 80}px, ${200 + Math.cos(t * 0.5) * 60}px)`;
+  $("bl1").style.transform = `translate(${560 + Math.cos(t * 0.45) * 90}px, ${1150 + Math.sin(t * 0.55) * 70}px)`;
+
+  // 風：C0 は弱く → C1 で最大 → C2 中くらい。色のカットと最後は止める
+  const BR0 = C[1] + 1.15, onBr = t >= BR0 && t < C[2] - 0.25;
+  const power = onBr ? 0 : t < C[1] ? 0.45 * clamp((t - 0.6) / 0.6) : t < C[2] ? 1 : t < C[3] ? 0.55 : 0;
+  drawSilk(cam, power, t);
+  // 吹き出し口から円が広がって実写へ（色のカットの「円で塗り替わる」と同じ言葉）。終わりは円が閉じて戻る
+  { const nz = toScreen(camAt(BR0 - 0.3), [4, 44]), open = inOutC((t - (BR0 - 0.3)) / 0.5), close = inOutC((t - (C[2] - 0.45)) / 0.4);
+    const rad = 2300 * open * (1 - close); $("brWrap").style.clipPath = `circle(${rad}px at ${nz[0]}px ${nz[1]}px)`;
+    if (rad > 0 && BR.length) bctx.drawImage(BR[clamp(Math.floor((t - (BR0 - 0.3)) * 25), 0, BR.length - 1)], 0, 0, 1080, 1920); }
+
+  // ===== C0 =====
+  kin("a1", -0.35, OUT(0)); kin("a2", 0.3, OUT(0), 0.06);
+  fadeUp("a3", EV.c0_bar, OUT(0)); $("a3b").style.width = (8 + 22 * outC((t - EV.c0_bar) / 2.6)) + "%";   // なかなか進まない
+  // ===== C1 =====
+  kin("b1", EV.c1_big, OUT(1), 0.05);
+  { const a = sp(t - EV.c1_fast, 16, 0.6), o = outC((t - OUT(1)) / 0.22); $("b2").style.opacity = clamp(a * 1.5) * (1 - o);
+    $("b2").style.transform = `translateX(${(1 - clamp(a, -1, 2)) * 300}px) skewX(${(1 - clamp(a)) * -14}deg)`;
+    $("b2e1").style.transform = `translateX(${(1 - clamp(a)) * 160 + 18}px)`; $("b2e2").style.transform = `translateX(${(1 - clamp(a)) * 320 + 40}px)`; }
+  fadeUp("b3", EV.c1_fast + 0.4, OUT(1));
+  // ===== C2：ダメージを斬る =====
+  { const a = sp(t - EV.c2_dmg, 12, 0.7), o = outC((t - OUT(2)) / 0.22), s = sp(t - EV.c2_cut, 9, 1);
+    $("c1").style.opacity = clamp(a * 1.4) * (1 - o) * (1 - 0.65 * s); $("c1").style.transform = `scale(${lerp(0.8, 1, clamp(a))})`; $("c1").style.transformOrigin = "0 50%";
+    $("c1top").style.transform = `translate(${-40 * s}px, ${-26 * s}px) rotate(${-3 * s}deg)`; $("c1bot").style.transform = `translate(${30 * s}px, ${22 * s}px) rotate(${2 * s}deg)`;
+    const sl = inOutC((t - EV.c2_slash) / 0.22), so = outC((t - (EV.c2_slash + 0.5)) / 0.4); $("slashL").setAttribute("stroke-dashoffset", String(1 - sl)); $("slashL").style.opacity = (1 - so) * (1 - o); }
+  kin("c2", EV.c2_cut, OUT(2), 0.06); fadeUp("c3", EV.c2_cut + 0.35, OUT(2)); fadeUp("c4", EV.c2_cut + 0.5, OUT(2));
+  // ===== C3：色。赤に替わる時、背景が赤い円で塗り替わる =====
+  fadeUp("d0", EV.c3_a - 0.1, OUT(3)); kin("d1", EV.c3_a, OUT(3)); kin("d2", EV.c3_a + 0.3, OUT(3));
+  { const rv = inOutC((t - (EV.c3_swap - 0.1)) / 0.55), ro = outC((t - (C[4] - 0.25)) / 0.4); $("redbg").style.clipPath = `circle(${rv * 1500 * (1 - ro)}px at 760px 1050px)`;
+    const onRed = rv > 0.5 && ro < 0.5; ["d0", "d1", "d2"].forEach((id) => $(id).style.color = onRed ? "#fff" : "#2A1F1E"); $("d4").style.color = onRed ? "#F6DADA" : "#6B5450";
+    $("d3t").textContent = rv > 0.5 ? "レッド系" : "シャンパン系"; $("d3t").style.background = onRed ? "#fff" : "#C8343F"; $("d3t").style.color = onRed ? "#C8343F" : "#fff"; }
+  fadeUp("d3", EV.c3_a + 0.6, OUT(3)); fadeUp("d4", EV.c3_a + 0.8, OUT(3));
+  $("redG").style.opacity = t > EV.c3_swap - 0.2 ? 1 : 0;
+  // ===== C4 =====
+  fadeUp("e1", EV.c4_star, 999); fadeUp("e2", EV.c4_rev, 999); $("e2t").textContent = Math.round(9028 * outC((t - EV.c4_rev) / 0.9)).toLocaleString("en-US");
+  fadeUp("e3", EV.c4_rev + 0.5, 999); fadeUp("cta", EV.c4_cta, 999, 34); fadeUp("e4", EV.c4_cta + 0.3, 999); sweepAt($("ctasw"), EV.c4_cta + 0.5, 0.9, 1);
+  if (t < C[3]) sweepAt($("swC"), C[1] + 0.3, 1.0, 0.8); else sweepAt($("swC"), C[4] + 0.8, 1.0, 0.6);
+  sweepAt($("swR"), EV.c3_swap + 0.4, 1.0, 0.7);
+};
+const BR = [], bctx = $("broll").getContext("2d");
+window.READY = (async () => {
+  const jobs = []; for (let i = 1; i <= 56; i++) { const im = new Image(); im.src = `broll_s/g_${String(i).padStart(3, "0")}.jpg`; BR.push(im); jobs.push(im.decode()); }
+  await Promise.all(jobs); await Promise.all([...document.images].map((i) => i.decode().catch(() => 0))); await document.fonts.ready; })();
+window.seek(0);
+</script>
+</body>
+</html>

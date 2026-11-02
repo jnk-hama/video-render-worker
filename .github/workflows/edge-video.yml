@@ -1,0 +1,98 @@
+name: edge-video
+# 商品そのものの 3D のコード動画（jmas-ai-os の engine：box3d・coat3d・prod3d／点検 23項目の qc_edge）を描いて届ける（jmas 決定#360）。0円：有料の生成は使わない
+#   設計書 code-video-edge/products/<key>/ → 素材（楽天の商品画像・VOICEVOX）→ 下ごしらえ → 描く → 点検 23項目
+#   → 合格した物だけ Storage へ上げ、LINE へ承認依頼＋投稿文（video-scene の notify_review）・Release render-marie-code-<key>-a
+#   → LINE の［Xに投稿］で GAS がアカウントA（日本語）へ投稿する（jmas 決定#245）
+# ★公開リポジトリ：商品画像・切り抜きはコミットしない（実行時に取り、ジョブと一緒に消える）。URL・鍵・本文はログに出さない
+on:
+  workflow_dispatch:
+    inputs:
+      product_key:
+        description: '設計書の名前（code-video-edge/products/<key>/）'
+        required: true
+        type: string
+      deliver:
+        description: 'LINE へ届ける（外すと描いて点検するだけ・Actions の成果物に残す）'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write        # Release を作るため
+
+jobs:
+  build:
+    # ★ubuntu-latest は 26.04 になり、playwright の --with-deps が入らない（jmas-ai-os 2026-11-02）。版を固定する
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    concurrency:
+      group: edge-video-${{ inputs.product_key }}
+      cancel-in-progress: false
+    env:
+      KEY: ${{ inputs.product_key }}
+      W: ${{ runner.temp }}/w
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        with:
+          node-version: '22'
+
+      - name: 依存（Python・ffmpeg）
+        run: |
+          set -euo pipefail
+          printf '%s' "$KEY" | grep -qE '^[a-z0-9][a-z0-9-]{2,60}$' || { echo "::error::product_key の形が違います"; exit 1; }
+          python3 -m pip install --quiet --disable-pip-version-check -c constraints.txt numpy scipy pillow imageio-ffmpeg "rembg[cpu]" onnxruntime opencv-python-headless
+          echo "CVPY=$(command -v python3)" >> "$GITHUB_ENV"
+
+      - name: 切り抜きのモデルの置き場（キャッシュ）
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830  # v4.3.0
+        with:
+          path: ~/.rembg
+          key: edge-video-rembg-v1
+
+      # #308 声は VOICEVOX（無料・オープンソース）。版は固定（エイリアス禁止）
+      - name: VOICEVOX を起動
+        run: |
+          set -euo pipefail
+          docker run -d -p 50021:50021 voicevox/voicevox_engine:cpu-amd64-ubuntu22.04-0.25.2
+          for i in $(seq 90); do curl -fsS localhost:50021/version && exit 0; sleep 2; done
+          echo "::error::VOICEVOX が起動しませんでした"; exit 1
+
+      - name: 描く（60fps・4サブフレーム）と点検 23項目
+        run: |
+          set -euo pipefail
+          mkdir -p "$W"
+          # Chromium は作業場所の playwright-core と同じ版を入れる（版が変わると絵が黙って変わる）
+          cp code-video-edge/package.json code-video-edge/package-lock.json "$W/"
+          (cd "$W" && npm ci --no-audit --no-fund >/dev/null && npx --no-install playwright-core install --with-deps chromium >/dev/null)
+          export CHROME=$(cd "$W" && node -e "import('playwright-core').then(m=>console.log(m.chromium.executablePath()))")
+          bash code-video-edge/build.sh "$KEY" "$W"
+
+      # ★届けない回の確認用。商品画像そのものは入れない（完成動画と点検結果だけ）
+      - name: 成果物（動画と点検結果）
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: edge-video-${{ inputs.product_key }}
+          path: |
+            ${{ runner.temp }}/w/stage/p/${{ inputs.product_key }}/out/final.mp4
+            ${{ runner.temp }}/w/stage/p/${{ inputs.product_key }}/out/qc.json
+            ${{ runner.temp }}/w/stage/p/${{ inputs.product_key }}/out/post.json
+          retention-days: 7
+
+      - name: 届ける（Storage・LINE・Release）
+        if: inputs.deliver
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          O="$W/stage/p/$KEY/out"; job="marie-code-$KEY-a"
+          python3 code-video-edge/deliver.py "$W/stage/p/$KEY/v/product.json" "$O" "$job"
+          cp "$O/final.mp4" out.mp4
+          python3 -c "import json,sys;p=json.load(open(sys.argv[1]));json.dump({k:p[k] for k in ('tiktok','x') if k in p},open('post.json','w'),ensure_ascii=False)" "$O/post.json"
+          # GAS の「X投稿 <job_id>」（LINE の［Xに投稿］）が動画と投稿文を取りに来る（jmas 決定#245）
+          gh release create "render-$job" out.mp4 post.json --title "render-$job" --notes "edge-video" \
+            || gh release upload "render-$job" out.mp4 post.json --clobber

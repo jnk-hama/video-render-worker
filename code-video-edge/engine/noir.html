@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<style>
+  /* 型：noir（アパレルの「静かな高級」#318）。暗い近黒のスタジオ・差し色は金1色・細い髪罫・大きな英字のイタリック。
+     高級＝抑制（#296 の研究：粒子の爆発・衝撃の輪・光芒・揺れを使わない）。wine にも lux の爆発にも頼らない。カメラはゆっくり寄るだけ */
+  :root { --nf-ink:#ECE7DD; --nf-acc:#C9A96A; --nf-acc-ink:#C9A96A; --nf-mut:#9B948A; --nf-bg:#111013; --nf-num:"Cormorant Garamond","Shippori Mincho"; --nf-num-w:500; /* 数字の見せ方 numfx.js（#279） */ --c1:#16151A; --c2:#0A0A0C; --ink:#ECE7DD; --mut:#9B948A; --acc:#C9A96A; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--c1); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; }
+  .abs { position:absolute; }
+  .en { font-family:"Cormorant Garamond","Shippori Mincho",serif; font-style:italic; font-weight:500; font-feature-settings:"lnum" 1; letter-spacing:-.01em; }
+  .ennum { font-family:"Cormorant Garamond","Shippori Mincho",serif; font-weight:500; font-feature-settings:"lnum" 1; font-variant-numeric:lining-nums; }
+  .jp { font-family:"Shippori Mincho","Noto Sans JP",serif; font-weight:500; letter-spacing:.045em; }   /* 見出しは明朝＝静かな高級（#318）。英字 Cormorant と同じ上品な系に揃える。極太ゴシックは「pop」で抑制に反する（#296） */
+  .cap { font:700 24px/1 "Noto Sans JP"; letter-spacing:.32em; color:var(--mut); }
+  .note { position:absolute; font:500 25px/1.5 "Noto Sans JP"; color:var(--mut); opacity:0; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.10em .22em .26em .06em; margin:-.10em -.22em -.26em -.06em; visibility:hidden; box-sizing:content-box; }
+  .ln > .in { display:block; will-change:transform; }
+  #bg { position:absolute; inset:0; background:
+          radial-gradient(ellipse 1100px 1300px at 50% 30%, rgba(201,169,106,.10) 0%, rgba(201,169,106,0) 55%),
+          radial-gradient(ellipse 1300px 1500px at 24% 10%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 60%),
+          linear-gradient(176deg, var(--c1) 0%, var(--c2) 100%); }
+  #floor { position:absolute; left:0; width:1080px; height:900px; background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.18) 60%, rgba(0,0,0,.34) 100%); }
+  #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:overlay; opacity:.06; pointer-events:none; }
+  #world { position:absolute; left:0; top:0; width:600px; height:600px; transform-origin:0 0; }
+  #world .m, #world img { position:absolute; display:block; }
+  .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(40,32,24,.42) 0%, rgba(40,32,24,.16) 45%, rgba(40,32,24,0) 72%); }
+  .sweep { position:absolute; inset:0; mix-blend-mode:soft-light; opacity:0; background:linear-gradient(105deg, rgba(255,255,255,0) 42%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 58%); background-size:340% 100%; background-position:100% 0; background-repeat:no-repeat; }
+  #pr { left:64px; top:176px; font:700 26px/1 "Noto Sans JP"; color:#ECE7DD; border:2px solid rgba(236,231,221,.6); background:rgba(20,19,24,.6); padding:5px 13px; border-radius:7px; letter-spacing:.06em; z-index:5; }   /* 暗い地で読める札（#277） */
+  .rule { position:absolute; height:2px; background:var(--ink); transform-origin:0 50%; transform:scaleX(0); }
+  .pg { position:absolute; right:64px; top:180px; font:700 24px/1 "Noto Sans JP"; letter-spacing:.2em; color:var(--mut); opacity:0; }
+  .pill { position:absolute; height:96px; min-width:150px; padding:0 30px; border-radius:48px; border:3px solid var(--ink); display:flex; align-items:center; justify-content:center; font:500 52px/1 "Cormorant Garamond"; font-feature-settings:"lnum" 1; opacity:0; }
+  .cta { position:absolute; display:flex; align-items:center; gap:16px; height:116px; padding:0 46px; border-radius:58px; background:var(--acc); color:#17150F; font:900 40px/1 "Noto Sans JP"; letter-spacing:.05em; white-space:nowrap; overflow:hidden; opacity:0; }
+  .cta .sw { position:absolute; inset:0; mix-blend-mode:plus-lighter; background:linear-gradient(103deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.35) 50%, rgba(255,255,255,0) 65%); background-size:300% 100%; background-position:100% 0; opacity:0; }
+</style>
+</head>
+<body>
+  <div id="bg"></div><div id="floor"></div>
+  <div id="behind" class="abs" style="left:0;top:0;width:1080px;height:1920px"></div>
+  <div id="world"></div>
+  <div id="prodlayer" class="abs prod" style="left:0;top:0;width:1080px;height:1920px;pointer-events:none"></div>
+  <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px"><div id="pr" class="abs">PR</div></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+<script src="core.js"></script>
+<script src="numfx.js"></script>
+<script src="target.js"></script>
+<script>
+function lineIn(e, tin, tout, w = 13) { const a = sp(T - tin, w, 1), o = outC((T - tout) / 0.30);
+  e.firstElementChild.style.transform = `translateY(${(1 - a) * 140 - o * 140}%)`; e.style.visibility = (a <= 0.001 || o >= 0.999) ? "hidden" : "visible"; }
+const ln = (cls, style, html, parent) => el("div", { class: `ln ${cls}`, style }, `<span class="in">${html}</span>`, parent);
+const fadeIO = (e, tin, tout, d = 0.3) => { e.style.opacity = outC((T - tin) / d) * (1 - outC((T - tout) / 0.28)); };
+const ruleAt = (e, tin, tout) => { e.style.transform = `scaleX(${inOutC((T - tin) / 0.5) * (1 - inOutC((T - tout) / 0.3))})`; };
+const STY = P.style || {};   // 版ごとの見せ方の切り替え（#294：no_page＝隅のページ番号を出さない・moving＝場面が止まらない）
+const page = (i, n, label) => el("div", { class: "pg", style: STY.no_page ? "display:none" : "" }, `${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}　${label}`);   // 隅の小さな文字は「AIっぽさ」になる（prompt-motion の作例）
+// 止まらない出入り（#294）：場面ごとの部品を入れ物にまとめ、入る時から動いている（減速）→ ゆっくり流れ続ける → 加速して抜ける（書き出しの動きのブレが付く）
+function movingKinds(kinds) {
+  const W = {};
+  Object.entries(kinds).forEach(([k, f]) => { W[k] = (b, i, s) => {
+    const L = ["ui", "prodlayer", "behind"].map((id) => { const real = $(id), box = el("div", { class: "abs", style: "left:0;top:0;width:1080px;height:1920px;will-change:transform" }, "", real); real.id = id + "_real"; box.id = id; return [real, box, id]; });
+    try { f(b, i, s); } finally { L.forEach(([real, box, id]) => { box.id = ""; real.id = id; }); }   // 組み立ての間だけ、入れ物を本来の層の名前で呼ばせる
+    const last = i === NB - 1, end = OUT(i);
+    U.push((t) => {
+      const xin = i ? 110 * Math.exp(-6 * Math.max(0, t - (s.t0 - 0.3))) : 0, drift = -12 * (t - (s.t0 + Math.min(end, s.t1)) / 2), q = last ? 0 : clamp((t - (end - 0.32)) / 0.36);
+      const x = xin + drift - 220 * q * q; L.forEach(([, box]) => { box.style.transform = `translateX(${x.toFixed(2)}px)`; }); });
+  }; });
+  return W;
+}
+
+// 服の輪郭：切り抜きの透明度を中心から放射状に調べ、外周の点を世界の単位で返す（なぞる線に使う）
+function contour(n = 120) {
+  const im = $("heroG").querySelector("img"), cv = document.createElement("canvas"); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+  const g = cv.getContext("2d"); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, cv.width, cv.height).data, k = cv.width / HERO.w, cx = F0.body[0] * k, cy = F0.body[1] * k, out = [];
+  for (let j = 0; j < n; j++) { const a = (j / n) * Math.PI * 2, dx = Math.cos(a), dy = Math.sin(a); let last = 0;
+    for (let r = 0; r < Math.max(cv.width, cv.height); r += 2) { const x = Math.round(cx + dx * r), y = Math.round(cy + dy * r); if (x < 0 || y < 0 || x >= cv.width || y >= cv.height) break; if (d[(y * cv.width + x) * 4 + 3] > 128) last = r; }
+    out.push([(cx + dx * (last + 10)) / k, (cy + dy * (last + 10)) / k]); }
+  return out;
+}
+const TOUCH = [];
+const NB = P.beats.length;
+const SH = [];   // カットごとの構え（ゆっくり寄る＝静かな雑誌のページ）
+function hold(i, s, F, A, w0, w1, show = 1) { K.push({ t: s.t0 + (i ? 0.28 : 0), F, A, z: fitZ(w0), r: 0, show, ease: "lin" }, { t: s.t1 - 0.28, F, A, z: fitZ(w1), r: 0, show, ease: "in" }); }
+const FLOAT = (t) => Math.sin(t * 1.1) * 4;   // 服がわずかに浮いて揺れる（平置きの写真を「置いてある物」に見せる）
+
+const KINDS = {
+  num: NUM_KIND,   // 数字の見せ方（numfx.js・#279）
+  // 表紙：大きな英字の後ろに服。1コマ目に見出しと服と PR（#267-7）
+  cover(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, words = b.en.split(" "), last = words.pop();
+    const e1 = ln("en", "left:52px;top:236px;font-size:150px;line-height:1", words.join(" "), $("behind"));
+    const e2 = ln("en", "left:150px;top:396px;font-size:190px;line-height:1", last, $("behind"));
+    const r = el("div", { class: "rule", style: "left:64px;top:1532px;width:280px;height:4px" });   // 服の影と重ならない短い罫
+    const h1 = ln("jp", "left:60px;top:1562px;font-size:84px;line-height:1.15", b.head[0]);
+    const h2 = ln("jp", "left:60px;top:1670px;font-size:84px;line-height:1.15", b.head[1]);
+    const pg = page(i, NB, "LOOK"), nm = el("div", { class: "abs", style: "left:64px;top:1780px;font:700 34px/1 'Noto Sans JP';letter-spacing:.06em;color:var(--mut);opacity:0" }, P.name);   // 商品名（#276）
+    hold(i, s, F0.body, [560, 1090], 720, 760);
+    U.push((t) => { lineIn(e1, t0 - 0.7, out, 12); lineIn(e2, t0 - 0.6, out, 12); lineIn(h1, t0 - 0.6, out); lineIn(h2, t0 - 0.55, out); ruleAt(r, t0 - 0.6, out); fadeIO(pg, t0 - 0.5, out); fadeIO(nm, t0 - 0.5, out);
+      $("behind").style.transform = `translateX(${-(t - t0) * 6}px)`; });
+  },
+  // 重さ：数え上げ＋半円のゲージ。服は右へ
+  gauge(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, c0 = t0 + 0.4, c1 = t0 + 1.5;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const num = ln("ennum", "left:52px;top:300px;font-size:300px;line-height:1", `<span class="d">0.0</span><span style="font-size:110px;font-style:italic;margin-left:14px">${b.unit}</span>`);
+    const sub = el("div", { class: "abs", style: "left:64px;top:640px;opacity:0" }, `<span style="display:inline-block;font:900 40px/1 'Noto Sans JP';padding:14px 24px;border-radius:12px;background:var(--ink);color:#F2EFEA">${b.sub}</span><span style="font:700 28px/1 'Noto Sans JP';vertical-align:top;margin-left:8px">${b.mark || ""}</span>`);
+    const g = el("div", { class: "abs", style: "left:0;top:0;opacity:0" }, `<svg width="1080" height="1920"><path d="M90,1040 A220,220 0 0 1 530,1040" fill="none" stroke="rgba(28,27,25,.14)" stroke-width="26" stroke-linecap="round"/><path class="p" d="M90,1040 A220,220 0 0 1 530,1040" fill="none" stroke="#1C1B19" stroke-width="26" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`);
+    const gp = g.querySelector(".p"), nt = el("div", { class: "note", style: "left:64px;top:1560px;width:952px" }, b.note || ""), pg = page(i, NB, "WEIGHT");
+    hold(i, s, F0.body, [830, 1150], 560, 590);
+    const d = num.querySelector(".d");
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(num, c0 - 0.1, out, 12); setText(d, (b.value * outC((t - c0) / (c1 - c0))).toFixed(1));
+      fadeIO(sub, t0 + 0.9, out); fadeIO(nt, c1, out); fadeIO(pg, t0 + 0.1, out);
+      gp.setAttribute("stroke-dashoffset", String(1 - inOutC((t - c0) / (c1 - c0)) * Math.min(1, b.value / 14))); fadeIO(g, c0 - 0.25, out); });
+  },
+  // 色：平置きの実画像を1枚ずつ、名前つきで並べる（服は商品の側＝重なりの点検で商品として扱う）
+  swatch(b, i, s) {
+    const t0 = s.t0 - (i ? 0 : 0.6), out = OUT(i) - 0.08, n = b.items.length, cols = 3, cw = 316;   // 1場面目は 1コマ目から見えている（点検「1コマ目に商品・見出し」）
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:96px;line-height:1.15", b.head), pg = page(i, NB, "COLOR");
+    const cells = b.items.map(([img, name], k) => { const x = 66 + (k % cols) * cw, y = 540 + Math.floor(k / cols) * 480;
+      const iw = b.img_w || cw - 30;   // 縦長の平置きは幅を詰める（名前と重ならない高さに）
+      const im = el("img", { src: `${DIR}${img}`, class: "abs", style: `left:${x + (cw - 30 - iw) / 2}px;top:${y}px;width:${iw}px;opacity:0` }, "", $("prodlayer"));
+      const nm = el("div", { class: "abs en", style: `left:${x}px;top:${y + 372}px;width:${cw - 30}px;text-align:center;font-size:44px;opacity:0` }, name);
+      return { im, nm, tin: t0 + 0.45 + k * (i ? 0.16 : 0.03) }; });
+    const nt = el("div", { class: "note", style: "left:64px;top:1560px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
+      cells.forEach((c, k) => { const a = sp(t - c.tin, 11, 0.8), o = outC((t - out) / 0.3); c.im.style.opacity = clamp(a * 1.3) * (1 - o);
+        c.im.style.transform = `translateY(${(1 - clamp(a)) * 50 + FLOAT(t + k) - o * 20}px) scale(${lerp(0.92, 1, clamp(a))})`; c.nm.style.opacity = clamp(sp(t - c.tin - 0.15, 12, 1) * 1.3) * (1 - o); }); });
+  },
+  // サイズ：丸い札が1つずつ。服は右下
+  sizes(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:150px;line-height:1.1", b.head), pg = page(i, NB, "SIZE");
+    const pills = b.sizes.map((z, k) => el("div", { class: "pill", style: `left:${64 + (k % 4) * 240}px;top:${560 + Math.floor(k / 4) * 130}px` }, z));
+    const sub = el("div", { class: "abs", style: "left:64px;top:860px;font:900 46px/1 'Noto Sans JP';opacity:0" }, b.sub || "");
+    hold(i, s, F0.body, [700, 1400], 620, 650);
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out, 12); fadeIO(pg, t0 + 0.1, out); fadeIO(sub, t0 + 1.6, out);
+      pills.forEach((p, k) => { const a = sp(t - (t0 + 0.55 + k * 0.11), 14, 0.7), o = outC((t - out) / 0.3); p.style.opacity = clamp(a * 1.4) * (1 - o); p.style.transform = `scale(${lerp(0.6, 1, clamp(a, 0, 1.2))})`;
+        p.style.background = k === b.sizes.length - 1 && a > 0.5 ? "var(--ink)" : "transparent"; p.style.color = k === b.sizes.length - 1 && a > 0.5 ? "#F2EFEA" : "var(--ink)"; }); });
+  },
+  // 肌ざわり：生地へぐっと寄る（触れる距離）。言葉は大きく・短く
+  touch(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08;
+    // 寄り切った生地は画面いっぱいの「質感の背景」。文字は白・上に暗いグラデーション（読めることを最優先）
+    const scrim = el("div", { id: `scrim${i}`, class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;opacity:0;background:linear-gradient(180deg, rgba(14,13,12,.78) 0%, rgba(14,13,12,.45) 42%, rgba(14,13,12,0) 62%, rgba(14,13,12,0) 82%, rgba(14,13,12,.6) 100%)" }, "", $("world").parentElement);
+    $("world").after(scrim);
+    const W = "color:#F4F1EC;text-shadow:0 2px 18px rgba(0,0,0,.45)";
+    const cap = el("div", { class: "abs cap", style: `left:64px;top:260px;opacity:0;${W}` }, b.label);
+    const w = ln("en", `left:52px;top:300px;font-size:170px;line-height:1;${W}`, b.en);
+    const h = ln("jp", `left:60px;top:500px;font-size:110px;line-height:1.15;${W}`, b.head);
+    const sub = el("div", { class: "abs", style: `left:64px;top:650px;font:900 44px/1.4 'Noto Sans JP';opacity:0;${W}` }, b.sub);
+    const nt = el("div", { class: "note", style: `left:64px;top:1700px;width:952px;${W}` }, b.note || ""), pg = page(i, NB, "TOUCH");
+    pg.style.color = "#F4F1EC";
+    const F = b.at || [F0.body[0] + 20, F0.body[1] + 30];   // 胸〜お腹の平らな所（生地がよく見える）
+    // b.image：主役と別の色の生地の寄り（販売ページの写真）を画面いっぱいに。主役は隠す（同じ服ばかりにしない・オーナー #292）
+    const ph = b.image ? el("img", { src: `${DIR}${b.image}`, class: "abs scrim", style: "left:0;top:0;width:1080px;height:1920px;object-fit:cover;opacity:0" }, "", $("world").parentElement) : null;
+    if (ph) { $("world").after(ph); ph.after(scrim); }
+    if (ph) K.push({ t: s.t0 + 0.28, F, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    else K.push({ t: s.t0 + 0.28, F, A: [620, 1280], z: fitZ(1500), r: -2, ease: "lin" }, { t: s.t1 - 0.28, F: [F[0] + 6, F[1] - 4], A: [620, 1280], z: fitZ(1650), r: -1, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(w, t0 + 0.2, out, 12); lineIn(h, t0 + 0.45, out); fadeIO(sub, t0 + 0.9, out); fadeIO(nt, t0 + 1.1, out); fadeIO(pg, t0 + 0.1, out);
+      const so = outC((t - (t0 - 0.1)) / 0.4) * (1 - outC((t - out) / 0.35)); scrim.style.opacity = so;
+      $("heroG").dataset.backdrop = t > t0 - 0.2 && t < s.t1 ? "1" : "";   // 重なりの点検で背景として扱う（画面いっぱいの質感）
+      if (ph) { ph.style.opacity = clamp((t - (t0 - 0.15)) / 0.3) * (1 - outC((t - out) / 0.3)); ph.style.transform = `scale(${1.08 + 0.08 * clamp((t - t0) / (s.t1 - t0))}) rotate(-1deg)`; }
+    });
+    TOUCH.push([t0 + 0.5, 1.3]);
+  },
+  // デザイン：服の輪郭を線でなぞり（大きなシルエット）、指し示しで見所を言う
+  callouts(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    // 見出しは英字1語（肌ざわりの「Smooth」と同じ誌面の作法）。日本語は札が言うので説明調の見出しは置かない（オーナー「ここがおしゃれ表記はダサい」）
+    const h = b.en ? ln("en", "left:52px;top:290px;font-size:170px;line-height:1", b.en) : ln("jp", "left:60px;top:300px;font-size:100px;line-height:1.15", b.head), pg = page(i, NB, "DESIGN");
+    // 輪郭の線は服の飾り（商品の側の層）。指し示しの線と札は文字の側
+    const ol = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><path class="o" d="" fill="none" stroke="#8C6F5A" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`, $("prodlayer"));
+    const svg = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920">${b.points.map(() => '<path class="l" d="" fill="none" stroke="#1C1B19" stroke-width="3"/><circle class="c" r="10" fill="#1C1B19"/>').join("")}</svg>`);
+    const O = ol.querySelector(".o"), Ls = svg.querySelectorAll(".l"), Cs = svg.querySelectorAll(".c");
+    const boxes = b.points.map((p, k) => el("div", { class: "abs", style: `left:${p.box[0]}px;top:${p.box[1]}px;width:${p.box[2] || 400}px;opacity:0` }, `<div style="font:900 44px/1.25 'Noto Sans JP'">${p.text}</div>${p.sub ? `<div style="font:500 26px/1.5 'Noto Sans JP';color:var(--mut);margin-top:6px">${p.sub}</div>` : ""}`));
+    const nt = el("div", { class: "note", style: "left:64px;top:1700px;width:952px" }, b.note || "");
+    const cam = { F: F0.body, A: [540, 1100], w0: 640, w1: 670 };
+    K.push({ t: s.t0 + 0.28, F: cam.F, A: cam.A, z: fitZ(cam.w0), r: 0, ease: "lin" }, { t: s.t1 - 0.28, F: cam.F, A: cam.A, z: fitZ(cam.w1), r: 0, ease: "in" });
+    let ring = null;
+    U.push((t, c) => {
+      if (!ring) ring = contour();
+      fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out, b.en ? 12 : undefined); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
+      const on = t >= t0 - 0.3 && t < s.t1, o = outC((t - out) / 0.3), fl = FLOAT(t);
+      const pts = ring.map((p) => { const q = toScreen(c, p); return [q[0], q[1] + fl]; });
+      O.setAttribute("d", on ? "M" + pts.map((p) => p.map((v) => v.toFixed(1)).join(",")).join(" L") + " Z" : "");
+      const g = inOutC((t - (t0 + 0.4)) / 1.0); O.setAttribute("stroke-dashoffset", String(1 - g)); O.style.opacity = (1 - o) * (g > 0 ? 1 : 0);   // 輪郭を一筆でなぞる
+      b.points.forEach((p, k) => { const ang = p.angle * Math.PI / 180, tgt = pts[Math.round(((p.angle + 360) % 360) / 360 * pts.length) % pts.length];
+        const tin = t0 + 0.9 + k * 0.45, a = outC((t - tin) / 0.4), bx = boxes[k], bh = bx.offsetHeight || 100, x0 = p.box[0] + (p.anchor === "right" ? (p.box[2] || 400) - 30 : 30), y0 = p.box[1] + bh + 12;   // 札の下の角から（服を横切らない）
+        Ls[k].setAttribute("d", `M${x0},${y0} L${lerp(x0, tgt[0], a)},${lerp(y0, tgt[1], a)}`); Cs[k].setAttribute("cx", lerp(x0, tgt[0], a)); Cs[k].setAttribute("cy", lerp(y0, tgt[1], a));
+        const op = (a > 0 ? 1 : 0) * (1 - o); Ls[k].style.opacity = op; Cs[k].style.opacity = op; fadeIO(bx, tin - 0.1, out); });
+    });
+  },
+  // 着た姿：販売ページの着用写真を首から下だけ（顔は使わない・オーナー「どちらも入れたらいい」#291）。
+  // 写真の横に襟から裾まで寸法線が下りて着丈を言う。札（フリーサイズ等）が1つずつ出る
+  worn(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, H = b.h || 1000, W = Math.round(H * b.ratio), L = 110, T = 560;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const e = ln("en", "left:52px;top:290px;font-size:140px;line-height:1", b.en), h = ln("jp", "left:60px;top:448px;font-size:64px;line-height:1.15", b.head), pg = page(i, NB, "WEAR");
+    const card = el("div", { class: "abs", style: `left:${L}px;top:${T}px;width:${W}px;height:${H}px;opacity:0;${b.cut ? "filter:drop-shadow(0 30px 40px rgba(40,30,20,.22))" : "border-radius:18px;overflow:hidden;box-shadow:0 30px 60px rgba(40,30,20,.20)"}` },
+      `<img src="${DIR}${b.cut || b.image}" style="width:${W}px;height:${H}px;object-fit:${b.cut ? "contain" : "cover"}">`, $("prodlayer"));   // b.cut＝服だけの切り抜き（枠なし）
+    const rg = b.ring ? el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><circle class="r" cx="${L + b.ring[0] * W}" cy="${T + b.ring[1] * H}" r="${b.ring[2] * W}" fill="none" stroke="#8C6F5A" stroke-width="7" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-100 ${L + b.ring[0] * W} ${T + b.ring[1] * H})"/></svg>`, $("prodlayer")) : null;   // 丸は写真の飾り＝商品の側（服の輪郭線と同じ）   // 見せたい所を丸で囲む（襟など・割合で指定）
+    const [y0, y1] = (b.span || [0, 1]).map((v) => T + v * H), x = L + W + 46;   // 襟の上〜裾（写真の高さに対する割合）
+    const svg = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><g stroke="#1C1B19" stroke-width="4">
+      <path class="d" d="M${x},${y0} V${y1}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path class="t" d="M${x - 20},${y0} h40 M${x - 20},${y1} h40" opacity="0"/>
+      <path class="g" d="M${L + W},${y0} H${x - 24} M${L + W},${y1} H${x - 24}" stroke-dasharray="6 8" stroke-width="2" opacity="0"/></g></svg>`);
+    const D = svg.querySelector(".d"), Tk = svg.querySelector(".t"), G = svg.querySelector(".g");
+    if (!b.dim) svg.style.display = "none";
+    const lab = b.dim ? el("div", { class: "abs", style: `left:${x + 30}px;top:${(y0 + y1) / 2 - 70}px;opacity:0;line-height:1` }, `<div style="font:900 34px/1 'Noto Sans JP';color:var(--mut)">${b.dim_label}</div><span class="ennum" style="font-size:150px">${b.dim}</span><span style="font:900 44px/1 'Noto Sans JP'">cm${b.mark || ""}</span>`) : null;
+    const chips = (b.chips || []).map((c, k) => el("div", { class: "abs", style: `left:${x + 30}px;top:${(b.dim ? (y0 + y1) / 2 + 140 : T + H * 0.45) + k * 92}px;opacity:0;font:900 36px/1 'Noto Sans JP';padding:16px 24px;border-radius:12px;background:var(--ink);color:#F2EFEA;white-space:nowrap` }, c));
+    const nt = el("div", { class: "note", style: "left:64px;top:1610px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(e, t0 + 0.15, out, 12); lineIn(h, t0 + 0.35, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
+      const a = sp(t - (t0 + 0.1), 10, 0.85), o = outC((t - out) / 0.3); card.style.opacity = clamp(a * 1.3) * (1 - o);
+      card.style.transform = `translateY(${(1 - clamp(a)) * 60 - o * 20}px)`; card.firstChild.style.transform = `scale(${1.02 + 0.03 * clamp((t - t0) / (s.t1 - t0))})`;
+      const d = inOutC((t - (t0 + 0.6)) / 0.9); D.setAttribute("stroke-dashoffset", String(1 - d)); D.style.opacity = 1 - o;
+      Tk.setAttribute("opacity", String(clamp((t - (t0 + 0.6)) / 0.2) * (1 - o))); G.setAttribute("opacity", String(clamp((t - (t0 + 1.3)) / 0.3) * (1 - o)));
+      if (lab) { fadeIO(lab, t0 + 1.2, out); setText(lab.querySelector(".ennum"), String(Math.round(b.dim * outC((t - (t0 + 1.2)) / 0.7)))); }
+      if (rg) { const r = rg.querySelector(".r"); r.setAttribute("stroke-dashoffset", String(1 - inOutC((t - (t0 + 0.7)) / 0.7))); r.style.opacity = 1 - o; }
+      chips.forEach((c, k) => { const q = sp(t - (t0 + 1.7 + k * 0.18), 13, 0.75); c.style.opacity = clamp(q * 1.4) * (1 - o); c.style.transform = `translateX(${(1 - clamp(q)) * 40}px)`; }); });
+  },
+  // 猫→同じ柄：販売ページの色見本の猫（柄の説明用）から、同じ柄の平置きへ矢印が伸びる（オーナー「好きな猫の柄を選べる」#293）。
+  // 猫の写真は商品ではない → 文字の層に置き、※で「商品に含まれません」
+  match(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:96px;line-height:1.15", b.head), pg = page(i, NB, "MATCH");
+    const rows = b.pairs.map(([cat, coat, name], k) => { const y = 520 + k * 345, tin = t0 + 0.35 + k * 0.55;
+      const c = el("img", { src: `${DIR}${cat}`, class: "abs", style: `left:70px;top:${y}px;width:300px;height:270px;object-fit:contain;object-position:50% 100%;opacity:0;filter:drop-shadow(0 14px 18px rgba(40,30,20,.18))` });   // 横長の猫（寝そべり）も枠に収める
+      const f = el("img", { src: `${DIR}${coat}`, class: "abs", style: `left:700px;top:${y - 10}px;height:290px;opacity:0` }, "", $("prodlayer"));
+      const ar = el("div", { class: "abs", style: "left:0;top:0" }, `<svg width="1080" height="1920"><path class="a" d="M400,${y + 150} C480,${y + 90} 560,${y + 90} 650,${y + 150}" fill="none" stroke="#8C6F5A" stroke-width="6" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path class="h" d="M628,${y + 128} L652,${y + 152} L622,${y + 160}" fill="none" stroke="#8C6F5A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0"/></svg>`);
+      const nm = el("div", { class: "abs", style: `left:390px;top:${y + 168}px;width:280px;text-align:center;font:900 34px/1.2 'Noto Sans JP';opacity:0` }, name);
+      return { c, f, A: ar.querySelector(".a"), H: ar.querySelector(".h"), nm, tin }; });
+    const nt = el("div", { class: "note", style: "left:64px;top:1580px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.15, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.6, out);
+      const o = outC((t - out) / 0.3);
+      rows.forEach((r, k) => { const a = sp(t - r.tin, 11, 0.8); r.c.style.opacity = clamp(a * 1.3) * (1 - o); r.c.style.transform = `translateX(${(1 - clamp(a)) * -50}px)`;
+        const d = inOutC((t - (r.tin + 0.2)) / 0.4); r.A.setAttribute("stroke-dashoffset", String(1 - d)); r.A.style.opacity = 1 - o; r.H.setAttribute("opacity", String((d >= 1 ? 1 : 0) * (1 - o)));
+        const q = sp(t - (r.tin + 0.45), 11, 0.8); r.f.style.opacity = clamp(q * 1.3) * (1 - o); r.f.style.transform = `translateY(${FLOAT(t + k)}px) scale(${lerp(0.85, 1, clamp(q))})`;
+        r.nm.style.opacity = clamp((t - (r.tin + 0.3)) / 0.25) * (1 - o); }); });
+  },
+  // 選べる：色の一覧＋サイズの札をひと画面に
+  choose(b, i, s) {
+    const t0 = s.t0, out = OUT(i) - 0.08, n = b.items.length, cw = 316;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:96px;line-height:1.15", b.head), pg = page(i, NB, "CHOICE");
+    const cells = b.items.map(([img, name], k) => { const x = 66 + (k % 3) * cw, y = 470 + Math.floor(k / 3) * 400;
+      const im = el("img", { src: `${DIR}${img}`, class: "abs", style: `left:${x + 20}px;top:${y}px;width:${cw - 70}px;opacity:0` }, "", $("prodlayer"));
+      const nm = el("div", { class: "abs en", style: `left:${x}px;top:${y + 306}px;width:${cw - 30}px;text-align:center;font-size:38px;opacity:0` }, name);
+      return { im, nm, tin: t0 + 0.35 + k * 0.12 }; });
+    const pills = b.sizes.map((z, k) => el("div", { class: "pill", style: `left:${64 + k * 120}px;top:1300px;height:76px;min-width:104px;padding:0 10px;font-size:38px;border-width:2px` }, z));
+    const sub = el("div", { class: "abs", style: "left:64px;top:1410px;font:900 40px/1 'Noto Sans JP';opacity:0" }, b.sub || "");
+    const nt = el("div", { class: "note", style: "left:64px;top:1700px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out); fadeIO(pg, t0 + 0.1, out); fadeIO(sub, t0 + 1.6, out); fadeIO(nt, t0 + 1.6, out);
+      cells.forEach((c, k) => { const a = sp(t - c.tin, 11, 0.8), o = outC((t - out) / 0.3); c.im.style.opacity = clamp(a * 1.3) * (1 - o);
+        c.im.style.transform = `translateY(${(1 - clamp(a)) * 40 + FLOAT(t + k) - o * 20}px)`; c.nm.style.opacity = clamp(sp(t - c.tin - 0.15, 12, 1) * 1.3) * (1 - o); });
+      pills.forEach((p, k) => { const a = sp(t - (t0 + 1.1 + k * 0.07), 14, 0.7), o = outC((t - out) / 0.3); p.style.opacity = clamp(a * 1.4) * (1 - o); p.style.transform = `scale(${lerp(0.6, 1, clamp(a, 0, 1.2))})`; }); });
+  },
+  // 新しい場面（#318・Reelfolio の Carousel）：色の平置きが右から弧を描いて中央へ流れ、焦点が合った1枚だけ大きく・髪罫の枠・色名。
+  //   #296「場面は前の場面から作る・カメラは動きながら・1ショット1つ」。爆発や壁は使わない（抑制）
+  carousel(b, i, s) {
+    const t0 = s.t0 - (i ? 0 : 0.5), out = OUT(i) - 0.08, items = b.items, n = items.length;
+    const cap = el("div", { class: "abs cap", style: "left:64px;top:260px;opacity:0" }, b.label);
+    const h = ln("jp", "left:60px;top:300px;font-size:96px;line-height:1.15", b.head), pg = page(i, NB, "COLOR");
+    const start = t0 + 0.55, slot = (s.t1 - 0.35 - start) / n;   // 1枚が中央に来る間隔
+    const cards = items.map(([img, name], k) => {
+      const panel = el("div", { class: "abs", style: "left:0;top:0;width:430px;height:540px;border:1px solid rgba(201,169,106,.45);border-radius:14px;background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(0,0,0,.18));opacity:0;will-change:transform,opacity" }, "", $("prodlayer"));
+      const im = el("img", { src: `${DIR}${img}`, style: "position:absolute;left:50%;top:40px;width:320px;transform:translateX(-50%);filter:drop-shadow(0 26px 34px rgba(0,0,0,.5))" }, "", panel);
+      const nm = el("div", { class: "abs en", style: "left:0;top:1140px;width:1080px;text-align:center;font-size:58px;color:var(--ink);opacity:0" }, name);
+      return { panel, nm, tc: start + (k + 0.5) * slot };
+    });
+    const nt = el("div", { class: "note", style: "left:64px;top:1700px;width:952px" }, b.note || "");
+    K.push({ t: s.t0 + 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "lin" }, { t: s.t1 - 0.28, F: F0.body, A: [540, 2600], z: fitZ(600), r: 0, show: 0, ease: "in" });
+    U.push((t) => { fadeIO(cap, t0 + 0.1, out); lineIn(h, t0 + 0.2, out); fadeIO(pg, t0 + 0.1, out); fadeIO(nt, t0 + 1.4, out);
+      const O = outC((t - out) / 0.3);
+      cards.forEach((c) => { const u = clamp((t - c.tc) / slot, -1.6, 1.6);   // 中央からの距離（弧の上を流れる）
+        // 提案B：疑似遠近（#323・§3-8）。three.js の遠近スケール式 scale ∝ focal/(focal+depth)。
+        // 中央からの距離を depth とみなし、外側ほど「遠く・小さく・消失点(中央)へ寄る」＝線形より自然な奥行き。WebGL不要・決定論
+        const d = Math.abs(u), FOCAL = 900, sc = FOCAL / (FOCAL + 506 * d);   // d=0→1.00 / d=1→0.64（従来の範囲に合わせた）
+        const x = 540 + u * 560 * (0.7 + 0.3 * sc), y = 660 + d * d * 150;   // 手前は広く、奥は中央へ収束＝視差
+        c.panel.style.left = (x - 215 * sc) + "px"; c.panel.style.top = (y - 270 * sc) + "px";
+        c.panel.style.transform = `scale(${sc})`; c.panel.style.opacity = clamp(1.15 - d * 0.85) * (1 - O);
+        c.nm.style.opacity = clamp(1 - d * 3.2) * (1 - O); }); });
+  },
+  // 締め：3色を並べて、評価・レビュー・集計日・リンク
+  finale(b, i, s) {
+    const t0 = s.t0, s0 = t0 + 0.25, r0 = t0 + 0.6, r1 = t0 + 1.6, cta = t0 + 1.9;
+    const st = el("div", { class: "abs", style: "left:60px;top:250px;opacity:0;display:flex;align-items:flex-end;gap:14px" }, `<svg width="84" height="84" viewBox="0 0 24 24" style="margin-bottom:34px"><path d="M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.9 6.2 20.1l1.4-6.4L2.7 9.3l6.5-.7z" fill="#C9A96A"/></svg><span class="ennum" style="font-size:230px;line-height:1">${b.rating.toFixed(2)}</span>`);
+    const rv = el("div", { class: "abs", style: "left:66px;top:500px;font:900 50px/1 'Noto Sans JP';letter-spacing:.04em;opacity:0" }, `レビュー <span class="ennum" style="font-size:84px">0</span> 件`);
+    const dt = el("div", { class: "note", style: "left:66px;top:580px" }, b.date);
+    const nm = el("div", { class: "abs", style: "left:62px;top:660px;width:960px;opacity:0" }, `<div class="en" style="font-size:64px;line-height:1">${P.en_name || ""}</div><div class="jp" style="font-size:44px;margin-top:10px">${P.name}</div>`);   // 商品名（#276）
+    const ct = el("div", { class: "cta", style: "left:60px;top:1600px" }, `<span style="position:relative">${b.cta}</span><svg width="38" height="38" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#17150F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sw"></div>`);
+    const cn = el("div", { class: "note", style: "left:66px;top:1740px" }, b.cta_note || "");
+    const trio = (b.pair || []).map((img, k) => el("img", { src: `${DIR}${img}`, class: "abs", style: `left:${k ? 700 : 40}px;top:860px;width:340px;opacity:0` }, "", $("prodlayer")));
+    hold(i, s, F0.body, [540, 1080], 400, 420);
+    U.push((t) => { fadeUp(st, s0, 999, 22, 12, 0.8); fadeUp(rv, r0, 999, 22, 12, 0.8); setText(rv.querySelector("span"), Math.round(b.reviews * outC((t - r0) / (r1 - r0))).toLocaleString("en-US"));
+      fadeIO(dt, r1, 999); fadeUp(nm, t0 + 0.4, 999, 22, 12, 0.8); fadeUp(ct, cta, 999, 34, 12, 0.8); fadeIO(cn, cta + 0.3, 999);
+      const cs = clamp((t - (cta + 0.35)) / 0.9), sw = ct.querySelector(".sw"); sw.style.backgroundPosition = `${lerp(100, 0, inOutC(cs))}% 0`; sw.style.opacity = (cs > 0 && cs < 1) ? 1 : 0;
+      trio.forEach((im, k) => { const a = sp(t - (t0 + 0.5 + k * 0.15), 10, 0.85); im.style.opacity = clamp(a * 1.3); im.style.transform = `translate(${(1 - clamp(a)) * (k ? 120 : -120)}px, ${FLOAT(t + k * 2)}px)`; }); });
+  },
+};
+// #308 VOICEVOX の声は規約で「VOICEVOX:話者名」の記載が条件。オーナー「表記は小さく透過して表示」→ PR の下に全編（暗い地なので明るい字）
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || "");
+  if (vv) document.body.insertBefore(el("div", { id: "credit", class: "abs", style: 'left:66px;top:226px;font:500 20px/1 "Noto Sans JP";letter-spacing:.04em;opacity:.45;color:#ECE7DD' }, `VOICEVOX:${vv[1]}`, document.body), $("grain")); }
+CORE.start({ grain: [22, 12], wipe: false, refl: false, motionBlur: true,
+  onSeek(t, cam) {
+    const base = toScreen(cam, [F0.body[0], F0.base_y]); $("floor").style.top = (base[1] - 120) + "px";
+    $("heroG").style.transform = `translateY(${FLOAT(t)}px)`; $("sh").style.opacity = 1;
+    const last = B[B.length - 1]; sweepAt($("sw"), t < last.t0 ? 0.9 : last.t0 + 0.4, 1.1, 0.7);
+    TOUCH.forEach(([a, d]) => { if (t > a && t < a + d) sweepAt($("sw"), a, d, 0.9); });
+  } }, STY.moving ? movingKinds(KINDS) : KINDS);
+</script>
+</body>
+</html>

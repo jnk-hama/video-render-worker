@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- UGREEN「一本の線」（#333・v3＝語りつき 8場面）。時刻は timing.json（window.TIMELINE）、文字は設計書（window.PRODUCT）、色・イージング・受け渡し位置は edge_tokens.js。
+     すべての値は時刻 T の関数（タイマー・乱数なし）。#over＝線と図（重なり検査の対象外）／.prod＝実写真／#ui＝文字 -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<style>
+  :root { --ground:#F5F6F8; --grid:#E8EAEF; --ink:#1E2027; --graphite:#5A5F6E; --lav:#AEAFC5; --bronze:#7C5E2E; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--ground); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  .abs { position:absolute; }
+  #bg { position:absolute; inset:0; background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px); background-size:40px 40px; }
+  #world, #prodlayer, #ui { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+  #over { position:absolute; left:0; top:0; }
+  .plate { position:absolute; overflow:hidden; border-radius:22px; box-shadow:0 28px 56px rgba(30,32,39,.13), 0 0 0 1px rgba(30,32,39,.07); will-change:transform,opacity; }
+  .plate img, .bare img { display:block; width:100%; height:100%; will-change:transform; }
+  .bare { position:absolute; will-change:transform,opacity; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln > .in { display:block; will-change:transform; }
+  .num { font-weight:300; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.01em; }
+  /* 製図のインク：斜線のハッチングを字の形で切り、輪郭を銅で引く（#334・Opus 5.5 の指示文の「hatching cut to the letter shapes」）。color は銅のまま＝点検が正しい色で測る */
+  .hatch { -webkit-text-fill-color:transparent; -webkit-text-stroke:3px var(--bronze); background:repeating-linear-gradient(-45deg, var(--bronze) 0 3px, transparent 3px 9px); -webkit-background-clip:text; background-clip:text; }
+  .note { position:absolute; left:64px; width:836px; font:400 24px/1.45 "Noto Sans JP"; color:var(--graphite); opacity:0; }
+  #credit { position:absolute; left:156px; top:184px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; opacity:.5; color:var(--ink); z-index:3; }   /* 全編に出す（#308）＝洪水より上 */
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:var(--ink); border:2px solid var(--ink); border-radius:6px; background:var(--ground); z-index:3; padding:5px 12px; letter-spacing:.08em; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="world"></div>
+<div id="prodlayer" class="prod"></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<div id="ui"><div id="pr">PR</div></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, { C, E, clamp, lerp, breathe, H, PHOTO } = EDGE;
+const beat = (b) => b * TL.beat_sec;
+// 出来事の時刻は timing.json の events だけから読む（拍の番号をここに書かない＝尺や語りが変わっても絵が音に付いてくる・v3）
+const ev = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b]));
+// #308 VOICEVOX の声は規約で「VOICEVOX:話者名」の記載が条件（オーナー「表記は小さく透過」）。PR の札の右。#ui の外（読ませる字ではない・qctext が別に確かめる）
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+const DIR = "p/ugreen-air/";
+let T = 0;
+const U = [];                                  // 毎フレーム呼ぶ更新（場面ごとに1つ）
+const AFTER_FONTS = [];                        // 字形が読み込まれてから実測で決める配置
+const $ = (id) => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, html = "", parent = $("ui")) { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (html) e.innerHTML = html; parent.appendChild(e); return e; }
+function sv(tag, attrs = {}, parent = $("over")) { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); parent.appendChild(e); return e; }
+const ln = (style, html, parent) => el("div", { class: "ln", style }, `<span class="in">${html}</span>`, parent);
+// 文字の出入り：マスクの中を下から（outExpo・ゆっくり識別できる）→ 上へ速く抜ける（inCubic）
+function reveal(e, tin, tout, d = 0.55, dout = 0.22) {
+  const a = E.outExpo((T - tin) / d), o = E.inCubic((T - tout) / dout);
+  e.firstElementChild.style.transform = `translateY(${((1 - a) * 115 - o * 115).toFixed(2)}%)`;
+  e.style.visibility = T < tin || T > tout + dout ? "hidden" : "visible";
+}
+const fade = (e, tin, tout, d = 0.3) => { e.style.opacity = (clamp((T - tin) / d) * (1 - clamp((T - tout) / 0.2))).toFixed(3); };
+const note = (text, y, tin, tout) => { const e = el("div", { class: "note", style: `top:${y}px` }, text); U.push(() => fade(e, tin, tout)); return e; };
+
+// ---------------- 図形の道具（THE LINE） ----------------
+const f2 = (v) => v.toFixed(2);
+const seg = (x0, y0, x1, y1) => `M${f2(x0)} ${f2(y0)} L${f2(x1)} ${f2(y1)}`;
+// 長さ L の線分を、真ん中 (cx,cy) を保ったまま上へ巻く。k=0 直線 / k=1 円（半径 L/2π・中心 (cx, cy−R)）
+function bend(cx, cy, L, k) {
+  if (k < 1e-4) return seg(cx - L / 2, cy, cx + L / 2, cy);
+  const R = L / (2 * Math.PI * k); let d = "";
+  for (let i = 0; i <= 120; i++) { const s = -L / 2 + (L * i) / 120, ph = s / R; d += `${i ? "L" : "M"}${f2(cx + R * Math.sin(ph))} ${f2(cy - R * (1 - Math.cos(ph)))} `; }
+  return d;
+}
+// 回転した楕円（上から時計回り）。frac で一部だけ
+function oval(o, frac = 1) {
+  const r = (o.rot * Math.PI) / 180; let d = ""; const n = 128;
+  for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + 2 * Math.PI * frac * (i / n), x0 = o.rx * Math.cos(a), y0 = o.ry * Math.sin(a);
+    d += `${i ? "L" : "M"}${f2(o.cx + x0 * Math.cos(r) - y0 * Math.sin(r))} ${f2(o.cy + x0 * Math.sin(r) + y0 * Math.cos(r))} `; }
+  return d;
+}
+const R0 = H.L / (2 * Math.PI);                  // 巻き切った輪の半径
+const F = H.floor;
+const mixO = (a, b, u) => ({ cx: lerp(a.cx, b.cx, u), cy: lerp(a.cy, b.cy, u), rx: lerp(a.rx, b.rx, u), ry: lerp(a.ry, b.ry, u), rot: lerp(a.rot, b.rot, u) });
+const ringAtFloor = { cx: (F.x0 + F.x1) / 2, cy: F.y - R0, rx: R0, ry: R0, rot: 0 };
+
+// 写真（実画像）。plate＝枠つき、bare＝枠なし（地と同じ背景の写真）
+function photo(src, x, y, w, h, cls = "plate", origin = "50% 50%") {
+  const e = el("div", { class: cls, style: `left:${x}px;top:${y}px;width:${w}px;height:${h}px;opacity:0` }, `<img src="${DIR}${src}" style="transform-origin:${origin}">`, $("prodlayer"));
+  return e;
+}
+
+// ---------------- 共有の状態（場面の外に出す物） ----------------
+const S = Object.fromEntries(TL.scenes.map((s) => [s.id, s]));
+const st = { s1: null, s4coil: null };          // S1 の本体の箱（線の隠し）・S4 の輪の画面上の位置
+const theLine = sv("path", { id: "theLine", fill: "none", stroke: C.ink, "stroke-width": EDGE.LINE_W, "stroke-linecap": "round", mask: "url(#s1mask)" });
+const defs = sv("defs"); const mask = sv("mask", { id: "s1mask", maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 1080, height: 1920 }, defs);
+sv("rect", { x: 0, y: 0, width: 1080, height: 1920, fill: "#fff" }, mask); const hole = sv("rect", { fill: "#000" }, mask);
+
+// =====================================================================
+// S1 EDGE：本体を真横から。本体＝一本の線。1コマ目で完成した絵
+// =====================================================================
+{
+  const c = COPY.S1, s = S.S1, k1 = 1080 / PHOTO.s1.w, PY = 780, B1 = PHOTO.s1.battery;
+  const ph = photo("edge/s1.png", 0, PY, 1080, Math.round(PHOTO.s1.h * k1), "bare");
+  ph.style.webkitMaskImage = ph.style.maskImage = "linear-gradient(to bottom, transparent 0, #000 9%, #000 84%, transparent 100%)";   // 上端（写真の淡い光の境目）と手首の切れ目を地に溶かす
+  const lab = ln("left:64px;top:236px;font:500 44px/1.2 'Noto Sans JP';letter-spacing:.04em", c.label);
+  const big = ln("left:64px;top:300px;font-size:300px;line-height:1;color:var(--bronze)", `<span class="num hatch">8.6</span><span class="num hatch" style="font-size:110px;margin-left:6px;-webkit-text-stroke-width:2px">mm</span>`);
+  const n = note(c.note, 640, -1, s.t1 - 0.3);   // 1.6倍の寄りで写真が下端まで来て、下の注記と重なった（R5）→ 数字の下へ
+  const yB = PY + ((B1.y0 + B1.y1) / 2) * k1;    // 本体の厚みの中心
+  const dim = sv("g", { stroke: C.ink, "stroke-width": 2.5, fill: "none", "stroke-linecap": "round", opacity: 0 });
+  const lead = sv("path", { d: "", stroke: C.ink, "stroke-width": 2, fill: "none", opacity: 0 });
+  U.push(() => {
+    const t = T, xp = clamp((t - s.t0) / (s.t1 - 0.4 - s.t0)), push = 1.6 - 0.6 * (1 - (1 - xp) * (1 - xp));   // 1コマ目は縁の寄り（1.6倍＝本体が画面を横切る線）→ 引いてスマホと手を見せる。寄りの 10% では薄さが 33px の線で伝わらなかった（R5）。出だしが一番速い＝止まって見えない
+    const out = E.inCubic((t - (s.t1 - 0.4)) / 0.25);                                   // 退場：下へ速く。次の写真が出る前に抜け切る（重なると二重写しになった・R2）
+    const dy = out * 700, cx = 540, cy = yB;
+    const map = (x, y) => [cx + (x - cx) * push, cy + (y - cy) * push + dy];
+    ph.style.opacity = (1 - clamp(out * 1.4)).toFixed(3);
+    ph.style.transform = `translateY(${f2(dy)}px) scale(${push.toFixed(4)})`; ph.style.transformOrigin = `${cx}px ${f2(yB - PY)}px`;
+    const [bx0, by0] = map(B1.x0 * k1 - 3, PY + B1.y0 * k1 - 3), [bx1, by1] = map(B1.x1 * k1 + 3, PY + B1.y1 * k1 + 3);
+    st.s1 = { bx0, by0, bx1, by1, yB: map(0, yB)[1] };
+    // 文字：1コマ目で見えている（前から入っている）。退場は上へ
+    reveal(lab, -0.8, s.t1 - 0.42); reveal(big, -0.7, s.t1 - 0.4);   // 次の写真（1.85秒〜）の前に抜け切る（R4：1.75〜1.92秒に二重写り）
+    big.style.transformOrigin = "0 100%"; big.style.transform = `scale(${(1.05 - 0.05 * E.outExpo(t / 0.45)).toFixed(4)})`;   // 1コマ目は完成した絵のまま、数字が置かれる動きで始まる（R4）
+    // b1：大きな数字の下から引き出し線を引き始め、b2 で本体の左端に着く → 厚みの矢印の両端がばねで開く（つかみの動作→結果）
+    const ax = bx0 - 30, ay0 = by0 + 3, ay1 = by1 - 3, ly0 = 730, ly1 = ay0 - 6;
+    const lu = E.outQuart((t - ev("pen")) / (ev("caps") - ev("pen")));
+    lead.setAttribute("d", MK.boilSeg(ax, ly0, ax, lerp(ly0, ly1, lu), t, 0.9, 12, 1));   // 製図の手描き線：位相は1秒に8回だけ変わる（#334） lead.setAttribute("opacity", t >= ev("pen") ? (1 - out).toFixed(3) : 0);
+    const da = E.spring(t - ev("caps")), w = 13 * clamp(da, 0, 1.4);
+    dim.innerHTML = `<path d="${MK.boilSeg(ax, ay0, ax, ay1, t, 0.6, 6, 2)}"/><path d="${MK.boilSeg(ax - w, ay0, ax + w, ay0, t, 0.6, 6, 3)}"/><path d="${MK.boilSeg(ax - w, ay1, ax + w, ay1, t, 0.6, 6, 4)}"/>`;
+    dim.setAttribute("opacity", t >= ev("caps") ? (1 - out).toFixed(3) : 0);
+    // 方眼：S1 は写真と地を継ぎ目なく見せるため出さない→退場で現れる
+    $("bg").style.opacity = clamp((t - (s.t1 - 0.4)) / 0.4).toFixed(3);
+  });
+}
+
+// =====================================================================
+// S2 POCKET：ポケットに入る実写真。下線＝床の線
+// =====================================================================
+{
+  const c = COPY.S2, s = S.S2, sc = 1.2, W = 580 * sc, Hh = 600 * sc, X = (1080 - W) / 2, Y = 380;
+  const ph = photo("edge/s2.png", X, Y, W, Hh, "plate", "53% 62%");
+  const lab = ln("left:120px;top:1140px;font:500 32px/1.2 'Noto Sans JP';color:var(--graphite)", c.label);
+  const h1 = ln("left:120px;top:1196px;font:700 66px/1.15 'Noto Sans JP'", "ポケットにも、");
+  const h2 = ln("left:582px;top:1196px;font:700 66px/1.15 'Noto Sans JP'", "スッと");   // 大きな字に句点を付けない（#315）
+  AFTER_FONTS.push(() => { h2.style.left = f2(120 + h1.firstElementChild.getBoundingClientRect().width) + "px"; });   // 詰め組みで幅が変わるので、実測して続ける
+  note(c.note, 1486, s.t0, s.t1 - 0.3);
+  U.push(() => {
+    const t = T, land = E.spring(t - (s.t0 - 0.15)), out = E.inCubic((t - (s.t1 - 0.25)) / 0.25);   // 前の写真が抜け切ってから（1.85秒）下から上がって着く
+    ph.style.opacity = (clamp((t - (s.t0 - 0.15)) / 0.1) * (1 - clamp(out * 1.5))).toFixed(3);
+    ph.style.transform = `translateY(${f2((1 - land) * 160 - out * 700)}px)`;
+    ph.firstElementChild.style.transform = `scale(${(1 + 0.06 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4)}) translateY(${f2(breathe(t, 3))}px)`;
+    reveal(lab, s.t0 + 0.1, s.t1 - 0.3); reveal(h1, s.t0 + 0.2, s.t1 - 0.28); reveal(h2, ev("sutto"), s.t1 - 0.26);   // 字は言う所で（先に出ると目と耳がずれた・v3 R1）
+  });
+}
+
+// =====================================================================
+// S3 CAPACITY：全画面の数字。床の線が目盛りの溝になり、金が満ちる
+// =====================================================================
+{
+  const c = COPY.S3, s = S.S3;
+  const big = ln("left:64px;top:430px;font-size:380px;line-height:1", `<span class="num">5000</span>`);
+  const unit = ln("left:640px;top:840px;font-size:120px;line-height:1", `<span class="num">mAh</span>`);
+  const sub = ln("left:120px;top:1150px;font:700 64px/1.15 'Noto Sans JP'", c.sub);
+  note(c.note, 1486, s.t0, s.t1 - 0.42);
+  const fill = sv("rect", { y: F.y - 6, height: 12, rx: 6, fill: C.bronze, opacity: 0 });
+  U.push(() => {
+    const t = T;
+    reveal(big, s.t0, s.t1 - 0.4, 0.6); reveal(unit, s.t0 + 0.12, s.t1 - 0.39); reveal(sub, ev("sumaho"), s.t1 - 0.38);   // 巻き上げ（5.75秒）の前に抜け切る（輪が文字を横切った・R2）
+    big.firstElementChild.style.transformOrigin = "0 100%";
+    // 満ちきった後（5.1〜5.6秒）に画面が止まった（静止0.5秒超え・QC）→ 数字を場面の間ずっと寄せ続ける。右端は 64+798×1.04≒894（≦900）
+    const dr = 1 + 0.04 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0));
+    big.style.transformOrigin = unit.style.transformOrigin = "0 100%"; big.style.transform = unit.style.transform = `scale(${dr.toFixed(4)})`;
+    const p = Math.pow(clamp((t - ev("fill")) / (ev("full") - ev("fill"))), 2);              // b8.5→b11 で加速して満ちきる（減速すると b11 の打音の時に画面が止まっていた・R4）
+    const pop = t >= ev("full") ? 10 * Math.sin(Math.PI * clamp((t - ev("full")) / 0.25)) : 0;   // b11：満ちた瞬間に棒が一度太る（打音の絵）
+    fill.setAttribute("x", F.x0); fill.setAttribute("width", f2(Math.max(0, (F.x1 - F.x0) * p))); fill.setAttribute("y", f2(F.y - 6 - pop / 2)); fill.setAttribute("height", f2(12 + pop));
+    fill.setAttribute("opacity", t >= ev("fill") && t < s.t1 ? (1 - clamp((t - (s.t1 - 0.25)) / 0.12)).toFixed(3) : 0);
+  });
+}
+
+// =====================================================================
+// S4 15W：iPhone を置く実写真。線が本体の磁石の輪に着地し、山場で閉じる
+// =====================================================================
+{
+  const c = COPY.S4, s = S.S4, sc = 1.2, W = PHOTO.s4.w * sc, Hh = PHOTO.s4.h * sc, X = (1080 - W) / 2, Y = 600;
+  const co = PHOTO.s4.coil, ox = co.cx * sc, oy = co.cy * sc;
+  const ph = photo("edge/s4.png", X, Y, W, Hh, "plate", `${f2(ox)}px ${f2(oy)}px`);
+  const lead = ln("left:64px;top:236px;font:700 64px/1.15 'Noto Sans JP'", c.lead);
+  const big = ln("left:64px;top:320px;font-size:200px;line-height:1;color:var(--bronze)", `<span style="font-weight:500;font-size:150px">最大</span><span class="num">15W</span>`);
+  note(c.note, 1440, s.t0 + 0.2, s.t1 - 0.45);
+  const arc = sv("path", { fill: "none", stroke: C.bronze, "stroke-width": 8, "stroke-linecap": "round", opacity: 0 });
+  const ripple = sv("path", { fill: "none", stroke: C.bronze, opacity: 0 });
+  U.push(() => {
+    const t = T, land = E.spring(t - (s.t0 - 0.1)), out = E.inCubic((t - (s.t1 - 0.4)) / 0.25);   // 次の写真（8.85秒〜）の前に抜け切る（二重写し・R2）
+    const ty = (1 - land) * 180 + out * 800, ip = 1 + 0.04 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0));
+    ph.style.opacity = (clamp((t - (s.t0 - 0.1)) / 0.15) * (1 - clamp(out * 1.5))).toFixed(3);
+    ph.style.transform = `translateY(${f2(ty)}px)`; ph.firstElementChild.style.transform = `scale(${ip.toFixed(4)})`;
+    // 磁石の輪の画面上の位置（写真の拡大の支点＝輪の中心なので中心は動かず、半径だけ拡大に合わせる）
+    const pulse = 1 + 0.06 * Math.sin(Math.PI * clamp((t - ev("close")) / 0.3)) * (t >= ev("close") ? 1 : 0) + MK.windup(t, ev("close"), 0.3, 0.03);   // 山場の 0.3秒前に少し縮み（溜め・#334）、山場で一度だけ弾む
+    st.s4coil = { cx: X + ox, cy: Y + ty + oy, rx: co.rx * sc * ip * pulse, ry: co.ry * sc * ip * pulse, rot: co.rot };
+    // 読む時間（0.7秒以上）を取るため文字は溜めの間に順に出す。山場 b16 は「輪が閉じ、数字が一度弾む」（R2）
+    reveal(lead, ev("coil"), s.t1 - 0.45); reveal(big, ev("w15"), s.t1 - 0.43, 0.5);   // 「置くだけで、」は語りの始まり、「最大15W」は「最大」と言う所（#312）
+    big.style.transformOrigin = "0 80%"; big.style.transform = `scale(${(1 + 0.12 * Math.sin(Math.PI * clamp((t - ev("close")) / 0.32)) * (t >= ev("close") ? 1 : 0)).toFixed(4)})`;   // 弾みの支点は左端（中央だと左端が 64px の外へ出た・R3）
+    const p = E.inOutCubic((t - ev("coil")) / (ev("close") - ev("coil")));                     // 溜めの間に満ちて、b16 で閉じる
+    arc.setAttribute("d", oval(st.s4coil, Math.max(0.001, p)));
+    // 山場 b16：輪が閉じた瞬間に同じ形の輪が外へ広がって消える（音の山に絵の山が無かった・R5）
+    const rp = clamp((t - ev("close")) / 0.55), rk = 1 + 1.1 * E.outQuart(rp);
+    arc.setAttribute("stroke-width", f2(8 + 8 * Math.sin(Math.PI * clamp((t - ev("close")) / 0.3)) * (t >= ev("close") ? 1 : 0)));
+    ripple.setAttribute("d", oval({ ...st.s4coil, rx: st.s4coil.rx * rk, ry: st.s4coil.ry * rk }, 1));
+    ripple.setAttribute("stroke-width", f2(6 - 4 * rp)); ripple.setAttribute("opacity", t >= ev("close") && rp < 1 ? (0.9 * (1 - rp)).toFixed(3) : 0);
+    arc.setAttribute("opacity", t >= ev("coil") ? (1 - clamp((t - (s.t1 - 0.4)) / 0.1)).toFixed(3) : 0);
+  });
+}
+
+// =====================================================================
+// S5 MAG：iPhone に付けた実写真。「iPhone 12〜17に、磁石で吸着。」— 「吸着」で本体がスマホに付く小さな弾み
+// =====================================================================
+{
+  const c = COPY.S5, s = S.S5, sc = 1.18, W = 804 * sc, Hh = 480 * sc, X = (1080 - W) / 2, Y = 300;
+  const ph = photo("edge/s6.png", X, Y, W, Hh, "plate");
+  const lead = ln("left:64px;top:960px;font:700 56px/1.15 'Noto Sans JP'", c.lead);
+  const head = ln("left:64px;top:1040px;font:700 96px/1.15 'Noto Sans JP'", c.head);
+  note(c.note, 1486, s.t0, s.t1 - 0.3);
+  U.push(() => {
+    const t = T, inn = E.outExpo((t - s.t0) / 0.45), out = E.inCubic((t - (s.t1 - 0.32)) / 0.22);   // 前の写真が抜けてから入り、次の前に抜ける（R2）
+    const snap = t >= ev("snap") ? Math.sin(Math.PI * clamp((t - ev("snap")) / 0.28)) : 0;      // 「吸着」：一度だけ縮んで戻る＝付いた手応え
+    ph.style.opacity = (clamp(inn) * (1 - clamp(out * 1.5))).toFixed(3);
+    ph.style.transform = `translateY(${f2(-out * 60)}px) scale(${(0.94 + 0.06 * inn - 0.025 * snap).toFixed(4)})`;   // 上へ大きく抜けると PR の印の下を通った（重なり・R3）→ 小さく上げて消す
+    ph.firstElementChild.style.transform = `translateY(${f2(breathe(t, 3, 1))}px) scale(${(1.02 + 0.05 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4)})`;
+    reveal(lead, s.t0 + 0.1, s.t1 - 0.36); reveal(head, ev("jishaku"), s.t1 - 0.34);   // 字は言う所で（v3 R1）
+  });
+}
+
+// =====================================================================
+// S6 COLORS：公式の4色の写真。床の線に色名と目盛りが「カラーは4色」に合わせて立つ
+// =====================================================================
+{
+  const c = COPY.S6, s = S.S6, sc = 1.4, W = 640 * sc, Hh = 500 * sc, X = (1080 - W) / 2, Y = 420;
+  const ph = photo("edge/s5.png", X, Y, W, Hh, "plate");
+  const head = ln("left:64px;top:236px;font:700 72px/1.15 'Noto Sans JP'", c.head);   // 見出しの左端を他の場面と揃える（v3 R1）
+  note(c.note, 1486, s.t0, s.t1 - 0.25);
+  const xs = [200, 400, 600, 800], tins = [ev("c1"), ev("c2"), ev("c3"), ev("c4")];   // 16分で流す＝最後の色名も読める（R2）
+  const names = c.names.map((nm, i) => ln(`left:${xs[i] - 100}px;width:200px;text-align:center;top:1214px;font:500 40px/1.2 'Noto Sans JP'`, nm));
+  const ticks = xs.map(() => sv("line", { stroke: C.ink, "stroke-width": 3, "stroke-linecap": "round" }));
+  U.push(() => {
+    const t = T, land = E.spring(t - (s.t0 - 0.15)), out = E.inCubic((t - (s.t1 - 0.25)) / 0.2);
+    ph.style.opacity = (clamp((t - (s.t0 - 0.15)) / 0.15) * (1 - clamp(out * 1.5))).toFixed(3);
+    ph.style.transform = `translateX(${f2((1 - land) * 320 - out * 1100)}px)`;
+    ph.firstElementChild.style.transform = `translateY(${f2(breathe(t, 3))}px) scale(1.02)`;
+    reveal(head, s.t0 + 0.05, s.t1 - 0.25);
+    names.forEach((e, i) => reveal(e, tins[i], s.t1 - 0.2, 0.35, 0.15));
+    ticks.forEach((l, i) => { const a = clamp(E.spring(t - tins[i]), 0, 1.3) * (1 - clamp((t - (s.t1 - 0.2)) / 0.12)), h = 16 * a;
+      l.setAttribute("x1", xs[i]); l.setAttribute("x2", xs[i]); l.setAttribute("y1", f2(F.y - h)); l.setAttribute("y2", f2(F.y + h)); l.setAttribute("opacity", t >= tins[i] && h > 0.3 ? 1 : 0); });   // 縮みきった目盛りは消す（場面の後に点が 0.1秒残った・v3 r4）
+  });
+}
+
+// =====================================================================
+// S7 PROOF：評価（取得日つき）。文字だけの場面（写真は S5 で使った）。THE LINE が「★4.53」の下線
+// =====================================================================
+const UL6 = { x0: 64, x1: 560, y: 990 };
+{
+  const c = COPY.S7, s = S.S7;
+  const star = el("div", { class: "abs", style: "left:64px;top:818px;width:104px;height:104px;opacity:0" },
+    `<svg width="104" height="104" viewBox="0 0 24 24"><path pathLength="1" stroke-dasharray="1" d="M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.9 6.2 20.1l1.4-6.4L2.7 9.3l6.5-.7z" fill="${C.bronze}" stroke="${C.bronze}" stroke-width="1.2" stroke-linejoin="round"/></svg>`);
+  const starP = star.querySelector("path");
+  const score = ln("left:186px;top:770px;font-size:190px;line-height:1", `<span class="num">${c.score}</span>`);
+  const cnt = ln("left:64px;top:1020px;font:700 56px/1.2 'Noto Sans JP'", c.count_label);
+  const date = ln("left:64px;top:1102px;font:500 30px/1.2 'Noto Sans JP';color:var(--graphite)", c.date);
+  note(c.note, 1486, s.t0, s.t1 - 0.36);
+  U.push(() => {
+    const t = T, out = E.inCubic((t - (s.t1 - 0.32)) / 0.22);
+    const sa = clamp(E.spring(t - ev("hyoka")), 0, 1.3);
+    star.style.opacity = t >= ev("hyoka") ? (1 - clamp(out * 1.5)).toFixed(3) : 0; star.style.transform = `translateY(${f2(breathe(t, 4))}px) scale(${(0.5 + 0.5 * sa).toFixed(4)})`;
+    // 「評価は」で ★ の輪郭を描き始め、「4.53」で塗る＝数字を待つ間も止めない（静止0.5秒超え・v3 R2）
+    starP.style.strokeDashoffset = (1 - E.inOutCubic((t - ev("hyoka")) / (ev("star") - ev("hyoka")))).toFixed(4);
+    starP.style.fillOpacity = clamp((t - ev("star")) / 0.12).toFixed(3);
+    reveal(score, ev("star") + 0.05, s.t1 - 0.36); reveal(cnt, s.t0 + 0.1, s.t1 - 0.35); reveal(date, s.t0 + 0.2, s.t1 - 0.34);   // 件数・日付は先に、数字は「ヨン」で
+    const dz = (1 + 0.06 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4); cnt.style.transformOrigin = date.style.transformOrigin = "0 0"; cnt.style.transform = date.style.transform = `scale(${dz})`;
+    score.style.transformOrigin = "0 100%"; score.style.transform = `scale(${(1 + 0.04 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4)})`;   // 文字だけの場面を止めない
+  });
+}
+
+// =====================================================================
+// S8 END：本体・名前・「詳しくはリンクから」。THE LINE が「リンク」と言う所で下線として着く
+// =====================================================================
+const UL7 = { x0: 270, x1: 810, y: 1362 };
+{
+  const c = COPY.S8, s = S.S8, Hh = 700, W = Math.round((1165 / 1696) * Hh), X = (1080 - W) / 2, Y = 300;
+  const shadow = el("div", { class: "abs", style: `left:${f2(540 - W * 0.31)}px;top:${f2(Y + Hh - 22)}px;width:${f2(W * 0.62)}px;height:30px;border-radius:50%;background:radial-gradient(closest-side, rgba(30,32,39,.28), rgba(30,32,39,0));opacity:0` }, "", $("world"));   // 接地影：本体が上がると縮んで薄くなる（#334）
+  const ph = photo("front.png", X, Y, W, Hh, "bare");
+  const ctr = "left:0;width:1080px;text-align:center;";
+  const name = ln(ctr + "top:1060px;font:700 84px/1.15 'Noto Sans JP'", c.head);
+  const sub = ln(ctr + "top:1172px;font:500 42px/1.2 'Noto Sans JP'", c.sub);
+  const cta = ln(ctr + "top:1262px;font:700 60px/1.2 'Noto Sans JP'", c.cta);
+  note(c.note, 1430, s.t0 + 0.3, 99); note(c.note2, 1466, s.t0 + 0.3, 99);
+  U.push(() => {
+    const t = T, land = E.spring(t - (s.t0 - 0.05));
+    ph.style.opacity = clamp((t - (s.t0 - 0.05)) / 0.2).toFixed(3);
+    const ty = (1 - land) * 140 + breathe(t, 5), lift = Math.max(0, -ty);
+    ph.style.transform = `translateY(${f2(ty)}px) scale(${(1 + 0.06 * E.inOutCubic((t - s.t0) / (s.t1 - s.t0))).toFixed(4)})`;   // 2.5% では最後の2秒がほぼ止まって見えた（R5）
+    shadow.style.opacity = (clamp((t - s.t0) / 0.3) * (1 - lift / 12)).toFixed(3); shadow.style.transform = `scaleX(${(1 - lift * 0.012).toFixed(4)})`;
+    reveal(name, s.t0 + 0.4, 99); reveal(sub, s.t0 + 0.5, 99); reveal(cta, ev("cta"), 99);   // アイリスが開いてから（#334）
+    cta.style.transform = `scale(${(1 + 0.05 * Math.sin(Math.PI * clamp((t - ev("under")) / 0.3)) * (t >= ev("under") ? 1 : 0)).toFixed(4)})`;   // 下線が着く「リンク」で一度弾む
+  });
+}
+
+// =====================================================================
+// THE LINE：1つのパス。形は T だけで決まる＝切れ目の前後で同じ画素
+// =====================================================================
+U.push(() => {
+  const t = T, s1 = S.S1, s3 = S.S3, s4 = S.S4, s7 = S.S7, s8 = S.S8;
+  let d;
+  if (t < s1.t1 - 0.35) d = seg(64, st.s1.yB, 1016, st.s1.yB);
+  else if (t < s1.t1) { const u = E.inOutCubic((t - (s1.t1 - 0.35)) / 0.35); d = seg(lerp(64, F.x0, u), lerp(st.s1.yB, F.y, u), lerp(1016, F.x1, u), lerp(st.s1.yB, F.y, u)); }
+  else if (t < s3.t1 - 0.25) d = seg(F.x0, F.y, F.x1, F.y);
+  else if (t < s3.t1) d = bend((F.x0 + F.x1) / 2, F.y, H.L, E.inOutCubic((t - (s3.t1 - 0.25)) / 0.25));                // 巻き上げ（長さ一定）
+  else if (t < ev("coil")) d = oval(mixO(ringAtFloor, st.s4coil, E.outExpo((t - s4.t0) / (ev("coil") - s4.t0))));          // 本体の磁石の輪へ
+  else if (t < s4.t1 - 0.25) d = oval(st.s4coil);
+  else if (t < s4.t1 - 0.125) d = oval(mixO(st.s4coil, ringAtFloor, E.inOutCubic((t - (s4.t1 - 0.25)) / 0.125)));
+  else if (t < s4.t1) d = bend((F.x0 + F.x1) / 2, F.y, H.L, 1 - E.inOutCubic((t - (s4.t1 - 0.125)) / 0.125));       // ほどける
+  else if (t < s7.t0) d = seg(F.x0, F.y, F.x1, F.y);                                                                   // S5・S6 は床の線（S6 は目盛り）
+  else if (t < s7.t0 + 0.45) { const ua = E.outExpo((t - s7.t0) / 0.3), ub = E.outExpo((t - s7.t0) / 0.45); d = seg(lerp(F.x0, UL6.x0, ua), lerp(F.y, UL6.y, ua), lerp(F.x1, UL6.x0 + 40, ub), lerp(F.y, UL6.y, ub)); }   // 両端を別の速さで（先の端が先に着き、後ろの端が遅れて付いてくる＝線が伸びて見える・awesome-opus5-5-videos の「端ごとに別のばね」）
+  else if (t < s8.t0) d = seg(UL6.x0, UL6.y, lerp(UL6.x0 + 40, UL6.x1, E.inOutCubic((t - ev("hyoka")) / (ev("star") - ev("hyoka")))), UL6.y);   // 「評価は」から伸びて「4.53」で下線になる（数字を待つ間を止めない・v3 R2）
+  else if (t < ev("cta")) { const ua = E.outExpo((t - s8.t0) / 0.65), ub = E.outExpo((t - s8.t0) / 0.45); d = seg(lerp(UL6.x0, UL7.x0, ua), lerp(UL6.y, UL7.y, ua), lerp(UL6.x1, UL7.x0 + 40, ub), lerp(UL6.y, UL7.y, ub)); }   // 下線の左端で待つ。進む向きの端（右）が先に着く
+  else { const u = E.inOutCubic((t - ev("cta")) / (ev("under") - ev("cta"))); d = seg(UL7.x0, UL7.y, lerp(UL7.x0 + 40, UL7.x1, u), UL7.y); }   // 「詳しくは」から伸びて「リンク」で着く（#312）
+  theLine.setAttribute("d", d);
+  // S1 の間だけ、本体の箱で線を隠す（線が本体の中へ続いて見える）。退場で写真と一緒に下がる
+  const on = t < s1.t1; hole.setAttribute("x", on ? f2(st.s1.bx0) : -10); hole.setAttribute("y", on ? f2(st.s1.by0) : -10);
+  hole.setAttribute("width", on ? f2(st.s1.bx1 - st.s1.bx0) : 0); hole.setAttribute("height", on ? f2(st.s1.by1 - st.s1.by0) : 0);
+});
+
+// =====================================================================
+// S7→S8 の切れ目：★から銅が「洪水」になって画面を満たし、本体の中心から「アイリス」で次の場面が開く（#334）
+//   どちらも面積で緩める（半径だと出だしの数コマが跳ぶ）・角の外まで覆う（覆い切らないと1コマで画面の半分が変わる）・始まりは柔らかく
+// =====================================================================
+{
+  // 洪水は文字の層（#ui）の中で文字より上・PR の札より下：退場中の文字を飲み込む。class="scrim"＝重なりの点検の対象外（文字でも写真でもない）
+  const fsvg = document.createElementNS(NS, "svg"); for (const [k, v] of Object.entries({ class: "scrim", width: 1080, height: 1920, viewBox: "0 0 1080 1920", style: "position:absolute;left:0;top:0;z-index:2;pointer-events:none" })) fsvg.setAttribute(k, v); $("ui").appendChild(fsvg);
+  const flood = sv("path", { fill: C.bronze, "fill-rule": "evenodd", opacity: 0 }, fsvg);
+  const A = { x: 116, y: 870 }, Bc = { x: 540, y: 650 }, RA = MK.coverR(A.x, A.y), RB = MK.coverR(Bc.x, Bc.y), DUR_IN = 0.4, DUR_OUT = 0.4;   // 0.3秒だと満ちる途中の1コマで画面の 34% が変わった（v4）
+  const circ = (c, r) => `M${f2(c.x - r)} ${f2(c.y)} a${f2(r)} ${f2(r)} 0 1 0 ${f2(2 * r)} 0 a${f2(r)} ${f2(r)} 0 1 0 ${f2(-2 * r)} 0Z`;
+  U.push(() => {
+    const t = T, t8 = S.S8.t0;
+    if (t < t8 - DUR_IN || t >= t8 + DUR_OUT) { flood.setAttribute("opacity", 0); return; }
+    flood.setAttribute("opacity", 1);
+    // アイリスも柔らかい出だし（inOutCubic）：出だしの速い型だと、開いた最初の1コマで画面の 55% が変わった（v4 r1）
+    if (t < t8) flood.setAttribute("d", circ(A, Math.max(0.01, MK.areaR((t - (t8 - DUR_IN)) / DUR_IN, RA, E.inOutCubic))));
+    else { const r = MK.areaR((t - t8) / DUR_OUT, RB, E.inOutCubic); flood.setAttribute("d", `M0 0H1080V1920H0Z ` + (r > 0.5 ? circ(Bc, r) : "")); }   // 満ちたら画面いっぱいの四角に替えて、穴を開ける
+  });
+}
+
+// ---------------- 時刻を進める ----------------
+window.seek = (t) => { T = t; for (const f of U) f(); };
+window.READY = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].map((im) => im.decode().catch(() => {})));
+  // 使う字形を先に読み込む（隠れている文字は読み込みを起こさない・同梱フォントは unicode-range で分割）
+  const text = $("ui").textContent + "0123456789.mAhW";
+  for (const w of [300, 400, 500, 700]) await document.fonts.load(`${w} 40px "Noto Sans JP"`, text);
+  AFTER_FONTS.forEach((f) => f());
+  window.seek(0); return true;
+})();
+</script>
+</body></html>

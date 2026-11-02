@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<style>
+  /* ギャラリーの暗いスタジオ。黒い本体が沈まないよう、背後に暖かい逆光、床にスポット */
+  :root { --ink:#0F0E0D; --text:#EFE9DF; --sub:#A69E92; --brass:#C9A46A; --brass2:#E6CFA2; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; overflow:hidden; background:var(--ink); }
+  body { position:relative; color:var(--text); font-family:"Noto Sans JP",sans-serif; }
+  .abs { position:absolute; }
+  .min { font-family:"Shippori Mincho",serif; font-weight:700; }
+  .gar { font-family:"Cormorant Garamond",serif; font-weight:300; font-feature-settings:"lnum" 1; font-variant-numeric:lining-nums; }
+  .thin { font-family:"Noto Sans JP",sans-serif; font-weight:300; }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .3em .3em .06em; margin:-.12em -.3em -.3em -.06em; }
+  .ln > .in { display:block; }
+  #stage { position:absolute; inset:-30px; width:1140px; height:1980px; transform-origin:570px 990px; }
+  #stage > .frame { position:absolute; left:30px; top:30px; width:1080px; height:1920px; }
+  #bg { position:absolute; left:-80px; top:-80px; width:1240px; height:2080px;
+        background:
+          radial-gradient(ellipse 760px 980px at 52% 52%, rgba(120,98,72,.42) 0%, rgba(80,64,48,.20) 42%, rgba(0,0,0,0) 72%),
+          linear-gradient(180deg, #0C0B0A 0%, #161412 46%, #1E1B18 66%, #262220 100%); }
+  #table { position:absolute; left:-80px; width:1240px; height:900px;
+        background: radial-gradient(ellipse 620px 220px at 50% 8%, rgba(214,186,140,.20) 0%, rgba(214,186,140,.06) 45%, rgba(0,0,0,0) 75%),
+                    linear-gradient(180deg, rgba(40,36,32,.0) 0%, rgba(40,36,32,.85) 6%, #221F1C 40%, #191715 100%); }
+  #halo { position:absolute; width:1100px; height:1100px; border-radius:50%; pointer-events:none;
+        background: radial-gradient(circle, rgba(230,196,140,.30) 0%, rgba(200,160,110,.12) 30%, rgba(0,0,0,0) 62%); mix-blend-mode:screen; }
+  #world { position:absolute; left:0; top:0; width:600px; height:400px; transform-origin:0 0; }
+  #world img, #world .m { position:absolute; display:block; }
+  .shadow { position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,.75) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,0) 72%); }
+  .refl { transform:scaleY(-1); transform-origin:50% 50%; opacity:.20;
+        -webkit-mask-image:linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,0) 30%); mask-image:linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,0) 30%); }
+  .sweep { position:absolute; inset:0; mix-blend-mode:plus-lighter; opacity:0;
+        background:linear-gradient(100deg, rgba(255,255,255,0) 44%, rgba(255,236,200,.55) 50%, rgba(255,255,255,0) 56%);
+        background-size:340% 100%; background-position:100% 0; background-repeat:no-repeat; }
+  #grain { position:absolute; inset:0; width:1080px; height:1920px; mix-blend-mode:overlay; opacity:.22; pointer-events:none; }
+  #vig { position:absolute; inset:0; pointer-events:none;
+        background:radial-gradient(ellipse 980px 1500px at 50% 50%, rgba(0,0,0,0) 45%, rgba(0,0,0,.35) 80%, rgba(0,0,0,.6) 100%); }
+  #pr { left:64px; top:176px; font:500 24px/1 "Noto Sans JP"; color:var(--sub); border:1.5px solid var(--sub); padding:5px 12px; border-radius:6px; letter-spacing:.08em; }
+  .note { position:absolute; font:300 23px/1.55 "Noto Sans JP"; color:var(--sub); letter-spacing:.02em; }
+  .pill { position:absolute; display:flex; align-items:center; gap:18px; height:92px; padding:0 34px 0 26px; border:1.5px solid rgba(201,164,106,.75);
+          border-radius:46px; font:400 44px/1 "Noto Sans JP"; letter-spacing:.06em; color:var(--text); background:rgba(15,14,13,.35); }
+  .pill svg { width:46px; height:46px; }
+  .lab { font:500 30px/1 "Cormorant Garamond"; letter-spacing:.42em; color:var(--brass); }
+  #cta { position:absolute; display:flex; align-items:center; gap:14px; height:104px; padding:0 40px; border-radius:52px;
+         background:linear-gradient(100deg, #B8925A, #D9BC86 50%, #B8925A); color:#141210; font:700 38px/1 "Noto Sans JP"; letter-spacing:.06em; white-space:nowrap; overflow:hidden; }
+</style>
+</head>
+<body>
+<div id="stage"><div class="frame">
+  <div id="bg"></div>
+  <div id="halo"></div>
+  <div id="table"></div>
+
+  <!-- C4 の輪：本体の後ろに回る時計 -->
+  <svg id="ring" class="abs" style="left:0;top:0" width="1080" height="1920">
+    <g id="rtick" stroke="#C9A46A" stroke-width="3" stroke-linecap="round" opacity=".55"></g>
+    <circle cx="540" cy="1010" r="440" fill="none" stroke="rgba(201,164,106,.16)" stroke-width="4"/>
+    <circle id="ringp" cx="540" cy="1010" r="440" fill="none" stroke="#C9A46A" stroke-width="5" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 540 1010)"/>
+    <circle id="ringdot" r="10" fill="#E6CFA2"/>
+  </svg>
+
+  <div id="world">
+    <!-- 白（奥・C7 だけ）。奥にあるので小さく・少しボケる -->
+    <div id="whiteG" class="m" style="left:250px;top:-30px;width:494px;height:309px;transform-origin:0 0;opacity:0">
+      <div class="shadow" style="left:40px;top:288px;width:420px;height:38px"></div>
+      <img class="refl" src="kettle_w.png" style="left:0;top:309px;width:494px;height:309px">
+      <img src="kettle_w.png" style="left:0;top:0;width:494px;height:309px">
+    </div>
+    <div id="potG" class="m" style="left:0;top:0;width:494px;height:309px">
+      <div class="shadow" id="sh" style="left:30px;top:286px;width:440px;height:44px"></div>
+      <img class="refl" src="kettle_b.png" style="left:0;top:309px;width:494px;height:309px">
+      <img src="kettle_b.png" style="left:0;top:0;width:494px;height:309px">
+      <div class="sweep" id="sw" style="-webkit-mask:url(kettle_b.png) center/100% 100% no-repeat; mask:url(kettle_b.png) center/100% 100% no-repeat"></div>
+    </div>
+  </div>
+
+  <!-- C3 の注ぎの線（グラフィック・注ぎ口の先から） -->
+  <svg id="pour" class="abs" style="left:0;top:0" width="1080" height="1920"><path id="pourP" fill="none" stroke="#E6CFA2" stroke-width="3.2" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><circle id="pourD" r="6" fill="#E6CFA2" opacity="0"/></svg>
+
+  <div id="ui" class="abs" style="left:0;top:0;width:1080px;height:1920px">
+    <div id="pr" class="abs">PR</div>
+
+    <!-- C1 -->
+    <div class="ln min" id="a1" style="left:70px;top:270px;height:140px;font-size:118px;letter-spacing:.04em"><span class="in">小さくて、</span></div>
+    <div class="ln min" id="a2" style="left:70px;top:412px;height:140px;font-size:118px;letter-spacing:.04em"><span class="in">美しい。</span></div>
+    <div id="a3" class="abs" style="left:74px;top:590px;height:2px;width:420px;background:var(--brass);transform-origin:0 50%;transform:scaleX(0)"></div>
+    <div class="ln gar" id="a4" style="left:72px;top:626px;height:56px;font-size:46px;font-weight:500;letter-spacing:.32em"><span class="in">BALMUDA The Pot</span></div>
+    <div class="ln thin" id="a5" style="left:74px;top:690px;height:40px;font-size:26px;letter-spacing:.2em;color:var(--sub)"><span class="in">電気ケトル　KPT03JP</span></div>
+
+    <!-- C2 -->
+    <div class="ln gar" id="b1" style="left:56px;top:212px;height:300px;font-size:290px;line-height:1"><span class="in"><span id="b1t">0</span><span style="font-size:110px;margin-left:10px;letter-spacing:.04em">ml</span></span></div>
+    <div class="ln thin" id="b2" style="left:74px;top:520px;height:56px;font-size:44px;letter-spacing:.14em"><span class="in">コーヒー<span class="gar" style="font-size:64px;font-weight:500;color:var(--brass);margin:0 8px">3</span>杯分</span></div>
+    <svg id="cups" class="abs" style="left:66px;top:640px" width="560" height="190"></svg>
+
+    <!-- C3 -->
+    <div class="ln min" id="d1" style="left:70px;top:270px;height:120px;font-size:104px;letter-spacing:.04em"><span class="in">細口ノズル</span></div>
+    <div class="ln gar" id="d2" style="left:74px;top:410px;height:50px;font-size:40px;font-weight:500;letter-spacing:.42em;color:var(--brass)"><span class="in">HAND DRIP</span></div>
+    <div class="note" id="d3" style="left:74px;top:1430px;opacity:0">※注ぎの線はイメージです。</div>
+
+    <!-- C4 -->
+    <div class="ln thin" id="e1" style="left:74px;top:262px;height:52px;font-size:40px;letter-spacing:.18em;color:var(--sub)"><span class="in">お湯が沸くまで</span></div>
+    <div class="ln" id="e2" style="left:62px;top:300px;height:250px;font-size:240px;line-height:1"><span class="in"><span class="min" style="font-size:96px;letter-spacing:.04em">約</span><span class="gar" id="e2t" style="margin:0 8px">3</span><span class="min" style="font-size:96px">分</span></span></div>
+    <div class="note" id="e3" style="left:74px;top:1478px;opacity:0">※湯沸かし時間 180±30秒（販売ページの記載）</div>
+
+    <!-- C5 -->
+    <div class="abs lab" id="f0" style="left:74px;top:262px;opacity:0">2026 MODEL</div>
+    <div class="abs thin" id="f1" style="left:74px;top:316px;font-size:34px;letter-spacing:.12em;color:var(--sub);opacity:0">前モデル <span class="gar" style="font-size:44px;font-weight:500">KPT01JP</span></div>
+    <svg id="farr" class="abs" style="left:0;top:0" width="1080" height="1920"><path id="farP" d="M86,386 L86,446" pathLength="1" stroke="#C9A46A" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="1" stroke-dashoffset="1"/><path id="farH" d="M72,432 L86,450 L100,432" stroke="#C9A46A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0"/></svg>
+    <div class="abs" id="f2" style="left:74px;top:466px;font-size:40px;letter-spacing:.12em;opacity:0"><span class="thin">2026年モデル</span> <span class="gar" style="font-size:58px;font-weight:500;color:var(--brass2)">KPT03JP</span></div>
+    <div class="ln min" id="f3" style="left:70px;top:580px;height:92px;font-size:74px;letter-spacing:.03em"><span class="in">転倒時の湯漏れに</span></div>
+    <div class="ln min" id="f4" style="left:70px;top:676px;height:92px;font-size:74px;letter-spacing:.03em"><span class="in">配慮した構造へ</span></div>
+    <div class="note" id="f5" style="left:74px;top:800px;width:900px;opacity:0">※新しい安全基準 J60335-2-15（2024）に適合。<br>※旧モデルとは仕様が異なります（容量 0.6L→0.55L、コード 1.3m→1m）。</div>
+
+    <!-- C6 -->
+    <div class="abs lab" id="g0" style="left:74px;top:262px;opacity:0">SAFETY</div>
+    <div class="pill" id="g1" style="left:70px;top:318px;opacity:0"><svg viewBox="0 0 24 24" fill="none" stroke="#C9A46A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2.5 3.2 5 5.6 5 9a5 5 0 0 1-10 0c0-2 1-3.6 2.2-5"/><path d="M4 4l16 16"/></svg>空焚き防止</div>
+    <div class="pill" id="g2" style="left:70px;top:432px;opacity:0"><svg viewBox="0 0 24 24" fill="none" stroke="#C9A46A" stroke-width="1.6" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.3 7.2a8 8 0 1 0 11.4 0"/></svg>自動電源オフ</div>
+
+    <!-- C7 -->
+    <div class="abs" id="h1" style="left:70px;top:250px;opacity:0;display:flex;align-items:flex-end;gap:18px">
+      <svg width="86" height="86" viewBox="0 0 24 24" style="margin-bottom:26px"><path d="M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.9 6.2 20.1l1.4-6.4L2.7 9.3l6.5-.7z" fill="#C9A46A"/></svg>
+      <span class="gar" id="h1t" style="font-size:190px;line-height:1">0.00</span>
+    </div>
+    <div class="abs thin" id="h2" style="left:76px;top:470px;font-size:40px;letter-spacing:.12em;opacity:0">レビュー <span class="gar" id="h2t" style="font-size:66px;font-weight:500;color:var(--brass2)">0</span> 件</div>
+    <div class="note" id="h3" style="left:76px;top:546px;opacity:0">楽天市場 2026年10月5日時点</div>
+    <div id="cta" style="left:70px;top:624px;opacity:0"><span style="position:relative">プロフィールのリンクへ</span><svg width="34" height="34" viewBox="0 0 24 24" style="position:relative"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#141210" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="sweep" id="ctasw" style="opacity:0"></div></div>
+    <div class="note" id="h4" style="left:76px;top:748px;opacity:0">価格・在庫・最新情報はリンク先でご確認ください</div>
+    <div class="abs lab" id="h5" style="left:76px;top:1470px;opacity:0;font-size:28px">WHITE ／ BLACK</div>
+  </div>
+
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="vig"></div>
+</div></div>
+
+<script>
+const TL = window.TIMELINE, C = TL.cuts, EV = TL.ev, END = TL.end;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const outC = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const inOutC = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+function sp(t, w = 12, z = 1) { if (t <= 0) return 0; if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t);
+  const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t)); }
+let T = 0;
+const OUT = (i) => (i + 1 < C.length ? C[i + 1] : 999) - 0.32;                 // カット i の文字が引く時刻
+// 文字：マスクの中からゆっくり上がり、字間が締まる（高級感は遅さと字間で出す）
+function lineIn(id, tin, tout, w = 9) {
+  const el = $(id), inner = el.firstElementChild, a = sp(T - tin, w, 1), o = outC((T - tout) / 0.32);
+  inner.style.transform = `translateY(${(1 - a) * 120 - o * 120}%)`;
+  inner.style.letterSpacing = `${(1 - outC((T - tin) / 1.1)) * 0.12}em`;
+  el.style.visibility = (a <= 0.001 || o >= 0.999) ? "hidden" : "visible";
+}
+function fadeUp(id, tin, tout, dy = 18) {
+  const el = $(id), a = sp(T - tin, 10, 1), o = outC((T - tout) / 0.3);
+  el.style.opacity = clamp(a * 1.15) * (1 - o); el.style.transform = `translateY(${(1 - a) * dy}px)`;
+}
+
+// ---- カメラ：全編を1本のキーフレームで（ワンテイクのつもりでつなぐ）。F=本体上の点（世界px）・A=画面上の位置・z=倍率・r=傾き ----
+const K = [
+  { t: 0.00, F: [30, 60], A: [860, 1100], z: 4.8, r: -3 },        // 注ぎ口の首のアップから
+  { t: 1.30, F: [130, 190], A: [880, 1250], z: 3.9, r: -1.5 },    // 首に沿って下へ滑る
+  { t: 2.15, F: [247, 155], A: [520, 1120], z: 1.55, r: 0 },     // 一気に引いて全体
+  { t: 3.00, F: [247, 152], A: [520, 1112], z: 1.62, r: 0 },
+  { t: 3.55, F: [247, 155], A: [610, 1250], z: 1.25, r: 0 },     // 右下へ譲る（数字の場所を空ける）
+  { t: 6.90, F: [262, 155], A: [610, 1250], z: 1.33, r: 0 },
+  { t: 7.55, F: [20, 40], A: [720, 560], z: 3.4, r: 2 },         // 注ぎ口の先へ
+  { t: 9.90, F: [32, 52], A: [720, 560], z: 3.55, r: 1 },
+  { t: 10.55, F: [247, 155], A: [540, 1060], z: 1.15, r: 0 },    // 輪の真ん中へ
+  { t: 12.70, F: [247, 155], A: [540, 1060], z: 1.22, r: 0 },
+  { t: 13.35, F: [247, 155], A: [640, 1220], z: 1.15, r: 0 },    // 右下に置いて比べる
+  { t: 17.45, F: [247, 155], A: [640, 1220], z: 1.28, r: 0 },
+  { t: 18.10, F: [276, 200], A: [560, 1150], z: 2.3, r: -1.5 },  // 胴のアップ
+  { t: 20.50, F: [292, 200], A: [560, 1150], z: 2.45, r: 0 },
+  { t: 21.25, F: [300, 150], A: [500, 1180], z: 1.18, r: 0 },    // 2色を並べて締める
+  { t: END, F: [300, 150], A: [500, 1180], z: 1.26, r: 0 },
+];
+function camAt(t) {
+  let i = 0; while (i < K.length - 2 && t >= K[i + 1].t) i++;
+  const a = K[i], b = K[i + 1], u = inOutC((t - a.t) / (b.t - a.t));
+  return { F: [lerp(a.F[0], b.F[0], u), lerp(a.F[1], b.F[1], u)], A: [lerp(a.A[0], b.A[0], u), lerp(a.A[1], b.A[1], u)],
+           z: Math.exp(lerp(Math.log(a.z), Math.log(b.z), u)), r: lerp(a.r, b.r, u) };
+}
+const toScreen = (cam, P) => [cam.A[0] + cam.z * (P[0] - cam.F[0]), cam.A[1] + cam.z * (P[1] - cam.F[1])];
+
+// ---- 乱数は seed 固定 ----
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const gctx = $("grain").getContext("2d"), gimg = gctx.createImageData(540, 960);
+function grain(seed) { const r = mulberry32(seed * 7919 + 17), d = gimg.data; for (let i = 0; i < d.length; i += 4) { const v = 110 + Math.floor(r() * 36); d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; } gctx.putImageData(gimg, 0, 0); }
+
+// 輪の目盛り（12）
+(function () { let s = ""; for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, r0 = 462, r1 = i % 3 ? 474 : 486; s += `<line x1="${540 + Math.sin(a) * r0}" y1="${1010 - Math.cos(a) * r0}" x2="${540 + Math.sin(a) * r1}" y2="${1010 - Math.cos(a) * r1}"/>`; } $("rtick").innerHTML = s; })();
+// カップ3つ（線画）。中身は下から満ちる
+(function () { let s = '<defs>'; for (let i = 0; i < 3; i++) s += `<clipPath id="cc${i}"><path d="M${18 + i * 180},40 L${30 + i * 180},150 Q${32 + i * 180},162 ${44 + i * 180},162 L${112 + i * 180},162 Q${124 + i * 180},162 ${126 + i * 180},150 L${138 + i * 180},40 Z"/></clipPath>`;
+  s += '</defs>'; for (let i = 0; i < 3; i++) { const x = i * 180;
+    s += `<g id="cup${i}" opacity="0"><rect id="cf${i}" clip-path="url(#cc${i})" x="${x}" y="162" width="160" height="0" fill="rgba(201,164,106,.55)"/>
+      <path d="M${18 + x},40 L${30 + x},150 Q${32 + x},162 ${44 + x},162 L${112 + x},162 Q${124 + x},162 ${126 + x},150 L${138 + x},40" fill="none" stroke="#E6CFA2" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M${136 + x},64 q26,4 24,30 q-2,24 -30,26" fill="none" stroke="#E6CFA2" stroke-width="3"/></g>`; }
+  $("cups").innerHTML = s; })();
+
+function sweepAt(el, t0, dur, peak) { const p = clamp((T - t0) / dur); el.style.opacity = (p <= 0 || p >= 1) ? 0 : Math.sin(p * Math.PI) * peak; el.style.backgroundPosition = `${lerp(100, 0, inOutC(p))}% 0`; }
+function setNum(id, s) { const el = $(id); if (el.textContent !== s) el.textContent = s; }
+
+window.seek = function (t) {
+  T = t;
+  const cam = camAt(t);
+  grain(Math.floor(t * 12));
+  $("stage").style.transform = `rotate(${Math.sin(t * 1.3) * 0.10}deg) translate(${Math.sin(t * 1.1) * 1.6}px, ${Math.cos(t * 0.9) * 1.6}px)`;
+  $("world").style.transform = `translate(${cam.A[0]}px, ${cam.A[1]}px) rotate(${cam.r}deg) scale(${cam.z}) translate(${-cam.F[0]}px, ${-cam.F[1]}px)`;
+  // 速さに応じたボケ（段々の残像を溶かす）
+  { const c0 = camAt(Math.max(0, t - 1 / 120)), P = [247, 155], a = toScreen(cam, P), b = toScreen(c0, P);
+    const v = Math.hypot(a[0] - b[0], a[1] - b[1]) * 120 + Math.abs(Math.log(cam.z / c0.z)) * 120 * 900, mb = clamp(v / 800, 0, 6);
+    $("world").style.filter = mb > 0.3 ? `blur(${mb / cam.z}px)` : "none"; }
+  // 床と逆光は本体についてくる（床の線＝本体の底）
+  const base = toScreen(cam, [247, 300]);
+  $("table").style.top = (base[1] - 40) + "px";
+  const hc = toScreen(cam, [250, 150]); $("halo").style.left = (hc[0] - 550) + "px"; $("halo").style.top = (hc[1] - 560) + "px";
+  $("halo").style.transform = `scale(${clamp(cam.z / 1.5, 0.7, 1.6)})`;
+  $("bg").style.transform = `translate(${(540 - cam.A[0]) * 0.04}px, 0)`;
+
+  // 光の走り：冒頭・胴のアップ・締め
+  const sw = $("sw");
+  if (t < C[1]) sweepAt(sw, EV.c1_glint, 1.1, 0.9); else if (t < C[6]) sweepAt(sw, EV.c6_glint, 1.2, 0.8); else sweepAt(sw, C[6] + 1.0, 1.2, 0.7);
+
+  // ===== C1 =====
+  lineIn("a1", EV.c1_head, OUT(0)); lineIn("a2", EV.c1_head2, OUT(0));
+  const ln = outC((t - (EV.c1_head2 + 0.45)) / 0.7), lo = outC((t - OUT(0)) / 0.3); $("a3").style.transform = `scaleX(${ln * (1 - lo)})`; $("a3").style.visibility = ln * (1 - lo) < 0.01 ? "hidden" : "visible";
+  lineIn("a4", EV.c1_name, OUT(0)); lineIn("a5", EV.c1_name + 0.18, OUT(0));
+
+  // ===== C2 =====
+  lineIn("b1", EV.c2_num0 - 0.1, OUT(1), 10);
+  setNum("b1t", String(Math.round(550 * outC((t - EV.c2_num0) / (EV.c2_num1 - EV.c2_num0)))));
+  lineIn("b2", EV.c2_num1 - 0.2, OUT(1));
+  for (let i = 0; i < 3; i++) {
+    const t0 = EV[`c2_cup${i}`], a = sp(t - (t0 - 0.35), 10, 1), o = outC((t - OUT(1)) / 0.3), f = inOutC((t - t0) / 0.55);
+    $(`cup${i}`).setAttribute("opacity", clamp(a * 1.2) * (1 - o)); $(`cup${i}`).setAttribute("transform", `translate(0 ${(1 - a) * 16})`);
+    $(`cf${i}`).setAttribute("y", 162 - 108 * f); $(`cf${i}`).setAttribute("height", 108 * f);
+  }
+
+  // ===== C3：注ぎの線は注ぎ口の先からまっすぐ下へ（カメラについていく）=====
+  lineIn("d1", EV.c3_label, OUT(2)); lineIn("d2", EV.c3_label + 0.25, OUT(2));
+  fadeUp("d3", EV.c3_line0 + 0.4, OUT(2));
+  { const tip = toScreen(cam, [4, 26]), g = inOutC((t - EV.c3_line0) / (EV.c3_line1 - EV.c3_line0)), o = outC((t - OUT(2)) / 0.3);
+    const y1 = tip[1] + (1360 - tip[1]) * g, d = `M${tip[0]},${tip[1]} C${tip[0] - 6},${tip[1] + 120} ${tip[0] - 14},${tip[1] + 260} ${tip[0] - 16},${y1}`;
+    $("pourP").setAttribute("d", d); $("pourP").setAttribute("stroke-dashoffset", String(1 - (g > 0 ? 1 : 0)));
+    // 線は「伸びる」ので、終点を毎フレーム作り直す
+    $("pourP").style.opacity = (g > 0 ? 1 : 0) * (1 - o);
+    $("pourD").setAttribute("cx", tip[0] - 16 * Math.min(1, g * 1.5)); $("pourD").setAttribute("cy", y1); $("pourD").setAttribute("opacity", (g > 0 && g < 1 ? 1 : 0) * (1 - o)); }
+
+  // ===== C4 =====
+  lineIn("e1", EV.c4_label, OUT(3)); lineIn("e2", EV.c4_label + 0.15, OUT(3), 10);
+  fadeUp("e3", EV.c4_ring1 - 0.3, OUT(3));
+  { const rin = sp(t - (EV.c4_ring0 - 0.25), 9, 1), o = outC((t - OUT(3)) / 0.3), p = inOutC((t - EV.c4_ring0) / (EV.c4_ring1 - EV.c4_ring0));
+    $("ring").style.opacity = clamp(rin * 1.2) * (1 - o); $("ringp").setAttribute("stroke-dashoffset", String(1 - p));
+    const a = p * Math.PI * 2; $("ringdot").setAttribute("cx", 540 + Math.sin(a) * 440); $("ringdot").setAttribute("cy", 1010 - Math.cos(a) * 440);
+    $("ring").style.transform = `scale(${lerp(0.94, 1, rin)})`; $("ring").style.transformOrigin = "540px 1010px"; }
+
+  // ===== C5 =====
+  fadeUp("f0", EV.c5_old - 0.2, OUT(4)); fadeUp("f1", EV.c5_old, OUT(4));
+  { const g = inOutC((t - EV.c5_arrow) / 0.35), o = outC((t - OUT(4)) / 0.3); $("farP").setAttribute("stroke-dashoffset", String(1 - g)); $("farP").style.opacity = 1 - o; $("farH").setAttribute("opacity", (g > 0.9 ? 1 : 0) * (1 - o)); }
+  fadeUp("f2", EV.c5_new, OUT(4)); lineIn("f3", EV.c5_body, OUT(4)); lineIn("f4", EV.c5_body + 0.16, OUT(4)); fadeUp("f5", EV.c5_note, OUT(4));
+
+  // ===== C6 =====
+  fadeUp("g0", EV.c6_chip0 - 0.25, OUT(5)); fadeUp("g1", EV.c6_chip0, OUT(5), 24); fadeUp("g2", EV.c6_chip1, OUT(5), 24);
+
+  // ===== C7 =====
+  { const w = sp(t - EV.c7_white, 7, 1); $("whiteG").style.opacity = clamp(w * 1.1); $("whiteG").style.transform = `translate(${(1 - w) * 40}px, 0) scale(0.80)`;
+    $("whiteG").style.filter = `blur(${1.6 / cam.z}px) brightness(.92)`; }
+  fadeUp("h1", EV.c7_star0 - 0.15, 999); setNum("h1t", (4.76 * outC((t - EV.c7_star0) / (EV.c7_star1 - EV.c7_star0))).toFixed(2));
+  fadeUp("h2", EV.c7_rev0 - 0.1, 999); setNum("h2t", Math.round(2079 * outC((t - EV.c7_rev0) / (EV.c7_rev1 - EV.c7_rev0))).toLocaleString("en-US"));
+  fadeUp("h3", EV.c7_rev1, 999); fadeUp("cta", EV.c7_cta, 999, 30); fadeUp("h4", EV.c7_cta + 0.35, 999); fadeUp("h5", EV.c7_white + 0.6, 999);
+  sweepAt($("ctasw"), EV.c7_cta + 0.5, 0.9, 1);
+};
+window.READY = (async () => { await Promise.all([...document.images].map((i) => i.decode().catch(() => 0))); await document.fonts.ready; })();
+window.seek(0);
+</script>
+</body>
+</html>
