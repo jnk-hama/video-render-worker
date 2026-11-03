@@ -1,30 +1,12 @@
 {
- "generated_at": "2026-11-02T11:26:33+00:00",
+ "generated_at": "2026-11-03T11:04:56+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1xg8vle",
-    "title": "Second woman to ever lift the dinnie stones side by side - Angelica Jardine.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xg8vle/second_woman_to_ever_lift_the_dinnie_stones_side/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xjetj5",
     "title": "Raven asks for water in scorching heat",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xjetj5/raven_asks_for_water_in_scorching_heat/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xfz3vy",
-    "title": "Delivering an perfect worm",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xfz3vy/delivering_an_perfect_worm/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -40,6 +22,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1xlyf0n",
+    "title": "\"Who ya gonna call?\"",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xlyf0n/who_ya_gonna_call/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1xipylo",
     "title": "Guy shows up at Trump Rally for a great reason and shares it live for all Fox News viewers to hear",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xipylo/guy_shows_up_at_trump_rally_for_a_great_reason/",
@@ -49,91 +40,100 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xk10u2",
-    "title": "Persian Scissor that's Shaped Like a Bird. It's over 300 Years Old.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xk10u2/persian_scissor_thats_shaped_like_a_bird_its_over/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xkv49n",
+    "title": "He went from 6'1 to 3'1 for Halloween!!",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xkv49n/he_went_from_61_to_31_for_halloween/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xjk77f",
+    "id": "t3_1xipc3j",
+    "title": "Crows leaving bread on a balcony because they think their human friend has run out of food is a remarkable display of intelligence",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xipc3j/crows_leaving_bread_on_a_balcony_because_they/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xhsbof",
+    "title": "Time Lapse of Pregnancy",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xhsbof/time_lapse_of_pregnancy/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xgxg57",
+    "title": "The backwards progression of cgi needs to be studied, this was 18 years ago",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xgxg57/the_backwards_progression_of_cgi_needs_to_be/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xli5sx",
+    "title": "This high school senior absolutely nailing “Thunderstuck” on the xylophone",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xli5sx/this_high_school_senior_absolutely_nailing/",
+    "subreddit": "BeAmazed",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xhdn4y",
+    "title": "I've seen this optical illusion before.",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xhdn4y/ive_seen_this_optical_illusion_before/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xm4wcg",
+    "title": "Look out for that wall",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xm4wcg/look_out_for_that_wall/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xi9o0x",
+    "title": "It looks like someone is stealing vegetables, just like in the cartoons",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xi9o0x/it_looks_like_someone_is_stealing_vegetables_just/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xjgu45",
     "title": "Massive \"Catrina\" skeleton for day of the dead celebration in mexico",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xjk77f/massive_catrina_skeleton_for_day_of_the_dead/",
-    "subreddit": "Damnthatsinteresting",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xjgu45/massive_catrina_skeleton_for_day_of_the_dead/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xhjr75",
-    "title": "This image highlights the surgical scars on Captain Smit Machchhar’s head, sustained during his heroic efforts to control Flydubai flight FZ1073, as he arrives to be honored by the Crown Prince of Dubai.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xhjr75/this_image_highlights_the_surgical_scars_on/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xl30t2",
+    "title": "A bird watches a man fish, he offers it his catch, and then this happened.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl30t2/a_bird_watches_a_man_fish_he_offers_it_his_catch/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xlpa1s",
-    "title": "The perfect wind turbine shot",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xlpa1s/the_perfect_wind_turbine_shot/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xktmqb",
-    "title": "Spectacular Halloween parade by Mecnas in Galway.Ireland",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xktmqb/spectacular_halloween_parade_by_mecnas_in/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xi517g",
-    "title": "when trying to be a disney princess for tiktok doesn't go too well",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xi517g/when_trying_to_be_a_disney_princess_for_tiktok/",
-    "subreddit": "WinStupidPrizes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xgp94p",
-    "title": "Man throws a can at a group",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xgp94p/man_throws_a_can_at_a_group/",
-    "subreddit": "WinStupidPrizes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xipm7d",
-    "title": "Don’t play around with gasoline",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xipm7d/dont_play_around_with_gasoline/",
-    "subreddit": "WinStupidPrizes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xjg4mb",
-    "title": "Slick driver didn't saw the police",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xjg4mb/slick_driver_didnt_saw_the_police/",
-    "subreddit": "WinStupidPrizes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xkz342",
-    "title": "Magical moment with Black backed dwarf Kingfisher in monsoon. (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1xkz342/magical_moment_with_black_backed_dwarf_kingfisher/",
-    "subreddit": "toptalent",
+    "id": "t3_1xjsicb",
+    "title": "This is what an elderly marmoset looks like",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xjsicb/this_is_what_an_elderly_marmoset_looks_like/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,129 +141,111 @@
   ],
   "B": [
    {
-    "id": "t3_1xk93nx",
-    "title": "The Legend of Hei 2 - Battle of the Abandoned Factory",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xk93nx/the_legend_of_hei_2_battle_of_the_abandoned/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1xjzzvi",
+    "title": "Sparxie [Honkai: Star Rail]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xjzzvi/sparxie_honkai_star_rail/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xk326w",
-    "title": "Avatar: Seven Havens Ep. 13 - Pavi's Stand",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xk326w/avatar_seven_havens_ep_13_pavis_stand/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1xitcxf",
+    "title": "Waiting in the Shade [Artist's Original]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xitcxf/waiting_in_the_shade_artists_original/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xkn8t5",
-    "title": "Halloween Creature Girl - James Baxter",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xkn8t5/halloween_creature_girl_james_baxter/",
-    "subreddit": "AnimeSakuga",
+    "id": "t3_1xli05b",
+    "title": "Suisei Hoshimachi [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xli05b/suisei_hoshimachi_hololive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xldcek",
-    "title": "Grandpa grabbing a coffee on a beautiful fall day in Toronto",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xldcek/grandpa_grabbing_a_coffee_on_a_beautiful_fall_day/",
-    "subreddit": "streetwear",
+    "id": "t3_1xkbepz",
+    "title": "Long Hair Neon [Valorant]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xkbepz/long_hair_neon_valorant/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xg4i3r",
-    "title": "[wdywt] layering szn in full effect",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xg4i3r/wdywt_layering_szn_in_full_effect/",
-    "subreddit": "streetwear",
+    "id": "t3_1xi4god",
+    "title": "The art of seduction",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xi4god/the_art_of_seduction/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xjiftb",
-    "title": "Happy halloween 🎃 👻, dante inspired gyaruo outfit",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xjiftb/happy_halloween_dante_inspired_gyaruo_outfit/",
-    "subreddit": "streetwear",
+    "id": "t3_1xk0q8y",
+    "title": "Horizontal Is My Favorite Position",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xk0q8y/horizontal_is_my_favorite_position/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xgwu74",
-    "title": "love a cream & brown combo",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xgwu74/love_a_cream_brown_combo/",
-    "subreddit": "streetwear",
+    "id": "t3_1xlwws5",
+    "title": "ISSHIKI-SAN wa KOI wo SHIRITΑΙ gif",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xlwws5/isshikisan_wa_koi_wo_shiritαι_gif/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xg8i86",
-    "title": "[ART] Begging - Mikoto-chan Doesn't Want to Be Hated!",
-    "url": "https://www.reddit.com/r/manga/comments/1xg8i86/art_begging_mikotochan_doesnt_want_to_be_hated/",
-    "subreddit": "manga",
+    "id": "t3_1xl1cqv",
+    "title": "Bocchi the Rock! The Movie Starry Footprints Teaser Visual Revealed",
+    "url": "https://www.reddit.com/r/anime/comments/1xl1cqv/bocchi_the_rock_the_movie_starry_footprints/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xjpz83",
-    "title": "[DISC] My Lovely Daughter and Her Girlfriend are Such a Cute Couple - Ch. 1",
-    "url": "https://www.reddit.com/r/manga/comments/1xjpz83/disc_my_lovely_daughter_and_her_girlfriend_are/",
-    "subreddit": "manga",
+    "id": "t3_1xiqph1",
+    "title": "Spooky Scary [Too Many Losing Heroines!]",
+    "url": "https://www.reddit.com/r/anime/comments/1xiqph1/spooky_scary_too_many_losing_heroines/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xk3zbu",
-    "title": "[DISC] - I'm so glad I went with her. - Oneshot by @medatarou1",
-    "url": "https://www.reddit.com/r/manga/comments/1xk3zbu/disc_im_so_glad_i_went_with_her_oneshot_by/",
-    "subreddit": "manga",
+    "id": "t3_1xk2chr",
+    "title": "Me as Yor Forger from Spy x Family",
+    "url": "https://www.reddit.com/r/anime/comments/1xk2chr/me_as_yor_forger_from_spy_x_family/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xghic1",
-    "title": "[News] Tetsuya Chiba, the artist for Ashita no Joe, has passed away at 87",
-    "url": "https://www.reddit.com/r/manga/comments/1xghic1/news_tetsuya_chiba_the_artist_for_ashita_no_joe/",
-    "subreddit": "manga",
+    "id": "t3_1xhvrul",
+    "title": "Ufotable, this is a slice-of-life Anime ok? Ufotable: [Today's Menu for the Emiya Family]",
+    "url": "https://www.reddit.com/r/anime/comments/1xhvrul/ufotable_this_is_a_sliceoflife_anime_ok_ufotable/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xfwlt6",
-    "title": "[DISC] Since I'm Interested In Your Hair - Chapter 6",
-    "url": "https://www.reddit.com/r/manga/comments/1xfwlt6/disc_since_im_interested_in_your_hair_chapter_6/",
-    "subreddit": "manga",
+    "id": "t3_1xmcniu",
+    "title": "I'm not saying that the quality of the dance portion of the opening of an anime is indicative of the overall quality of the show, but in these cases it kind of was",
+    "url": "https://www.reddit.com/r/anime/comments/1xmcniu/im_not_saying_that_the_quality_of_the_dance/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xg8x1h",
-    "title": "Bleach: Thousand-Year Blood War Arc - Final Episode Special ED",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xg8x1h/bleach_thousandyear_blood_war_arc_final_episode/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": false,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xklzua",
-    "title": "Shingo Natsume’s Ghost And Madoka Magica: Walpurgisnacht Rising Shake Up The Status Quo For High-Profile Theatrical Anime",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xklzua/shingo_natsumes_ghost_and_madoka_magica/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": false,
     "source": "rss"
    }
   ]
