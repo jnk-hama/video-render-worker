@@ -241,7 +241,10 @@ function handleLineEvent_(event) {
 
   switch (command.type) {
     case 'marie_post':
-      replyToLine_(replyToken, handleMariePost_(command.jobId));
+      // ★動画を X へ上げる間（13MB を分けて送り、X 側の変換を待つ）に LINE の返事の期限が切れ、結果が黙って落ちた（2026-11-03・jmas #360）。
+      //   受け付けを先に返し、結果は push で送る（push は期限が無い）
+      replyToLine_(replyToken, '受け付けました。X へ動画を上げています（1〜3分）。結果はこのあと届きます。', null);
+      pushToLine_(userId, handleMariePost_(command.jobId));
       break;
     case 'post':
       handlePostCommand_(replyToken, command.account, command.body);
