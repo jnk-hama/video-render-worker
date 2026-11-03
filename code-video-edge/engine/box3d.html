@@ -48,7 +48,7 @@ const GRAIN = Array.from({ length: 4 }, (_, k) => { const c = document.createEle
   for (let i = 0; i < 256 * 256; i++) { const x = Math.sin((i + 1) * 12.9898 + (k + 1) * 78.233) * 43758.5453, v = 128 + ((x - Math.floor(x)) - 0.5) * 90; im.data[i * 4] = im.data[i * 4 + 1] = im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; }
   g.putImageData(im, 0, 0); return c.toDataURL(); });
 const grain = scrimDiv("left:0;top:0;width:1080px;height:1920px;mix-blend-mode:soft-light;background-size:256px 256px");
-U.push(() => { grain.style.backgroundImage = `url(${GRAIN[Math.floor(T() * 24) % 4]})`; grain.style.opacity = 0.14; });
+U.push(() => { grain.style.backgroundImage = `url(${GRAIN[Math.floor(Math.round(T() * 60) * 0.4) % 4]})`; grain.style.opacity = 0.14; });   // 粒は 24fps で替える。替わり目はコマ番号で決める（pdoom-video の frameIdx・MIT）＝1コマの中の4枚が別の粒を重ねない
 
 // =====================================================================
 // 箱と中身の置き場所とカメラ。単位は m。箱の幅を 0.30m とする（大きさは写真の比だけ・動画では寸法を言わない）
@@ -81,10 +81,10 @@ const shotAt = (t) => { let i = KEYS.findIndex((k) => k[0] > t); if (i === -1) r
 const dropAt = (t) => { const u = clamp(t / 0.9); return (1 - MK.springBD(t, 0.9, 0.18)) * 0.13 * (u < 1 ? 1 : 0); };   // 高さ 0.13m：高くから落とすと箱が見出しを横切った（字が箱の上で 3.0:1）
 // 中身の置き場所（床の上・箱の手前）。出る時刻は S2 の言葉（かぶせて・固めて・捨てる）
 const ITEMS = [
-  { id: "black", cue: "kabuse", to: [-0.18, 0, 0.55], tag: 0 },
-  { id: "sachet", cue: "katame", to: [0, 0, 0.57], tag: 1 },
-  { id: "white", cue: "suteru", to: [0.18, 0, 0.55], tag: 2 },
-  { id: "tissue", cue: "suteru", to: [0.24, 0, 0.3], tag: -1, lag: 0.25 }];
+  { id: "black", k6: 0, cue: "kabuse", to: [-0.18, 0, 0.55], tag: 0 },
+  { id: "sachet", k6: 1, cue: "katame", to: [0, 0, 0.57], tag: 1 },
+  { id: "white", k6: 2, cue: "suteru", to: [0.18, 0, 0.55], tag: 2 },
+  { id: "tissue", k6: 3, cue: "suteru", to: [0.24, 0, 0.3], tag: -1, lag: 0.25 }];
 
 // ---------- three.js（読み込みが済むまで seek は待つ） ----------
 const T3 = {};
@@ -121,8 +121,9 @@ T3.ready = import("./vendor/three.module.min.js").then(async (THREE) => {
   Object.assign(T3, { THREE, rd, sc, cam, box, boxG, boxSh, floor, items, grid, slots, ow, oh, ok: true });
 });
 // 中身の時刻：箱の上から出て（弧）、床の置き場所へ着く
-const itemAt = (it, t) => { const t0 = ev(it.cue) + (it.lag || 0) - 0.1, u = E.inOutCubic((t - t0) / 0.75), s = MK.springBD(t - t0, 0.75, 0.15);
-  const from = [0, BH + 0.02, 0], to = it.to, arc = Math.sin(Math.PI * clamp(u)) * 0.16;
+// S6 の頭で中身を箱の後ろの床から順に滑り出させる（ClaudeAnimationBase「物は弧で出入りさせ、ぽんと出さない」・MIT）＝前は S6 の頭に4つが一度に現れていた。箱の上から出すと大きな数字にかかった
+const itemAt = (it, t) => { const t0 = t > s6.t0 ? s6.t0 + 0.4 + it.k6 * 0.12 : ev(it.cue) + (it.lag || 0) - 0.1, u = E.inOutCubic((t - t0) / 0.75), s = MK.springBD(t - t0, 0.75, 0.15);
+  const from = t > s6.t0 ? [0, 0, -BD / 2] : [0, BH + 0.02, 0], to = it.to, arc = Math.sin(Math.PI * clamp(u)) * (t > s6.t0 ? 0.05 : 0.16);
   return { on: t >= t0, p: [lerp(from[0], to[0], u), lerp(from[1], to[1], s) + arc + (t >= t0 ? 0 : 0), lerp(from[2], to[2], u)] }; };
 // 格子の i 番目（行＝日・列＝回）：S3 の「5回」で1行目、「7日」で残りが降りてくる
 const gridAt = (i, t) => { const row = Math.floor(i / 5), col = i % 5, t0 = (row === 0 ? ev("goka") : ev("nanoka")) + (row === 0 ? col * 0.06 : (row - 1) * 0.07 + col * 0.02);
