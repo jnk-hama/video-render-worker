@@ -315,7 +315,11 @@ function adminNotifyTarget_() {
 function isAllowedLineUser_(userId) {
   const raw = getProp_('ALLOWED_LINE_USER_IDS');
   if (!raw) {
-    console.warn('ALLOWED_LINE_USER_IDS が未設定のため、全員を拒否しました（未設定なら閉じる）。');
+    // ★許可リストが無い時は、管理者（ADMIN_LINE_USER_ID）1人だけを通す。どちらも無ければ閉じる（2026-11-03・jmas E-052）。
+    //   8月27日版は「無ければ全員を通す」だったので、リストを入れないまま運用していると、閉じた瞬間にオーナーの命令まで断られる
+    const admin = String(getProp_('ADMIN_LINE_USER_ID') || '').trim();
+    if (admin && userId === admin) return true;
+    console.warn('ALLOWED_LINE_USER_IDS が未設定のため、管理者以外を拒否しました（未設定なら閉じる）。');
     return false;
   }
   return raw.split(',').map(function (s) { return s.trim(); })
