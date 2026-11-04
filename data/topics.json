@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T11:04:56+00:00",
+ "generated_at": "2026-11-04T11:09:04+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -49,46 +49,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xipc3j",
-    "title": "Crows leaving bread on a balcony because they think their human friend has run out of food is a remarkable display of intelligence",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xipc3j/crows_leaving_bread_on_a_balcony_because_they/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xk10u2",
+    "title": "Persian Scissor that's Shaped Like a Bird. It's over 300 Years Old.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xk10u2/persian_scissor_thats_shaped_like_a_bird_its_over/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xhsbof",
-    "title": "Time Lapse of Pregnancy",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xhsbof/time_lapse_of_pregnancy/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xlrc28",
+    "title": "The Learjet 60 that crashed in Palm Beach County today went from 35,000 ft to the ground in 76 seconds.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xlrc28/the_learjet_60_that_crashed_in_palm_beach_county/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xgxg57",
-    "title": "The backwards progression of cgi needs to be studied, this was 18 years ago",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xgxg57/the_backwards_progression_of_cgi_needs_to_be/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xn6qtk",
+    "title": "How a gorilla communicates he comes in peace",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xn6qtk/how_a_gorilla_communicates_he_comes_in_peace/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xli5sx",
-    "title": "This high school senior absolutely nailing “Thunderstuck” on the xylophone",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xli5sx/this_high_school_senior_absolutely_nailing/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xjk77f",
+    "title": "Massive \"Catrina\" skeleton for day of the dead celebration in mexico",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xjk77f/massive_catrina_skeleton_for_day_of_the_dead/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xhdn4y",
-    "title": "I've seen this optical illusion before.",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xhdn4y/ive_seen_this_optical_illusion_before/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xkztc3",
+    "title": "Gallium needle developed by KAIST.South Korea stays solid to pierce the skin, then softens inside the body for safety and single use",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xkztc3/gallium_needle_developed_by_kaistsouth_korea/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -98,6 +98,15 @@
     "title": "Look out for that wall",
     "url": "https://www.reddit.com/r/Unexpected/comments/1xm4wcg/look_out_for_that_wall/",
     "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xl30t2",
+    "title": "A bird watches a man fish, he offers it his catch, and then this happened.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl30t2/a_bird_watches_a_man_fish_he_offers_it_his_catch/",
+    "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -121,15 +130,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xl30t2",
-    "title": "A bird watches a man fish, he offers it his catch, and then this happened.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl30t2/a_bird_watches_a_man_fish_he_offers_it_his_catch/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xjsicb",
     "title": "This is what an elderly marmoset looks like",
     "url": "https://www.reddit.com/r/interestingasfuck/comments/1xjsicb/this_is_what_an_elderly_marmoset_looks_like/",
@@ -141,37 +141,28 @@
   ],
   "B": [
    {
-    "id": "t3_1xjzzvi",
-    "title": "Sparxie [Honkai: Star Rail]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xjzzvi/sparxie_honkai_star_rail/",
-    "subreddit": "awwnime",
+    "id": "t3_1xi7ge9",
+    "title": "THICK THIGHS SAVE LIVES",
+    "url": "https://www.reddit.com/r/Animemes/comments/1xi7ge9/thick_thighs_save_lives/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xitcxf",
-    "title": "Waiting in the Shade [Artist's Original]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xitcxf/waiting_in_the_shade_artists_original/",
-    "subreddit": "awwnime",
+    "id": "t3_1xklfjs",
+    "title": "Silly jokes may not make people laugh but it helps",
+    "url": "https://www.reddit.com/r/Animemes/comments/1xklfjs/silly_jokes_may_not_make_people_laugh_but_it_helps/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xli05b",
-    "title": "Suisei Hoshimachi [Hololive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xli05b/suisei_hoshimachi_hololive/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xkbepz",
-    "title": "Long Hair Neon [Valorant]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xkbepz/long_hair_neon_valorant/",
-    "subreddit": "awwnime",
+    "id": "t3_1xkolqh",
+    "title": "The Agenda is back!!!",
+    "url": "https://www.reddit.com/r/Animemes/comments/1xkolqh/the_agenda_is_back/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -186,9 +177,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xk0q8y",
-    "title": "Horizontal Is My Favorite Position",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xk0q8y/horizontal_is_my_favorite_position/",
+    "id": "t3_1xmo0d0",
+    "title": "Asking the important questions",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xmo0d0/asking_the_important_questions/",
     "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
@@ -222,6 +213,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1xmcniu",
+    "title": "I'm not saying that the quality of the dance portion of the opening of an anime is indicative of the overall quality of the show, but in these cases it kind of was",
+    "url": "https://www.reddit.com/r/anime/comments/1xmcniu/im_not_saying_that_the_quality_of_the_dance/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1xk2chr",
     "title": "Me as Yor Forger from Spy x Family",
     "url": "https://www.reddit.com/r/anime/comments/1xk2chr/me_as_yor_forger_from_spy_x_family/",
@@ -240,10 +240,37 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xmcniu",
-    "title": "I'm not saying that the quality of the dance portion of the opening of an anime is indicative of the overall quality of the show, but in these cases it kind of was",
-    "url": "https://www.reddit.com/r/anime/comments/1xmcniu/im_not_saying_that_the_quality_of_the_dance/",
-    "subreddit": "anime",
+    "id": "t3_1xhq5jd",
+    "title": "New Game Genshin Impact Releases Tomorrow",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xhq5jd/new_game_genshin_impact_releases_tomorrow/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xjmn49",
+    "title": "6 years and the ministry still hasn't fixed this bridge btw",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xjmn49/6_years_and_the_ministry_still_hasnt_fixed_this/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xmjcxf",
+    "title": "Whoever said Stell4r was forced and not real, TAKE THIS!",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmjcxf/whoever_said_stell4r_was_forced_and_not_real_take/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xmqxuz",
+    "title": "Hoyo had to make sure their hands don't touch lmao",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmqxuz/hoyo_had_to_make_sure_their_hands_dont_touch_lmao/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
