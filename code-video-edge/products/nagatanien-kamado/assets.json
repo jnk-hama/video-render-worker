@@ -1,0 +1,70 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。asp_images の順が dl の asp0, asp1… になる。prep.py が販売ページの番号（asp6・asp25・asp27・asp29）の名前に戻して p/<key>/img/ に置く。lines の i が line<i>.mp3",
+ "asp_images": [
+  "https://image.rakuten.co.jp/nagatanienkamadosan-d/cabinet/09948616/85075826_o29.jpg",
+  "https://image.rakuten.co.jp/nagatanienkamadosan-d/cabinet/etc/kamadosan_2025_01.jpg",
+  "https://image.rakuten.co.jp/nagatanienkamadosan-d/cabinet/etc/kamadosan_2025_03.jpg",
+  "https://image.rakuten.co.jp/nagatanienkamadosan-d/cabinet/etc/kamadosan_2025_05.jpg"
+ ],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "火加減、いらない土鍋。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "ちゅうつよびで、やく13分。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "火を止めて、20分むらすだけ。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "二重のふたで、吹きこぼれない。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "伊賀の土を、肉厚に。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "評価は、4.83。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "ながたにえん、かまどさん、さんごうだき。リンクはプロフィールから。",
+   "speed": 0.95,
+   "pause": 0.5
+  }
+ ],
+ "prep": [
+  []
+ ]
+}

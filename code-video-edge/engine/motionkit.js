@@ -21,6 +21,11 @@
   // 円を「面積で」緩める：r = R √e(u)。半径で緩めると出だしの数コマが跳ぶ（閉じるアイリスの落とし穴）
   const areaR = (u, R, ease) => R * Math.sqrt(ease(clamp(u)));
 
+  // 寄り・引きは「見た目の大きさ」で緩める：a·(b/a)^u（掛け算の比で進む）。画面の大きさは距離に反比例するので、
+  //   カメラの距離や拡大率を足し算で緩めると、寄りは最後に突っ込み、引きは最後に止まって見える（Remotion の perceptual-scale の考え方・コードは写していない）
+  //   core.js の 2D のカメラ（cam.z）は前からこの形。3D の型の距離（SH の r）にも使う。a・b は正の数だけ
+  const zoomLerp = (a, b, u) => a * Math.pow(b / a, u);
+
   // 鉛筆のふるえ（line boil）：位相は1秒に8回だけ変わる。値は時刻の段と点の番号から作る（乱数を使わない）
   const hash = (a, b) => { const h = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return h - Math.floor(h); };
   const boil = (t, i, amp) => (hash(Math.floor(t * 8), i) - 0.5) * 2 * amp;
@@ -79,5 +84,5 @@
     return out;
   };
 
-  root.MK = { clamp, cd, springSum, coverR, areaR, boil, boilSeg, windup, springBD, stagger, phys };
+  root.MK = { clamp, cd, springSum, coverR, areaR, zoomLerp, boil, boilSeg, windup, springBD, stagger, phys };
 })(typeof window !== "undefined" ? window : globalThis);

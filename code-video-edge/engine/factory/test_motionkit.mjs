@@ -51,6 +51,13 @@ ok(MK.stagger(4, 9, 0.1, { from: "center", grid: [3, 3] }) === 0 && Math.abs(MK.
 const tr2 = { hz: 10, t0: 1, s: [[0, 0, 0], [10, 20, 1]] }, tr3 = { hz: 10, t0: 0, s: [[0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1, 0]] };
 ok(MK.phys(tr2, 0.9) === null && MK.phys(tr2, 1).join() === "0,0,0" && MK.phys(tr2, 1.05).every((v, q) => Math.abs(v - [5, 10, 0.5][q]) < 1e-9) && MK.phys(tr2, 9).join() === "10,20,1", "phys(2D) の読み出しが違う");
 const q = MK.phys(tr3, 0.05); ok(Math.abs(Math.hypot(q[3], q[4], q[5], q[6]) - 1) < 1e-12 && Math.abs(q[5] - q[6]) < 1e-12, "phys(3D) の回転の補いが違う");
+// 11) 寄り・引き：端は一致・真ん中は相乗平均・同じ u の刻みで画面の大きさ（1/r）が同じ比で変わる（足し算の補いでは比がずれる）
+ok(MK.zoomLerp(2.35, 3.2, 0) === 2.35 && Math.abs(MK.zoomLerp(2.35, 3.2, 1) - 3.2) < 1e-12 && Math.abs(MK.zoomLerp(2.35, 3.2, 0.5) - Math.sqrt(2.35 * 3.2)) < 1e-12, "zoomLerp の端か真ん中が違う");
+const rs = Array.from({ length: 11 }, (_, i) => MK.zoomLerp(3.6, 1.2, i / 10)), ratios = rs.slice(1).map((r, i) => rs[i] / r);
+ok(Math.max(...ratios) - Math.min(...ratios) < 1e-12, "zoomLerp の刻みで大きさの比が揃わない");
+const lin = Array.from({ length: 11 }, (_, i) => 3.6 + (1.2 - 3.6) * i / 10), lr = lin.slice(1).map((r, i) => lin[i] / r);
+ok(Math.log(lr.at(-1)) / Math.log(lr[0]) > 1.5, "足し算の補いとの差が測れていない（検査が空振り）");
+console.log(`寄り 3.6→1.2：足し算だと最後の刻みが最初の ${(Math.log(lr.at(-1)) / Math.log(lr[0])).toFixed(1)}倍の速さ（zoomLerp は 1.0倍）`);
 
 console.log(`motionkit 検査 ${n}件` + (fail.length ? `・不合格 ${fail.length}\n- ` + fail.join("\n- ") : "・すべて合格"));
 process.exit(fail.length ? 1 : 0);
