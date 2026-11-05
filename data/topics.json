@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-04T11:09:04+00:00",
+ "generated_at": "2026-11-05T11:10:05+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -67,9 +67,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xn6qtk",
-    "title": "How a gorilla communicates he comes in peace",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xn6qtk/how_a_gorilla_communicates_he_comes_in_peace/",
+    "id": "t3_1xkztc3",
+    "title": "Gallium needle developed by KAIST.South Korea stays solid to pierce the skin, then softens inside the body for safety and single use",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xkztc3/gallium_needle_developed_by_kaistsouth_korea/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -85,9 +85,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xkztc3",
-    "title": "Gallium needle developed by KAIST.South Korea stays solid to pierce the skin, then softens inside the body for safety and single use",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xkztc3/gallium_needle_developed_by_kaistsouth_korea/",
+    "id": "t3_1xktmqb",
+    "title": "Spectacular Halloween parade by Mecnas in Galway.Ireland",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xktmqb/spectacular_halloween_parade_by_mecnas_in/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
@@ -103,18 +103,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xl30t2",
-    "title": "A bird watches a man fish, he offers it his catch, and then this happened.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl30t2/a_bird_watches_a_man_fish_he_offers_it_his_catch/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1xjcren",
+    "title": "One-eyed squirrel can't believe its eye",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xjcren/oneeyed_squirrel_cant_believe_its_eye/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xi9o0x",
-    "title": "It looks like someone is stealing vegetables, just like in the cartoons",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xi9o0x/it_looks_like_someone_is_stealing_vegetables_just/",
+    "id": "t3_1xnasaw",
+    "title": "The storms got all the Dawgs worked up",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xnasaw/the_storms_got_all_the_dawgs_worked_up/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xl30t2",
+    "title": "A bird watches a man fish, he offers it his catch, and then this happened.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl30t2/a_bird_watches_a_man_fish_he_offers_it_his_catch/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -128,27 +137,9 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
-   },
-   {
-    "id": "t3_1xjsicb",
-    "title": "This is what an elderly marmoset looks like",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xjsicb/this_is_what_an_elderly_marmoset_looks_like/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
    }
   ],
   "B": [
-   {
-    "id": "t3_1xi7ge9",
-    "title": "THICK THIGHS SAVE LIVES",
-    "url": "https://www.reddit.com/r/Animemes/comments/1xi7ge9/thick_thighs_save_lives/",
-    "subreddit": "Animemes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1xklfjs",
     "title": "Silly jokes may not make people laugh but it helps",
@@ -168,10 +159,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xi4god",
-    "title": "The art of seduction",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xi4god/the_art_of_seduction/",
-    "subreddit": "animegifs",
+    "id": "t3_1xn9u5n",
+    "title": "There's an imposter among us",
+    "url": "https://www.reddit.com/r/Animemes/comments/1xn9u5n/theres_an_imposter_among_us/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -189,6 +180,15 @@
     "id": "t3_1xlwws5",
     "title": "ISSHIKI-SAN wa KOI wo SHIRITΑΙ gif",
     "url": "https://www.reddit.com/r/animegifs/comments/1xlwws5/isshikisan_wa_koi_wo_shiritαι_gif/",
+    "subreddit": "animegifs",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xk0q8y",
+    "title": "Horizontal Is My Favorite Position",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xk0q8y/horizontal_is_my_favorite_position/",
     "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
@@ -231,19 +231,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xhvrul",
-    "title": "Ufotable, this is a slice-of-life Anime ok? Ufotable: [Today's Menu for the Emiya Family]",
-    "url": "https://www.reddit.com/r/anime/comments/1xhvrul/ufotable_this_is_a_sliceoflife_anime_ok_ufotable/",
+    "id": "t3_1xj2fqp",
+    "title": "‘DEATH STRANDING ISOLATIONS’ Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xj2fqp/death_stranding_isolations_key_visual/",
     "subreddit": "anime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xhq5jd",
-    "title": "New Game Genshin Impact Releases Tomorrow",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xhq5jd/new_game_genshin_impact_releases_tomorrow/",
-    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -270,6 +261,15 @@
     "id": "t3_1xmqxuz",
     "title": "Hoyo had to make sure their hands don't touch lmao",
     "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmqxuz/hoyo_had_to_make_sure_their_hands_dont_touch_lmao/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xiwulm",
+    "title": "the symbols for each of the divine nails spell paimon….",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xiwulm/the_symbols_for_each_of_the_divine_nails_spell/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
