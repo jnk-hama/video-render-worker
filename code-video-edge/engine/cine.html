@@ -31,7 +31,7 @@
   .lab { font:400 24px/1 "Noto Sans JP"; color:var(--dim); }
   #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:var(--ground); border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ink); z-index:3; }
   #credit { position:absolute; left:156px; top:184px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; opacity:.62; color:var(--ink); z-index:3; }
-  #cta { position:absolute; left:64px; top:1268px; padding:20px 36px; border:2px solid var(--gold); border-radius:999px; font:500 36px/1 "Noto Sans JP"; color:var(--ink); letter-spacing:.04em; opacity:0; white-space:nowrap; }
+  #cta { position:absolute; left:64px; top:1294px; padding:18px 34px; border:2px solid var(--gold); border-radius:999px; font:500 36px/1 "Noto Sans JP"; color:var(--ink); letter-spacing:.04em; opacity:0; white-space:nowrap; }
 </style></head>
 <body>
 <div id="bg"></div>
@@ -57,19 +57,19 @@ const TF = () => Math.round(T() * 60) / 60;
 // 帯（窓）：場面ごとの形 [x, y, w, h]。切り替えは場面の頭から 0.6秒のばね（行き過ぎなし）。0.08秒までは止める（1コマ目のブランド色を鮮明に・点検 8）
 // =====================================================================
 const BAND = [
-  [0,          [0, 650, 1080, 240]],    // S1 の始まり：光の隙間
-  [0.08,       [0, 650, 1080, 240]],
-  [0.95,       [0, 420, 1080, 700]],    // 開いて映画の帯に
-  [s2.t0,      [0, 420, 1080, 700]],
-  [s2.t0 + .6, [0, 300, 1080, 400]],    // S2・S3：上の細い帯（炎）＋下に温度の線
-  [s4.t0,      [0, 300, 1080, 400]],
-  [s4.t0 + .6, [0, 400, 1080, 680]],    // S4：ふたの寄り（上下に札）
-  [s5.t0,      [0, 400, 1080, 680]],
-  [s5.t0 + .6, [64, 380, 520, 900]],    // S5：縦の窓（土の寄り）＋右に縦書き
-  [s6.t0,      [64, 380, 520, 900]],
-  [s6.t0 + .6, [0, 380, 1080, 560]],    // S6：炊き上がり
-  [s7.t0,      [0, 380, 1080, 560]],
-  [s7.t0 + .6, [0, 330, 1080, 600]],    // S7：最初の炎の鍋へ戻る（最初と最後を同じ世界に）
+  [0,          [0, 610, 1080, 240]],    // S1 の始まり：光の隙間
+  [0.08,       [0, 610, 1080, 240]],
+  [0.95,       [0, 322, 1080, 808]],    // 開いて映画の帯に（v2：700→808・オーナー「画面もう少し大きく」）
+  [s2.t0,      [0, 322, 1080, 808]],
+  [s2.t0 + .6, [0, 300, 1080, 560]],    // S2・S3：上の細い帯（炎）＋下に温度の線
+  [s4.t0,      [0, 300, 1080, 560]],
+  [s4.t0 + .6, [0, 380, 1080, 780]],    // S4：ふたの寄り（上下に札）
+  [s5.t0,      [0, 380, 1080, 780]],
+  [s5.t0 + .6, [0, 300, 640, 1100]],    // S5：縦の窓（土の寄り）＋右に縦書き
+  [s6.t0,      [0, 300, 640, 1100]],
+  [s6.t0 + .6, [0, 300, 1080, 700]],    // S6：炊き上がり
+  [s7.t0,      [0, 300, 1080, 700]],
+  [s7.t0 + .6, [0, 300, 1080, 710]],    // S7：最初の炎の鍋へ戻る（最初と最後を同じ世界に）
 ];
 const bandAt = (t) => { let i = BAND.findIndex((k) => k[0] > t); if (i === -1) return BAND.at(-1)[1]; if (i === 0) return BAND[0][1];
   const [ta, a] = BAND[i - 1], [tb, b] = BAND[i], d = tb - ta, u = i === 2 ? E.outExpo((t - ta) / d) : MK.springBD(t - ta, d, 0);
@@ -80,10 +80,10 @@ const bandAt = (t) => { let i = BAND.findIndex((k) => k[0] > t); if (i === -1) r
 const PH = [
   { id: "fire", src: "asp29.jpg", w: 1300, h: 600, keys: [[0, 770, 560, 1.9], [s1.t1, 800, 330, 1.25], [s2.t0 + 0.6, 760, 500, 1.3], [s3.t1, 740, 510, 1.42]], vis: [-1, ev("off") + 0.1, 0, 0.8], glow: true },
   { id: "steam", src: "asp6.jpg", w: 750, h: 750, keys: [[ev("off"), 300, 400, 1.44], [s4.t0 + 0.6, 280, 420, 1.6]], vis: [ev("off") + 0.1, s4.t0 + 0.05, 0.8, 0.5] },
-  { id: "lids", src: "asp27.jpg", w: 1300, h: 600, keys: [[s4.t0, 640, 300, 1.14], [s5.t0 + 0.6, 650, 310, 1.26]], vis: [s4.t0 - 0.15, s5.t0 + 0.05, 0.5, 0.5] },
-  { id: "clay", src: "asp29.jpg", w: 1300, h: 600, keys: [[s5.t0, 860, 330, 1.5], [s6.t0 + 0.6, 880, 420, 1.68]], vis: [s5.t0 - 0.15, s6.t0 + 0.05, 0.5, 0.5] },
-  { id: "rice", src: "asp25.jpg", w: 1300, h: 600, keys: [[s6.t0, 780, 300, 1.0], [s7.t0 + 0.6, 800, 250, 1.12]], vis: [s6.t0 - 0.15, s7.t0 + 0.05, 0.5, 0.5] },
-  { id: "end", src: "asp29.jpg", w: 1300, h: 600, keys: [[s7.t0, 800, 330, 1.02], [TL.end, 790, 320, 1.12]], vis: [s7.t0 - 0.15, 99, 0.5, 0], glow: true },
+  { id: "lids", src: "asp27.jpg", w: 1300, h: 600, keys: [[s4.t0, 640, 300, 1.3], [s5.t0 + 0.6, 650, 310, 1.42]], vis: [s4.t0 - 0.15, s5.t0 + 0.05, 0.5, 0.5] },
+  { id: "clay", src: "asp29.jpg", w: 1300, h: 600, keys: [[s5.t0, 860, 300, 1.85], [s6.t0 + 0.6, 870, 320, 2.0]], vis: [s5.t0 - 0.15, s6.t0 + 0.05, 0.5, 0.5] },
+  { id: "rice", src: "asp25.jpg", w: 1300, h: 600, keys: [[s6.t0, 780, 300, 1.17], [s7.t0 + 0.6, 800, 280, 1.28]], vis: [s6.t0 - 0.15, s7.t0 + 0.05, 0.5, 0.5] },
+  { id: "end", src: "asp29.jpg", w: 1300, h: 600, keys: [[s7.t0, 800, 330, 1.19], [TL.end, 790, 320, 1.3]], vis: [s7.t0 - 0.15, 99, 0.5, 0], glow: true },
 ];
 const keyAt = (keys, t) => { let i = keys.findIndex((k) => k[0] > t); if (i === -1) return keys.at(-1).slice(1); if (i === 0) return keys[0].slice(1);
   const a = keys[i - 1], b = keys[i], u = E.inOutSine((t - a[0]) / (b[0] - a[0]));
@@ -125,10 +125,10 @@ const fade = (e, tin, tout, d = 0.35) => U.push(() => { const t = T(), a = clamp
 
 // ---------- S1：光の隙間が開き、炎に照らされた鍋（つかみ・#303）----------
 { const c = COPY.S1, out = s1.t1 - 0.3;
-  line(`left:64px;top:292px;font:500 30px/1 'Shippori Mincho';color:var(--gold)`, `${c.brand}<span style="color:var(--dim)">　―　</span><span style="color:var(--ink)">${c.series}</span>`, -1, out, 0.01, [0.42, 0.32]);
-  line(`left:64px;top:1150px;font:700 92px/1.1 'Shippori Mincho'`, c.hook, 0.25, out);
-  line(`left:64px;top:1256px;font:700 92px/1.1 'Shippori Mincho'`, c.hook2, ev("hook2") - 0.05, out);
-  line(`left:64px;top:346px;font:400 28px/1 'Noto Sans JP';color:var(--dim)`, P.target.who, -1, out, 0.01, [0.12, 0.08]);
+  line(`left:64px;top:232px;font:500 30px/1 'Shippori Mincho';color:var(--gold)`, `${c.brand}<span style="color:var(--dim)">　―　</span><span style="color:var(--ink)">${c.series}</span>`, -1, out, 0.01, [0.42, 0.32]);
+  line(`left:64px;top:1160px;font:700 92px/1.1 'Shippori Mincho'`, c.hook, 0.25, out);
+  line(`left:64px;top:1266px;font:700 92px/1.1 'Shippori Mincho'`, c.hook2, ev("hook2") - 0.05, out);
+  line(`left:64px;top:278px;font:400 26px/1 'Noto Sans JP';color:var(--dim)`, P.target.who, -1, out, 0.01, [0.12, 0.08]);
   note(c.note, 1404, -1, out); }
 
 // ---------- S2・S3：金の1本線（販売ページの温度の記録を時刻どおりに描き直す）----------
@@ -136,9 +136,9 @@ const fade = (e, tin, tout, d = 0.35) => U.push(() => { const t = T(), a = clamp
 const GX = [[190, 0], [648, 12], [737, 13], [1273, 23], [1528, 33]], gmin = (x) => { for (let i = 1; i < GX.length; i++) if (x <= GX[i][0]) { const [x0, m0] = GX[i - 1], [x1, m1] = GX[i]; return m0 + (m1 - m0) * (x - x0) / (x1 - x0); } return 33; };
 const CURVE = [[190,873],[230,862],[270,855],[300,840],[320,800],[350,730],[385,650],[408,612],[415,580],[425,578],[445,490],[460,480],[470,435],[485,405],[500,398],[515,400],[535,372],[550,330],[565,280],[570,255],[578,220],[585,210],[595,145],[605,125],[615,128],[635,128],[648,132],[670,122],[705,113],[737,118],[820,111],[950,110],[1100,110],[1200,113],[1273,120],[1380,130],[1528,155]]
   .map(([x, y]) => [gmin(x), (965 - y) / 8.45]);   // [分, ℃]（0℃＝y 965・100℃＝y 120）
-const G = { x0: 64, x1: 900, y0: 1300, y100: 1000 }, gx = (m) => G.x0 + (G.x1 - G.x0) * m / 33, gy = (c) => G.y0 + (G.y100 - G.y0) * c / 100;
+const G = { x0: 64, x1: 900, y0: 1300, y100: 1070 }, gx = (m) => G.x0 + (G.x1 - G.x0) * m / 33, gy = (c) => G.y0 + (G.y100 - G.y0) * c / 100;
 const tau = (t) => t < s3.t0 ? 13 * E.inOutCubic((t - ev("start")) / (ev("juusan") - ev("start"))) : 13 + 20 * E.inOutCubic((t - (ev("nijuu") - 0.3)) / 1.15);
-{ const gIn = s2.t0 + 0.5, gOut = s3.t1 - 0.25, g = sv("g", {});
+{ const gIn = s2.t0 + 0.55, gOut = s3.t1 - 0.25, g = sv("g", {});
   const axis = sv("line", { x1: G.x0, x2: G.x1, y1: G.y0, y2: G.y0, stroke: "#A39A8C", "stroke-width": 1.2 }, g);
   const h100 = sv("line", { x1: G.x0, x2: G.x1, y1: G.y100, y2: G.y100, stroke: "#A39A8C", "stroke-width": 1, "stroke-dasharray": "3 7" }, g);
   const area = sv("path", { fill: GOLD, "fill-opacity": 0.1 }, g), path = sv("path", { fill: "none", stroke: GOLD, "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
@@ -150,12 +150,12 @@ const tau = (t) => t < s3.t0 ? 13 * E.inOutCubic((t - ev("start")) / (ev("juusan
   const t13 = el("div", { class: "lab", style: `position:absolute;left:${gx(13) - 20}px;top:${G.y0 + 16}px` }, "13分"); fade(t13, ev("juusan"), gOut);
   const t33 = el("div", { class: "lab", style: `position:absolute;right:${1080 - G.x1}px;top:${G.y0 + 16}px` }, "33分"); fade(t33, ev("nijuu") + 0.7, gOut);
   const markB = el("div", { style: `position:absolute;left:${gx(13) + 14}px;top:${G.y100 - 40}px;font:500 26px/1 'Shippori Mincho';color:var(--gold);white-space:nowrap` }, c2.mark); fade(markB, ev("juusan") + 0.05, gOut);
-  const markD = el("div", { style: `position:absolute;right:${1080 - G.x1}px;top:${G.y100 - 76}px;font:500 26px/1 'Shippori Mincho';color:var(--gold);white-space:nowrap` }, c3.mark); fade(markD, ev("nijuu") + 0.75, gOut);
+  const markD = el("div", { style: `position:absolute;right:${1080 - G.x1}px;top:${G.y0 - 40}px;font:500 26px/1 'Shippori Mincho';color:var(--gold);white-space:nowrap` }, c3.mark); fade(markD, ev("nijuu") + 0.75, gOut);
   // 見出し：小さな札（白米三合・中強火 → 蒸らし）と、数え上がる大きな分
-  line(`left:64px;top:742px;font:500 30px/1 'Shippori Mincho';color:var(--gold)`, c2.label, gIn, s2.t1 - 0.25, 0.9, [0.3, 0.18]);
-  line(`left:64px;top:742px;font:500 30px/1 'Shippori Mincho';color:var(--gold)`, c3.label, s3.t0 + 0.15, gOut, 0.9, [0.3, 0.18]);
-  const big = line(`left:64px;top:790px;font-size:150px;line-height:1`, `<span class="min" style="font:500 52px/1 'Shippori Mincho';vertical-align:top;margin-right:14px">約</span><span class="num">0</span><span class="min" style="font:500 60px/1 'Shippori Mincho';margin-left:10px">分</span>`, gIn, s2.t1 - 0.25, 0.9, null);
-  const big3 = line(`left:64px;top:790px;font-size:150px;line-height:1`, `<span class="num">0</span><span class="min" style="font:500 60px/1 'Shippori Mincho';margin-left:10px">分</span>`, s3.t0 + 0.15, gOut, 0.9, null);
+  line(`left:64px;top:896px;font:500 30px/1 'Shippori Mincho';color:var(--gold)`, c2.label, gIn, s2.t1 - 0.25, 0.9, [0.3, 0.18]);
+  line(`left:64px;top:896px;font:500 30px/1 'Shippori Mincho';color:var(--gold)`, c3.label, s3.t0 + 0.15, gOut, 0.9, [0.3, 0.18]);
+  const big = line(`right:180px;top:888px;font-size:150px;line-height:1`, `<span class="min" style="font:500 52px/1 'Shippori Mincho';vertical-align:top;margin-right:14px">約</span><span class="num">0</span><span class="min" style="font:500 60px/1 'Shippori Mincho';margin-left:10px">分</span>`, gIn, s2.t1 - 0.25, 0.9, null);
+  const big3 = line(`right:180px;top:888px;font-size:150px;line-height:1`, `<span class="num">0</span><span class="min" style="font:500 60px/1 'Shippori Mincho';margin-left:10px">分</span>`, s3.t0 + 0.15, gOut, 0.9, null);
   note(c2.note, 1370, gIn, gOut);
   U.push(() => { const t = T(), a = clamp((t - gIn) / 0.4) * (1 - clamp((t - gOut) / 0.25)); g.style.opacity = a.toFixed(3); g.style.display = a > 0.001 ? "inline" : "none"; if (a <= 0.001) return;
     const m = Math.max(0, tau(t)), pts = []; for (const [mm, cc] of CURVE) { if (mm >= m) break; pts.push([mm, cc]); }
@@ -171,7 +171,7 @@ const tau = (t) => t < s3.t0 ? 13 * E.inOutCubic((t - ev("start")) / (ev("juusan
 
 // ---------- S4：上ふた・中ふた（実写の上に引き出し線、札は帯の外）----------
 { const c = COPY.S4, tin = s4.t0 + 0.55, out = s4.t1 - 0.25, ph = PH.find((p) => p.id === "lids");
-  const tags = [[c.tags[0], 560, 120, 318, "up"], [c.tags[1], 470, 470, 1110, "dn"]];
+  const tags = [[c.tags[0], 560, 120, 318, "up"], [c.tags[1], 470, 470, 1182, "dn"]];
   for (const [txt, px, py, y, k] of tags) {
     const e = line(`left:64px;top:${y}px;font:500 40px/1 'Shippori Mincho'`, txt, k === "up" ? ev("futa") - 0.1 : ev("futa") + 0.12, out, 0.7, [0.3, 0.16]);
     const lnE = sv("polyline", { fill: "none", stroke: GOLD, "stroke-width": 2 }), dot = sv("circle", { r: 6, fill: GOLD });
@@ -181,35 +181,35 @@ const tau = (t) => t < s3.t0 ? 13 * E.inOutCubic((t - ev("start")) / (ev("juusan
       const p2 = L <= L1 ? [lx + Math.sign(mx - lx) * L, ly] : [mx, my + Math.sign(qy - my) * (L - L1)];
       lnE.setAttribute("points", (L <= L1 ? [pts[0], p2] : [pts[0], pts[1], p2]).map((p) => p.map((v) => v.toFixed(2)).join(",")).join(" "));
       lnE.style.opacity = dot.style.opacity = (u > 0 ? o : 0).toFixed(3); dot.setAttribute("cx", qx.toFixed(2)); dot.setAttribute("cy", qy.toFixed(2)); dot.setAttribute("r", (6 * clamp((u - 0.9) / 0.1)).toFixed(2)); }); }
-  line(`left:64px;top:1188px;font:700 104px/1.1 'Shippori Mincho'`, c.head, tin, out);
-  line(`left:64px;top:1322px;font:400 36px/1 'Noto Sans JP';color:var(--dim)`, c.sub, tin + 0.25, out, 0.9, [0.2, 0.08]); }
+  line(`left:64px;top:1236px;font:700 104px/1.1 'Shippori Mincho'`, c.head, tin, out);
+  line(`left:64px;top:1370px;font:400 36px/1 'Noto Sans JP';color:var(--dim)`, c.sub, tin + 0.25, out, 0.9, [0.2, 0.08]); }
 
 // ---------- S5：縦の窓に土の寄り、右に縦書き ----------
 { const c = COPY.S5, tin = s5.t0 + 0.55, out = s5.t1 - 0.25, ph = PH.find((p) => p.id === "clay");
-  line(`left:668px;top:400px;font:700 100px/1 'Shippori Mincho';writing-mode:vertical-rl;padding:0 .3em .12em .3em;margin:0 -.3em -.12em -.3em`, c.head, ev("tsuchi") - 0.1, out, 1.0, null);
-  line(`left:812px;top:420px;font:500 44px/1 'Shippori Mincho';color:var(--gold);writing-mode:vertical-rl;padding:0 .3em .12em .3em;margin:0 -.3em -.12em -.3em`, c.sub, ev("niku"), out, 0.9, null);
-  line(`left:64px;top:1322px;font:400 28px/1 'Noto Sans JP';color:var(--dim)`, `${c.origin}`, tin + 0.2, out, 0.9, [0.4, 0.24]);
+  line(`left:690px;top:330px;font:700 100px/1 'Shippori Mincho';writing-mode:vertical-rl;padding:0 .3em .12em .3em;margin:0 -.3em -.12em -.3em`, c.head, Math.max(ev("tsuchi") - 0.1, s5.t0 + 0.6), out, 1.0, null);
+  line(`left:834px;top:350px;font:500 44px/1 'Shippori Mincho';color:var(--gold);writing-mode:vertical-rl;padding:0 .3em .12em .3em;margin:0 -.3em -.12em -.3em`, c.sub, ev("niku"), out, 0.9, null);
+  line(`left:690px;top:1340px;font:400 28px/1 'Noto Sans JP';color:var(--dim)`, `${c.origin}`, tin + 0.2, out, 0.9, [0.4, 0.24]);
   // 肉厚の札から土の帯（写真の素焼きの所）へ金の線
   //   縦に下りてから左へ（斜めに引くと縦書きの「伊賀の粗土」を横切った）
   const lnE = sv("polyline", { fill: "none", stroke: GOLD, "stroke-width": 2 }), dot = sv("circle", { r: 6, fill: GOLD });
-  U.push(() => { const t = T(), u = E.outCubic((t - ev("niku") - 0.15) / 0.6), o = 1 - clamp((t - out) / 0.22), [qx, qy] = toScreen(ph, 940, 500), sx = 834, sy = 620;
+  U.push(() => { const t = T(), u = E.outCubic((t - ev("niku") - 0.15) / 0.6), o = 1 - clamp((t - out) / 0.22), [qx, qy] = toScreen(ph, 940, 500), sx = 856, sy = 560;
     const L1 = qy - sy, L2 = sx - qx, L = (L1 + L2) * u, pts = L <= L1 ? [[sx, sy], [sx, sy + L]] : [[sx, sy], [sx, qy], [sx - (L - L1), qy]];
     lnE.setAttribute("points", pts.map((p) => p.map((v) => v.toFixed(2)).join(",")).join(" "));
     lnE.style.opacity = dot.style.opacity = (u > 0 ? o : 0).toFixed(3); dot.setAttribute("cx", qx.toFixed(2)); dot.setAttribute("cy", qy.toFixed(2)); dot.setAttribute("r", (6 * clamp((u - 0.9) / 0.1)).toFixed(2)); }); }
 
 // ---------- S6：炊き上がり（山場）。評価は数え上げ（コマの時刻）----------
-{ const c = COPY.S6, tin = s6.t0 + 0.55, out = s6.t1 - 0.25, val = parseFloat(c.score);
-  const sc = line(`left:64px;top:984px;font-size:230px;line-height:1;color:var(--gold)`, `<span class="num">0.00</span>`, tin, out, 0.9, null);
-  line(`left:64px;top:1236px;font:500 36px/1 'Noto Sans JP'`, c.count_label, ev("dot") - 0.2, out, 0.8, [0.12, 0.04]);
-  line(`left:64px;top:1294px;font:400 26px/1 'Noto Sans JP';color:var(--dim)`, c.date, ev("dot") - 0.1, out, 0.8, null);
+{ const c = COPY.S6, tin = s6.t0 + 0.6, out = s6.t1 - 0.25, val = parseFloat(c.score);
+  const sc = line(`left:64px;top:1030px;font-size:230px;line-height:1;color:var(--gold)`, `<span class="num">0.00</span>`, tin, out, 0.9, null);
+  line(`left:64px;top:1280px;font:500 36px/1 'Noto Sans JP'`, c.count_label, ev("dot") - 0.2, out, 0.8, [0.12, 0.04]);
+  line(`left:64px;top:1336px;font:400 26px/1 'Noto Sans JP';color:var(--dim)`, c.date, ev("dot") - 0.1, out, 0.8, null);
   note(c.note, 1404, tin, out);
   U.push(() => { const f = TF(); sc.querySelector(".num").textContent = (E.inOutCubic((f - tin) / (ev("dot") + 0.3 - tin)) * val).toFixed(2); }); }
 
 // ---------- S7：最初の炎の鍋に戻り、名前と行動 ----------
 { const c = COPY.S7, tin = s7.t0 + 0.55;
-  line(`left:64px;top:986px;font:500 32px/1 'Shippori Mincho';color:var(--gold)`, c.brand, tin, 99, 0.9, [0.5, 0.36]);
-  line(`left:64px;top:1036px;font:700 128px/1.1 'Shippori Mincho'`, c.head, ev("name") - 0.15, 99, 1.0);
-  line(`left:64px;top:1196px;font:500 40px/1 'Shippori Mincho';color:var(--dim)`, c.sub, ev("name") + 0.2, 99, 0.9, [0.3, 0.16]);
+  line(`left:64px;top:1046px;font:500 32px/1 'Shippori Mincho';color:var(--gold)`, c.brand, tin, 99, 0.9, [0.5, 0.36]);
+  line(`left:64px;top:1088px;font:700 120px/1.1 'Shippori Mincho'`, c.head, ev("name") - 0.15, 99, 1.0);
+  line(`left:64px;top:1236px;font:500 36px/1 'Shippori Mincho';color:var(--dim)`, c.sub, ev("name") + 0.2, 99, 0.9, [0.3, 0.16]);
   const cta = el("div", { id: "cta" }, c.cta);
   U.push(() => { const t = T(), a = E.outCubic((t - ev("cta")) / 0.5), pr = Math.sin(Math.PI * clamp((t - ev("under")) / 0.3));
     cta.style.opacity = a.toFixed(3); cta.style.transform = `translateY(${((1 - a) * 30).toFixed(2)}px) scale(${(1 - 0.04 * pr).toFixed(4)})`;
