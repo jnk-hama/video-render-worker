@@ -207,6 +207,13 @@ def norm(src, dst, codec=True):
           f":measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
     args = ["-c:a", "aac", "-b:a", "192k"] if codec else []
     subprocess.run([FF, "-v", "error", "-y", "-i", src, "-af", af, "-ar", "48000", "-t", f"{END:.3f}", *args, dst], check=True)
+    # AAC にすると山（真のピーク）が上がる。同じミックス（−1.43 dBTP）が描くたびに −1.4 と −0.3 になり、点検（−1.0 以下）に落ちた（#367）
+    #   書いた物を測り直し、−1.3 を超えていたら超えた分（＋余裕 0.3dB）だけ下げて書き直す。下げるのは最大でも約1dB＝音量の点検（±1 LUFS）の内
+    if codec:
+        tp = float(measure(dst)["input_tp"])
+        if tp > -1.3:
+            subprocess.run([FF, "-v", "error", "-y", "-i", src, "-af", f"{af},volume={-(tp + 1.6):.2f}dB", "-ar", "48000", "-t", f"{END:.3f}", *args, dst], check=True)
+            print(f"AAC の山 {tp:.2f} dBTP → {-(tp + 1.6):.2f}dB 下げて書き直し → {float(measure(dst)['input_tp']):.2f} dBTP", file=sys.stderr)
 norm(f"{OUT}/mix_raw.wav", f"{OUT}/audio.m4a"); norm(f"{OUT}/mix_raw.wav", f"{OUT}/audio_mix.wav", codec=False)
 norm(f"{OUT}/music.wav", f"{OUT}/music_only.m4a")    # 純音楽版（声も効果音もなし）
 final = measure(f"{OUT}/audio_mix.wav"); stem_m = measure(f"{OUT}/music.wav"); stem_s = measure(f"{OUT}/sfx.wav")
