@@ -8,7 +8,7 @@ TPL=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['template']
 export FFMPEG=$(python3 -c "import imageio_ffmpeg as i;print(i.get_ffmpeg_exe())") PAGE=stage/$TPL.html TL=$OUT/timing.json PRODUCT=$PJ
 export WEBGL=$(python3 -c "import json,sys;print('1' if json.load(open(sys.argv[1])).get('webgl') else '')" "$PJ")   # 3D の型だけ CPU の WebGL を使う（chrome.mjs）
 node factory/test_motionkit.mjs   # 動きの部品（ばね・洪水・ふるえ）の検査。落ちたら描かない（#334）
-python3 factory/lint_swallow.py "$PAGE" stage/motionkit.js stage/edge_tokens.js stage/stagekit.js   # 行の途中の // に飲まれたコード（3回起きた・#354）。落ちたら描かない
+python3 factory/lint_swallow.py "$PAGE" stage/motionkit.js stage/edge_tokens.js stage/stagekit.js factory/post.py factory/qc_edge.py   # 行の途中の // に飲まれたコード（3回起きた・#354）。落ちたら描かない
 grep -q "MK.phys" "$PAGE" && node factory/test_physbake.mjs   # 先に焼いた物理を使う型だけ：同じ spec で同じ表になるか（#354）
 python3 factory/score_edge.py "$OUT" "$VDIR" "$PJ"
 FR=$(python3 -c "import json;print(json.load(open('$TL'))['frames'])"); END=$(python3 -c "import json;print(json.load(open('$TL'))['end'])"); Q=$((FR/4))

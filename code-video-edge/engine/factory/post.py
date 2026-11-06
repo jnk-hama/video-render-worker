@@ -29,7 +29,8 @@ tiktok = "\n".join(["#PR " + hook, ""] + ["✔ " + p for p in points] + [""] + n
 def xlen(s):   # X の数え方：URL は 23、全角は 2、半角は 1（上限 280）
     s2 = re.sub(r"https?://\S+", "x" * 23, s); return sum(2 if unicodedata.east_asian_width(c) in "WFA" else 1 for c in s2)
 def xtext(k):
-    lines = ["#PR " + hook] + ["・" + p for p in points[:k]] + ([("※3DCG・" if any("3DCG" in n for n in notes) else "※") + "条件は動画内に記載"] if notes else [])   # 3DCG の時は X でも先に言う（#366 の例外の条件） + credit_lines + [url if url else "リンクはプロフィールから"]
+    # 3DCG の時は X でも先に言う（#366 の例外の条件）。★注釈は行の最後か別の行に（行の途中の # がリンクの足し算を飲んだ・#367）
+    lines = ["#PR " + hook] + ["・" + p for p in points[:k]] + ([("※3DCG・" if any("3DCG" in n for n in notes) else "※") + "条件は動画内に記載"] if notes else []) + credit_lines + [url if url else "リンクはプロフィールから"]
     return "\n".join(lines)
 k = len(points)
 while k > 0 and xlen(xtext(k)) > 280: k -= 1
