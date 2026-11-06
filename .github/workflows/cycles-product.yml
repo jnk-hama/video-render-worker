@@ -1,0 +1,74 @@
+name: cycles-product
+# 商品そのものの 3DCG を Blender Cycles で描く（jmas-ai-os #366・オーナー承認の #068 の例外：形・寸法・色は販売ページに合わせる／画面に ※3DCG）
+#   code-video-edge/products/<key>/cycles.json（script・samples）と cycles_jobs.json（コマの時刻＝timing.json の写し）を読み、20 台に分けて描く
+#   描いた絵（k_####.jpg）・鍋の形（m_####.png）・画面の点（proj.js）を Release「cycles-<key>」の cycles-frames.tar に置く → edge-video がそれを取って字を重ねる
+# ★販売ページの写真は使わない（材質は手続きで作る）＝公開リポジトリで描いてよい。0円（公開リポジトリの Actions）
+on:
+  workflow_dispatch:
+    inputs:
+      product_key:
+        description: '設計書の名前（code-video-edge/products/<key>/）'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  KEY: ${{ inputs.product_key }}
+  SHARDS: 20
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+      - uses: actions/setup-python@v5   # cycles-room と同じ（固定の SHA はこのセッションから確かめられない）
+        with: { python-version: "3.11" }
+      - name: Blender（Python 版・版は固定）
+        run: |
+          set -euo pipefail
+          printf '%s' "$KEY" | grep -qE '^[a-z0-9][a-z0-9-]{2,60}$' || { echo "::error::product_key の形が違います"; exit 1; }
+          sudo apt-get update -qq && sudo apt-get install -y -qq libxrender1 libxi6 libxkbcommon0 libxxf86vm1 libxfixes3 libgl1 libsm6 >/dev/null
+          pip install -q bpy==4.2.0
+      - name: 描く（k 台目は k, k+20, k+40… のコマ）
+        run: |
+          set -euo pipefail
+          P=code-video-edge/products/$KEY; S=$(python3 -c "import json;print(json.load(open('$P/cycles.json'))['script'])"); N=$(python3 -c "import json;print(json.load(open('$P/cycles.json'))['samples'])")
+          mkdir -p frames
+          python code-video-edge/engine/$S --jobs $P/cycles_jobs.json --dir frames --shard ${{ matrix.shard }}/$SHARDS --samples $N 2>&1 | grep -E "^wrote|rror|Traceback"
+          ls frames | wc -l
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with: { name: "frames-${{ matrix.shard }}", path: frames, retention-days: 3 }
+
+  collect:
+    needs: render
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+      - uses: actions/download-artifact@v4   # cycles-room と同じ
+        with: { pattern: "frames-*", path: frames, merge-multiple: true }
+      - name: 全部そろったか数え、画面の点を1つにまとめて Release に置く
+        run: |
+          set -euo pipefail
+          P=code-video-edge/products/$KEY; S=$(python3 -c "import json;print(json.load(open('$P/cycles.json'))['script'])")
+          want=$(python3 -c "import json;print(len(json.load(open('$P/cycles_jobs.json'))['frames']))")
+          for x in k m p; do got=$(ls frames/${x}_*.* | wc -l); echo "$x $got / $want"; [ "$got" = "$want" ] || { echo "::error::コマが足りない（$x）"; exit 1; }; done
+          python3 - frames <<'PY'
+          import glob, json, os, sys
+          d = sys.argv[1]; P = {os.path.basename(f)[2:6].lstrip("0") or "0": json.load(open(f)) for f in glob.glob(f"{d}/p_*.json")}
+          open(f"{d}/proj.js", "w").write("window.PROJ = " + json.dumps(P, separators=(",", ":")) + ";\n")
+          PY
+          rm frames/p_*.json
+          sha256sum code-video-edge/engine/$S | cut -d' ' -f1 > frames/SOURCE.sha256; cp $P/cycles_jobs.json frames/
+          tar cf cycles-frames.tar -C frames .
+          gh release view "cycles-$KEY" >/dev/null 2>&1 || gh release create "cycles-$KEY" --title "cycles-$KEY" --notes "jmas-ai-os #366 の 3DCG（販売ページの写真は使っていない）" --prerelease
+          gh release upload "cycles-$KEY" cycles-frames.tar --clobber

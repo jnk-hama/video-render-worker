@@ -42,5 +42,26 @@ python3 -c "import json,sys;[print(' '.join(g)) for g in json.load(open(sys.argv
   # shellcheck disable=SC2086
   python3 "$PK/prep.py" "dl-$KEY" "$P/b3d" $g
 done
-SUB=4 bash factory/build_edge.sh "$P/v/product.json" "$P/out" "$PK/facts.json" "$P/voice"
+# 3DCG の商品（jmas #366）：cycles-product が描いた絵を Release から取る。描いた本体（sha256）とコマの時刻が今の物と同じか照合してから使う
+if [ -f "$PK/cycles.json" ]; then
+  S=$(python3 -c "import json;print(json.load(open('$PK/cycles.json'))['script'])")
+  mkdir -p "$P/cy" && curl -fsSL -o "$W/cy.tar" "https://github.com/${GH_REPO:-jnk-hama/video-render-worker}/releases/download/cycles-$KEY/cycles-frames.tar" && tar xf "$W/cy.tar" -C "$P/cy"
+  [ "$(cat "$P/cy/SOURCE.sha256")" = "$(sha256sum "engine/$S" 2>/dev/null | cut -d' ' -f1)" ] || [ "$(cat "$P/cy/SOURCE.sha256")" = "$(sha256sum "$HERE/engine/$S" | cut -d' ' -f1)" ] || { echo "::error::描いた 3D の本体が今の $S と違う（cycles-product を描き直す）"; exit 1; }
+  cmp -s "$P/cy/cycles_jobs.json" "$PK/cycles_jobs.json" || { echo "::error::3D のコマの時刻が設計書の cycles_jobs.json と違う"; exit 1; }
+  echo "3D の絵 $(ls "$P/cy"/k_*.jpg | wc -l) コマ"
+fi
+SUB=${SUB:-4} bash factory/build_edge.sh "$P/v/product.json" "$P/out" "$PK/facts.json" "$P/voice"
+# 3DCG：この回の語りの時刻が、3D を描いた時刻（cycles_jobs.json）と 1コマ（1/30秒）以内か。ずれていれば届けない
+if [ -f "$PK/cycles.json" ]; then
+  python3 - "$P/out/timing.json" "$PK/cycles_jobs.json" <<'PY'
+import json, sys
+t, j = json.load(open(sys.argv[1])), json.load(open(sys.argv[2])); bad = []
+for e in t["events"]:
+    if abs(e["t"] - j["events"].get(e["id"], -9)) > 1 / 30: bad.append(e["id"])
+for s in t["scenes"]:
+    if [s["t0"], s["t1"]] != j["scenes"].get(s["id"]): bad.append(s["id"])
+if abs(t["end"] - j["end"]) > 1e-6: bad.append("end")
+print("3D と語りの時刻", "ok" if not bad else bad); sys.exit(2 if bad else 0)
+PY
+fi
 python3 -c "import json,sys;q=json.load(open(sys.argv[1]));bad=[k for k,v in q.items() if isinstance(v,dict) and not v['ok']];print('点検', 'ok' if q['ok'] else 'NG', bad);sys.exit(0 if q['ok'] else 2)" "$P/out/qc.json"

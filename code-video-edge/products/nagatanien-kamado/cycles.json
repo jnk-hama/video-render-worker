@@ -1,0 +1,1 @@
+{"script": "cycles_kamado.py", "samples": 48, "_comment": "3DCG（jmas #366）。cycles-product.yml が描き、build.sh が Release cycles-<key> から取る。cycles_jobs.json は kamado3d.html の CYCLES_JOBS（timing.json の写し）"}
