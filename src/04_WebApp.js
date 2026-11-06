@@ -1083,6 +1083,7 @@ function handleStopCommand_(replyToken) {
 }
 
 function handleStartCommand_(replyToken) {
+  if (AUTO_POST_OFF) { replyToLine_(replyToken, '⏸ 自動投稿はコードで止めています（オーナー指示 2026-11-04）。動画の［Xに投稿］は使えます。戻す時はコードの AUTO_POST_OFF を false に。'); return; }
   try {
     setupAutoPost();
     const cap = Number(getProp_('MONTHLY_SOFT_CAP', '0')) || 0;

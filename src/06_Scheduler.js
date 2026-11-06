@@ -205,6 +205,8 @@ const QUEUE_STATUS_UNKNOWN = 'UNKNOWN';
  * 未投稿行が無ければ何もしない（正常終了）。
  */
 function processQueue() {
+  // 自動投稿を止めている間は、自分のトリガーを消して終わる（00_Config の AUTO_POST_OFF）。通知も出さない
+  if (AUTO_POST_OFF) { const n = deleteAutoPost(); console.warn('AUTO_POST_OFF のため自動投稿を止めました（トリガー ' + n + '件を削除）'); return; }
   // 別アカウントが作った幽霊トリガーなら、ここで自分自身を消して終わる。
   // 投稿処理には一切入らない（そのアカウントはシートを開けないため）。
   if (!guardQueueTriggerOwner_()) return;
