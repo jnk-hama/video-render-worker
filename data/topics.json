@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-05T11:10:05+00:00",
+ "generated_at": "2026-11-06T11:07:06+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -31,15 +31,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xipylo",
-    "title": "Guy shows up at Trump Rally for a great reason and shares it live for all Fox News viewers to hear",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xipylo/guy_shows_up_at_trump_rally_for_a_great_reason/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xkv49n",
     "title": "He went from 6'1 to 3'1 for Halloween!!",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xkv49n/he_went_from_61_to_31_for_halloween/",
@@ -49,46 +40,28 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xk10u2",
-    "title": "Persian Scissor that's Shaped Like a Bird. It's over 300 Years Old.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xk10u2/persian_scissor_thats_shaped_like_a_bird_its_over/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xonfu7",
+    "title": "GeoGuessr expert helps an adoptee find the exact location of the only photo they have of their late mother.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xonfu7/geoguessr_expert_helps_an_adoptee_find_the_exact/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xlrc28",
-    "title": "The Learjet 60 that crashed in Palm Beach County today went from 35,000 ft to the ground in 76 seconds.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xlrc28/the_learjet_60_that_crashed_in_palm_beach_county/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xli5sx",
+    "title": "This high school senior absolutely nailing “Thunderstuck” on the xylophone",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xli5sx/this_high_school_senior_absolutely_nailing/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xkztc3",
-    "title": "Gallium needle developed by KAIST.South Korea stays solid to pierce the skin, then softens inside the body for safety and single use",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xkztc3/gallium_needle_developed_by_kaistsouth_korea/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xjk77f",
-    "title": "Massive \"Catrina\" skeleton for day of the dead celebration in mexico",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xjk77f/massive_catrina_skeleton_for_day_of_the_dead/",
-    "subreddit": "Damnthatsinteresting",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xktmqb",
-    "title": "Spectacular Halloween parade by Mecnas in Galway.Ireland",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xktmqb/spectacular_halloween_parade_by_mecnas_in/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xkahm0",
+    "title": "A sheep comforting a dog after it protects the herd from a wolf attack. The blood around the dog’s neck isn’t his, it’s likely from the spikes on his protective collar. These collars are designed to make it harder for wolves to target a herding dog’s throat. 🐾",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xkahm0/a_sheep_comforting_a_dog_after_it_protects_the/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -106,6 +79,15 @@
     "id": "t3_1xjcren",
     "title": "One-eyed squirrel can't believe its eye",
     "url": "https://www.reddit.com/r/Unexpected/comments/1xjcren/oneeyed_squirrel_cant_believe_its_eye/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xoe2tc",
+    "title": "Ruining the ceremony",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xoe2tc/ruining_the_ceremony/",
     "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
@@ -137,32 +119,68 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
+   },
+   {
+    "id": "t3_1xnlq9p",
+    "title": "That dog is very well trained.",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xnlq9p/that_dog_is_very_well_trained/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xjsicb",
+    "title": "This is what an elderly marmoset looks like",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xjsicb/this_is_what_an_elderly_marmoset_looks_like/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
    }
   ],
   "B": [
    {
-    "id": "t3_1xklfjs",
-    "title": "Silly jokes may not make people laugh but it helps",
-    "url": "https://www.reddit.com/r/Animemes/comments/1xklfjs/silly_jokes_may_not_make_people_laugh_but_it_helps/",
-    "subreddit": "Animemes",
+    "id": "t3_1xjzzvi",
+    "title": "Sparxie [Honkai: Star Rail]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xjzzvi/sparxie_honkai_star_rail/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xkolqh",
-    "title": "The Agenda is back!!!",
-    "url": "https://www.reddit.com/r/Animemes/comments/1xkolqh/the_agenda_is_back/",
-    "subreddit": "Animemes",
+    "id": "t3_1xmp5se",
+    "title": "OL Shinobu [Demon Slayer]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xmp5se/ol_shinobu_demon_slayer/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xn9u5n",
-    "title": "There's an imposter among us",
-    "url": "https://www.reddit.com/r/Animemes/comments/1xn9u5n/theres_an_imposter_among_us/",
-    "subreddit": "Animemes",
+    "id": "t3_1xmyjni",
+    "title": "Perfect maid doing perfect things [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xmyjni/perfect_maid_doing_perfect_things_hololive/",
+    "subreddit": "awwnime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xli05b",
+    "title": "Suisei Hoshimachi [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xli05b/suisei_hoshimachi_hololive/",
+    "subreddit": "awwnime",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xkbepz",
+    "title": "Long Hair Neon [Valorant]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xkbepz/long_hair_neon_valorant/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -195,18 +213,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xl1cqv",
-    "title": "Bocchi the Rock! The Movie Starry Footprints Teaser Visual Revealed",
-    "url": "https://www.reddit.com/r/anime/comments/1xl1cqv/bocchi_the_rock_the_movie_starry_footprints/",
-    "subreddit": "anime",
+    "id": "t3_1xnqopy",
+    "title": "Getting Ready For A Soak",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xnqopy/getting_ready_for_a_soak/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xiqph1",
-    "title": "Spooky Scary [Too Many Losing Heroines!]",
-    "url": "https://www.reddit.com/r/anime/comments/1xiqph1/spooky_scary_too_many_losing_heroines/",
+    "id": "t3_1xl1cqv",
+    "title": "Bocchi the Rock! The Movie Starry Footprints Teaser Visual Revealed",
+    "url": "https://www.reddit.com/r/anime/comments/1xl1cqv/bocchi_the_rock_the_movie_starry_footprints/",
     "subreddit": "anime",
     "views": 0,
     "has_media": true,
@@ -231,45 +249,27 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xj2fqp",
-    "title": "‘DEATH STRANDING ISOLATIONS’ Key Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1xj2fqp/death_stranding_isolations_key_visual/",
+    "id": "t3_1xokrpd",
+    "title": "The Dangers in My Heart | Season 3 Teaser Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xokrpd/the_dangers_in_my_heart_season_3_teaser_visual/",
     "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xjmn49",
-    "title": "6 years and the ministry still hasn't fixed this bridge btw",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xjmn49/6_years_and_the_ministry_still_hasnt_fixed_this/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xmrslb",
+    "title": "Girls Band Cry The Movie Teaser Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xmrslb/girls_band_cry_the_movie_teaser_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xmjcxf",
-    "title": "Whoever said Stell4r was forced and not real, TAKE THIS!",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmjcxf/whoever_said_stell4r_was_forced_and_not_real_take/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xmqxuz",
-    "title": "Hoyo had to make sure their hands don't touch lmao",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmqxuz/hoyo_had_to_make_sure_their_hands_dont_touch_lmao/",
-    "subreddit": "Genshin_Impact",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xiwulm",
-    "title": "the symbols for each of the divine nails spell paimon….",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xiwulm/the_symbols_for_each_of_the_divine_nails_spell/",
+    "id": "t3_1xoe8yb",
+    "title": "The illusion of openworld exploration",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xoe8yb/the_illusion_of_openworld_exploration/",
     "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
