@@ -1,39 +1,12 @@
 {
- "generated_at": "2026-11-07T10:27:54+00:00",
+ "generated_at": "2026-11-08T10:36:11+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1xkaq8q",
-    "title": "This tall Halloween cosplay",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xkaq8q/this_tall_halloween_cosplay/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xlyf0n",
     "title": "\"Who ya gonna call?\"",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xlyf0n/who_ya_gonna_call/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xkv49n",
-    "title": "He went from 6'1 to 3'1 for Halloween!!",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xkv49n/he_went_from_61_to_31_for_halloween/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xonfu7",
-    "title": "GeoGuessr expert helps an adoptee find the exact location of the only photo they have of their late mother.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xonfu7/geoguessr_expert_helps_an_adoptee_find_the_exact/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -49,10 +22,28 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xli5sx",
-    "title": "This high school senior absolutely nailing “Thunderstuck” on the xylophone",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xli5sx/this_high_school_senior_absolutely_nailing/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xonfu7",
+    "title": "GeoGuessr expert helps an adoptee find the exact location of the only photo they have of their late mother.",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xonfu7/geoguessr_expert_helps_an_adoptee_find_the_exact/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xlthcy",
+    "title": "Futurama Halloween Costume",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xlthcy/futurama_halloween_costume/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xo9swr",
+    "title": "Best WALL-E cosplay ever",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xo9swr/best_walle_cosplay_ever/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -67,46 +58,19 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xkahm0",
-    "title": "A sheep comforting a dog after it protects the herd from a wolf attack. The blood around the dog’s neck isn’t his, it’s likely from the spikes on his protective collar. These collars are designed to make it harder for wolves to target a herding dog’s throat. 🐾",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xkahm0/a_sheep_comforting_a_dog_after_it_protects_the/",
+    "id": "t3_1xli5sx",
+    "title": "This high school senior absolutely nailing “Thunderstuck” on the xylophone",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xli5sx/this_high_school_senior_absolutely_nailing/",
     "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xm4wcg",
-    "title": "Look out for that wall",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xm4wcg/look_out_for_that_wall/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xoe2tc",
-    "title": "Ruining the ceremony",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xoe2tc/ruining_the_ceremony/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xnasaw",
-    "title": "The storms got all the Dawgs worked up",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xnasaw/the_storms_got_all_the_dawgs_worked_up/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xos13x",
-    "title": "Opening a bottle of wine",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xos13x/opening_a_bottle_of_wine/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xpr8jy",
+    "title": "The absolute discipline of a fully trained service dog handling air travel perfectly",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xpr8jy/the_absolute_discipline_of_a_fully_trained/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -133,6 +97,24 @@
     "id": "t3_1xnxa4a",
     "title": "Belgian Malinois are dogs on a whole other level.",
     "url": "https://www.reddit.com/r/interestingasfuck/comments/1xnxa4a/belgian_malinois_are_dogs_on_a_whole_other_level/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xotbqq",
+    "title": "Freediver fights off his body's urge to black out",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xotbqq/freediver_fights_off_his_bodys_urge_to_black_out/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xl6wqw",
+    "title": "Firework display where it's shot at a building",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl6wqw/firework_display_where_its_shot_at_a_building/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -168,18 +150,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xkbepz",
-    "title": "Long Hair Neon [Valorant]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xkbepz/long_hair_neon_valorant/",
+    "id": "t3_1xo9i4c",
+    "title": "Ronova [Genshin Impact]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xo9i4c/ronova_genshin_impact/",
     "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xo9i4c",
-    "title": "Ronova [Genshin Impact]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xo9i4c/ronova_genshin_impact/",
+    "id": "t3_1xl7npw",
+    "title": "A date with Nightingale [Fate/Grand Order]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xl7npw/a_date_with_nightingale_fategrand_order/",
     "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
@@ -222,46 +204,55 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xl1cqv",
-    "title": "Bocchi the Rock! The Movie Starry Footprints Teaser Visual Revealed",
-    "url": "https://www.reddit.com/r/anime/comments/1xl1cqv/bocchi_the_rock_the_movie_starry_footprints/",
-    "subreddit": "anime",
+    "id": "t3_1xmukzr",
+    "title": "Why strain yourself so much to keep it hidden ? A little extra only adds to the beauty",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xmukzr/why_strain_yourself_so_much_to_keep_it_hidden_a/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xmcniu",
-    "title": "I'm not saying that the quality of the dance portion of the opening of an anime is indicative of the overall quality of the show, but in these cases it kind of was",
-    "url": "https://www.reddit.com/r/anime/comments/1xmcniu/im_not_saying_that_the_quality_of_the_dance/",
-    "subreddit": "anime",
+    "id": "t3_1xldcek",
+    "title": "Grandpa grabbing a coffee on a beautiful fall day in Toronto",
+    "url": "https://www.reddit.com/r/streetwear/comments/1xldcek/grandpa_grabbing_a_coffee_on_a_beautiful_fall_day/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xokrpd",
-    "title": "The Dangers in My Heart | Season 3 Teaser Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1xokrpd/the_dangers_in_my_heart_season_3_teaser_visual/",
-    "subreddit": "anime",
+    "id": "t3_1xnsxg6",
+    "title": "Jordan 1s still fly in 2026?",
+    "url": "https://www.reddit.com/r/streetwear/comments/1xnsxg6/jordan_1s_still_fly_in_2026/",
+    "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xlpju9",
-    "title": "[KonoSuba: God's Blessing on This Wonderful World] - Darkness being Darkness is the best thing in this series 😂",
-    "url": "https://www.reddit.com/r/anime/comments/1xlpju9/konosuba_gods_blessing_on_this_wonderful_world/",
-    "subreddit": "anime",
+    "id": "t3_1xoe8yb",
+    "title": "The illusion of openworld exploration",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xoe8yb/the_illusion_of_openworld_exploration/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xmrslb",
-    "title": "Girls Band Cry The Movie Teaser Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1xmrslb/girls_band_cry_the_movie_teaser_visual/",
-    "subreddit": "anime",
+    "id": "t3_1xmqxuz",
+    "title": "Hoyo had to make sure their hands don't touch lmao",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmqxuz/hoyo_had_to_make_sure_their_hands_dont_touch_lmao/",
+    "subreddit": "Genshin_Impact",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xmjcxf",
+    "title": "Whoever said Stell4r was forced and not real, TAKE THIS!",
+    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmjcxf/whoever_said_stell4r_was_forced_and_not_real_take/",
+    "subreddit": "Genshin_Impact",
     "views": 0,
     "has_media": true,
     "source": "rss"
