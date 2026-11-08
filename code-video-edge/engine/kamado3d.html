@@ -54,6 +54,8 @@ const TF = () => Math.round(T() * 60) / 60;   // 数を数える表示はコマ�
 window.CYCLES_JOBS = () => ({ fps: FPS3D, end: TL.end, events: Object.fromEntries(TL.events.map((e) => [e.id, e.t])), scenes: Object.fromEntries(TL.scenes.map((s) => [s.id, [s.t0, s.t1]])),
   frames: Array.from({ length: Math.floor(TL.end * FPS3D) }, (_, i) => ({ i, t: +(i / FPS3D).toFixed(4) })) });
 const NF = Math.floor(TL.end * FPS3D), fidx = (t) => Math.min(NF - 1, Math.max(0, Math.floor(t * FPS3D + 1e-6))), pad = (i) => String(i).padStart(4, "0");
+// 見せる絵：60コマ/秒に補った物（f_####.jpg・factory/interp60.py・#368）があればそちら。無ければ 30コマ/秒（k_）を2コマずつ
+const F60 = () => window.F60 || 0, srcAt = (t) => F60() ? `${DIR}cy/f_${pad(Math.min(F60() - 1, Math.max(0, Math.floor(t * 60 + 1e-6))))}.jpg` : `${DIR}cy/k_${pad(fidx(t))}.jpg`;
 const WAITS = [], cy = $("cy"), cyp = $("cyp"), cyq = $("cyq"); let QC = false;
 // 場面の切れ目（カメラが替わる所）：前の場面の最後のコマを 0.3秒かけて溶かす。切り替えたままだと1コマで画面の 43.7% が変わった（点検）
 const CUTS = [s2.t0, s3.t0, s4.t0, s5.t0, s6.t0, s7.t0], XF = 0.3;
@@ -67,9 +69,9 @@ U.push(() => { const t = T(), i = fidx(t), a = t < photoT ? 1 : t < s7.t0 ? 1 - 
   const k = t >= s6.t0 && t < s7.t0 ? E.inOutSine((t - s6.t0) / 0.3) : 0, w = $("world");
   w.style.transformOrigin = "540px 0"; w.style.transform = k ? `translateY(${(250 * k).toFixed(2)}px) scale(${(1 - 0.22 * k).toFixed(4)})` : "none";
   w.style.borderRadius = "28px"; w.style.overflow = "hidden";
-  show(cy, `${DIR}cy/k_${pad(i)}.jpg`); cy.style.opacity = a.toFixed(3); w.style.display = a > 0.001 ? "block" : "none";
+  show(cy, srcAt(t)); cy.style.opacity = a.toFixed(3); w.style.display = a > 0.001 ? "block" : "none";
   const c = CUTS.find((b) => t >= b && t < b + XF), x = c === undefined || QC ? 0 : 1 - E.inOutSine((t - c) / XF);
-  if (x > 0.001) show(cyp, `${DIR}cy/k_${pad(fidx(c) - 1)}.jpg`);
+  if (x > 0.001) show(cyp, srcAt(c - 1 / 60));
   cyp.style.opacity = (x * a).toFixed(3); cyp.style.display = x > 0.001 ? "block" : "none";
   if (QC) { cyq.style.backgroundImage = `url(${DIR}cy/k_${pad(i)}.jpg)`; cyq.style.webkitMaskImage = cyq.style.maskImage = `url(${DIR}cy/m_${pad(i)}.png)`; } });
 // 点検（重なり）：鍋の形だけを描く（台・壁・コンロは商品ではない）。絵と形の読み込みを待って返す
@@ -189,7 +191,7 @@ const tau = (t) => t < s3.t0 ? 13 * E.inOutCubic((t - ev("start")) / (ev("juusan
 
 SK.boot([300, 400, 500, 700]);
 window.READY = window.READY.then(async () => {
-  await new Promise((r) => { const s = document.createElement("script"); s.src = `${DIR}cy/proj.js`; s.onload = s.onerror = () => r(); document.head.appendChild(s); });
+  for (const f of ["proj.js", "f60.js"]) await new Promise((r) => { const s = document.createElement("script"); s.src = `${DIR}cy/${f}`; s.onload = s.onerror = () => r(); document.head.appendChild(s); });
   const text = $("ui").textContent + "0123456789分約";
   for (const w of [500, 700]) await document.fonts.load(`${w} 40px "Shippori Mincho"`, text);
   window.seek(0); await Promise.all(WAITS); return true; });

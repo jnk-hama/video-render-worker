@@ -49,6 +49,8 @@ if [ -f "$PK/cycles.json" ]; then
   [ "$(cat "$P/cy/SOURCE.sha256")" = "$(sha256sum "engine/$S" 2>/dev/null | cut -d' ' -f1)" ] || [ "$(cat "$P/cy/SOURCE.sha256")" = "$(sha256sum "$HERE/engine/$S" | cut -d' ' -f1)" ] || { echo "::error::描いた 3D の本体が今の $S と違う（cycles-product を描き直す）"; exit 1; }
   cmp -s "$P/cy/cycles_jobs.json" "$PK/cycles_jobs.json" || { echo "::error::3D のコマの時刻が設計書の cycles_jobs.json と違う"; exit 1; }
   echo "3D の絵 $(ls "$P/cy"/k_*.jpg | wc -l) コマ"
+  # 30コマ/秒の 3D を 60コマ/秒へ補う（jmas #368・ffmpeg の minterpolate・切れ目は補わない）。cycles.json の interp が 60 の時だけ
+  [ "$(python3 -c "import json;print(json.load(open('$PK/cycles.json')).get('interp', 0))")" = "60" ] && python3 factory/interp60.py "$P/cy"
 fi
 SUB=${SUB:-4} bash factory/build_edge.sh "$P/v/product.json" "$P/out" "$PK/facts.json" "$P/voice"
 # 3DCG：この回の語りの時刻が、3D を描いた時刻（cycles_jobs.json）と 1コマ（1/30秒）以内か。ずれていれば届けない
