@@ -15,7 +15,7 @@
   body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
   #bg { position:absolute; inset:0; background:var(--ground); }
   #world, #prodlayer, #ui { position:absolute; left:0; top:0; width:1080px; height:1920px; }
-  #world img, #cyq { position:absolute; left:0; top:0; width:1080px; height:1920px; display:block; }
+  #world img, #cyq { position:absolute; left:0; top:0; width:1080px; height:1920px; display:block; transform-origin:760px 1000px; }
   #cyq { display:none; background-size:1080px 1920px; -webkit-mask-size:1080px 1920px; mask-size:1080px 1920px; -webkit-mask-mode:luminance; mask-mode:luminance; }
   #th, #thp { display:none; }
   #over { position:absolute; left:0; top:0; }
@@ -66,32 +66,43 @@ const WAITS = [], cy = $("cy"), cyp = $("cyp"), th = $("th"), thp = $("thp"), cy
 const CUTS = [s2.t0, s3.t0, s4.t0, s5.t0, s6.t0, s7.t0], XF = 0.3;   // 場面の切れ目は 0.3秒で溶かす（かまどさん v3：切り替えたままだと1コマで 43.7%）
 const show = (im, src) => { if (im.getAttribute("src") !== src) { im.setAttribute("src", src); WAITS.push(im.decode().catch(() => {})); } };
 const PJ = (i) => (window.PROJ || {})[String(i)] || null;
-const pt = (k) => { const p = PJ(fidx(T())); return p && p[k] ? p[k] : null; };
+// S2 だけ本体を中心にゆっくり寄る（引きの熱の色は面が平らで、横移動だけでは「止まって見える」に落ちた・手元の点検 3.8〜5.1秒）
+const ZO = [760, 1000], Z = (t) => (t >= s2.t0 && t < s3.t0 ? 1 + 0.07 * clamp((t - s2.t0) / (s3.t0 - s2.t0)) : 1);
+const ptRaw = (k) => { const p = PJ(fidx(T())); return p && p[k] ? p[k] : null; };
+const pt = (k) => { const p = ptRaw(k), z = Z(T()); return p ? [ZO[0] + z * (p[0] - ZO[0]), ZO[1] + z * (p[1] - ZO[1]), p[2]] : null; };   // 画面の点も同じ倍率で
 
 // 熱の輪：開く（heat から 1.4秒・本体から外へ）→ 閉じる（20℃ の後・普通の絵が本体から広がる）。1コマで画面の 30% を超えて変えない速さ
 const OPEN0 = ev("heat") + 0.05, OPEN1 = OPEN0 + 1.4, CLOSE0 = ev("nijuu") + 0.35, CLOSE1 = CLOSE0 + 1.4, RMAX = 2300;
 const ringR = (t) => t < OPEN1 ? RMAX * E.inOutSine((t - OPEN0) / (OPEN1 - OPEN0)) : t < CLOSE0 ? RMAX : RMAX * E.inOutSine((t - CLOSE0) / (CLOSE1 - CLOSE0));
 const ringMode = (t) => (t >= OPEN0 && t < CLOSE0 ? "open" : t >= CLOSE0 && t < CLOSE1 ? "close" : "off");
-const maskAt = (t) => { const c = pt("center") || [760, 1100], r = ringR(t), m = ringMode(t);
+const maskAt = (t) => { const c = ptRaw("center") || [760, 1100], r = ringR(t), m = ringMode(t);
   return m === "open" ? `radial-gradient(circle at ${c[0].toFixed(1)}px ${c[1].toFixed(1)}px, #000 ${r.toFixed(1)}px, transparent ${(r + 4).toFixed(1)}px)`
     : `radial-gradient(circle at ${c[0].toFixed(1)}px ${c[1].toFixed(1)}px, transparent ${r.toFixed(1)}px, #000 ${(r + 4).toFixed(1)}px)`; };
 const ring = sv("circle", { fill: "none", stroke: "#FFE7B8", "stroke-width": 5, filter: "url(#glow)" }), ring2 = sv("circle", { fill: "none", stroke: "#FFF6E6", "stroke-width": 2 });
 U.push(() => { const t = T(), w = $("world");
-  show(cy, srcAt(t));
+  show(cy, srcAt(t)); for (const e of [cy, th, cyq]) e.style.transform = `scale(${Z(t).toFixed(4)})`;
   const c = CUTS.find((b) => t >= b && t < b + XF), x = c === undefined || QC ? 0 : 1 - E.inOutSine((t - c) / XF);
-  if (x > 0.001) show(cyp, srcAt(c - 1 / 60));
+  if (x > 0.001) { show(cyp, srcAt(c - 1 / 60)); for (const e of [cyp, thp]) e.style.transform = `scale(${Z(c - 1 / 60).toFixed(4)})`; }
   cyp.style.opacity = x.toFixed(3); cyp.style.display = x > 0.001 ? "block" : "none";
   const m = QC ? "off" : ringMode(t), on = m !== "off";
   th.style.display = on ? "block" : "none"; thp.style.display = on && x > 0.001 ? "block" : "none";
   if (on) { show(th, thAt(t)); const mk = maskAt(t); th.style.webkitMaskImage = th.style.maskImage = mk;
     if (x > 0.001) { show(thp, thAt(c - 1 / 60)); thp.style.opacity = x.toFixed(3); thp.style.webkitMaskImage = thp.style.maskImage = mk; } }
-  const r = ringR(t), q = pt("center") || [760, 1100], edge = on && r > 2 && r < RMAX - 10, a = edge ? Math.sin(Math.PI * clamp(r / 1400)) : 0;
+  const r = ringR(t) * Z(t), q = pt("center") || [760, 1100], edge = on && r > 2 && r < RMAX - 10, a = edge ? Math.sin(Math.PI * clamp(r / 1400)) : 0;
   for (const e of [ring, ring2]) { e.setAttribute("cx", q[0].toFixed(1)); e.setAttribute("cy", q[1].toFixed(1)); e.setAttribute("r", r.toFixed(1)); e.style.opacity = a.toFixed(3); }
   if (QC) { const i = fidx(t); cyq.style.backgroundImage = `url(${DIR}cy/k_${pad(i)}.jpg)`; cyq.style.webkitMaskImage = cyq.style.maskImage = `url(${DIR}cy/m_${pad(i)}.png)`; } });
 window.QC_PRODUCT_ONLY = (on) => { QC = on; for (const e of [cy, cyp, th, thp]) e.style.visibility = on ? "hidden" : "visible"; cyq.style.display = on ? "block" : "none"; if (!on) return;
   const i = fidx(T()), ld = (src) => new Promise((r) => { const im = new Image(); im.onload = im.onerror = () => r(); im.src = src; });
   cyq.style.backgroundImage = `url(${DIR}cy/k_${pad(i)}.jpg)`; cyq.style.webkitMaskImage = cyq.style.maskImage = `url(${DIR}cy/m_${pad(i)}.png)`;
   return Promise.all([ld(`${DIR}cy/k_${pad(i)}.jpg`), ld(`${DIR}cy/m_${pad(i)}.png`)]).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))); };
+
+// 熱の波（熱の色が出ている間）：本体から細い光の輪が 0.5秒ごとに外へ＝輻射熱が壁・床・天井へ届く（本文 305〜306行）。CG＝凡例と ※ で「イメージ」
+{ const N = 4, LIFE = 2.0, waves = Array.from({ length: N }, () => sv("circle", { fill: "none", stroke: "#FFE7C4", filter: "url(#glow)" }));
+  U.push(() => { const t = T(), on = clamp((t - OPEN1) / 0.4) * (1 - clamp((t - (CLOSE0 - 0.3)) / 0.3)), q = pt("center");
+    waves.forEach((w, k) => { const age = ((t - OPEN1) - k * 0.5) % LIFE, u = age / LIFE;
+      if (!(on > 0.001 && q && t - OPEN1 - k * 0.5 >= 0)) { w.style.opacity = 0; return; }
+      w.setAttribute("cx", q[0].toFixed(1)); w.setAttribute("cy", q[1].toFixed(1)); w.setAttribute("r", ((60 + 1000 * E.outCubic(u)) * Z(t)).toFixed(1));
+      w.setAttribute("stroke-width", (10 - 7 * u).toFixed(2)); w.style.opacity = (on * 0.75 * (1 - u)).toFixed(3); }); }); }
 
 // 字の道具（入りは 0.9秒・字間を締めながら）。縦書きは .vt
 const line = (style, html, tin, tout, d = 0.9, track = [0.14, 0.04], vt = false) => { const e = ln(style, html); if (vt) e.classList.add("vt"); U.push(() => { reveal(e, tin, tout, d, 0.22);
