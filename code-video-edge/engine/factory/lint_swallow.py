@@ -7,7 +7,8 @@ import re
 import sys
 
 CODE = re.compile(r";\s*[A-Za-z_$][\w$.]*\s*[(=.\[]|\)\s*;|\b(const|let|var|return)\s+[A-Za-z_$]|\b[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*\([^)]*\)\s*;")
-PYCODE = re.compile(r"\s\+\s*[\[A-Za-z_(]|\]\s*\+|\bfor\s+\w+\s+in\b|\)\s*\+|=\s*[A-Za-z_]\w*\(")   # 注釈の中に足し算・内包・呼び出しの代入が残る形
+PYCODE = re.compile(r"\s\+\s*[\[A-Za-z_(]|\]\s*\+|\bfor\s+\w+\s+in\b|\)\s*\+|=\s*[A-Za-z_]\w*\(|;\s*[A-Za-z_][\w.]*(\[[^\]]*\])*(\.[A-Za-z_]\w*)*\s*[(=]")   # 注釈の中に足し算・内包・呼び出しの代入が残る形
+#   ★「; 名前(…)」「; 名前.名前 = …」も（2026-11-08 cycles_delonghi.py・cycles_kamado.py：注釈の後ろの「; nt.links.new(…)」が飲まれ、熱の色の輪・素焼きの色むらがつながらなかった）
 bad, n = [], 0
 for path in sys.argv[1:]:
     for i, line in enumerate(open(path, encoding="utf-8"), 1):

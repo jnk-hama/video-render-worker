@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- デロンギ オイルヒーター 3DCG（#366 の例外・5人会議 works/delonghi-oil/MEETING.md）：Blender Cycles の連番（cycles_delonghi.py・30コマ/秒→60）を全画面に差し替え、
+     字は左の縦の列（すりガラスの板の上・明朝の縦書き）。本体はいつも右（x≥440）＝字を本体に載せない。かまどさん（上の壁に横書き・金の線）と形を変える（#302）。
+     熱の色（t_####.jpg＝同じカメラで描いた放射だけの絵）を、本体から広がる輪で普通の絵と切り替える（S1 で開き、S2 の 20℃ の後に閉じる）。
+     時刻は timing.json（window.TIMELINE）の events、文字は設計書（window.PRODUCT）。すべての値は時刻 T の関数（タイマー・乱数なし） -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ground:#F2EDE6; --ink:#1E1A17; --dim:#5A5048; --acc:#8A341F; --line:#B4492B; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--ground); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  #bg { position:absolute; inset:0; background:var(--ground); }
+  #world, #prodlayer, #ui { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+  #world img, #cyq { position:absolute; left:0; top:0; width:1080px; height:1920px; display:block; }
+  #cyq { display:none; background-size:1080px 1920px; -webkit-mask-size:1080px 1920px; mask-size:1080px 1920px; -webkit-mask-mode:luminance; mask-mode:luminance; }
+  #th, #thp { display:none; }
+  #over { position:absolute; left:0; top:0; }
+  /* 左の縦の列：すりガラスの板（字の地）。.scrim＝重なりの点検では字にも商品にも数えない */
+  #col { position:absolute; left:0; top:150px; width:440px; height:1770px; background:rgba(242,237,230,.86); -webkit-backdrop-filter:blur(18px) saturate(1.1); backdrop-filter:blur(18px) saturate(1.1); box-shadow:1px 0 0 rgba(180,73,43,.35); }
+  #hdr { position:absolute; left:0; top:0; width:1080px; height:150px; background:var(--ground); pointer-events:none; }
+  #hdr i { position:absolute; left:0; top:144px; width:1080px; height:6px; background:var(--line); }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln.vt { writing-mode:vertical-rl; padding:.3em .3em .3em .3em; margin:-.3em; }   /* 縦書きの字の箱はマスクより広くなる（かまどさん v1 の点検）＝左右に余白 */
+  .ln > .in { display:block; }
+  .tcy { text-combine-upright:all; }
+  .min { font-family:"Shippori Mincho",serif; font-feature-settings:"palt" 1; }
+  .num { font-family:"Noto Sans JP"; font-weight:300; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.02em; }
+  .note { position:absolute; left:64px; width:350px; font:400 24px/1.45 "Noto Sans JP"; color:var(--dim); opacity:0; }
+  .lab { font:500 24px/1 "Noto Sans JP"; color:var(--dim); white-space:nowrap; }
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:var(--ground); border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ink); z-index:3; }
+  #credit { position:absolute; left:156px; top:184px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; opacity:.75; color:var(--ink); z-index:3; }
+  #cta { position:absolute; left:64px; top:1110px; padding:14px 24px; border:2px solid var(--ink); border-radius:999px; font:500 26px/1 "Noto Sans JP"; color:var(--ink); letter-spacing:.02em; opacity:0; white-space:nowrap; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="world"><img id="cy" alt=""><img id="cyp" alt=""><img id="th" alt=""><img id="thp" alt=""><div id="cyq"></div></div>
+<div id="prodlayer" class="prod"></div>
+<div id="col" class="scrim"></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"><defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  <linearGradient id="iron" x1="0" x2="1"><stop offset="0" stop-color="#0E0A33"/><stop offset=".18" stop-color="#2E1A7A"/><stop offset=".36" stop-color="#8A1C7C"/><stop offset=".52" stop-color="#D2343A"/><stop offset=".68" stop-color="#F2731E"/><stop offset=".84" stop-color="#FAC335"/><stop offset="1" stop-color="#FFF6DA"/></linearGradient></defs></svg>
+<div id="hdr" class="scrim"><i></i></div>
+<div id="ui"><div id="pr">PR</div></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, { clamp, lerp } = EDGE, { el, sv, ln, reveal, note, $ } = SK;
+const E = Object.assign({}, EDGE.E, { inOutSine: (x) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(x)), outCubic: (x) => 1 - Math.pow(1 - clamp(x), 3) });
+const ev = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b])), S = Object.fromEntries(TL.scenes.map((s) => [s.id, s]));
+const DIR = `p/${P.product_key}/`, U = SK.U, T = () => SK.T, FPS3D = 30;
+const s1 = S.S1, s2 = S.S2, s3 = S.S3, s4 = S.S4, s5 = S.S5, s6 = S.S6, s7 = S.S7;
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+const TF = () => Math.round(T() * 60) / 60;
+// 熱の色を描くコマ＝熱の輪が開いている間（＋前後の余白）。Blender（cycles_delonghi.py）はここで th のコマだけ t_ を描く（一度決めたら全部で強制）
+const TH0 = ev("heat") - 0.1, TH1 = ev("nijuu") + 1.2, isTh = (t) => t >= TH0 && t <= TH1;
+window.CYCLES_JOBS = () => ({ fps: FPS3D, end: TL.end, events: Object.fromEntries(TL.events.map((e) => [e.id, e.t])), scenes: Object.fromEntries(TL.scenes.map((s) => [s.id, [s.t0, s.t1]])),
+  frames: Array.from({ length: Math.floor(TL.end * FPS3D) }, (_, i) => ({ i, t: +(i / FPS3D).toFixed(4), th: isTh(i / FPS3D) })) });
+const NF = Math.floor(TL.end * FPS3D), fidx = (t) => Math.min(NF - 1, Math.max(0, Math.floor(t * FPS3D + 1e-6))), pad = (i) => String(i).padStart(4, "0");
+const f60 = (t) => Math.floor(t * 60 + 1e-6);
+const F60 = () => window.F60 || 0, srcAt = (t) => F60() ? `${DIR}cy/f_${pad(Math.min(F60() - 1, Math.max(0, f60(t))))}.jpg` : `${DIR}cy/k_${pad(fidx(t))}.jpg`;
+const thAt = (t) => { const g = window.G60, j = f60(t); if (g && j >= g[0] && j < g[1]) return `${DIR}cy/g_${pad(j)}.jpg`;   // 熱の色も 60コマ/秒（interp60.py の g_）
+  const i = Math.min(Math.max(fidx(t), Math.ceil(TH0 * FPS3D - 1e-6)), Math.floor(TH1 * FPS3D + 1e-6)); return `${DIR}cy/t_${pad(i)}.jpg`; };
+const WAITS = [], cy = $("cy"), cyp = $("cyp"), th = $("th"), thp = $("thp"), cyq = $("cyq"); let QC = false;
+const CUTS = [s2.t0, s3.t0, s4.t0, s5.t0, s6.t0, s7.t0], XF = 0.3;   // 場面の切れ目は 0.3秒で溶かす（かまどさん v3：切り替えたままだと1コマで 43.7%）
+const show = (im, src) => { if (im.getAttribute("src") !== src) { im.setAttribute("src", src); WAITS.push(im.decode().catch(() => {})); } };
+const PJ = (i) => (window.PROJ || {})[String(i)] || null;
+const pt = (k) => { const p = PJ(fidx(T())); return p && p[k] ? p[k] : null; };
+
+// 熱の輪：開く（heat から 1.4秒・本体から外へ）→ 閉じる（20℃ の後・普通の絵が本体から広がる）。1コマで画面の 30% を超えて変えない速さ
+const OPEN0 = ev("heat") + 0.05, OPEN1 = OPEN0 + 1.4, CLOSE0 = ev("nijuu") + 0.35, CLOSE1 = CLOSE0 + 1.4, RMAX = 2300;
+const ringR = (t) => t < OPEN1 ? RMAX * E.inOutSine((t - OPEN0) / (OPEN1 - OPEN0)) : t < CLOSE0 ? RMAX : RMAX * E.inOutSine((t - CLOSE0) / (CLOSE1 - CLOSE0));
+const ringMode = (t) => (t >= OPEN0 && t < CLOSE0 ? "open" : t >= CLOSE0 && t < CLOSE1 ? "close" : "off");
+const maskAt = (t) => { const c = pt("center") || [760, 1100], r = ringR(t), m = ringMode(t);
+  return m === "open" ? `radial-gradient(circle at ${c[0].toFixed(1)}px ${c[1].toFixed(1)}px, #000 ${r.toFixed(1)}px, transparent ${(r + 4).toFixed(1)}px)`
+    : `radial-gradient(circle at ${c[0].toFixed(1)}px ${c[1].toFixed(1)}px, transparent ${r.toFixed(1)}px, #000 ${(r + 4).toFixed(1)}px)`; };
+const ring = sv("circle", { fill: "none", stroke: "#FFE7B8", "stroke-width": 5, filter: "url(#glow)" }), ring2 = sv("circle", { fill: "none", stroke: "#FFF6E6", "stroke-width": 2 });
+U.push(() => { const t = T(), w = $("world");
+  show(cy, srcAt(t));
+  const c = CUTS.find((b) => t >= b && t < b + XF), x = c === undefined || QC ? 0 : 1 - E.inOutSine((t - c) / XF);
+  if (x > 0.001) show(cyp, srcAt(c - 1 / 60));
+  cyp.style.opacity = x.toFixed(3); cyp.style.display = x > 0.001 ? "block" : "none";
+  const m = QC ? "off" : ringMode(t), on = m !== "off";
+  th.style.display = on ? "block" : "none"; thp.style.display = on && x > 0.001 ? "block" : "none";
+  if (on) { show(th, thAt(t)); const mk = maskAt(t); th.style.webkitMaskImage = th.style.maskImage = mk;
+    if (x > 0.001) { show(thp, thAt(c - 1 / 60)); thp.style.opacity = x.toFixed(3); thp.style.webkitMaskImage = thp.style.maskImage = mk; } }
+  const r = ringR(t), q = pt("center") || [760, 1100], edge = on && r > 2 && r < RMAX - 10, a = edge ? Math.sin(Math.PI * clamp(r / 1400)) : 0;
+  for (const e of [ring, ring2]) { e.setAttribute("cx", q[0].toFixed(1)); e.setAttribute("cy", q[1].toFixed(1)); e.setAttribute("r", r.toFixed(1)); e.style.opacity = a.toFixed(3); }
+  if (QC) { const i = fidx(t); cyq.style.backgroundImage = `url(${DIR}cy/k_${pad(i)}.jpg)`; cyq.style.webkitMaskImage = cyq.style.maskImage = `url(${DIR}cy/m_${pad(i)}.png)`; } });
+window.QC_PRODUCT_ONLY = (on) => { QC = on; for (const e of [cy, cyp, th, thp]) e.style.visibility = on ? "hidden" : "visible"; cyq.style.display = on ? "block" : "none"; if (!on) return;
+  const i = fidx(T()), ld = (src) => new Promise((r) => { const im = new Image(); im.onload = im.onerror = () => r(); im.src = src; });
+  cyq.style.backgroundImage = `url(${DIR}cy/k_${pad(i)}.jpg)`; cyq.style.webkitMaskImage = cyq.style.maskImage = `url(${DIR}cy/m_${pad(i)}.png)`;
+  return Promise.all([ld(`${DIR}cy/k_${pad(i)}.jpg`), ld(`${DIR}cy/m_${pad(i)}.png`)]).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))); };
+
+// 字の道具（入りは 0.9秒・字間を締めながら）。縦書きは .vt
+const line = (style, html, tin, tout, d = 0.9, track = [0.14, 0.04], vt = false) => { const e = ln(style, html); if (vt) e.classList.add("vt"); U.push(() => { reveal(e, tin, tout, d, 0.22);
+  if (track) e.firstElementChild.style.letterSpacing = lerp(track[0], track[1], E.outCubic((T() - tin) / 1.4)).toFixed(3) + "em"; }); return e; };
+const vline = (style, html, tin, tout, d = 1.0) => line(style, html, tin, tout, d, [0.24, 0.06], true);
+const fade = (e, tin, tout, d = 0.35) => U.push(() => { const t = T(), a = clamp((t - tin) / d) * (1 - clamp((t - tout) / 0.22)); e.style.opacity = a.toFixed(3); e.style.visibility = a > 0.001 ? "visible" : "hidden"; });
+// 引き出し線：札の点から本体の点へ（横→縦の2本）。カメラが動いても Blender が写した点に付いて動く
+const leader = (key, sx, sy, t0, out) => { const lnE = sv("polyline", { fill: "none", stroke: "#B4492B", "stroke-width": 2 }), dot = sv("circle", { r: 6, fill: "#B4492B" }), halo = sv("circle", { r: 18, fill: "none", stroke: "#B4492B", "stroke-width": 2 });
+  U.push(() => { const t = T(), u = E.outCubic((t - t0) / 0.7), o = 1 - clamp((t - out) / 0.22), q = pt(key);
+    if (!q || u <= 0) { lnE.style.opacity = dot.style.opacity = halo.style.opacity = 0; return; }
+    const L1 = Math.abs(q[0] - sx), L2 = Math.abs(q[1] - sy), L = (L1 + L2) * u;
+    const pts = L <= L1 ? [[sx, sy], [sx + Math.sign(q[0] - sx) * L, sy]] : [[sx, sy], [q[0], sy], [q[0], sy + Math.sign(q[1] - sy) * (L - L1)]];
+    lnE.setAttribute("points", pts.map((p) => p.map((v) => v.toFixed(2)).join(",")).join(" "));
+    const k = clamp((u - 0.9) / 0.1), pulse = (t - t0 - 0.7) % 1.2;
+    for (const c of [dot, halo]) { c.setAttribute("cx", q[0].toFixed(2)); c.setAttribute("cy", q[1].toFixed(2)); }
+    dot.setAttribute("r", (6 * k).toFixed(2)); halo.setAttribute("r", (8 + 26 * clamp(pulse / 1.2)).toFixed(2));
+    lnE.style.opacity = dot.style.opacity = o.toFixed(3); halo.style.opacity = (k * o * (1 - clamp(pulse / 1.2))).toFixed(3); }); };
+const NOTE_Y = 1235;
+
+// ---------- S1：夕方の居間 → 本体から熱の色が広がる（つかみ）。縦書き2列 ----------
+{ const c = COPY.S1, out = s1.t1 - 0.3;
+  line(`left:64px;top:232px;font:500 28px/1 'Shippori Mincho';color:var(--acc)`, `${c.brand}<span style="color:var(--dim)">　―　</span><span style="color:var(--ink)">${c.series}</span>`, -1, out, 0.01, [0.2, 0.12]);
+  line(`left:64px;top:276px;font:400 24px/1 'Noto Sans JP';color:var(--dim)`, P.target.who, -1, out, 0.01, [0.1, 0.06]);
+  vline(`left:286px;top:340px;font:700 96px/1 'Shippori Mincho'`, c.hook, 0.15, out);
+  vline(`left:156px;top:340px;font:700 96px/1 'Shippori Mincho'`, c.hook2, ev("hook2") - 0.05, out);
+  note(c.note, NOTE_Y, -1, out); }
+
+// ---------- 熱の色の凡例（熱の輪が開いている間）：冷→暖の帯＝イメージであることを言う ----------
+{ const g = sv("g", {}), y = 1150;
+  sv("rect", { x: 64, y, width: 300, height: 12, rx: 6, fill: "url(#iron)" }, g);
+  const l1 = el("div", { class: "lab", style: `position:absolute;left:64px;top:${y + 24}px` }, "冷"), l2 = el("div", { class: "lab", style: `position:absolute;left:340px;top:${y + 24}px` }, "暖");
+  const l3 = el("div", { class: "lab", style: `position:absolute;left:64px;top:${y - 40}px` }, "熱の色（イメージ）");
+  const a0 = OPEN0 + 0.4, a1 = CLOSE0;
+  U.push(() => { const t = T(), a = clamp((t - a0) / 0.4) * (1 - clamp((t - a1) / 0.3)); g.style.opacity = a.toFixed(3); g.style.display = a > 0.001 ? "inline" : "none"; });
+  for (const e of [l1, l2, l3]) fade(e, a0, a1); }
+
+// ---------- S2：自社試験 8畳・30分・8℃→20℃（数え上げ・30分の輪）----------
+{ const c = COPY.S2, out = s2.t1 - 0.25, tin = Math.max(s2.t0 + 0.1, ev("test") - 0.1);
+  line(`left:64px;top:232px;font:500 30px/1 'Shippori Mincho';color:var(--acc)`, c.label, tin, out, 0.9, [0.3, 0.16]);
+  line(`left:64px;top:290px;font-size:150px;line-height:1`, `<span class="num">${c.room.replace("畳", "")}</span><span class="min" style="font:700 64px/1 'Shippori Mincho';margin-left:8px">畳</span>`, tin + 0.15, out, 0.9, null);
+  // 30分の輪（ev sanjuu で一周）
+  const cx = 140, cyy = 560, R = 76, trk = sv("circle", { cx, cy: cyy, r: R, fill: "none", stroke: "#CFC4B6", "stroke-width": 6 }), arc = sv("circle", { cx, cy: cyy, r: R, fill: "none", stroke: "#B4492B", "stroke-width": 8, "stroke-linecap": "round", transform: `rotate(-90 ${cx} ${cyy})`, "stroke-dasharray": `0 ${2 * Math.PI * R}` });
+  const mins = el("div", { style: `position:absolute;left:${cx - 70}px;top:${cyy - 30}px;width:140px;text-align:center;white-space:nowrap` }, `<span class="num" style="font-size:56px;line-height:1">${c.mins}</span><span class="min" style="font:700 30px/1 'Shippori Mincho';margin-left:2px">分</span>`);
+  fade(mins, ev("sanjuu") - 0.1, out);
+  U.push(() => { const t = T(), a = clamp((t - (ev("sanjuu") - 0.15)) / 0.3) * (1 - clamp((t - out) / 0.22)), u = E.inOutSine((t - ev("sanjuu")) / 1.1), C = 2 * Math.PI * R;
+    for (const e of [trk, arc]) e.style.opacity = a.toFixed(3); arc.setAttribute("stroke-dasharray", `${(C * u).toFixed(2)} ${C.toFixed(2)}`); });
+  // 温度：8 から 20 へ数え上げ（「8度から」で出て「20度へ」で着く）
+  const big = line(`left:64px;top:700px;font-size:170px;line-height:1;color:var(--acc)`, `<span class="num">${c.from}</span><span class="min" style="font:700 64px/1 'Shippori Mincho';margin-left:6px">℃</span>`, ev("hachi") - 0.25, out, 0.8, null);
+  line(`left:64px;top:900px;font:500 34px/1 'Shippori Mincho'`, `${c.from}℃ → ${c.to}℃`, ev("nijuu") + 0.05, out, 0.8, [0.2, 0.08]);
+  U.push(() => { const f = TF(), from = +c.from, to = +c.to; big.querySelector(".num").textContent = String(Math.round(from + (to - from) * E.inOutCubic((f - ev("hachi")) / (ev("nijuu") - ev("hachi"))))); });
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S3：サーマルカットフィン（縦書き）・15か所の穴・表面 約80℃。札から長穴へ線 ----------
+{ const c = COPY.S3, tin = s3.t0 + 0.3, out = s3.t1 - 0.25;
+  vline(`left:300px;top:232px;font:700 72px/1 'Shippori Mincho'`, c.head, tin, out);
+  vline(`left:222px;top:236px;font:500 34px/1 'Shippori Mincho';color:var(--acc)`, c.sub, ev("ana") - 0.1, out, 0.9);
+  leader("fin", 400, 600, ev("ana") + 0.3, out);   // 起点は見出しの列の右（左からだと縦書きを横切った）
+  const big = line(`left:64px;top:980px;font-size:150px;line-height:1`, `<span class="min" style="font:500 30px/1 'Shippori Mincho';vertical-align:top;margin-right:8px">${c.pre}</span><span class="num">0</span><span class="min" style="font:700 56px/1 'Shippori Mincho';margin-left:4px">${c.unit}</span>`, ev("hachijuu") - 0.35, out, 0.8, null);
+  U.push(() => { const f = TF(); big.querySelector(".num").textContent = String(Math.round(+c.big * E.inOutCubic((f - (ev("hachijuu") - 0.3)) / 0.7))); });
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S4：24時間タイマー（縦書き・24 は縦中横）。ピンが順に内側へ（3D）・札から輪へ線 ----------
+{ const c = COPY.S4, tin = s4.t0 + 0.3, out = s4.t1 - 0.25;
+  vline(`left:296px;top:232px;font:700 88px/1 'Shippori Mincho'`, c.head.replace(/^(\d+)/, '<span class="tcy">$1</span>'), tin, out);
+  line(`left:64px;top:960px;font:500 34px/1.3 'Shippori Mincho';color:var(--acc)`, c.sub.split(/\s+/)[0], ev("pin") - 0.1, out, 0.9, [0.2, 0.06]);
+  line(`left:64px;top:1012px;font:500 30px/1 'Noto Sans JP';color:var(--dim)`, c.sub.split(/\s+/).slice(1).join(" "), ev("pin") + 0.05, out, 0.9, [0.2, 0.06]);
+  leader("timer", 250, 986, ev("pin") + 0.05, out);   // 札（15分刻みで）が出てから
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S5：折りたたみ式（縦書き）・キャスター。札から足へ線 ----------
+{ const c = COPY.S5, tin = s5.t0 + 0.3, out = s5.t1 - 0.25;
+  vline(`left:290px;top:232px;font:700 100px/1 'Shippori Mincho'`, c.head, Math.max(tin, ev("fold") - 0.3), out);
+  vline(`left:206px;top:236px;font:500 44px/1 'Shippori Mincho';color:var(--acc)`, c.sub, tin, out, 0.9);
+  leader("caster", 410, 520, ev("fold") + 0.1, out);   // 起点は見出しの列の右
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S6：評価（山場）。数え上げ・件数と取得日 ----------
+{ const c = COPY.S6, tin = s6.t0 + 0.3, out = s6.t1 - 0.25, val = parseFloat(c.score);
+  line(`left:64px;top:520px;font:500 32px/1 'Shippori Mincho';color:var(--dim)`, "評価", tin, out, 0.9, [0.4, 0.2]);
+  const sc = line(`left:64px;top:568px;font-size:150px;line-height:1;color:var(--acc)`, `<span class="num">0.00</span>`, tin, out, 0.9, null);
+  line(`left:64px;top:752px;font:500 32px/1 'Noto Sans JP'`, c.count_label, ev("dot") - 0.1, out, 0.8, [0.12, 0.04]);
+  line(`left:64px;top:802px;font:400 24px/1 'Noto Sans JP';color:var(--dim)`, c.date, ev("dot") - 0.05, out, 0.8, null);
+  U.push(() => { const f = TF(); sc.querySelector(".num").textContent = (E.inOutCubic((f - tin) / (ev("dot") + 0.3 - tin)) * val).toFixed(2); });
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S7：締め。名前（縦書き）・1500W・行動 ----------
+{ const c = COPY.S7, tin = s7.t0 + 0.4;
+  line(`left:64px;top:232px;font:500 30px/1 'Shippori Mincho';color:var(--acc)`, c.brand, tin, 99, 0.9, [0.4, 0.24]);
+  vline(`left:270px;top:290px;font:700 104px/1 'Shippori Mincho'`, c.head, ev("name") - 0.1, 99, 1.0);
+  line(`left:64px;top:1040px;font:500 26px/1 'Noto Sans JP';color:var(--dim)`, c.sub, ev("name") + 0.3, 99, 0.9, [0.12, 0.04]);
+  const cta = el("div", { id: "cta" }, c.cta);
+  U.push(() => { const t = T(), a = E.outCubic((t - ev("cta")) / 0.5), pr = Math.sin(Math.PI * clamp((t - ev("under")) / 0.3));
+    cta.style.opacity = a.toFixed(3); cta.style.transform = `translateY(${((1 - a) * 30).toFixed(2)}px) scale(${(1 - 0.04 * pr).toFixed(4)})`;
+    cta.style.background = `rgba(180,73,43,${(0.12 * clamp((t - ev("under")) / 0.25)).toFixed(3)})`; });
+  note(c.note, NOTE_Y, tin + 0.2, 99); }
+
+SK.boot([300, 400, 500, 700]);
+window.READY = window.READY.then(async () => {
+  for (const f of ["proj.js", "f60.js"]) await new Promise((r) => { const s = document.createElement("script"); s.src = `${DIR}cy/${f}`; s.onload = s.onerror = () => r(); document.head.appendChild(s); });
+  const text = $("ui").textContent + "0123456789分約℃畳.→";
+  for (const w of [500, 700]) await document.fonts.load(`${w} 40px "Shippori Mincho"`, text);
+  window.seek(0); await Promise.all(WAITS); return true; });
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+</script>
+</body></html>

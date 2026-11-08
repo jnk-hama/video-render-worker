@@ -1,0 +1,65 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。デロンギは販売ページの写真を画面に使わない（全部 3DCG・#366）＝asp_images は空。lines の i が line<i>.mp3（手元で作った声と同じ文＝3D の時刻と合う）",
+ "asp_images": [],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "風を出さずに、部屋ごと暖める。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "自社試験では、8畳を30分で、はちどから、にじゅうどへ。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "じゅうごかしょの穴で、表面は、やく80度。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "24時間タイマーは、15分刻み。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "キャスターは、折りたたみ式。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "評価は、4.37。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "デロンギ、オイルヒーター。リンクはプロフィールから。",
+   "speed": 0.95,
+   "pause": 0.5
+  }
+ ],
+ "prep": [
+  []
+ ]
+}

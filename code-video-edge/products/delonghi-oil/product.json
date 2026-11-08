@@ -1,0 +1,383 @@
+{
+ "product_key": "delonghi-oil",
+ "template": "heat3d",
+ "name": "デロンギ オイルヒーター",
+ "item_no": "H771015EFSN-BK",
+ "genre": "home",
+ "target": {
+  "who": "風の出ない暖房を探す人に",
+  "source": "温風やニオイも発生しない（line 307）"
+ },
+ "prep": {
+  "voice": "voicevox:WhiteCUL",
+  "speed": 0.95
+ },
+ "brand": {
+  "ground": "#F2EDE6",
+  "accent": "#B4492B",
+  "accent_box": [
+   0,
+   130,
+   1080,
+   170
+  ]
+ },
+ "beats": [
+  {
+   "kind": "S1",
+   "source": "F1,F8,F9",
+   "voice": "line0.mp3",
+   "say": "風を出さずに、部屋ごと暖める。",
+   "brand": "DeLonghi",
+   "series": "オイルヒーター",
+   "hook": "風を出さずに、",
+   "hook2": "部屋ごと暖める。",
+   "note": "※3DCG（形と大きさは販売ページの写真と寸法から作った物）。熱の色はイメージ（CG）で、温度の測定ではありません。"
+  },
+  {
+   "kind": "S2",
+   "source": "F2",
+   "voice": "line1.mp3",
+   "say": "自社試験では、8畳を30分で、8度から20度へ。",
+   "label": "デロンギ自社試験",
+   "room": "8畳",
+   "mins": "30",
+   "from": "8",
+   "to": "20",
+   "note": "※デロンギ自社試験（新省エネルギー基準・外気温5℃・5面接触）。10畳は60分。部屋の条件で変わります。"
+  },
+  {
+   "kind": "S3",
+   "source": "F3",
+   "voice": "line2.mp3",
+   "say": "15か所の穴で、表面は約80度。",
+   "head": "サーマルカットフィン",
+   "sub": "フィンの15か所の穴",
+   "big": "80",
+   "pre": "表面 約",
+   "unit": "℃",
+   "note": "※平均表面温度 約80℃（販売ページの記載）。熱の色はイメージ（CG）です。"
+  },
+  {
+   "kind": "S4",
+   "source": "F4",
+   "voice": "line3.mp3",
+   "say": "24時間タイマーは、15分刻み。",
+   "head": "24時間タイマー",
+   "sub": "15分刻みで ON／OFF",
+   "note": "※3DCG。ピンを内側でON・外側でOFF（販売ページの記載）。"
+  },
+  {
+   "kind": "S5",
+   "source": "F5,F9",
+   "voice": "line4.mp3",
+   "say": "キャスターは、折りたたみ式。",
+   "head": "折りたたみ式",
+   "sub": "キャスター",
+   "note": "※3DCG。"
+  },
+  {
+   "kind": "S6",
+   "source": "F7",
+   "voice": "line5.mp3",
+   "say": "評価は、4.37。",
+   "score": "4.37",
+   "count_label": "レビュー197件",
+   "date": "楽天市場 2026年11月8日時点",
+   "note": "※評価・件数は販売ページの表示です。"
+  },
+  {
+   "kind": "S7",
+   "source": "F6,F8,F9",
+   "voice": "line6.mp3",
+   "say": "デロンギ、オイルヒーター。リンクはプロフィールから。",
+   "brand": "DeLonghi",
+   "head": "オイルヒーター",
+   "sub": "1500W・10〜13畳",
+   "cta": "リンクはプロフィールから",
+   "note": "※3DCG。適用畳数 10畳は日本電機工業会自主基準・13畳はデロンギ自社試験。価格・在庫はリンク先でご確認ください。"
+  }
+ ],
+ "score": {
+  "scenes": [
+   [
+    "S1",
+    "line0.mp3",
+    3.0
+   ],
+   [
+    "S2",
+    "line1.mp3",
+    5.0
+   ],
+   [
+    "S3",
+    "line2.mp3",
+    3.7
+   ],
+   [
+    "S4",
+    "line3.mp3",
+    3.2
+   ],
+   [
+    "S5",
+    "line4.mp3",
+    2.5
+   ],
+   [
+    "S6",
+    "line5.mp3",
+    2.5
+   ],
+   [
+    "S7",
+    "line6.mp3",
+    0
+   ]
+  ],
+  "climax": [
+   "S6",
+   "ヨンテン"
+  ],
+  "music": {
+   "quiet": [
+    "S1",
+    "S3",
+    "S5"
+   ],
+   "hush": [
+    [
+     [
+      "cue",
+      "S6",
+      "ヨンテン",
+      -0.45
+     ],
+     [
+      "cue",
+      "S6",
+      "ヨンテン",
+      0.02
+     ]
+    ]
+   ]
+  },
+  "events": [
+   {
+    "id": "heat",
+    "at": [
+     "t0",
+     "S1",
+     0.2
+    ],
+    "what": "S1 本体から熱の色が広がる",
+    "sfx": [
+     "glide",
+     0.9,
+     70,
+     140,
+     0.45
+    ],
+    "band": "low"
+   },
+   {
+    "id": "hook2",
+    "at": [
+     "cue",
+     "S1",
+     "ヘヤゴト"
+    ],
+    "what": "S1 2行目"
+   },
+   {
+    "id": "test",
+    "at": [
+     "cue",
+     "S2",
+     "ジシャ"
+    ],
+    "what": "S2 自社試験の札"
+   },
+   {
+    "id": "sanjuu",
+    "at": [
+     "cue",
+     "S2",
+     "サンジュッ"
+    ],
+    "what": "S2 30分の輪が回り始める",
+    "sfx": [
+     "tick",
+     2400,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "hachi",
+    "at": [
+     "cue",
+     "S2",
+     "ハチド"
+    ],
+    "what": "S2 8℃から数え上げ"
+   },
+   {
+    "id": "nijuu",
+    "at": [
+     "cue",
+     "S2",
+     "ニジュウ"
+    ],
+    "what": "S2 20℃に着く",
+    "sfx": [
+     "bell",
+     1568.0,
+     0.45,
+     1.2
+    ],
+    "band": "high"
+   },
+   {
+    "id": "ana",
+    "at": [
+     "cue",
+     "S3",
+     "ジュウゴカショ"
+    ],
+    "what": "S3 フィンの札",
+    "sfx": [
+     "tick",
+     2600,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "hachijuu",
+    "at": [
+     "cue",
+     "S3",
+     "ハチジュウ"
+    ],
+    "what": "S3 約80℃",
+    "sfx": [
+     "shimmer",
+     0.9,
+     0.4
+    ],
+    "band": "high"
+   },
+   {
+    "id": "timer",
+    "at": [
+     "cue",
+     "S4",
+     "タイマア"
+    ],
+    "what": "S4 ピンが押される",
+    "sfx": [
+     "tick",
+     2800,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "pin",
+    "at": [
+     "cue",
+     "S4",
+     "ジュウゴフン"
+    ],
+    "what": "S4 15分刻み"
+   },
+   {
+    "id": "fold",
+    "at": [
+     "cue",
+     "S5",
+     "オリタタミ"
+    ],
+    "what": "S5 キャスターが開く",
+    "sfx": [
+     "tock",
+     220,
+     0.7
+    ],
+    "band": "low-mid"
+   },
+   {
+    "id": "dot",
+    "at": [
+     "cue",
+     "S6",
+     "ヨンテン"
+    ],
+    "what": "S6「4.37」",
+    "sfx": [
+     "bell",
+     2093.0,
+     0.5,
+     1.4
+    ],
+    "band": "high"
+   },
+   {
+    "id": "name",
+    "at": [
+     "cue",
+     "S7",
+     "デロ"
+    ],
+    "what": "S7 名前"
+   },
+   {
+    "id": "cta",
+    "at": [
+     "cue",
+     "S7",
+     "リンクワ"
+    ],
+    "what": "S7「リンクは」で札"
+   },
+   {
+    "id": "under",
+    "at": [
+     "cue",
+     "S7",
+     "プロフィ"
+    ],
+    "what": "S7「プロフィール」で札が押される",
+    "sfx": [
+     "bell",
+     1318.5,
+     0.4,
+     0.9
+    ],
+    "band": "high-mid"
+   }
+  ],
+  "sustain": [
+   {
+    "id": "room",
+    "from": [
+     "t0",
+     "S1"
+    ],
+    "to": [
+     "t1",
+     "S2"
+    ],
+    "sfx": [
+     "roomtone"
+    ],
+    "over_db": -12.0,
+    "what": "S1〜S2 冬の外の静けさ"
+   }
+  ]
+ },
+ "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00t7tcn.sdgff2d2.g00t7tcn.sdgfgfed/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fdelonghi%2F0108776315%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fdelonghi%2Fi%2F10002253%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
+ "item_code": "delonghi:10002253"
+}

@@ -63,7 +63,7 @@ def glaze_clay():
     # 素焼き（粗土）：生成りの地＋色むら＋黒い粒＋細かな凹凸
     c = node(nt, "ShaderNodeBsdfPrincipled"); c.inputs["Roughness"].default_value = 0.88
     cn = node(nt, "ShaderNodeTexNoise"); cn.inputs["Scale"].default_value = 40; cn.inputs["Detail"].default_value = 6; nt.links.new(tc.outputs["Object"], cn.inputs["Vector"])
-    cr = node(nt, "ShaderNodeValToRGB"); cr.color_ramp.elements[0].color = srgb("#B4A386"); cr.color_ramp.elements[1].color = srgb("#CDBFA4")   # 白く見えた（3周目）＝販売ページの素焼きの生成りへ; nt.links.new(cn.outputs["Fac"], cr.inputs[0])
+    cr = node(nt, "ShaderNodeValToRGB"); cr.color_ramp.elements[0].color = srgb("#B4A386"); cr.color_ramp.elements[1].color = srgb("#CDBFA4"); nt.links.new(cn.outputs["Fac"], cr.inputs[0])   # 白く見えた（3周目）＝販売ページの素焼きの生成りへ。★この線は注釈に飲まれていた（2026-11-08 に気づいた・投稿済みの絵は色むら無しの単色の生成り）
     gv = node(nt, "ShaderNodeTexVoronoi", feature="F1"); gv.inputs["Scale"].default_value = 380; nt.links.new(tc.outputs["Object"], gv.inputs["Vector"])
     gr = node(nt, "ShaderNodeValToRGB"); gr.color_ramp.elements[0].color = srgb("#6E6252"); gr.color_ramp.elements[1].position = 0.08; gr.color_ramp.elements[1].color = (1, 1, 1, 1); gr.color_ramp.interpolation = "CONSTANT"
     nt.links.new(gv.outputs["Distance"], gr.inputs[0])

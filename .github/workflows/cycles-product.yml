@@ -41,6 +41,7 @@ jobs:
           set -euo pipefail
           P=code-video-edge/products/$KEY; S=$(python3 -c "import json;print(json.load(open('$P/cycles.json'))['script'])"); N=$(python3 -c "import json;print(json.load(open('$P/cycles.json'))['samples'])")
           mkdir -p frames
+          python3 code-video-edge/engine/factory/lint_swallow.py code-video-edge/engine/$S   # 注釈に飲まれたコード（jmas 2026-11-08：熱の色の輪・素焼きの色むらの線が飲まれていた）。落ちたら描かない
           python code-video-edge/engine/$S --jobs $P/cycles_jobs.json --dir frames --shard ${{ matrix.shard }}/$SHARDS --samples $N 2>&1 | grep -E "^wrote|rror|Traceback"
           ls frames | wc -l
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
@@ -62,6 +63,8 @@ jobs:
           P=code-video-edge/products/$KEY; S=$(python3 -c "import json;print(json.load(open('$P/cycles.json'))['script'])")
           want=$(python3 -c "import json;print(len(json.load(open('$P/cycles_jobs.json'))['frames']))")
           for x in k m p; do got=$(ls frames/${x}_*.* | wc -l); echo "$x $got / $want"; [ "$got" = "$want" ] || { echo "::error::コマが足りない（$x）"; exit 1; }; done
+          th=$(python3 -c "import json;print(sum(1 for f in json.load(open('$P/cycles_jobs.json'))['frames'] if f.get('th')))"); got=$(ls frames/ | grep -c '^t_' || true)
+          echo "t $got / $th"; [ "$got" = "$th" ] || { echo "::error::熱の色のコマが足りない（t）"; exit 1; }   # 熱の色（デロンギ・th のコマだけ）。th の無い商品は 0 / 0
           python3 - frames <<'PY'
           import glob, json, os, sys
           d = sys.argv[1]; P = {os.path.basename(f)[2:6].lstrip("0") or "0": json.load(open(f)) for f in glob.glob(f"{d}/p_*.json")}
