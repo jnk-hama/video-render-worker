@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-08T10:36:11+00:00",
+ "generated_at": "2026-11-09T11:49:01+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -31,15 +31,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xlthcy",
-    "title": "Futurama Halloween Costume",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xlthcy/futurama_halloween_costume/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xo9swr",
     "title": "Best WALL-E cosplay ever",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xo9swr/best_walle_cosplay_ever/",
@@ -49,37 +40,91 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xovupm",
-    "title": "Man frees hare stuck in a fence",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xovupm/man_frees_hare_stuck_in_a_fence/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xmu2vk",
+    "title": "Accurate throw to put out a fire with some coke, crazy dangerous and i would have missed lol",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xmu2vk/accurate_throw_to_put_out_a_fire_with_some_coke/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xli5sx",
-    "title": "This high school senior absolutely nailing “Thunderstuck” on the xylophone",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xli5sx/this_high_school_senior_absolutely_nailing/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xprrvj",
+    "title": "The surface of Mars (NASA images)",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xprrvj/the_surface_of_mars_nasa_images/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xpr8jy",
-    "title": "The absolute discipline of a fully trained service dog handling air travel perfectly",
-    "url": "https://www.reddit.com/r/BeAmazed/comments/1xpr8jy/the_absolute_discipline_of_a_fully_trained/",
-    "subreddit": "BeAmazed",
+    "id": "t3_1xqdf38",
+    "title": "Uruguay, one of the most atheist countries in the world, during Pope Leo's visit.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xqdf38/uruguay_one_of_the_most_atheist_countries_in_the/",
+    "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xl30t2",
-    "title": "A bird watches a man fish, he offers it his catch, and then this happened.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl30t2/a_bird_watches_a_man_fish_he_offers_it_his_catch/",
-    "subreddit": "interestingasfuck",
+    "id": "t3_1xp2t2v",
+    "title": "Stunning Image of Our Satellite-Choked Night Skies. 578 photos over Mount Taranaki, NZ in 2 hours.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xp2t2v/stunning_image_of_our_satellitechoked_night_skies/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xmk0z7",
+    "title": "Two helicopters collided mid-air while trying to land at the same helipad at the exact same time in the Everest region, Nepal",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xmk0z7/two_helicopters_collided_midair_while_trying_to/",
+    "subreddit": "Damnthatsinteresting",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xm4wcg",
+    "title": "Look out for that wall",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xm4wcg/look_out_for_that_wall/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xos13x",
+    "title": "Opening a bottle of wine",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xos13x/opening_a_bottle_of_wine/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xoe2tc",
+    "title": "Ruining the ceremony",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xoe2tc/ruining_the_ceremony/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xnasaw",
+    "title": "The storms got all the Dawgs worked up",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xnasaw/the_storms_got_all_the_dawgs_worked_up/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xpmbvx",
+    "title": "Going for fast break at a basketball game",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xpmbvx/going_for_fast_break_at_a_basketball_game/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -92,77 +137,32 @@
     "views": 0,
     "has_media": true,
     "source": "rss"
-   },
-   {
-    "id": "t3_1xnxa4a",
-    "title": "Belgian Malinois are dogs on a whole other level.",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xnxa4a/belgian_malinois_are_dogs_on_a_whole_other_level/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xotbqq",
-    "title": "Freediver fights off his body's urge to black out",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xotbqq/freediver_fights_off_his_bodys_urge_to_black_out/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xl6wqw",
-    "title": "Firework display where it's shot at a building",
-    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xl6wqw/firework_display_where_its_shot_at_a_building/",
-    "subreddit": "interestingasfuck",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
    }
   ],
   "B": [
    {
-    "id": "t3_1xmyjni",
-    "title": "Perfect maid doing perfect things [Hololive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xmyjni/perfect_maid_doing_perfect_things_hololive/",
-    "subreddit": "awwnime",
+    "id": "t3_1xp8b6b",
+    "title": "anime fans really don't know how body types work",
+    "url": "https://www.reddit.com/r/Animemes/comments/1xp8b6b/anime_fans_really_dont_know_how_body_types_work/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xmp5se",
-    "title": "OL Shinobu [Demon Slayer]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xmp5se/ol_shinobu_demon_slayer/",
-    "subreddit": "awwnime",
+    "id": "t3_1xojck9",
+    "title": "Bro folded immediately",
+    "url": "https://www.reddit.com/r/Animemes/comments/1xojck9/bro_folded_immediately/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xli05b",
-    "title": "Suisei Hoshimachi [Hololive]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xli05b/suisei_hoshimachi_hololive/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xo9i4c",
-    "title": "Ronova [Genshin Impact]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xo9i4c/ronova_genshin_impact/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xl7npw",
-    "title": "A date with Nightingale [Fate/Grand Order]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xl7npw/a_date_with_nightingale_fategrand_order/",
-    "subreddit": "awwnime",
+    "id": "t3_1xn9u5n",
+    "title": "There's an imposter among us",
+    "url": "https://www.reddit.com/r/Animemes/comments/1xn9u5n/theres_an_imposter_among_us/",
+    "subreddit": "Animemes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -195,36 +195,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xlm8r3",
-    "title": "How to win at twister",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xlm8r3/how_to_win_at_twister/",
-    "subreddit": "animegifs",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xmukzr",
-    "title": "Why strain yourself so much to keep it hidden ? A little extra only adds to the beauty",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xmukzr/why_strain_yourself_so_much_to_keep_it_hidden_a/",
-    "subreddit": "animegifs",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xldcek",
-    "title": "Grandpa grabbing a coffee on a beautiful fall day in Toronto",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xldcek/grandpa_grabbing_a_coffee_on_a_beautiful_fall_day/",
+    "id": "t3_1xnsxg6",
+    "title": "Jordan 1s still fly in 2026?",
+    "url": "https://www.reddit.com/r/streetwear/comments/1xnsxg6/jordan_1s_still_fly_in_2026/",
     "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xnsxg6",
-    "title": "Jordan 1s still fly in 2026?",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xnsxg6/jordan_1s_still_fly_in_2026/",
+    "id": "t3_1xrbgdg",
+    "title": "love a good trenchcoat moment",
+    "url": "https://www.reddit.com/r/streetwear/comments/1xrbgdg/love_a_good_trenchcoat_moment/",
     "subreddit": "streetwear",
     "views": 0,
     "has_media": true,
