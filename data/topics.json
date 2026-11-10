@@ -1,26 +1,8 @@
 {
- "generated_at": "2026-11-09T11:49:01+00:00",
+ "generated_at": "2026-11-10T11:25:55+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
-   {
-    "id": "t3_1xlyf0n",
-    "title": "\"Who ya gonna call?\"",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xlyf0n/who_ya_gonna_call/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xmjyrf",
-    "title": "A Nonchalant frog VS. a Black Mamba.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xmjyrf/a_nonchalant_frog_vs_a_black_mamba/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1xonfu7",
     "title": "GeoGuessr expert helps an adoptee find the exact location of the only photo they have of their late mother.",
@@ -49,46 +31,46 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xprrvj",
-    "title": "The surface of Mars (NASA images)",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xprrvj/the_surface_of_mars_nasa_images/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xrxonb",
+    "title": "World's Biggest Human Catapult",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xrxonb/worlds_biggest_human_catapult/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xqdf38",
-    "title": "Uruguay, one of the most atheist countries in the world, during Pope Leo's visit.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xqdf38/uruguay_one_of_the_most_atheist_countries_in_the/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xrrm2n",
+    "title": "Beating failure with dignity",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xrrm2n/beating_failure_with_dignity/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xp2t2v",
-    "title": "Stunning Image of Our Satellite-Choked Night Skies. 578 photos over Mount Taranaki, NZ in 2 hours.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xp2t2v/stunning_image_of_our_satellitechoked_night_skies/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xovupm",
+    "title": "Man frees hare stuck in a fence",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xovupm/man_frees_hare_stuck_in_a_fence/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xmk0z7",
-    "title": "Two helicopters collided mid-air while trying to land at the same helipad at the exact same time in the Everest region, Nepal",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xmk0z7/two_helicopters_collided_midair_while_trying_to/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xpr8jy",
+    "title": "The absolute discipline of a fully trained service dog handling air travel perfectly",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xpr8jy/the_absolute_discipline_of_a_fully_trained/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xm4wcg",
-    "title": "Look out for that wall",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xm4wcg/look_out_for_that_wall/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xqp2tt",
+    "title": "In 2010, Steven Carter went on a missing kids website and realized that he had been missing for about 33 years",
+    "url": "https://www.reddit.com/r/BeAmazed/comments/1xqp2tt/in_2010_steven_carter_went_on_a_missing_kids/",
+    "subreddit": "BeAmazed",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -130,9 +112,27 @@
     "source": "rss"
    },
    {
+    "id": "t3_1xqy53z",
+    "title": "Total overreaction perhaps",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xqy53z/total_overreaction_perhaps/",
+    "subreddit": "Unexpected",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1xnlq9p",
     "title": "That dog is very well trained.",
     "url": "https://www.reddit.com/r/interestingasfuck/comments/1xnlq9p/that_dog_is_very_well_trained/",
+    "subreddit": "interestingasfuck",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xotbqq",
+    "title": "Freediver fights off his body's urge to black out",
+    "url": "https://www.reddit.com/r/interestingasfuck/comments/1xotbqq/freediver_fights_off_his_bodys_urge_to_black_out/",
     "subreddit": "interestingasfuck",
     "views": 0,
     "has_media": true,
@@ -141,46 +141,46 @@
   ],
   "B": [
    {
-    "id": "t3_1xp8b6b",
-    "title": "anime fans really don't know how body types work",
-    "url": "https://www.reddit.com/r/Animemes/comments/1xp8b6b/anime_fans_really_dont_know_how_body_types_work/",
-    "subreddit": "Animemes",
+    "id": "t3_1xrtyl2",
+    "title": "Tetoceptipn [Vocaloid]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xrtyl2/tetoceptipn_vocaloid/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xojck9",
-    "title": "Bro folded immediately",
-    "url": "https://www.reddit.com/r/Animemes/comments/1xojck9/bro_folded_immediately/",
-    "subreddit": "Animemes",
+    "id": "t3_1xmyjni",
+    "title": "Perfect maid doing perfect things [Hololive]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xmyjni/perfect_maid_doing_perfect_things_hololive/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xn9u5n",
-    "title": "There's an imposter among us",
-    "url": "https://www.reddit.com/r/Animemes/comments/1xn9u5n/theres_an_imposter_among_us/",
-    "subreddit": "Animemes",
+    "id": "t3_1xqoyt1",
+    "title": "Zhu Yuan & Feixiao [ZZZ x Honkai: Star Rail]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xqoyt1/zhu_yuan_feixiao_zzz_x_honkai_star_rail/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xmo0d0",
-    "title": "Asking the important questions",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xmo0d0/asking_the_important_questions/",
-    "subreddit": "animegifs",
+    "id": "t3_1xq7a49",
+    "title": "Leia [Punishing: Gray Raven]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xq7a49/leia_punishing_gray_raven/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xlwws5",
-    "title": "ISSHIKI-SAN wa KOI wo SHIRITΑΙ gif",
-    "url": "https://www.reddit.com/r/animegifs/comments/1xlwws5/isshikisan_wa_koi_wo_shiritαι_gif/",
-    "subreddit": "animegifs",
+    "id": "t3_1xn6492",
+    "title": "Bocchi and her Gibson [Bocchi The Rock]",
+    "url": "https://www.reddit.com/r/awwnime/comments/1xn6492/bocchi_and_her_gibson_bocchi_the_rock/",
+    "subreddit": "awwnime",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -195,48 +195,57 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xnsxg6",
-    "title": "Jordan 1s still fly in 2026?",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xnsxg6/jordan_1s_still_fly_in_2026/",
-    "subreddit": "streetwear",
+    "id": "t3_1xmukzr",
+    "title": "Why strain yourself so much to keep it hidden ? A little extra only adds to the beauty",
+    "url": "https://www.reddit.com/r/animegifs/comments/1xmukzr/why_strain_yourself_so_much_to_keep_it_hidden_a/",
+    "subreddit": "animegifs",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xrbgdg",
-    "title": "love a good trenchcoat moment",
-    "url": "https://www.reddit.com/r/streetwear/comments/1xrbgdg/love_a_good_trenchcoat_moment/",
-    "subreddit": "streetwear",
+    "id": "t3_1xr7tkq",
+    "title": "Audiences Will Pay for Human-Crafted Anime, Not AI-Generated Imitations, Says Sony CEO.",
+    "url": "https://www.reddit.com/r/anime/comments/1xr7tkq/audiences_will_pay_for_humancrafted_anime_not/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xoe8yb",
-    "title": "The illusion of openworld exploration",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xoe8yb/the_illusion_of_openworld_exploration/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xqvxz5",
+    "title": "\"SPY×FAMILY\" Season 4 Announced for 2027",
+    "url": "https://www.reddit.com/r/anime/comments/1xqvxz5/spyfamily_season_4_announced_for_2027/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xmqxuz",
-    "title": "Hoyo had to make sure their hands don't touch lmao",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmqxuz/hoyo_had_to_make_sure_their_hands_dont_touch_lmao/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xr0yrr",
+    "title": "Why Do People Find It So Hard To Believe And Accept That The Demons In Frieren Are Actually Pure Evil And Irredeemable?",
+    "url": "https://www.reddit.com/r/anime/comments/1xr0yrr/why_do_people_find_it_so_hard_to_believe_and/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    },
    {
-    "id": "t3_1xmjcxf",
-    "title": "Whoever said Stell4r was forced and not real, TAKE THIS!",
-    "url": "https://www.reddit.com/r/Genshin_Impact/comments/1xmjcxf/whoever_said_stell4r_was_forced_and_not_real_take/",
-    "subreddit": "Genshin_Impact",
+    "id": "t3_1xqsqyr",
+    "title": "Anime that features nipples",
+    "url": "https://www.reddit.com/r/anime/comments/1xqsqyr/anime_that_features_nipples/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xq0sx6",
+    "title": "Me as Yoko Littner from Gurren Lagann",
+    "url": "https://www.reddit.com/r/anime/comments/1xq0sx6/me_as_yoko_littner_from_gurren_lagann/",
+    "subreddit": "anime",
+    "views": 0,
+    "has_media": false,
     "source": "rss"
    }
   ]
