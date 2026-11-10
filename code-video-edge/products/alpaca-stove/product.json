@@ -1,0 +1,395 @@
+{
+ "product_key": "alpaca-stove",
+ "template": "stove3d",
+ "name": "アルパカ プラス ストーブ",
+ "item_no": "TS-77NC",
+ "genre": "home",
+ "target": {
+  "who": "小さくて、よく暖まる石油ストーブを探す人に",
+  "source": "コンパクトなのに高火力（line 205・207）"
+ },
+ "prep": {
+  "voice": "voicevox:WhiteCUL",
+  "speed": 0.95
+ },
+ "brand": {
+  "ground": "#F3EFE8",
+  "accent": "#C2562B",
+  "accent_box": [
+   0,
+   130,
+   1080,
+   170
+  ]
+ },
+ "beats": [
+  {
+   "kind": "S1",
+   "source": "F1,F3,F9,F11",
+   "voice": "line0.mp3",
+   "say": "小さいのに、3.0キロワット。",
+   "brand": "アルパカ",
+   "series": "プラス ストーブ",
+   "hook": "小さいのに、",
+   "big": "3.0",
+   "unit": "kW",
+   "dimW": "35cm",
+   "dimH": "42cm",
+   "note": "※3DCG（形と大きさは販売ページの写真と寸法から作った物）。炎の光は CG です。使用中は1時間に1回、1〜2分の換気を。"
+  },
+  {
+   "kind": "S2",
+   "source": "F4",
+   "voice": "line1.mp3",
+   "say": "360度、まわりを暖める。",
+   "big": "360",
+   "unit": "°",
+   "sub": "まわりを暖める",
+   "note": "※3DCG。光の輪はイメージ（CG）です。"
+  },
+  {
+   "kind": "S3",
+   "source": "F2",
+   "voice": "line2.mp3",
+   "say": "3.7リットルで、約10時間。",
+   "tank": "3.7",
+   "tunit": "L",
+   "pre": "約",
+   "big": "10",
+   "unit": "時間",
+   "label": "燃焼継続時間",
+   "note": "※燃焼継続時間 約10時間・油タンク容量 3.7L（販売ページの記載）。"
+  },
+  {
+   "kind": "S4",
+   "source": "F5,F6",
+   "voice": "line3.mp3",
+   "say": "強い揺れを感じると、自動で消火。",
+   "head": "耐震自動消火",
+   "sub": "震度5以上の強い振動や衝撃で",
+   "tag": "JHIA 認証取得",
+   "note": "※3DCG。揺れと消火の動きはイメージ。販売ページの記載：震度5以上の強い振動や衝撃で自動消火。"
+  },
+  {
+   "kind": "S5",
+   "source": "F7",
+   "voice": "line4.mp3",
+   "say": "1968年から、職人の手づくり。",
+   "year": "1968",
+   "head": "職人の手づくり",
+   "parts": [
+    "上板",
+    "ガード",
+    "燃焼筒",
+    "タンク"
+   ],
+   "note": "※3DCG（部品の分け方は説明のための絵です）。1968年創業の韓国のブランド（販売ページの記載）。"
+  },
+  {
+   "kind": "S6",
+   "source": "F8",
+   "voice": "line5.mp3",
+   "say": "評価は、4.73。",
+   "score": "4.73",
+   "count_label": "レビュー508件",
+   "date": "楽天市場 2026年11月8日時点",
+   "note": "※評価・件数は販売ページの表示です。"
+  },
+  {
+   "kind": "S7",
+   "source": "F9,F10,F3",
+   "voice": "line6.mp3",
+   "say": "アルパカ、プラスストーブ。換気は、1時間に1回。リンクはプロフィールから。",
+   "brand": "アルパカ",
+   "head": "プラス ストーブ",
+   "sub": "TS-77NC・幅35×奥行35×高さ42cm",
+   "vent": "換気は1時間に1回",
+   "cta": "リンクはプロフィールから",
+   "note": "※3DCG。使用中は1時間に1回、1〜2分の換気を。屋外での使用は自己責任。価格・在庫はリンク先で。"
+  }
+ ],
+ "score": {
+  "scenes": [
+   [
+    "S1",
+    "line0.mp3",
+    3.0
+   ],
+   [
+    "S2",
+    "line1.mp3",
+    3.0
+   ],
+   [
+    "S3",
+    "line2.mp3",
+    3.05
+   ],
+   [
+    "S4",
+    "line3.mp3",
+    3.0
+   ],
+   [
+    "S5",
+    "line4.mp3",
+    3.95
+   ],
+   [
+    "S6",
+    "line5.mp3",
+    2.4
+   ],
+   [
+    "S7",
+    "line6.mp3",
+    0
+   ]
+  ],
+  "climax": [
+   "S6",
+   "ヨンテン"
+  ],
+  "music": {
+   "quiet": [
+    "S1",
+    "S3",
+    "S5"
+   ],
+   "hush": [
+    [
+     [
+      "cue",
+      "S6",
+      "ヨンテン",
+      -0.45
+     ],
+     [
+      "cue",
+      "S6",
+      "ヨンテン",
+      0.02
+     ]
+    ]
+   ]
+  },
+  "events": [
+   {
+    "id": "dims",
+    "at": [
+     "t0",
+     "S1",
+     0.25
+    ],
+    "what": "S1 寸法の線"
+   },
+   {
+    "id": "ignite",
+    "at": [
+     "cue",
+     "S1",
+     "サンテン"
+    ],
+    "what": "S1 点火・燃焼筒が光る",
+    "sfx": [
+     "tick",
+     2600,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "ring",
+    "at": [
+     "t0",
+     "S2",
+     0.3
+    ],
+    "what": "S2 光の輪が全方向へ",
+    "sfx": [
+     "glide",
+     0.9,
+     70,
+     140,
+     0.45
+    ],
+    "band": "low"
+   },
+   {
+    "id": "deg",
+    "at": [
+     "cue",
+     "S2",
+     "ロクジュウ"
+    ],
+    "what": "S2 360°"
+   },
+   {
+    "id": "liter",
+    "at": [
+     "cue",
+     "S3",
+     "ナナリ"
+    ],
+    "what": "S3 3.7L"
+   },
+   {
+    "id": "hours",
+    "at": [
+     "cue",
+     "S3",
+     "ジュウジ"
+    ],
+    "what": "S3 約10時間の輪",
+    "sfx": [
+     "bell",
+     1568.0,
+     0.45,
+     1.2
+    ],
+    "band": "high"
+   },
+   {
+    "id": "shake",
+    "at": [
+     "cue",
+     "S4",
+     "ユレ"
+    ],
+    "what": "S4 揺れ",
+    "sfx": [
+     "tock",
+     180,
+     0.7
+    ],
+    "band": "low-mid"
+   },
+   {
+    "id": "off",
+    "at": [
+     "cue",
+     "S4",
+     "ショオカ"
+    ],
+    "what": "S4 消火",
+    "sfx": [
+     "glide",
+     0.5,
+     180,
+     70,
+     0.45
+    ],
+    "band": "low"
+   },
+   {
+    "id": "explode",
+    "at": [
+     "t0",
+     "S5",
+     0.25
+    ],
+    "what": "S5 部品が浮く",
+    "sfx": [
+     "tock",
+     240,
+     0.6
+    ],
+    "band": "low-mid"
+   },
+   {
+    "id": "craft",
+    "at": [
+     "cue",
+     "S5",
+     "ショクニン"
+    ],
+    "what": "S5 職人の手づくり",
+    "sfx": [
+     "shimmer",
+     0.9,
+     0.4
+    ],
+    "band": "high"
+   },
+   {
+    "id": "dot",
+    "at": [
+     "cue",
+     "S6",
+     "ヨンテン"
+    ],
+    "what": "S6「4.73」",
+    "sfx": [
+     "bell",
+     2093.0,
+     0.5,
+     1.4
+    ],
+    "band": "high"
+   },
+   {
+    "id": "name",
+    "at": [
+     "cue",
+     "S7",
+     "アルパカ"
+    ],
+    "what": "S7 名前"
+   },
+   {
+    "id": "vent",
+    "at": [
+     "cue",
+     "S7",
+     "カンキ"
+    ],
+    "what": "S7 換気"
+   },
+   {
+    "id": "cta",
+    "at": [
+     "cue",
+     "S7",
+     "リンクワ"
+    ],
+    "what": "S7「リンクは」で札"
+   },
+   {
+    "id": "under",
+    "at": [
+     "cue",
+     "S7",
+     "プロフィ"
+    ],
+    "what": "S7 札が押される",
+    "sfx": [
+     "bell",
+     1318.5,
+     0.4,
+     0.9
+    ],
+    "band": "high-mid"
+   }
+  ],
+  "sustain": [
+   {
+    "id": "room",
+    "from": [
+     "t0",
+     "S1"
+    ],
+    "to": [
+     "t1",
+     "S3"
+    ],
+    "sfx": [
+     "roomtone"
+    ],
+    "over_db": -12.0,
+    "what": "S1〜S3 静かな撮影台"
+   }
+  ]
+ },
+ "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00pzd8n.sdgff0f9.g00pzd8n.sdgfg7b9/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fplywood%2F47083004%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fplywood%2Fi%2F10019871%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
+ "item_code": "plywood:10019871"
+}

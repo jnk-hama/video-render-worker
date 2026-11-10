@@ -1,0 +1,65 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。アルパカは販売ページの写真を画面に使わない（全部 3DCG・#366）＝asp_images は空。lines の i が line<i>.mp3（手元で作った声と同じ文＝3D の時刻と合う）",
+ "asp_images": [],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "小さいのに、さんてんゼロキロワット。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "360度、まわりを暖める。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "さんてんななリットルで、やく10時間。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "強い揺れを感じると、自動で消火。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "せんきゅうひゃくろくじゅうはちねんから、職人の手づくり。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "評価は、4.73。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "アルパカ、プラスストーブ。換気は、1時間に1回。リンクはプロフィールから。",
+   "speed": 0.95,
+   "pause": 0.5
+  }
+ ],
+ "prep": [
+  []
+ ]
+}

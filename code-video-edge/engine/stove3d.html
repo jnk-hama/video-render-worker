@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- アルパカ プラス ストーブ 3DCG（#366 の例外・5人会議 works/alpaca-stove/MEETING.md）：Blender Cycles の連番（cycles_alpaca.py・30コマ/秒→60）を全画面に差し替え、
+     字は下の帯（y 1150〜1440・「仕様書」の型：札の見出し・大きな数字・細い罫線）。本体はいつも画面の上側＝字を本体に載せない。
+     かまどさん（上の壁に横書き）・デロンギ（左の縦の列）と置き場を変える（#302）。寸法の線・360° の弧・10時間の目盛り・分解図の札は製図の線（SVG）。
+     時刻は timing.json（window.TIMELINE）の events、文字は設計書（window.PRODUCT）。すべての値は時刻 T の関数（タイマー・乱数なし） -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ground:#F3EFE8; --ink:#1E1A17; --dim:#5A5048; --acc:#8F3A1C; --line:#C2562B; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--ground); }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  #bg { position:absolute; inset:0; background:var(--ground); }
+  #world, #prodlayer, #ui { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+  #world img, #cyq { position:absolute; left:0; top:0; width:1080px; height:1920px; display:block; }
+  #cyq { display:none; background-size:1080px 1920px; -webkit-mask-size:1080px 1920px; mask-size:1080px 1920px; -webkit-mask-mode:luminance; mask-mode:luminance; }
+  #over { position:absolute; left:0; top:0; }
+  #hdr { position:absolute; left:0; top:0; width:1080px; height:150px; background:var(--ground); pointer-events:none; }
+  #hdr i { position:absolute; left:0; top:144px; width:1080px; height:6px; background:var(--line); }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln.vt { writing-mode:vertical-rl; padding:.3em; margin:-.3em; }
+  .ln > .in { display:block; }
+  .num { font-family:"Noto Sans JP"; font-weight:300; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.03em; }
+  .note { position:absolute; left:64px; width:836px; font:400 24px/1.45 "Noto Sans JP"; color:var(--dim); opacity:0; }
+  .lab { font:500 24px/1 "Noto Sans JP"; color:var(--dim); white-space:nowrap; }
+  .tag { position:absolute; font:500 26px/1 "Noto Sans JP"; color:var(--ink); white-space:nowrap; }
+  .pill { position:absolute; padding:10px 22px; border:2px solid var(--ink); border-radius:999px; font:500 24px/1 "Noto Sans JP"; color:var(--ink); white-space:nowrap; opacity:0; }
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:var(--ground); border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ink); z-index:3; }
+  #credit { position:absolute; left:156px; top:184px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; opacity:.75; color:var(--ink); z-index:3; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="world"><img id="cy" alt=""><img id="cyp" alt=""><div id="cyq"></div></div>
+<div id="prodlayer" class="prod"></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<div id="hdr" class="scrim"><i></i></div>
+<div id="ui"><div id="pr">PR</div></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, { clamp, lerp } = EDGE, { el, sv, ln, reveal, note, $ } = SK;
+const E = Object.assign({}, EDGE.E, { inOutSine: (x) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(x)), outCubic: (x) => 1 - Math.pow(1 - clamp(x), 3) });
+const ev = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b])), S = Object.fromEntries(TL.scenes.map((s) => [s.id, s]));
+const DIR = `p/${P.product_key}/`, U = SK.U, T = () => SK.T, FPS3D = 30;
+const s1 = S.S1, s2 = S.S2, s3 = S.S3, s4 = S.S4, s5 = S.S5, s6 = S.S6, s7 = S.S7;
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+const TF = () => Math.round(T() * 60) / 60;
+window.CYCLES_JOBS = () => ({ fps: FPS3D, end: TL.end, events: Object.fromEntries(TL.events.map((e) => [e.id, e.t])), scenes: Object.fromEntries(TL.scenes.map((s) => [s.id, [s.t0, s.t1]])),
+  frames: Array.from({ length: Math.floor(TL.end * FPS3D) }, (_, i) => ({ i, t: +(i / FPS3D).toFixed(4) })) });
+const NF = Math.floor(TL.end * FPS3D), fidx = (t) => Math.min(NF - 1, Math.max(0, Math.floor(t * FPS3D + 1e-6))), pad = (i) => String(i).padStart(4, "0");
+const F60 = () => window.F60 || 0, srcAt = (t) => F60() ? `${DIR}cy/f_${pad(Math.min(F60() - 1, Math.max(0, Math.floor(t * 60 + 1e-6))))}.jpg` : `${DIR}cy/k_${pad(fidx(t))}.jpg`;
+const WAITS = [], cy = $("cy"), cyp = $("cyp"), cyq = $("cyq"); let QC = false;
+const CUTS = [s2.t0, s3.t0, s4.t0, s5.t0, s6.t0, s7.t0], XF = 0.3;   // 場面の切れ目は 0.3秒で溶かす（かまどさん v3）
+const show = (im, src) => { if (im.getAttribute("src") !== src) { im.setAttribute("src", src); WAITS.push(im.decode().catch(() => {})); } };
+const PJ = (i) => (window.PROJ || {})[String(i)] || null;
+const pt = (k) => { const p = PJ(fidx(T())); return p && p[k] ? p[k] : null; };
+U.push(() => { const t = T(); show(cy, srcAt(t));
+  const c = CUTS.find((b) => t >= b && t < b + XF), x = c === undefined || QC ? 0 : 1 - E.inOutSine((t - c) / XF);
+  if (x > 0.001) show(cyp, srcAt(c - 1 / 60));
+  cyp.style.opacity = x.toFixed(3); cyp.style.display = x > 0.001 ? "block" : "none";
+  if (QC) { const i = fidx(t); cyq.style.backgroundImage = `url(${DIR}cy/k_${pad(i)}.jpg)`; cyq.style.webkitMaskImage = cyq.style.maskImage = `url(${DIR}cy/m_${pad(i)}.png)`; } });
+window.QC_PRODUCT_ONLY = (on) => { QC = on; for (const e of [cy, cyp]) e.style.visibility = on ? "hidden" : "visible"; cyq.style.display = on ? "block" : "none"; if (!on) return;
+  const i = fidx(T()), ld = (src) => new Promise((r) => { const im = new Image(); im.onload = im.onerror = () => r(); im.src = src; });
+  cyq.style.backgroundImage = `url(${DIR}cy/k_${pad(i)}.jpg)`; cyq.style.webkitMaskImage = cyq.style.maskImage = `url(${DIR}cy/m_${pad(i)}.png)`;
+  return Promise.all([ld(`${DIR}cy/k_${pad(i)}.jpg`), ld(`${DIR}cy/m_${pad(i)}.png`)]).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))); };
+
+// 字の道具（入りは 0.9秒・字間を締めながら）
+const line = (style, html, tin, tout, d = 0.9, track = [0.14, 0.04], vt = false) => { const e = ln(style, html); if (vt) e.classList.add("vt"); U.push(() => { reveal(e, tin, tout, d, 0.22);
+  if (track) e.firstElementChild.style.letterSpacing = lerp(track[0], track[1], E.outCubic((T() - tin) / 1.4)).toFixed(3) + "em"; }); return e; };
+const fade = (e, tin, tout, d = 0.35) => U.push(() => { const t = T(), a = clamp((t - tin) / d) * (1 - clamp((t - tout) / 0.22)); e.style.opacity = a.toFixed(3); e.style.visibility = a > 0.001 ? "visible" : "hidden"; });
+const vis = (e, a) => { e.style.opacity = a.toFixed(3); e.style.display = a > 0.001 ? "inline" : "none"; };
+const LINE = "#C2562B", INK = "#1E1A17";
+// 下の帯の型：上の細い罫線（場面ごとに左から引く）＋札の見出し
+const BAND = 1150, NOTE_Y = 1364;
+const bandRule = (tin, tout) => { const r = sv("line", { x1: 64, x2: 64, y1: BAND - 18, y2: BAND - 18, stroke: INK, "stroke-width": 1.5 });
+  U.push(() => { const t = T(), u = E.outCubic((t - tin) / 0.7), o = 1 - clamp((t - tout) / 0.22); r.setAttribute("x2", (64 + 836 * u).toFixed(1)); r.style.opacity = (u > 0 ? o : 0).toFixed(3); }); };
+const kicker = (txt, tin, tout) => line(`left:64px;top:${BAND}px;font:500 24px/1 'Noto Sans JP';color:var(--acc)`, txt, tin, tout, 0.7, [0.3, 0.16]);
+// 製図の線：矢印つきの寸法線（端に短い直交線）
+const dimLine = (getA, getB, tin, tout) => { const g = sv("g", {}), m = sv("line", { stroke: INK, "stroke-width": 1.5 }, g), e1 = sv("line", { stroke: INK, "stroke-width": 1.5 }, g), e2 = sv("line", { stroke: INK, "stroke-width": 1.5 }, g);
+  U.push(() => { const t = T(), u = E.inOutSine((t - tin) / 0.8), o = 1 - clamp((t - tout) / 0.22), a = getA(), b = getB();
+    if (!a || !b || u <= 0) { vis(g, 0); return; } vis(g, o);
+    const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, ax = lerp(mx, a[0], u), ay = lerp(my, a[1], u), bx = lerp(mx, b[0], u), by = lerp(my, b[1], u);
+    m.setAttribute("x1", ax); m.setAttribute("y1", ay); m.setAttribute("x2", bx); m.setAttribute("y2", by);
+    const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L * 12, ny = dx / L * 12;
+    for (const [e, x, y] of [[e1, ax, ay], [e2, bx, by]]) { e.setAttribute("x1", x - nx); e.setAttribute("y1", y - ny); e.setAttribute("x2", x + nx); e.setAttribute("y2", y + ny); } }); return g; };
+// 引き出し線：札の点から本体の点へ（横→縦）
+const leader = (key, sx, sy, t0, out, dx = 0) => { const lnE = sv("polyline", { fill: "none", stroke: LINE, "stroke-width": 2 }), dot = sv("circle", { r: 6, fill: LINE });
+  U.push(() => { const t = T(), u = E.outCubic((t - t0) / 0.6), o = 1 - clamp((t - out) / 0.22), q0 = pt(key);
+    if (!q0 || u <= 0) { lnE.style.opacity = dot.style.opacity = 0; return; } const q = [q0[0] + dx, q0[1]];
+    const L1 = Math.abs(q[0] - sx), L2 = Math.abs(q[1] - sy), L = (L1 + L2) * u;
+    const pts = L <= L1 ? [[sx, sy], [sx + Math.sign(q[0] - sx) * L, sy]] : [[sx, sy], [q[0], sy], [q[0], sy + Math.sign(q[1] - sy) * (L - L1)]];
+    lnE.setAttribute("points", pts.map((p) => p.map((v) => v.toFixed(2)).join(",")).join(" "));
+    dot.setAttribute("cx", q[0].toFixed(2)); dot.setAttribute("cy", q[1].toFixed(2)); dot.setAttribute("r", (6 * clamp((u - 0.9) / 0.1)).toFixed(2)); lnE.style.opacity = dot.style.opacity = o.toFixed(3); }); };
+const bigNum = (style, html, tin, tout) => line(style, html, tin, tout, 0.8, null);
+
+// ---------- S1：小さいのに 3.0kW（寸法の線・点火で数え上げ）----------
+{ const c = COPY.S1, out = s1.t1 - 0.3;
+  bandRule(-1, out);
+  line(`left:64px;top:${BAND}px;font:500 24px/1 'Noto Sans JP';color:var(--acc)`, `${c.brand}<span style="color:var(--dim)">　―　</span><span style="color:var(--ink)">${c.series}</span>`, -1, out, 0.01, [0.2, 0.12]);
+  line(`left:64px;top:${BAND + 50}px;font:700 76px/1.1 'Noto Sans JP'`, c.hook, 0.15, out);
+  const big = bigNum(`right:180px;top:${BAND + 20}px;font-size:150px;line-height:1;color:var(--acc)`, `<span class="num">0.0</span><span style="font:500 52px/1 'Noto Sans JP';margin-left:6px">${c.unit}</span>`, ev("ignite") - 0.3, out);
+  U.push(() => { big.querySelector(".num").textContent = (+c.big * E.inOutCubic((TF() - (ev("ignite") - 0.2)) / 0.8)).toFixed(1); });
+  line(`left:64px;top:${BAND + 152}px;font:400 24px/1 'Noto Sans JP';color:var(--dim)`, P.target.who, -1, out, 0.01, [0.1, 0.06]);
+  // 寸法：幅（受け皿の下の線）・高さ（左の縦の線）。札は線の外（本体に載せない）
+  const below = (k, d) => () => { const p = pt(k); return p ? [p[0], p[1] + d] : null; };
+  const L = () => { const b = pt("left"), tc = pt("topc"); return b && tc ? [Math.min(b[0], tc[0]) - 46, b[1]] : null; }, Ltop = () => { const b = pt("left"), tc = pt("topc"); return b && tc ? [Math.min(b[0], tc[0]) - 46, tc[1]] : null; };
+  dimLine(below("left", 34), below("right", 34), ev("dims"), out); dimLine(L, Ltop, ev("dims") + 0.15, out);
+  // 札は左の縦の線の外に1つ（幅の札を線の下に置くと受け皿の黒い縁に載り 2.0:1・右の端では x>900 になった）
+  const h = el("div", { class: "tag", style: "writing-mode:vertical-rl" }, `高さ${c.dimH}　幅${c.dimW}`);
+  fade(h, ev("dims") + 0.65, out);
+  U.push(() => { const l = pt("left"), tc = pt("topc");
+    if (l && tc) { h.style.left = (Math.min(l[0], tc[0]) - 92).toFixed(1) + "px"; h.style.top = ((l[1] + tc[1]) / 2 - 130).toFixed(1) + "px"; } });
+  note(c.note, NOTE_Y, -1, out); }
+
+// ---------- S2：360°（本体の周りに弧を描き、数え上げ）----------
+{ const c = COPY.S2, tin = s2.t0 + 0.25, out = s2.t1 - 0.25;
+  bandRule(tin - 0.1, out); kicker("暖める向き", tin, out);
+  const big = bigNum(`left:64px;top:${BAND + 40}px;font-size:170px;line-height:1;color:var(--acc)`, `<span class="num">0</span><span style="font:300 110px/1 'Noto Sans JP';vertical-align:top">${c.unit}</span>`, ev("deg") - 0.45, out);
+  big.style.color = "var(--ink)";   // 床の光の輪が帯の下まで来て、赤茶の数字が 4.4:1 になった（手元の点検）
+  line(`left:500px;top:${BAND + 96}px;font:700 48px/1.1 'Noto Sans JP'`, c.sub, ev("deg") + 0.1, out, 0.9, [0.16, 0.04]);
+  const arc = sv("path", { fill: "none", stroke: LINE, "stroke-width": 4, "stroke-linecap": "round" }), tip = sv("circle", { r: 7, fill: LINE });
+  U.push(() => { const t = T(), u = E.inOutSine((t - (ev("deg") - 0.35)) / 1.3), o = 1 - clamp((t - out) / 0.22), q = pt("center"), f = TF();
+    big.querySelector(".num").textContent = String(Math.round(360 * E.inOutSine((f - (ev("deg") - 0.35)) / 1.3)));
+    if (!q || u <= 0) { arc.style.opacity = tip.style.opacity = 0; return; }
+    const R = 400, a0 = -Math.PI / 2, a1 = a0 + 2 * Math.PI * Math.min(u, 0.9999), x0 = q[0] + R * Math.cos(a0), y0 = q[1] + R * Math.sin(a0), x1 = q[0] + R * Math.cos(a1), y1 = q[1] + R * Math.sin(a1);
+    arc.setAttribute("d", `M${x0.toFixed(1)} ${y0.toFixed(1)} A${R} ${R} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`);
+    tip.setAttribute("cx", x1.toFixed(1)); tip.setAttribute("cy", y1.toFixed(1)); arc.style.opacity = tip.style.opacity = o.toFixed(3); });
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S3：3.7L で 約10時間（目盛りの棒が 10時間まで伸びる）----------
+{ const c = COPY.S3, tin = s3.t0 + 0.25, out = s3.t1 - 0.25;
+  bandRule(tin - 0.1, out); kicker(c.label, tin, out);
+  bigNum(`left:64px;top:${BAND + 44}px;font-size:120px;line-height:1`, `<span class="num">${c.tank}</span><span style="font:500 52px/1 'Noto Sans JP';margin-left:4px">${c.tunit}</span>`, ev("liter") - 0.3, out);
+  const big = bigNum(`right:180px;top:${BAND + 24}px;font-size:150px;line-height:1;color:var(--acc)`, `<span style="font:500 40px/1 'Noto Sans JP';vertical-align:top;margin-right:8px">${c.pre}</span><span class="num">0</span><span style="font:500 52px/1 'Noto Sans JP';margin-left:4px">${c.unit}</span>`, ev("hours") - 0.45, out);
+  U.push(() => { big.querySelector(".num").textContent = String(Math.round(+c.big * E.inOutCubic((TF() - (ev("hours") - 0.4)) / 0.9))); });
+  // 目盛り（0〜10時間）
+  const g = sv("g", {}), y = BAND + 186, x0 = 64, x1 = 900; sv("line", { x1: x0, x2: x1, y1: y, y2: y, stroke: "#B9AEA0", "stroke-width": 6, "stroke-linecap": "round" }, g);
+  const bar = sv("line", { x1: x0, x2: x0, y1: y, y2: y, stroke: LINE, "stroke-width": 6, "stroke-linecap": "round" }, g);
+  for (let k = 0; k <= 10; k++) sv("line", { x1: x0 + (x1 - x0) * k / 10, x2: x0 + (x1 - x0) * k / 10, y1: y + 10, y2: y + (k % 5 ? 18 : 26), stroke: INK, "stroke-width": 1.5 }, g);
+  U.push(() => { const t = T(), a = clamp((t - (ev("liter") - 0.2)) / 0.3) * (1 - clamp((t - out) / 0.22)); vis(g, a); bar.setAttribute("x2", (x0 + (x1 - x0) * E.inOutCubic((t - (ev("hours") - 0.4)) / 0.9)).toFixed(1)); });
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S4：耐震自動消火（揺れ→消火）・JHIA。札からつまみ箱へ線 ----------
+{ const c = COPY.S4, tin = s4.t0 + 0.25, out = s4.t1 - 0.25;
+  bandRule(tin - 0.1, out); kicker("安全", tin, out);
+  line(`left:64px;top:${BAND + 46}px;font:700 80px/1.1 'Noto Sans JP'`, c.head, Math.max(tin, ev("shake") - 0.2), out);
+  line(`left:64px;top:${BAND + 152}px;font:400 28px/1 'Noto Sans JP';color:var(--dim)`, c.sub, ev("shake") + 0.2, out, 0.9, [0.1, 0.04]);
+  const pill = el("div", { class: "pill", style: `left:640px;top:${BAND + 66}px` }, c.tag); fade(pill, ev("off") - 0.2, out);
+  leader("knob", 600, BAND + 90, ev("shake"), out);
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S5：1968年から、職人の手づくり（分解図・部品の札）----------
+{ const c = COPY.S5, tin = s5.t0 + 0.25, out = s5.t1 - 0.25;
+  bandRule(tin - 0.1, out); kicker("つくり", tin, out);
+  bigNum(`left:64px;top:${BAND + 40}px;font-size:140px;line-height:1`, `<span class="num">${c.year}</span><span style="font:500 40px/1 'Noto Sans JP';margin-left:8px">年から</span>`, tin + 0.1, out);
+  line(`left:500px;top:${BAND + 92}px;font:700 48px/1.1 'Noto Sans JP';color:var(--acc)`, c.head, ev("craft") - 0.1, out, 0.9, [0.16, 0.04]);
+  // 部品の札（右の列・x 822〜）：上から 上板・ガード・燃焼筒・タンク
+  [["top", c.parts[0], 0.0], ["guard", c.parts[1], 0.12], ["chimney", c.parts[2], 0.24], ["tank", c.parts[3], 0.36]].forEach(([k, txt, d]) => {
+    const tg = el("div", { class: "tag" }, txt), t0 = ev("explode") + 0.55 + d;
+    fade(tg, t0 + 0.4, s6.t0 - 0.8);
+    const lnE = sv("polyline", { fill: "none", stroke: LINE, "stroke-width": 2 }), dot = sv("circle", { r: 5, fill: LINE });
+    U.push(() => { const t = T(), q = pt(k), u = E.outCubic((t - t0) / 0.5), o = 1 - clamp((t - (s6.t0 - 0.8)) / 0.22);
+      if (!q || u <= 0) { lnE.style.opacity = dot.style.opacity = 0; return; }
+      const lx = 812, ly = q[1]; tg.style.left = "822px"; tg.style.top = (ly - 13).toFixed(1) + "px";
+      const x = lerp(lx, q[0], u); lnE.setAttribute("points", `${lx},${ly.toFixed(1)} ${x.toFixed(1)},${ly.toFixed(1)}`); dot.setAttribute("cx", q[0].toFixed(1)); dot.setAttribute("cy", ly.toFixed(1));
+      dot.setAttribute("r", (5 * clamp((u - 0.9) / 0.1)).toFixed(2)); lnE.style.opacity = dot.style.opacity = o.toFixed(3); }); });
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S6：評価（山場・数え上げ）----------
+{ const c = COPY.S6, tin = s6.t0 + 0.25, out = s6.t1 - 0.25, val = parseFloat(c.score);
+  bandRule(tin - 0.1, out); kicker("評価", tin, out);
+  const sc = bigNum(`left:64px;top:${BAND + 34}px;font-size:170px;line-height:1;color:var(--acc)`, `<span class="num">0.00</span>`, tin, out);
+  line(`left:520px;top:${BAND + 70}px;font:500 36px/1 'Noto Sans JP'`, c.count_label, ev("dot") - 0.1, out, 0.8, [0.12, 0.04]);
+  line(`left:520px;top:${BAND + 126}px;font:400 24px/1 'Noto Sans JP';color:var(--dim)`, c.date, ev("dot") - 0.05, out, 0.8, null);
+  U.push(() => { sc.querySelector(".num").textContent = (E.inOutCubic((TF() - tin) / (ev("dot") + 0.3 - tin)) * val).toFixed(2); });
+  note(c.note, NOTE_Y, tin, out); }
+
+// ---------- S7：締め（名前・寸法・換気・行動）----------
+{ const c = COPY.S7, tin = s7.t0 + 0.35;
+  bandRule(tin - 0.1, 99);
+  line(`left:64px;top:${BAND}px;font:500 24px/1 'Noto Sans JP';color:var(--acc)`, c.brand, tin, 99, 0.9, [0.3, 0.16]);
+  line(`left:64px;top:${BAND + 30}px;font:700 84px/1.1 'Noto Sans JP'`, c.head, ev("name") - 0.1, 99, 1.0);
+  line(`left:64px;top:${BAND + 134}px;font:400 24px/1 'Noto Sans JP';color:var(--dim)`, c.sub, ev("name") + 0.3, 99, 0.9, [0.08, 0.02]);
+  const vent = el("div", { class: "pill", style: `left:64px;top:${BAND + 168}px;border-color:var(--acc);color:var(--acc)` }, c.vent); fade(vent, ev("vent") - 0.1, 99);
+  const cta = el("div", { class: "pill", style: `left:392px;top:${BAND + 168}px` }, c.cta);
+  U.push(() => { const t = T(), a = E.outCubic((t - ev("cta")) / 0.5), pr = Math.sin(Math.PI * clamp((t - ev("under")) / 0.3));
+    cta.style.opacity = a.toFixed(3); cta.style.transform = `translateY(${((1 - a) * 20).toFixed(2)}px) scale(${(1 - 0.04 * pr).toFixed(4)})`;
+    cta.style.background = `rgba(194,86,43,${(0.14 * clamp((t - ev("under")) / 0.25)).toFixed(3)})`; });
+  note(c.note, NOTE_Y, tin + 0.2, 99); }
+
+SK.boot([300, 400, 500, 700]);
+window.READY = window.READY.then(async () => {
+  for (const f of ["proj.js", "f60.js"]) await new Promise((r) => { const s = document.createElement("script"); s.src = `${DIR}cy/${f}`; s.onload = s.onerror = () => r(); document.head.appendChild(s); });
+  window.seek(0); await Promise.all(WAITS); return true; });
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+</script>
+</body></html>
