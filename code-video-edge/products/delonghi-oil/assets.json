@@ -1,6 +1,16 @@
 {
- "_comment": "素材の取り方（edge-video.yml）。デロンギは販売ページの写真を画面に使わない（全部 3DCG・#366）＝asp_images は空。lines の i が line<i>.mp3（手元で作った声と同じ文＝3D の時刻と合う）",
- "asp_images": [],
+ "_comment": "素材の取り方（edge-video.yml）。v2（jmas #370）：商品は販売ページの実物の写真だけ・場面は Pexels の本物の映像。asp_images の順が dl の asp0〜3（本体・フィン・タイマー・キャスター）、videos の順が vid0〜2（本を読む人・窓の雪・眠る猫）。prep.py が切り抜き・切り出し・コマ出しをする",
+ "asp_images": [
+  "https://shop.r10s.jp/delonghi/cabinet/06618479/item/heater/imgrc0080140288.jpg",
+  "https://image.rakuten.co.jp/delonghi/cabinet/06618479/item/heater/0108776315_2.jpg",
+  "https://image.rakuten.co.jp/delonghi/cabinet/06618479/item/heater/0108776315_3.jpg",
+  "https://image.rakuten.co.jp/delonghi/cabinet/06618479/item/heater/0108776315_4.jpg"
+ ],
+ "videos": [
+  "https://videos.pexels.com/video-files/8295345/8295345-hd_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/9493732/9493732-hd_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/30022530/12880936_1080_1920_60fps.mp4"
+ ],
  "lines": [
   {
    "engine": "voicevox",

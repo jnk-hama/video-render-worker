@@ -32,10 +32,13 @@ a, dl, vdir = sys.argv[1:4]; A = json.load(open(a))
 for i, u in enumerate(A["asp_images"]):
     if not re.fullmatch(r"https://(image\.rakuten\.co\.jp|shop\.r10s\.jp)/[\w-]+/cabinet/[\w./-]+\.jpe?g", u): sys.exit(f"楽天の画像の住所ではない: {i}")
     subprocess.run(["curl", "-fsSL", "-A", "Mozilla/5.0", "-o", f"{dl}/asp{i}.jpg", u], check=True)
+for i, u in enumerate(A.get("videos", [])):   # 本物の映像（Pexels・商用可・jmas #370）。Pexels の動画の住所だけ通す。公開リポジトリには置かない（実行時に取り、ジョブと一緒に消える）
+    if not re.fullmatch(r"https://videos\.pexels\.com/video-files/\d+/[\w-]+\.mp4", u): sys.exit(f"Pexels の動画の住所ではない: {i}")
+    subprocess.run(["curl", "-fsSL", "-o", f"{dl}/vid{i}.mp4", u], check=True)
 sys.path.insert(0, "factory"); import prep
 for i, line in enumerate(A["lines"]):
     prep.vv_synth(line, f"{vdir}/line{i}.mp3")
-print("画像", len(A["asp_images"]), "枚・声", len(A["lines"]), "行")
+print("画像", len(A["asp_images"]), "枚・映像", len(A.get("videos", [])), "本・声", len(A["lines"]), "行")
 PY
 # 下ごしらえ：組ごとに別の処理で（BiRefNet は1つの処理で2回呼ぶとメモリが 14GB まで膨らんで落ちた）
 python3 -c "import json,sys;[print(' '.join(g)) for g in json.load(open(sys.argv[1]))['prep']]" "$PK/assets.json" | while read -r g; do

@@ -11,6 +11,7 @@ node factory/test_motionkit.mjs   # 動きの部品（ばね・洪水・ふる�
 python3 factory/lint_swallow.py "$PAGE" stage/motionkit.js stage/edge_tokens.js stage/stagekit.js factory/post.py factory/qc_edge.py   # 行の途中の // に飲まれたコード（3回起きた・#354）。落ちたら描かない
 grep -q "MK.phys" "$PAGE" && node factory/test_physbake.mjs   # 先に焼いた物理を使う型だけ：同じ spec で同じ表になるか（#354）
 python3 factory/score_edge.py "$OUT" "$VDIR" "$PJ"
+node factory/qc_seek.mjs   # 途中の時刻から描いても同じ絵か（#370：4つに分けて描くので、前のコマの状態に頼る型は区間の頭で絵が変わる）。落ちたら描かない
 FR=$(python3 -c "import json;print(json.load(open('$TL'))['frames'])"); END=$(python3 -c "import json;print(json.load(open('$TL'))['end'])"); Q=$((FR/4))
 # 動きのぶれは1コマに SUB 枚を重ねる（既定 8）。3D の型（全画面の CPU の WebGL）は1枚が約 0.3秒なので 4 にして約半分の時間にする（#356）
 rm -f "$OUT"/seg*.mp4

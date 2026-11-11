@@ -1,1 +1,0 @@
-{"script": "cycles_delonghi.py", "samples": 48, "interp": 60, "_comment": "3DCG（jmas #366）。cycles-product.yml が描き（熱の色 t_ も）、build.sh が Release cycles-<key> から取る。cycles_jobs.json は heat3d.html の CYCLES_JOBS（timing.json の写し）"}
