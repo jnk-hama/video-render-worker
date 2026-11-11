@@ -21,7 +21,7 @@ try:
     with urllib.request.urlopen(req, timeout=120) as r: print("Storage へ上げました（HTTP %d）" % r.status)
 except urllib.error.HTTPError as e: sys.exit("Storage へ上げられません（HTTP %d）" % e.code)
 q = {k: v for k, v in qc.items() if isinstance(v, dict)}
-notes = [f"コード動画（{P['template']}の型・商品そのものの 3D）",
+notes = [f"コード動画（{P['template']}の型）",   # 前は「商品そのものの 3D」と固定で書いていた＝実物の写真の型（real・film）でも 3D と伝えていた
          "点検 %d項目すべて合格（長さ %.1f秒・音量 %.1f LUFS・声と背景の差 %.1f dB）" % (len(q), q["長さ・大きさ・fps"]["秒"], q["ラウドネス"]["LUFS"], q["声と背景の差"]["dB"])]
 body = {"action": "notify_review", "clip_ids": [], "notes": notes, "post_texts": {k: post[k] for k in ("tiktok", "x") if post.get(k)},
         "title": P.get("name", P["product_key"])[:60], "job_id": job,
