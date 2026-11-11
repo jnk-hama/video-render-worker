@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- 映画の撮り方の型（film・#371）：オーナー「クオリティが下がってます…没入感、モーショングラフィック、カメラワーク」
+     real.html（白い台に写真を並べた＝スライドに見えた）をやめ、全画面の本物の映像の中でカメラが動く形にした。偽物感の原因だった 3DCG の商品は使わない（#370）。
+     ・世界＝本物の映像（Pexels）を最後まで全画面で流す。白い板で止めない
+     ・商品＝販売ページの実物の写真の切り抜き。映像の「中」に置くのではなく、カメラの手前の被写体として撮る：
+         ピント送り（奥の人にピント → 手前の実物へ送る＝奥がぼける）・視差（手前ほど大きく動く）・寄り
+     ・細部＝販売ページの寄りの実写真を、拡大鏡の丸い窓で見せる（カードにしない）。カメラは実物の上を一筆書きで下りる（フィン → タイマー → キャスター）
+     ・字＝映像の上は白い札、ぼけた明るい地の上は墨。数字は数え上げ
+     設計書：film.{cut_ar, clips{名前:{n}}, bg[{clip, from コマ, pp 往復}]（場面ごと）, points{名前:[x,y]（切り抜きの中の位置 0〜1）}, scenes{S1:{type, point, photo, ev{}}}}
+     時刻は timing.json（window.TIMELINE）。すべての値は時刻 T だけの関数（factory/qc_seek.mjs が描く前に見る） -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ground:#F4F5F7; --ink:#111A2E; --dim:#3F4759; --acc:#14284B; --hot:#A8320A; --line:#14284B; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:#0B1220; }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  #bg, #world, #prodlayer, #ui, #tone, #haze, #aura, #shadow, #grain, #dust { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+  #bg { overflow:hidden; background:#0B1220; }   /* 映像は背景（重なりの点検では字にも商品にも数えない） */
+  #bg img { position:absolute; left:0; top:0; width:1080px; height:1920px; display:none; transform-origin:50% 45%; }
+  #tone, #haze, #aura, #shadow, #dust { pointer-events:none; }
+  #world, #prodlayer { overflow:hidden; pointer-events:none; }
+  #over { position:absolute; left:0; top:0; }
+  #grain { top:150px; height:1770px; pointer-events:none; mix-blend-mode:overlay; opacity:.14; background-size:512px 512px; }
+  #hdr { position:absolute; left:0; top:0; width:1080px; height:150px; background:var(--ground); pointer-events:none; }
+  #hdr i { position:absolute; left:0; top:144px; width:1080px; height:6px; background:var(--line); }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln > .in { display:block; }
+  .tag { display:inline-block; background:#fff; color:var(--ink); padding:.10em .26em .16em; }   /* 明るい映像の上の字は白い札（映像を暗くしないで読ませる） */
+  .tag.k { background:var(--acc); color:#fff; }
+  .num { font-family:"Noto Sans JP"; font-weight:400; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.03em; }
+  .note { position:absolute; left:64px; width:520px; font:400 24px/1.45 "Noto Sans JP"; color:var(--dim); opacity:0; }
+  .note.pl { background:#fff; padding:6px 12px 8px; }
+  .plate { position:absolute; background:var(--acc); color:#fff; white-space:nowrap; padding:8px 16px 10px; font:500 26px/1 "Noto Sans JP"; letter-spacing:.06em; opacity:0; }
+  .pill { position:absolute; padding:14px 26px 16px; border-radius:999px; font:700 28px/1 "Noto Sans JP"; white-space:nowrap; opacity:0; background:var(--ink); color:#fff; }
+  #cut { position:absolute; display:none; }
+  #cut img { display:block; width:100%; height:100%; }
+  .loupe { position:absolute; border-radius:50%; overflow:hidden; display:none; box-shadow:0 0 0 6px #fff, 0 0 0 7px rgba(17,26,46,.22), 0 26px 60px rgba(17,26,46,.34); background:#DDE1E7; }
+  .loupe img { position:absolute; display:block; transform-origin:50% 50%; }
+  .loupe:after { content:""; position:absolute; inset:0; border-radius:50%; background:linear-gradient(140deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,0) 36%); }
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:#fff; border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ink); z-index:3; }
+  #credit { position:absolute; left:156px; top:178px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; color:#fff; background:rgba(17,26,46,.72); padding:6px 10px; border-radius:6px; z-index:3; }
+</style></head>
+<body>
+<div id="bg"><div id="tone"></div><div id="haze"></div><div id="aura"></div><div id="shadow"></div></div>
+<div id="world"></div>
+<div id="prodlayer" class="prod"></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"><defs><filter id="hb" x="-50%" y="-20%" width="200%" height="140%"><feGaussianBlur stdDeviation="2.2"/></filter></defs></svg>
+<svg id="dust" class="scrim" width="1080" height="1920" viewBox="0 0 1080 1920"><defs><filter id="db" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5"/></filter></defs></svg>
+<div id="hdr" class="scrim"><i></i></div>
+<div id="ui"><div id="pr">PR</div></div>
+<div id="grain" class="scrim"></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, F = P.film, { clamp, lerp } = EDGE, { el, sv, ln, reveal, note, $ } = SK;
+if (!F || !F.scenes) throw new Error("設計書に film.scenes が無い");
+const E = Object.assign({}, EDGE.E, { inOutSine: (x) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(x)), outCubic: (x) => 1 - Math.pow(1 - clamp(x), 3), outBack: (x) => { x = clamp(x); const c = 1.5; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); } });
+const evT = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b]));
+const DIR = `p/${P.product_key}/`, U = SK.U, T = () => SK.T, pad = (i) => String(i).padStart(4, "0"), TF = () => Math.round(T() * 60) / 60, WAITS = [];
+const SC = TL.scenes.map((s, i) => { const r = F.scenes[s.id]; if (!r) throw new Error(`film.scenes に ${s.id} が無い`); return Object.assign({ id: s.id, t0: s.t0, t1: s.t1, i, c: COPY[s.id] || {}, ev: {} }, r); });
+const last = SC[SC.length - 1], E_ = (s, k, d) => (s.ev && s.ev[k] ? evT(s.ev[k]) : d);
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+const show = (im, src) => { if (im.getAttribute("src") !== src) { im.setAttribute("src", src); WAITS.push(im.decode().catch(() => {})); } };
+const XF = 0.4, H0 = 1040, W0 = H0 * F.cut_ar, PT = F.points || {}, X0 = 500, AMB = "#E8590C";   // AMB＝図の橙（線・点・目盛り。字には使わない＝字は --hot）
+
+// =====================================================================
+// カメラ：場面ごとの「撮り方」を鍵にして、間をつなぐ（時刻だけの関数）
+//   鍵＝{ t, px, py（切り抜きの中の点 0〜1）, sx, sy（その点を置く画面の位置）, z（寄り）, f（ピント：1＝手前の実物・0＝奥の映像）, d（奥の明るさを少しだけ抑える量。暗くはしない＝「暗さは高級感ではない」#366）, lin（＝ゆっくり流す区間）}
+// =====================================================================
+const KEYS = [];
+const key = (t, px, py, sx, sy, z, f, d, lin) => KEYS.push({ t, px, py, sx, sy, z, f, d, lin });
+for (const s of SC) {
+  if (s.type === "hook") { const l2 = E_(s, "line2", s.t0 + 1.2);   // 実物にピント（奥の部屋はぼけている）→ 2行目でピントを部屋へ送る。カメラは横へ動きながら寄り、実物は手前でぼける
+    key(s.t0, 0.5, 0.5, 776, 1168, 1.04, 1, 0.25); key(l2 - 0.2, 0.5, 0.5, 762, 1160, 1.07, 1, 0.25, 1); key(l2 + 0.8, 0.5, 0.5, 968, 1300, 1.34, 0, 0); key(s.t1 - 0.1, 0.5, 0.5, 990, 1318, 1.37, 0, 0, 1);
+  } else if (s.type === "stat" || s.type === "rating") {   // 奥の映像が主役。実物は右下の手前でぼけて、ゆっくり流れる（奥行き）
+    key(s.t0 + 0.45, 0.5, 0.5, 1120, 1690, 1.5, 0, 0); key(s.t1 - 0.1, 0.5, 0.5, 1086, 1668, 1.52, 0, 0, 1);
+  } else if (s.type === "detail") { const p = PT[s.point]; if (!p) throw new Error(`film.points に ${s.point} が無い`); const z = s.zoom || 1.3, sy = s.sy || 900;   // 実物の左端は X0 に置いたまま、狙う点の高さへカメラが下りる
+    key(s.t0 + 0.5, p[0], p[1], X0 + p[0] * W0 * z, sy, z, 1, 0.25); key(s.t1 - 0.1, p[0], p[1], X0 + p[0] * W0 * (z + 0.04), sy - 16, z + 0.04, 1, 0.25, 1);
+  } else if (s.type === "end") { key(s.t0 + 0.6, 0.5, 0.5, 790, 1030, 0.98, 1, 0.25); key(TL.end, 0.5, 0.5, 780, 1016, 1.05, 1, 0.25, 1); }
+  else throw new Error(`${s.id} の type が違う: ${s.type}`); }
+KEYS.sort((a, b) => a.t - b.t);
+const NK = ["px", "py", "sx", "sy", "z", "f", "d"];
+const cam = (t) => { if (t <= KEYS[0].t) return KEYS[0]; for (let i = 1; i < KEYS.length; i++) if (t <= KEYS[i].t) { const a = KEYS[i - 1], b = KEYS[i], x = (t - a.t) / (b.t - a.t), u = b.lin ? x : E.inOutCubic(x), o = {}; for (const k of NK) o[k] = lerp(a[k], b[k], u); return o; } return KEYS[KEYS.length - 1]; };
+const box = (t) => { const c = cam(t), w = W0 * c.z, h = H0 * c.z; return { x: c.sx - c.px * w, y: c.sy - c.py * h, w, h, f: c.f, z: c.z, d: c.d }; };   // 実物の箱
+const at = (t, p) => { const b = box(t); return [b.x + p[0] * b.w, b.y + p[1] * b.h]; };   // 切り抜きの中の点 → 画面の位置
+
+// ---------- 映像（本物・30コマ/秒の連番）：bg を持つ場面で切り替える。前の映像から 0.4秒で溶かす。pp＝往復 ----------
+const tone = $("tone"), haze = $("haze"), aura = $("aura"), shadow = $("shadow");
+// 字の後ろの明るい霞（窓の光のにじみ）：字の地を暗くして作らない。場面の種類ごとに字の列の後ろへ [中心x, 中心y, 横, 縦]
+const HAZE = { stat: [250, 1150, 880, 500], detail: [230, 1040, 640, 600], rating: [260, 1150, 880, 470], end: [220, 800, 640, 800] };
+const BG = SC.filter((s) => F.bg[s.id]).map((s, k, arr) => { const b = F.bg[s.id], nx = arr[k + 1], c = F.clips[b.clip]; if (!c) throw new Error(`film.clips に ${b.clip} が無い`);
+  return { im: el("img", { alt: "" }, "", $("bg")), c, b, a: s.t0, z: nx ? nx.t0 + XF : TL.end + 1, first: k === 0 }; });
+for (const e of [tone, haze, aura, shadow]) $("bg").appendChild(e);
+const frameOf = (g, t) => { let i = Math.floor((t - g.a) * 30 + 1e-6) + (g.b.from || 0); const n = g.c.n; if (g.b.pp) { const m = 2 * (n - 1); i = ((i % m) + m) % m; if (i >= n) i = m - i; } return Math.min(n - 1, Math.max(0, i)); };
+U.push(() => { const t = T(), b = box(t), cx = b.x + b.w / 2, cy = b.y + b.h / 2; let cold = 0, warm = 0; const hz = [];
+  for (const g of BG) { const on = t >= g.a && t < g.z; g.im.style.display = on ? "block" : "none"; if (!on) continue;
+    show(g.im, `${DIR}fv/${g.b.clip}_${pad(frameOf(g, t))}.jpg`);
+    const u = clamp((t - g.a) / (g.z - g.a)), zb = 1.06 + 0.06 * u + (b.z - 1) * 0.08;   // 奥はゆっくり寄る。カメラが動くと手前の実物より小さく動く（視差）
+    g.im.style.transform = `translate(${(-(cx - 540) * 0.05).toFixed(2)}px, ${((g.b.dy || 0) - (cy - 960) * 0.03).toFixed(2)}px) scale(${zb.toFixed(4)})`;
+    g.im.style.filter = b.f > 0.01 || b.d > 0.01 ? `blur(${(22 * b.f).toFixed(2)}px) brightness(${(1 - 0.5 * b.d).toFixed(3)})` : "none";   // ピントが手前の実物に来ると、奥はぼける（白い実物が明るい部屋に溶けないよう、明るさを1割ほど抑える）
+    g.im.style.opacity = g.first ? 1 : E.inOutSine((t - g.a) / XF).toFixed(3); }
+  for (const s of SC) { const k = clamp((t - s.t0 - 0.1) / XF) * (s === last ? 1 : 1 - clamp((t - (s.t1 - 0.3)) / 0.3)), h = HAZE[s.type];
+    if (h && k > 0.002) hz.push(`radial-gradient(${h[2]}px ${h[3]}px at ${h[0]}px ${h[1]}px, rgba(255,255,255,${(0.86 * k).toFixed(3)}) 0%, rgba(255,255,255,${(0.74 * k).toFixed(3)}) 50%, rgba(255,255,255,0) 100%)`);
+    if (s.type !== "stat" && s.type !== "rating") continue;
+    if (s.tone === "cold2warm") { const c0 = E_(s, "c0", s.t0 + 1), g = E.inOutCubic((t - c0) / Math.max(0.1, E_(s, "c1", c0 + 1) - c0)); cold += k * (1 - g) * 0.20; warm += k * g * 0.24; } else warm += k * 0.06; }
+  tone.style.background = `linear-gradient(rgba(36,84,170,${cold.toFixed(3)}), rgba(36,84,170,${cold.toFixed(3)})), linear-gradient(rgba(255,150,60,${warm.toFixed(3)}), rgba(255,150,60,${warm.toFixed(3)}))`;
+  haze.style.background = hz.length ? hz.join(", ") : "none";
+  // 実物の後ろの暖かい光（図）：実物にピントがある間だけ。ゆっくり息をする
+  const ao = b.f * (0.26 + 0.06 * Math.sin(t * 1.7)), ar = 0.62 * b.h;
+  // 足元の影（実物を宙に浮かせない）。ピントが外れている間は影もぼける
+  { const sx = cx, sy = b.y + 0.955 * b.h, rx = 0.56 * b.w, ry = 0.045 * b.h, sa = 0.34 * b.f + 0.12;
+    shadow.style.background = `radial-gradient(${rx.toFixed(0)}px ${ry.toFixed(0)}px at ${sx.toFixed(0)}px ${sy.toFixed(0)}px, rgba(4,8,16,${sa.toFixed(3)}) 0%, rgba(4,8,16,${(sa * 0.45).toFixed(3)}) 55%, rgba(4,8,16,0) 100%)`; }
+  aura.style.background = ao > 0.004 ? `radial-gradient(${ar.toFixed(0)}px ${ar.toFixed(0)}px at ${cx.toFixed(0)}px ${(cy + 0.08 * b.h).toFixed(0)}px, rgba(255,160,80,${ao.toFixed(3)}) 0%, rgba(255,160,80,${(ao * 0.35).toFixed(3)}) 45%, rgba(255,160,80,0) 100%)` : "none"; });
+{ const g = $("grain"); g.style.backgroundImage = `url(${DIR}img/grain.png)`; U.push(() => { const f = Math.floor(T() * 30 + 1e-6); g.style.backgroundPosition = `${(f * 193) % 512}px ${(f * 331) % 512}px`; }); }
+// 手前を漂う光の粒：カメラと被写体の間の空気。正弦波の和（乱数なし）
+{ const N = 14, ds = Array.from({ length: N }, () => sv("circle", { fill: "#FFE9CF", filter: "url(#db)" }, $("dust")));
+  U.push(() => { const t = T(); ds.forEach((d, k) => { const a = k * 2.399, x = 540 + 520 * Math.sin(a * 1.7 + t * (0.05 + 0.011 * k)) + 60 * Math.sin(t * 0.7 + k), y = ((1920 + 300 * k - t * (14 + 3 * (k % 5))) % 2100 + 2100) % 2100 - 90;
+      d.setAttribute("cx", x.toFixed(1)); d.setAttribute("cy", y.toFixed(1)); d.setAttribute("r", (5 + (k % 4) * 3).toFixed(1)); d.setAttribute("opacity", (0.10 + 0.10 * (0.5 + 0.5 * Math.sin(t * 0.9 + k * 1.3))).toFixed(3)); }); }); }
+
+// ---------- 実物（販売ページの写真の切り抜き）：カメラの鍵どおりに置く。ピントが外れている間はぼかす ----------
+//   #world の .m に置く＝3px 以上ぼかした時は「奥行きの一部」として重なりの点検から外れる（ovl.mjs の既存の決まり）。ピントが合っている間は商品として字と重ならないかを見る
+const cutEl = el("div", { id: "cut", class: "m" }, `<img src="${DIR}img/cut.png" alt="">`, $("world"));
+U.push(() => { const t = T(), b = box(t), bl = 20 * (1 - b.f); cutEl.style.display = "block"; cutEl.style.left = b.x.toFixed(2) + "px"; cutEl.style.top = b.y.toFixed(2) + "px"; cutEl.style.width = b.w.toFixed(2) + "px"; cutEl.style.height = b.h.toFixed(2) + "px";
+  cutEl.style.filter = `${bl > 0.05 ? `blur(${bl.toFixed(2)}px) ` : ""}drop-shadow(0 ${(34 * b.z).toFixed(0)}px ${(40 * b.z).toFixed(0)}px rgba(17,26,46,0.26))`; });
+
+// ---------- 字の道具 ----------
+const line = (style, html, tin, tout, d = 0.8, track = [0.1, 0.0]) => { const e = ln(style, html); U.push(() => { reveal(e, tin, tout, d, 0.22);
+  if (track) e.firstElementChild.style.letterSpacing = lerp(track[0], track[1], E.outCubic((T() - tin) / 1.4)).toFixed(3) + "em"; }); return e; };
+const fade = (e, tin, tout, d = 0.35) => U.push(() => { const t = T(), a = clamp((t - tin) / d) * (1 - clamp((t - tout) / 0.22)); e.style.opacity = a.toFixed(3); e.style.visibility = a > 0.001 ? "visible" : "hidden"; });
+const vis = (e, a) => { e.style.opacity = a.toFixed(3); e.style.display = a > 0.001 ? "inline" : "none"; };
+const noteAt = (txt, x, y, w, tin, tout, cls) => { if (!txt) return; const n = note(txt, y, tin, tout); n.style.left = x + "px"; n.style.width = w + "px"; if (cls) n.classList.add(cls); };
+const countTo = (node, from, to, dec, t0, t1) => U.push(() => { node.textContent = (from + (to - from) * E.inOutCubic((TF() - t0) / Math.max(0.1, t1 - t0))).toFixed(dec || 0); });
+const tagged = (s, k) => `<span class="tag${k ? " k" : ""}">${s}</span>`;
+const wide = (s) => [...s].reduce((n, ch) => n + (ch.charCodeAt(0) < 128 ? 0.6 : 1), 0);   // 全角で何字ぶんか（見出しを列の幅に収める）
+
+// ---------- 場面ごとの字・拡大鏡・図 ----------
+for (const s of SC) { const c = s.c, out = s === last ? 99 : s.t1 - 0.3;
+  if (s.type === "hook") {   // 見出しは白い札。1コマ目から実物と見出しが見える
+    const l2 = E_(s, "line2", s.t0 + 1.2);
+    line(`left:64px;top:240px;font:500 26px/1.2 'Noto Sans JP'`, tagged(`${c.brand}<span style="opacity:.6">　―　</span>${c.series}`, 1), -1, out, 0.01, null);
+    line(`left:64px;top:306px;font:900 86px/1.2 'Noto Sans JP'`, tagged(c.hook), -1, out, 0.01, null);
+    if (c.hook2) line(`left:64px;top:430px;font:900 86px/1.2 'Noto Sans JP'`, tagged(c.hook2, 1), l2 - 0.05, out, 0.7, [0.06, 0.0]);
+    line(`left:64px;top:1226px;font:400 24px/1.2 'Noto Sans JP'`, tagged(P.target.who), -1, out, 0.01, null);
+    if (c.spec) line(`left:64px;top:1280px;font:700 40px/1.2 'Noto Sans JP'`, tagged(c.spec), -1, out, 0.01, null);
+    noteAt(c.note, 64, 1352, 372, -1, out, "pl");
+    // 2行目で、暖かさの輪が実物から部屋へ広がる（図）
+    const g = sv("g", {}), rings = Array.from({ length: 3 }, () => sv("circle", { fill: "none", stroke: "#FF9F45" }, g));
+    U.push(() => { const t = T(), o = 1 - clamp((t - out) / 0.22), q = at(t, [0.5, 0.55]); rings.forEach((r, k) => { const a = (t - (l2 + 0.1) - k * 0.36) / 1.6, v = a >= 0 && a < 1;
+        r.setAttribute("cx", q[0].toFixed(1)); r.setAttribute("cy", q[1].toFixed(1)); r.setAttribute("r", (160 + 900 * E.outCubic(a)).toFixed(1)); r.setAttribute("stroke-width", (26 * (1 - a)).toFixed(2)); r.style.opacity = (v ? 0.6 * (1 - a) * o : 0).toFixed(3); }); });
+  } else if (s.type === "stat") {   // 証拠の数字：映像の上に大きく。色が冷→暖へ
+    const tin = Math.max(s.t0 + 0.35, E_(s, "label", s.t0 + 0.35) - 0.05), tr = E_(s, "ring", tin + 0.6), c0 = E_(s, "c0", tin + 1.0), c1 = E_(s, "c1", c0 + 0.9);
+    if (c.label) line(`left:64px;top:880px;font:500 26px/1.2 'Noto Sans JP'`, tagged(c.label), tin, out, 0.6, null);
+    if (c.room) line(`left:64px;top:946px;font:700 96px/1 'Noto Sans JP'`, c.room.replace(/^([\d.]+)/, `<span class="num" style="font-weight:300;font-size:108px">$1</span>`), tin + 0.15, out, 0.8, null);
+    if (c.mins) { const cx = 420, cy = 1000, RR = 62, C = 2 * Math.PI * RR, trk = sv("circle", { cx, cy, r: RR, fill: "none", stroke: "rgba(17,26,46,.16)", "stroke-width": 6 }), arc = sv("circle", { cx, cy, r: RR, fill: "none", stroke: AMB, "stroke-width": 8, "stroke-linecap": "round", transform: `rotate(-90 ${cx} ${cy})`, "stroke-dasharray": `0 ${C}` });
+      const m = el("div", { style: `position:absolute;left:${cx - 60}px;top:${cy - 24}px;width:120px;text-align:center;white-space:nowrap` }, `<span class="num" style="font-size:46px;line-height:1">${c.mins}</span><span style="font:700 24px/1 'Noto Sans JP';margin-left:2px">${c.mins_unit || ""}</span>`); fade(m, tr - 0.1, out);
+      U.push(() => { const t = T(), a = clamp((t - (tr - 0.15)) / 0.3) * (1 - clamp((t - out) / 0.22)); for (const e of [trk, arc]) e.style.opacity = a.toFixed(3); arc.setAttribute("stroke-dasharray", `${(C * E.inOutSine((t - tr) / 1.1)).toFixed(2)} ${C.toFixed(2)}`); }); }
+    if (c.to) { const big = line(`left:64px;top:1064px;font-size:236px;line-height:1`, `<span class="num">${c.from}</span><span style="font:700 92px/1 'Noto Sans JP';margin-left:10px">${c.unit || ""}</span>`, c0 - 0.3, out, 0.7, null);
+      countTo(big.querySelector(".num"), +c.from, +c.to, 0, c0, c1); }
+    noteAt(c.note, 64, 1322, 600, tin, out);
+  } else if (s.type === "detail") {   // 実物の上をカメラが下りる。細部は拡大鏡（販売ページの寄りの実写真）＋狙う点への線
+    const tin = s.t0 + 0.35, ph = s.photo, th = E_(s, "head", tin + 0.2), ts = E_(s, "sub", th + 0.3), tn = E_(s, "num", th + 0.8), p = PT[s.point], LX = 286, LY = 520, LR = 200;
+    const lp = el("div", { class: "loupe", style: `left:${LX - LR}px;top:${LY - LR}px;width:${2 * LR}px;height:${2 * LR}px` }, `<img src="${DIR}img/${ph.src}" alt="">`, $("prodlayer")), im = lp.firstElementChild;
+    { const k = Math.max(2 * LR / ph.w, 2 * LR / ph.h) * (ph.k || 1.04); im.style.width = (ph.w * k).toFixed(1) + "px"; im.style.height = (ph.h * k).toFixed(1) + "px"; im.style.left = (LR - ph.w * k * (ph.cx || 0.5)).toFixed(1) + "px"; im.style.top = (LR - ph.h * k * (ph.cy || 0.5)).toFixed(1) + "px"; im.style.transformOrigin = `${(100 * (ph.cx || 0.5)).toFixed(0)}% ${(100 * (ph.cy || 0.5)).toFixed(0)}%`; }
+    const ln2 = sv("line", { stroke: "#14284B", "stroke-width": 3, "stroke-linecap": "round" }), dot = sv("circle", { r: 9, fill: AMB, stroke: "#fff", "stroke-width": 3 }), halo = sv("circle", { fill: "none", stroke: AMB, "stroke-width": 3 });
+    const ticks = s.ticks ? Array.from({ length: 96 }, (_, k) => { const a = -Math.PI / 2 + 2 * Math.PI * k / 96, r0 = LR + 20, r1 = LR + (k % 4 ? 32 : 42); return sv("line", { x1: (LX + r0 * Math.cos(a)).toFixed(1), y1: (LY + r0 * Math.sin(a)).toFixed(1), x2: (LX + r1 * Math.cos(a)).toFixed(1), y2: (LY + r1 * Math.sin(a)).toFixed(1), "stroke-width": 4, "stroke-linecap": "round" }); }) : null;
+    const tk = E_(s, "fig", ts), ON = (k) => (s.ticks || []).some(([a, b]) => k >= a && k < b);
+    U.push(() => { const t = T(), a = E.outBack((t - tin) / 0.55), o = 1 - clamp((t - out) / 0.25), on = t >= tin && t < out + 0.26, q = at(t, p);
+      lp.style.display = on ? "block" : "none"; lp.style.transform = `scale(${(0.6 + 0.4 * a).toFixed(4)})`; lp.style.opacity = (clamp((t - tin) / 0.2) * o).toFixed(3);
+      im.style.transform = `scale(${(1.18 - 0.16 * clamp((t - tin) / (out - tin))).toFixed(4)})`;
+      const u = E.outCubic((t - (tin + 0.25)) / 0.5), dx = q[0] - LX, dy = q[1] - LY, L = Math.hypot(dx, dy) || 1, x0 = LX + dx / L * (LR + 8), y0 = LY + dy / L * (LR + 8);   // 拡大鏡の縁から、実物の狙う点へ
+      ln2.setAttribute("x1", x0.toFixed(1)); ln2.setAttribute("y1", y0.toFixed(1)); ln2.setAttribute("x2", lerp(x0, q[0], u).toFixed(1)); ln2.setAttribute("y2", lerp(y0, q[1], u).toFixed(1));
+      const va = on && u > 0 ? o : 0, vd = va * clamp((u - 0.85) / 0.15); ln2.style.opacity = va.toFixed(3); dot.setAttribute("cx", q[0].toFixed(1)); dot.setAttribute("cy", q[1].toFixed(1)); dot.style.opacity = vd.toFixed(3);
+      const hp = ((t - tin) % 1.3) / 1.3; halo.setAttribute("cx", q[0].toFixed(1)); halo.setAttribute("cy", q[1].toFixed(1)); halo.setAttribute("r", (12 + 40 * hp).toFixed(1)); halo.style.opacity = (vd * (1 - hp)).toFixed(3);
+      if (ticks) { let n = 0; ticks.forEach((e, k) => { const lit = ON(k) ? clamp((t - (tk + n++ * 0.02)) / 0.1) : 0; e.setAttribute("stroke", lit > 0.5 ? AMB : "rgba(17,26,46,.38)"); e.style.opacity = (clamp((t - (tin + 0.2 + k * 0.004)) / 0.2) * o * (on ? 1 : 0)).toFixed(3); }); } });
+    if (s.fx === "heat") {   // 熱のゆらぎ（図）：実物の上へ立ちのぼる線。乱数なし
+      const g = sv("g", { filter: "url(#hb)" }), N = 6, ps = Array.from({ length: N }, () => sv("path", { fill: "none", stroke: AMB, "stroke-width": 5, "stroke-linecap": "round" }, g));
+      U.push(() => { const t = T(), b = box(t), a = clamp((t - th) / 0.6) * (1 - clamp((t - out) / 0.25)); vis(g, a); if (a <= 0.001) return;
+        ps.forEach((pe, k) => { const x0 = b.x + (0.40 + 0.11 * k) * b.w, y0 = b.y + (0.075 - 0.011 * k) * b.h, ph = t * (1.6 + 0.13 * k) + k * 1.9; let d = "";
+          for (let j = 0; j <= 14; j++) { const u = j / 14, yy = y0 - 12 - u * (230 + 26 * (k % 3)), xx = x0 + (10 + 22 * u) * Math.sin(u * 5.2 - ph) + 14 * u; d += `${j ? "L" : "M"}${xx.toFixed(1)} ${yy.toFixed(1)}`; }
+          pe.setAttribute("d", d); pe.setAttribute("stroke-dasharray", "1 0"); pe.style.opacity = (0.34 + 0.14 * Math.sin(t * 1.3 + k)).toFixed(3); }); }); }
+    let y = 800; const hp = c.head_px || Math.min(56, Math.floor(424 / wide(c.head)));   // 字は拡大鏡の下・左の列（実物は x≥X0）
+    line(`left:64px;top:${y}px;font:900 ${hp}px/1.15 'Noto Sans JP'`, c.head, th - 0.1, out); y += hp + 32;
+    if (c.sub) { line(`left:64px;top:${y}px;font:500 32px/1 'Noto Sans JP';color:var(--acc)`, c.sub, ts - 0.1, out, 0.8, [0.1, 0.02]); y += 72; }
+    if (c.big) { if (c.pre) line(`left:64px;top:${y + 14}px;font:700 32px/1 'Noto Sans JP'`, c.pre, tn - 0.4, out, 0.7, [0.1, 0.02]);
+      const big = line(`left:${c.pre ? 64 + Math.ceil(wide(c.pre) * 32) + 12 : 64}px;top:${y}px;font-size:170px;line-height:1;color:var(--hot)`, `<span class="num">0</span><span style="font:700 60px/1 'Noto Sans JP';margin-left:4px">${c.unit || ""}</span>`, tn - 0.35, out, 0.7, null); countTo(big.querySelector(".num"), 0, +c.big, c.dec, tn - 0.3, tn + 0.4); y += 200; }
+    if (c.tag) { const tg = el("div", { class: "plate", style: `left:64px;top:${y + 4}px` }, c.tag); fade(tg, E_(s, "tag", ts + 0.2), out); y += 70; }
+    noteAt(c.note, 64, Math.max(y + 16, 1230), 400, tin, out);
+  } else if (s.type === "rating") {   // 評価（山場）：数え上げと星
+    const tin = s.t0 + 0.25, td = E_(s, "dot", tin + 1.0), val = parseFloat(c.score);
+    const sc = line(`left:64px;top:930px;font-size:260px;line-height:1`, `<span class="num">0.00</span>`, tin, out, 0.7, null);
+    const STAR = "M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z", g = sv("g", {}), cp = sv("clipPath", { id: `sc${s.i}` }, g), cr = sv("rect", { x: 66, y: 1202, height: 60, width: 0 }, cp);
+    for (const [fill, clip] of [["rgba(17,26,46,.16)", null], ["#F5A300", `url(#sc${s.i})`]]) { const gg = sv("g", clip ? { "clip-path": clip } : {}, g); for (let k = 0; k < 5; k++) sv("path", { d: STAR, fill, transform: `translate(${90 + k * 58}, 1232)` }, gg); }
+    line(`left:380px;top:1216px;font:500 34px/1 'Noto Sans JP'`, c.count_label, td - 0.1, out, 0.8, [0.12, 0.04]);
+    line(`left:64px;top:1284px;font:400 24px/1 'Noto Sans JP';color:var(--dim)`, c.date, td - 0.05, out, 0.8, null);
+    noteAt(c.note, 64, 1340, 600, tin, out);
+    U.push(() => { const t = T(), k = E.inOutCubic((TF() - tin) / (td + 0.3 - tin)); sc.querySelector(".num").textContent = (k * val).toFixed(2); vis(g, clamp((t - tin) / 0.3) * (1 - clamp((t - out) / 0.22))); cr.setAttribute("width", (278 * k * val / 5).toFixed(1)); });
+  } else if (s.type === "end") {   // 締め：実物にピント・名前・要点・行動
+    const tin = s.t0 + 0.45, tn = E_(s, "name", tin + 0.2), tc = E_(s, "cta", tn + 1.6), tp = E_(s, "press", tc + 0.5);
+    const pl = el("div", { class: "plate", style: "left:64px;top:250px" }, c.brand); fade(pl, tin, 99);
+    line(`left:64px;top:316px;font:900 60px/1.15 'Noto Sans JP'`, c.head, tn - 0.1, 99, 0.9);
+    if (c.sub) line(`left:64px;top:404px;font:500 30px/1 'Noto Sans JP';color:var(--acc)`, c.sub, tn + 0.3, 99, 0.8, [0.1, 0.02]);
+    (c.points || []).forEach((p, k) => { const e = el("div", { style: `position:absolute;left:64px;top:${600 + k * 74}px;font:500 30px/1 'Noto Sans JP';white-space:nowrap;opacity:0` }, `<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${AMB};margin-right:14px;vertical-align:2px"></span>${p}`);
+      U.push(() => { const a = E.outCubic((T() - (tn + 0.6 + k * 0.18)) / 0.5); e.style.opacity = a.toFixed(3); e.style.transform = `translateX(${((1 - a) * -24).toFixed(2)}px)`; }); });
+    const cta = el("div", { class: "pill", style: "left:64px;top:1290px" }, c.cta);
+    U.push(() => { const t = T(), a = E.outCubic((t - tc) / 0.5), pr = Math.sin(Math.PI * clamp((t - tp) / 0.3)); cta.style.opacity = a.toFixed(3); cta.style.transform = `translateY(${((1 - a) * 24).toFixed(2)}px) scale(${(1 - 0.05 * pr).toFixed(4)})`; });
+    noteAt(c.note, 64, 600 + (c.points || []).length * 74 + 40, 372, tin + 0.2, 99); } }
+
+SK.boot([300, 400, 500, 700, 900]);
+window.READY = window.READY.then(async () => { for (const w of [400, 900]) await document.fonts.load(`${w} 40px "Noto Sans JP"`, $("ui").textContent + "0123456789.℃畳分時→"); window.seek(0); await Promise.all(WAITS); return true; });
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+</script>
+</body></html>

@@ -1,4 +1,4 @@
-# 下ごしらえ（real の型・デロンギ v2・#370）： python3 prep.py <取った素材 dl-<key>> <出力 p/<key>/b3d>
+# 下ごしらえ（film の型・デロンギ v3・#371。real v2 と同じ素材で、部屋の映像だけ全編を取る）： python3 prep.py <取った素材 dl-<key>> <出力 p/<key>/b3d>
 #   商品は販売ページの実物の写真だけ（3DCG で作らない）。場面は Pexels の本物の映像（商用可・帰属は credits.json）。
 #   ★写真の画素は描き変えない：切り抜く・範囲を切る・拡大する（Lanczos）だけ。店の飾り文字（橙の札）が入らない範囲を切る
 #   入力：asp0＝本体（白地）・asp1＝フィンの寄り・asp2＝タイマー・asp3＝キャスター（assets.json の順）／vid0＝本を読む人・vid1＝窓の雪・vid2＝眠る猫
@@ -29,7 +29,7 @@ for name, (asp, bx) in CROPS.items():
     im.save(os.path.join(img, f"{name}.jpg"), quality=93); print(name, im.size)
 
 # 3) 映像のコマ（開始秒・長さ）。場面の長さ＋溶かす分。30コマ/秒・1080×1920
-CLIPS = {"a": ("vid0", 0.3, 3.6), "b": ("vid1", 2.0, 5.6), "c": ("vid2", 0.4, 3.2)}
+CLIPS = {"a": ("vid0", 0.2, 10.6), "b": ("vid1", 2.0, 5.6), "c": ("vid2", 0.4, 3.2)}   # a＝部屋の映像は全編（film の型：見出し・細部3場面・締めの奥に使う）
 for k, (v, ss, dur) in CLIPS.items():
     subprocess.run([FF, "-v", "error", "-y", "-ss", str(ss), "-t", str(dur), "-i", os.path.join(src, v + ".mp4"),
                     "-vf", "fps=30,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920", "-q:v", "3", "-start_number", "0", os.path.join(fv, f"{k}_%04d.jpg")], check=True)

@@ -1,5 +1,5 @@
 {
- "_comment": "素材の取り方（edge-video.yml）。v2（jmas #370）：商品は販売ページの実物の写真だけ・場面は Pexels の本物の映像。asp_images の順が dl の asp0〜3（本体・フィン・タイマー・キャスター）、videos の順が vid0〜2（本を読む人・窓の雪・眠る猫）。prep.py が切り抜き・切り出し・コマ出しをする",
+ "_comment": "素材の取り方（edge-video.yml）。v3（jmas #371・film の型）：商品は販売ページの実物の写真だけ・場面は Pexels の本物の映像を全画面で。asp_images の順が dl の asp0〜3（本体・フィン・タイマー・キャスター）、videos の順が vid0〜2（本を読む人・窓の雪・眠る猫）。prep.py が切り抜き・切り出し・コマ出しをする",
  "asp_images": [
   "https://shop.r10s.jp/delonghi/cabinet/06618479/item/heater/imgrc0080140288.jpg",
   "https://image.rakuten.co.jp/delonghi/cabinet/06618479/item/heater/0108776315_2.jpg",
