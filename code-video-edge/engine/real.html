@@ -32,7 +32,7 @@
   .note.w { color:#E9EDF5; }
   .plate { position:absolute; background:var(--acc); color:#fff; white-space:nowrap; padding:8px 16px 10px; font:500 26px/1 "Noto Sans JP"; letter-spacing:.06em; opacity:0; }
   .pill { position:absolute; padding:12px 24px; border:2px solid var(--ink); border-radius:999px; font:500 28px/1 "Noto Sans JP"; color:var(--ink); white-space:nowrap; opacity:0; }
-  .card { position:absolute; overflow:hidden; border-radius:18px; box-shadow:0 30px 60px rgba(17,26,46,.20), 0 2px 0 rgba(255,255,255,.6) inset; background:#E9EBEF; opacity:0; }
+  .card { position:absolute; overflow:hidden; background:#E9EBEF; opacity:0; }   /* 細部の写真は画面の端まで届く帯（角丸・影・傾きなし）。カードに見せない（オーナー「カード感が強くて安っぽい」#357） */
   .card img { position:absolute; left:0; top:0; display:block; transform-origin:50% 50%; }
   #cut, #cut2, #cut3 { position:absolute; display:none; filter:drop-shadow(0 26px 30px rgba(17,26,46,.22)); }   /* 初期は隠す（置き場が決まるまで見せない） */
   #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:#fff; border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ink); z-index:3; }
@@ -92,11 +92,11 @@ const prod = $("prodlayer");
 // 実物の切り抜き（販売ページの写真）。置き場は場面ごと：[x, 下端 y, 高さ]
 const CUT_AR = 666 / 1224, cut = el("img", { id: "cut", src: `${DIR}img/cut.png`, alt: "" }, "", prod);
 const putCut = (im, x, bottom, h, a = 1) => { im.style.height = h.toFixed(1) + "px"; im.style.width = (h * CUT_AR).toFixed(1) + "px"; im.style.left = x.toFixed(1) + "px"; im.style.top = (bottom - h).toFixed(1) + "px"; im.style.opacity = a.toFixed(3); im.style.display = a > 0.001 ? "block" : "none"; };
-// 細部の写真のカード（横から入って、次のカードに押されて出る）
-const card = (src, x, y, w, h, iw, ih, tin, tout) => { const c = el("div", { class: "card", style: `left:${x}px;top:${y}px;width:${w}px;height:${h}px` }, `<img src="${DIR}img/${src}" style="width:${iw}px;height:${ih}px;left:${(w - iw) / 2}px;top:${(h - ih) / 2}px">`, prod);
-  U.push(() => { const t = T(), a = E.outCubic((t - tin) / 0.55), o = E.inCubic((t - tout) / 0.35), k = clamp((t - tin) / (tout - tin + 0.35));
-    c.style.opacity = (clamp((t - tin) / 0.2) * (1 - clamp((t - tout) / 0.35))).toFixed(3); c.style.display = t >= tin && t < tout + 0.36 ? "block" : "none";
-    c.style.transform = `translateX(${((1 - a) * 260 - o * 320).toFixed(2)}px) rotate(${((1 - a) * 2.4).toFixed(3)}deg)`;
+// 細部の写真の帯（端から幕が開くように現れ、次の場面で閉じる。中の写真はゆっくり引く）。side＝どちらの端に付くか
+const card = (src, x, y, w, h, iw, ih, tin, tout, side = "left") => { const c = el("div", { class: "card", style: `left:${x}px;top:${y}px;width:${w}px;height:${h}px` }, `<img src="${DIR}img/${src}" style="width:${iw}px;height:${ih}px;left:${(w - iw) / 2}px;top:${(h - ih) / 2}px">`, prod);
+  U.push(() => { const t = T(), a = E.outCubic((t - tin) / 0.6), o = E.inCubic((t - tout) / 0.35), k = clamp((t - tin) / (tout - tin + 0.35)), cut = (1 - a + o) * 100;
+    c.style.opacity = 1; c.style.display = t >= tin && t < tout + 0.36 ? "block" : "none";
+    c.style.clipPath = side === "left" ? `inset(0 ${cut.toFixed(2)}% 0 0)` : `inset(0 0 0 ${cut.toFixed(2)}%)`;
     c.firstElementChild.style.transform = `scale(${(1.24 - 0.22 * k).toFixed(4)})`; }); return c; };
 const kicker = (txt, y, tin, tout) => line(`left:64px;top:${y}px;font:500 26px/1 'Noto Sans JP';color:var(--dim)`, txt, tin, tout, 0.7, [0.3, 0.16]);
 const NOTE_Y = 1330;
@@ -141,37 +141,37 @@ const NOTE_Y = 1330;
 
 // ---------- S3：フィン（実物の寄りの写真）・15か所の穴・表面 約80℃ ----------
 { const c = COPY.S3, tin = s3.t0 + 0.2, out = s3.t1 - 0.3;
-  card("fin.jpg", 64, 250, 560, 470, 560, 470, tin - 0.1, out);
-  line(`left:644px;top:296px;font:700 36px/1 'Noto Sans JP'`, c.pre, ev("hachijuu") - 0.4, out, 0.7, [0.1, 0.02]);
-  const big = line(`left:636px;top:350px;font-size:170px;line-height:1;color:var(--hot)`, `<span class="num" style="font-weight:400">0</span><span style="font:700 56px/1 'Noto Sans JP';margin-left:4px">${c.unit}</span>`, ev("hachijuu") - 0.35, out, 0.7, null);
+  card("fin.jpg", 0, 230, 610, 470, 620, 520, tin - 0.1, out);   // 帯は PR の札の下から（札に写真を重ねない）
+  line(`left:660px;top:250px;font:700 36px/1 'Noto Sans JP'`, c.pre, ev("hachijuu") - 0.4, out, 0.7, [0.1, 0.02]);
+  const big = line(`left:652px;top:304px;font-size:170px;line-height:1;color:var(--hot)`, `<span class="num" style="font-weight:400">0</span><span style="font:700 56px/1 'Noto Sans JP';margin-left:4px">${c.unit}</span>`, ev("hachijuu") - 0.35, out, 0.7, null);
   U.push(() => { big.querySelector(".num").textContent = String(Math.round(+c.big * E.inOutCubic((TF() - (ev("hachijuu") - 0.3)) / 0.7))); });
-  kicker(c.head, 764, tin + 0.1, out);
-  line(`left:64px;top:810px;font:900 56px/1.15 'Noto Sans JP'`, c.sub, ev("ana") - 0.1, out, 0.8, [0.1, 0.0]);
-  const n = note(c.note, 906, tin, out); n.style.width = "400px"; }
+  kicker(c.head, 716, tin + 0.1, out);
+  line(`left:64px;top:762px;font:900 56px/1.15 'Noto Sans JP'`, c.sub, ev("ana") - 0.1, out, 0.8, [0.1, 0.0]);
+  const n = note(c.note, 858, tin, out); n.style.width = "400px"; }
 
 // ---------- S4：タイマー（実物の写真）・24時間を 15分ずつ＝96コマの帯が順に点く ----------
 { const c = COPY.S4, tin = s4.t0 + 0.1, out = s4.t1 - 0.3;
-  card("timer.jpg", 64, 250, 952, 511, 952, 511, tin - 0.05, out);
-  kicker("タイマー", 806, tin + 0.1, out);
-  line(`left:64px;top:852px;font:900 84px/1.15 'Noto Sans JP'`, c.head, tin + 0.15, out, 0.8, [0.1, 0.0]);
-  line(`left:64px;top:974px;font:500 40px/1 'Noto Sans JP';color:var(--acc)`, c.sub, ev("pin") - 0.1, out, 0.8, [0.1, 0.02]);
+  card("timer.jpg", 0, 230, 1080, 530, 1080, 580, tin - 0.05, out);
+  kicker("タイマー", 776, tin + 0.1, out);
+  line(`left:64px;top:822px;font:900 84px/1.15 'Noto Sans JP'`, c.head, tin + 0.15, out, 0.8, [0.1, 0.0]);
+  line(`left:64px;top:944px;font:500 40px/1 'Noto Sans JP';color:var(--acc)`, c.sub, ev("pin") - 0.1, out, 0.8, [0.1, 0.02]);
   // 24時間の帯（96コマ）。6〜9時と 18〜23時が点く例（図）
-  const g = sv("g", {}), x0 = 64, x1 = 900, y = 1076, w = (x1 - x0) / 96, cells = Array.from({ length: 96 }, (_, k) => sv("rect", { x: (x0 + k * w + 1).toFixed(2), y, width: (w - 2).toFixed(2), height: 50, rx: 2, fill: "#C9CED8" }, g));
+  const g = sv("g", {}), x0 = 64, x1 = 900, y = 1046, w = (x1 - x0) / 96, cells = Array.from({ length: 96 }, (_, k) => sv("rect", { x: (x0 + k * w + 1).toFixed(2), y, width: (w - 2).toFixed(2), height: 50, rx: 2, fill: "#C9CED8" }, g));
   [0, 6, 12, 18, 24].forEach((h) => { const e = el("div", { style: `position:absolute;left:${x0 + (x1 - x0) * h / 24 - (h === 24 ? 56 : h ? 16 : 0)}px;top:${y + 62}px;font:500 24px/1 'Noto Sans JP';color:var(--dim);white-space:nowrap` }, `${h}時`); fade(e, ev("timer") - 0.2, out); });
   const ON = (k) => (k >= 24 && k < 36) || (k >= 72 && k < 92);
   U.push(() => { const t = T(), a = clamp((t - (ev("timer") - 0.3)) / 0.3) * (1 - clamp((t - out) / 0.22)); vis(g, a); let n = 0;
     cells.forEach((r, k) => { if (!ON(k)) return; const u = clamp((t - (ev("timer") + n * 0.022)) / 0.12); n++; r.setAttribute("fill", u > 0.5 ? ACC : "#C9CED8"); r.setAttribute("y", (y - 10 * Math.sin(Math.PI * u)).toFixed(2)); }); });
-  const n = note(c.note, 1250, tin, out); n.style.width = "400px"; }
+  const n = note(c.note, 1220, tin, out); n.style.width = "400px"; }
 
 // ---------- S5：キャスター（実物の写真は右）・折りたたみ式。左に実物の全身 ----------
 { const c = COPY.S5, tin = s5.t0 + 0.1, out = s5.t1 - 0.3;
-  card("caster.jpg", 520, 250, 496, 562, 496, 562, tin - 0.05, out);
+  card("caster.jpg", 540, 230, 540, 560, 540, 612, tin - 0.05, out, "right");
   const c2 = el("img", { id: "cut3", src: `${DIR}img/cut.png`, alt: "" }, "", prod);
   U.push(() => { const t = T(), a = E.outCubic((t - tin) / 0.7), o = E.inCubic((t - (out + 0.1)) / 0.3); const k = t - s5.t0; putCut(c2, 6 + 22 * k - (1 - a) * 420, 1470 + o * 600 + 8 * k, 900 + 10 * k, t >= tin && t < s6.t0 + 0.2 ? 1 : 0); });
   kicker(c.sub, 262, tin + 0.1, out);
   line(`left:64px;top:306px;font:900 72px/1.15 'Noto Sans JP'`, c.head, Math.max(tin + 0.1, ev("fold") - 0.35), out, 0.8, [0.1, 0.0]);
   line(`left:64px;top:412px;font:500 38px/1 'Noto Sans JP';color:var(--acc)`, c.tag, ev("fold") + 0.1, out, 0.8, [0.1, 0.02]);
-  const n = note(c.note, 870, tin, out); n.style.left = "540px"; n.style.width = "440px"; }
+  const n = note(c.note, 800, tin, out); n.style.left = "600px"; n.style.width = "300px"; }
 
 // ---------- S6：評価（山場）。眠る猫の映像の上に、数え上げと星 ----------
 { const c = COPY.S6, tin = s6.t0 + 0.25, out = s6.t1 - 0.3, val = parseFloat(c.score), W = "#FFFFFF";
