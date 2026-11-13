@@ -20,11 +20,15 @@ req = urllib.request.Request(f"https://{host}/storage/v1/object/videos/{path}", 
 try:
     with urllib.request.urlopen(req, timeout=120) as r: print("Storage へ上げました（HTTP %d）" % r.status)
 except urllib.error.HTTPError as e: sys.exit("Storage へ上げられません（HTTP %d）" % e.code)
+# 商品の写真の住所（販売ページの1枚目）。products/<key>/assets.json の asp_images の先頭。無ければ空（写真なしで並ぶ）
+try: image_url = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "products", P["product_key"], "assets.json")))["asp_images"][0]
+except (OSError, KeyError, IndexError, ValueError): image_url = ""
 q = {k: v for k, v in qc.items() if isinstance(v, dict)}
 notes = [f"コード動画（{P['template']}の型）",   # 前は「商品そのものの 3D」と固定で書いていた＝実物の写真の型（real・film）でも 3D と伝えていた
          "点検 %d項目すべて合格（長さ %.1f秒・音量 %.1f LUFS・声と背景の差 %.1f dB）" % (len(q), q["長さ・大きさ・fps"]["秒"], q["ラウドネス"]["LUFS"], q["声と背景の差"]["dB"])]
 body = {"action": "notify_review", "clip_ids": [], "notes": notes, "post_texts": {k: post[k] for k in ("tiktok", "x") if post.get(k)},
         "title": P.get("name", P["product_key"])[:60], "job_id": job,
+        "affiliate_url": P.get("affiliate_url", ""), "image_url": image_url,   # TikTok の列（jmas #374）とリンク先のページに使う。形は video-scene が確かめる
         "video_url": f"https://{host}/storage/v1/object/public/videos/{path}"}
 req = urllib.request.Request(f"https://{host}/functions/v1/video-scene", data=json.dumps(body).encode(), headers=dict(H, **{"Content-Type": "application/json"}))
 try:
