@@ -1,17 +1,8 @@
 {
- "generated_at": "2026-11-12T11:31:38+00:00",
+ "generated_at": "2026-11-13T11:14:27+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
-   {
-    "id": "t3_1xonfu7",
-    "title": "GeoGuessr expert helps an adoptee find the exact location of the only photo they have of their late mother.",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xonfu7/geoguessr_expert_helps_an_adoptee_find_the_exact/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
    {
     "id": "t3_1xrrm2n",
     "title": "Beating failure with dignity",
@@ -49,6 +40,15 @@
     "source": "rss"
    },
    {
+    "id": "t3_1xpbrgc",
+    "title": "This shit triggers my claustrophobia everytime",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xpbrgc/this_shit_triggers_my_claustrophobia_everytime/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
     "id": "t3_1xtmivp",
     "title": "Wildlife in barren fields after forests were burned for palm oil plantations in Indonesia",
     "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xtmivp/wildlife_in_barren_fields_after_forests_were/",
@@ -76,64 +76,64 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xr70bd",
-    "title": "Terrifying sculpture at an abandoned mausoleum in Poland",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xr70bd/terrifying_sculpture_at_an_abandoned_mausoleum_in/",
+    "id": "t3_1xu5vyi",
+    "title": "Mutated fish found in Mekong River, Myanmar, possibly caused by toxic water contamination from rare earth mining.",
+    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xu5vyi/mutated_fish_found_in_mekong_river_myanmar/",
     "subreddit": "Damnthatsinteresting",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xqui0g",
-    "title": "Acting like you're pulling someone over",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xqui0g/acting_like_youre_pulling_someone_over/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xqy53z",
+    "title": "Total overreaction perhaps",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xqy53z/total_overreaction_perhaps/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xqug42",
-    "title": "Fan jumps on the apron and slaps a luchador after the main event, gets knocked out cold",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xqug42/fan_jumps_on_the_apron_and_slaps_a_luchador_after/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xthnz7",
+    "title": "Big Bruce is enjoying life",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xthnz7/big_bruce_is_enjoying_life/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xp8xnm",
-    "title": "Let me punch someone in front of the police",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xp8xnm/let_me_punch_someone_in_front_of_the_police/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xpmbvx",
+    "title": "Going for fast break at a basketball game",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xpmbvx/going_for_fast_break_at_a_basketball_game/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xrqezr",
-    "title": "Shoulder traffic skipper gets instant karma",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xrqezr/shoulder_traffic_skipper_gets_instant_karma/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xtt299",
+    "title": "Will we eat cake or not?",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xtt299/will_we_eat_cake_or_not/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xpa5vd",
-    "title": "Guy tries stealing iPhones",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xpa5vd/guy_tries_stealing_iphones/",
-    "subreddit": "WinStupidPrizes",
+    "id": "t3_1xq1s61",
+    "title": "Waxing your nose, what could possibly go wrong?",
+    "url": "https://www.reddit.com/r/Unexpected/comments/1xq1s61/waxing_your_nose_what_could_possibly_go_wrong/",
+    "subreddit": "Unexpected",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xqv0j8",
-    "title": "Looks like he's got all his bases covered",
-    "url": "https://www.reddit.com/r/ContagiousLaughter/comments/1xqv0j8/looks_like_hes_got_all_his_bases_covered/",
-    "subreddit": "ContagiousLaughter",
+    "id": "t3_1xsh63v",
+    "title": "It was a BIG problem, until it wasn't (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xsh63v/it_was_a_big_problem_until_it_wasnt_source_link/",
+    "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -141,55 +141,46 @@
   ],
   "B": [
    {
-    "id": "t3_1xrtyl2",
-    "title": "Tetoceptipn [Vocaloid]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xrtyl2/tetoceptipn_vocaloid/",
-    "subreddit": "awwnime",
+    "id": "t3_1xrqi3b",
+    "title": "The Legend of Hei - Wuxian appears",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xrqi3b/the_legend_of_hei_wuxian_appears/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xqoyt1",
-    "title": "Zhu Yuan & Feixiao [ZZZ x Honkai: Star Rail]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xqoyt1/zhu_yuan_feixiao_zzz_x_honkai_star_rail/",
-    "subreddit": "awwnime",
+    "id": "t3_1xt498s",
+    "title": "Etochiya (えとちや), Ruta (るた) — mirror mirror MV",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xt498s/etochiya_えとちや_ruta_るた_mirror_mirror_mv/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xq7a49",
-    "title": "Leia [Punishing: Gray Raven]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xq7a49/leia_punishing_gray_raven/",
-    "subreddit": "awwnime",
+    "id": "t3_1xuu97e",
+    "title": "Sonic the Hedgehog: Memories and Beyond - 35th Anniversary Animation",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xuu97e/sonic_the_hedgehog_memories_and_beyond_35th/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xtbukd",
-    "title": "Elyms [Neverness to Everness]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xtbukd/elyms_neverness_to_everness/",
-    "subreddit": "awwnime",
+    "id": "t3_1xt4cfs",
+    "title": "Saba Clip by James Baxter",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xt4cfs/saba_clip_by_james_baxter/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xpezbr",
-    "title": "Tying her hair [Artist's Original]",
-    "url": "https://www.reddit.com/r/awwnime/comments/1xpezbr/tying_her_hair_artists_original/",
-    "subreddit": "awwnime",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xogpc6",
-    "title": "Emily from Corpse Bride my handmade cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xogpc6/emily_from_corpse_bride_my_handmade_cosplay/",
-    "subreddit": "cosplay",
+    "id": "t3_1xs658y",
+    "title": "Robot Riot - Phineas and Ferb: Across the 2nd Dimension (2011)",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xs658y/robot_riot_phineas_and_ferb_across_the_2nd/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -222,9 +213,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xokcpx",
-    "title": "Giant glowing lava axe prop I've made for an Assassins Creed skin cosplay I'm working on!",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xokcpx/giant_glowing_lava_axe_prop_ive_made_for_an/",
+    "id": "t3_1xt15w0",
+    "title": "Ahri cosplay league of legends",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xt15w0/ahri_cosplay_league_of_legends/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
@@ -249,15 +240,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xoidii",
-    "title": "[DISC] Inu o Okuru | Sending Off a Dog - Oneshot by Fujiwara Haru",
-    "url": "https://www.reddit.com/r/manga/comments/1xoidii/disc_inu_o_okuru_sending_off_a_dog_oneshot_by/",
-    "subreddit": "manga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xrfch4",
     "title": "[DISC] The Two Just Don't Fit Into the World - Ch. 1",
     "url": "https://www.reddit.com/r/manga/comments/1xrfch4/disc_the_two_just_dont_fit_into_the_world_ch_1/",
@@ -267,9 +249,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xp7tio",
-    "title": "[DISC] - Introvert-chan's Job Hunting - Oneshot by @medatarou1",
-    "url": "https://www.reddit.com/r/manga/comments/1xp7tio/disc_introvertchans_job_hunting_oneshot_by/",
+    "id": "t3_1xrsktl",
+    "title": "[ART] A quick flash after tying my hair in a ponytail🩷💛💚 - Now That We Draw",
+    "url": "https://www.reddit.com/r/manga/comments/1xrsktl/art_a_quick_flash_after_tying_my_hair_in_a/",
+    "subreddit": "manga",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xpe5ep",
+    "title": "[DISC] Just taking turn - Mikoto-chan Doesn't Want to Be Hated!",
+    "url": "https://www.reddit.com/r/manga/comments/1xpe5ep/disc_just_taking_turn_mikotochan_doesnt_want_to/",
     "subreddit": "manga",
     "views": 0,
     "has_media": true,
