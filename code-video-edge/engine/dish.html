@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- 食べ物の型（dish・#375）：湯気を軸にした撮り方。film（#371）の「全画面の本物の映像・実物の写真は手前の被写体」を受け継ぎ、場面の種類は変える（#302）
+     ・1場面目：湯気が晴れて、販売ページの「箸で持ち上げた1粒」が見える（ピントが写真に来て、奥の鍋がぼける）
+     ・数の場面：60粒の山の切り抜きが下から上がり、数え上げが 60 に着く。山の上に「1kg 約30粒」の括弧（ページの記載どおり）
+     ・冷凍の場面：1粒の切り抜きの周りに霜の線が伸びる（図）
+     ・料理の場面：斜めに割った2枚の調理例の写真が、左右から言葉に合わせて入る
+     ・写真は四角を見せない：縁をぼかして映像に溶かす（#357 カード感）。字は白い札（映像の明るさに左右されない）
+     設計書：dish.{clips{名前:{n}}, bg{場面:{clip, from, pp}}, scenes{場面:{type: hook|count|frost|menu|rating|end, ev{}}}}
+     時刻は timing.json（window.TIMELINE）。すべての値は時刻 T だけの関数（factory/qc_seek.mjs が描く前に見る） -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ground:#F4F5F7; --ink:#111A2E; --dim:#3F4759; --acc:#174A63; --hot:#A8320A; --line:#174A63; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:#0E1418; }
+  body { position:relative; color:var(--ink); font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; }
+  #bg, #world, #prodlayer, #ui, #tone, #haze, #glow, #grain, #fog, #dust { position:absolute; left:0; top:0; width:1080px; height:1920px; }
+  #bg { overflow:hidden; background:#0E1418; }   /* 映像は背景（重なりの点検では字にも商品にも数えない） */
+  #bg img { position:absolute; left:0; top:0; width:1080px; height:1920px; display:none; transform-origin:50% 45%; }
+  #tone, #haze, #glow, #fog, #dust { pointer-events:none; }
+  #world, #prodlayer { overflow:hidden; pointer-events:none; }
+  #over { position:absolute; left:0; top:0; }
+  #grain { top:150px; height:1770px; pointer-events:none; mix-blend-mode:overlay; opacity:.12; background-size:512px 512px; }
+  #hdr { position:absolute; left:0; top:0; width:1080px; height:150px; background:var(--ground); pointer-events:none; }
+  #hdr i { position:absolute; left:0; top:144px; width:1080px; height:6px; background:var(--line); }
+  .ln { position:absolute; overflow:hidden; white-space:nowrap; padding:.12em .22em .22em 0; margin:-.12em -.22em -.22em 0; visibility:hidden; }
+  .ln > .in { display:block; }
+  .tag { display:inline-block; background:#fff; color:var(--ink); padding:.10em .26em .16em; }   /* 映像の上の字は白い札 */
+  .tag.k { background:var(--acc); color:#fff; }
+  .num { font-family:"Noto Sans JP"; font-weight:400; font-feature-settings:"tnum" 1, "palt" 0; letter-spacing:-.03em; }
+  .note { position:absolute; left:64px; width:560px; font:400 24px/1.45 "Noto Sans JP"; color:var(--dim); opacity:0; background:#fff; padding:6px 12px 8px; }
+  .plate { position:absolute; background:var(--acc); color:#fff; white-space:nowrap; padding:8px 16px 10px; font:500 26px/1 "Noto Sans JP"; letter-spacing:.06em; opacity:0; }
+  .pill { position:absolute; padding:14px 26px 16px; border-radius:999px; font:700 28px/1 "Noto Sans JP"; white-space:nowrap; opacity:0; background:var(--ink); color:#fff; }
+  .m { position:absolute; display:none; }
+  .m img { display:block; width:100%; height:100%; object-fit:cover; }
+  .feather { -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 13%, #000 87%, transparent 100%); mask-image:linear-gradient(180deg, transparent 0%, #000 13%, #000 87%, transparent 100%); }
+  .soft { -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 58%, rgba(0,0,0,.5) 80%, transparent 100%); mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 58%, rgba(0,0,0,.5) 80%, transparent 100%); }   /* 四角の縁を見せない（#357） */
+  #pr { position:absolute; left:64px; top:176px; font:700 24px/1 "Noto Sans JP"; color:#fff; border:2px solid var(--ink); border-radius:6px; padding:5px 12px; letter-spacing:.08em; background:var(--ink); z-index:3; }
+  #credit { position:absolute; left:156px; top:178px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; color:#fff; background:rgba(17,26,46,.72); padding:6px 10px; border-radius:6px; z-index:3; }
+</style></head>
+<body>
+<div id="bg"><div id="tone"></div><div id="haze"></div><div id="glow"></div></div>
+<div id="world"></div>
+<div id="prodlayer" class="prod"></div>
+<div id="fog" class="scrim"></div>
+<svg id="over" width="1080" height="1920" viewBox="0 0 1080 1920"><defs><filter id="fb" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter></defs></svg>
+<svg id="dust" class="scrim" width="1080" height="1920" viewBox="0 0 1080 1920"><defs><filter id="sb" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="16"/></filter></defs></svg>
+<div id="hdr" class="scrim"><i></i></div>
+<div id="ui"><div id="pr">PR</div></div>
+<div id="grain" class="scrim"></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, F = P.dish, { clamp, lerp } = EDGE, { el, sv, ln, reveal, note, $ } = SK;
+if (!F || !F.scenes) throw new Error("設計書に dish.scenes が無い");
+const E = Object.assign({}, EDGE.E, { inOutSine: (x) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(x)), outCubic: (x) => 1 - Math.pow(1 - clamp(x), 3), outBack: (x) => { x = clamp(x); const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); } });
+const evT = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b]));
+const DIR = `p/${P.product_key}/`, U = SK.U, T = () => SK.T, pad = (i) => String(i).padStart(4, "0"), TF = () => Math.round(T() * 60) / 60, WAITS = [];
+const SC = TL.scenes.map((s, i) => { const r = F.scenes[s.id]; if (!r) throw new Error(`dish.scenes に ${s.id} が無い`); return Object.assign({ id: s.id, t0: s.t0, t1: s.t1, i, c: COPY[s.id] || {}, ev: {} }, r); });
+const last = SC[SC.length - 1], E_ = (s, k, d) => (s.ev && s.ev[k] ? evT(s.ev[k]) : d);
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+const show = (im, src) => { if (im.getAttribute("src") !== src) { im.setAttribute("src", src); WAITS.push(im.decode().catch(() => {})); } };
+const XF = 0.4, ICE = "#BFE6FF", AMB = "#E8590C";
+// 場面の見え方：入り（XF 秒で溶ける）と出（次の場面へ溶ける）。最後の場面は出ない。1場面目は最初から見えている（1コマ目に商品）
+const inS = (s, t) => (s.i === 0 ? 1 : E.inOutSine((t - s.t0) / XF)) * (s === last ? 1 : 1 - E.inOutSine((t - s.t1) / XF));
+const onS = (s, t) => t >= (s.i === 0 ? -1 : s.t0) && (s === last || t < s.t1 + XF);
+
+// ---------- 映像（本物・30コマ/秒の連番）：bg を持つ場面で切り替える。前の映像から XF 秒で溶かす。pp＝往復 ----------
+const tone = $("tone"), haze = $("haze"), glow = $("glow"), fog = $("fog");
+const BG = SC.filter((s) => F.bg[s.id]).map((s, k, arr) => { const b = F.bg[s.id], nx = arr[k + 1], c = F.clips[b.clip]; if (!c) throw new Error(`dish.clips に ${b.clip} が無い`);
+  return { im: el("img", { alt: "" }, "", $("bg")), c, b, s, a: s.t0, z: nx ? nx.t0 + XF : TL.end + 1, first: k === 0 }; });
+for (const e of [tone, haze, glow]) $("bg").appendChild(e);
+const frameOf = (g, t) => { let i = Math.floor((t - g.a) * 30 + 1e-6) + (g.b.from || 0); const n = g.c.n; if (g.b.pp) { const m = 2 * (n - 1); i = ((i % m) + m) % m; if (i >= n) i = m - i; } return Math.min(n - 1, Math.max(0, i)); };
+// 奥（映像）のぼけ：写真にピントがある場面ほどぼかす。場面の種類ごとの量（0〜1）
+const FOCUS = { hook: 0.55, count: 0.75, frost: 0.85, menu: 0.6, rating: 0, end: 0.7 };
+const sceneAt = (t) => SC.reduce((a, s) => (t >= s.t0 ? s : a), SC[0]);
+U.push(() => { const t = T(), s = sceneAt(t);
+  // 1場面目：湯気が晴れるまでは奥にピント（写真がぼけている）→ 0.9秒でピントが写真へ
+  const rack = s.type === "hook" ? E.inOutCubic((t - (s.t0 + 0.15)) / 0.9) : 1, fb = (FOCUS[s.type] || 0) * rack;
+  for (const g of BG) { const on = t >= g.a && t < g.z; g.im.style.display = on ? "block" : "none"; if (!on) continue;
+    show(g.im, `${DIR}fv/${g.b.clip}_${pad(frameOf(g, t))}.jpg`);
+    const u = clamp((t - g.a) / (g.z - g.a)), zb = 1.05 + 0.07 * u;   // 奥はゆっくり寄る
+    g.im.style.transform = `translate(${(-10 * Math.sin(u * 2.1)).toFixed(2)}px, ${(-14 * u).toFixed(2)}px) scale(${zb.toFixed(4)})`;
+    g.im.style.filter = fb > 0.01 ? `blur(${(16 * fb).toFixed(2)}px) brightness(${(1 - 0.12 * fb).toFixed(3)})` : "none";
+    g.im.style.opacity = g.first ? 1 : E.inOutSine((t - g.a) / XF).toFixed(3); }
+  // 冷凍の場面だけ、青く冷たい色をのせる（明るさは落とさない）
+  const fr = SC.filter((x) => x.type === "frost").reduce((a, x) => Math.max(a, onS(x, t) ? inS(x, t) : 0), 0);
+  tone.style.background = fr > 0.002 ? `linear-gradient(rgba(150,205,255,${(0.28 * fr).toFixed(3)}), rgba(150,205,255,${(0.28 * fr).toFixed(3)}))` : "none";
+  // 食卓の場面（評価）は字の後ろに明るい霞
+  const rt = SC.filter((x) => x.type === "rating").reduce((a, x) => Math.max(a, onS(x, t) ? inS(x, t) : 0), 0);
+  haze.style.background = rt > 0.002 ? `radial-gradient(860px 520px at 320px 1120px, rgba(255,255,255,${(0.84 * rt).toFixed(3)}) 0%, rgba(255,255,255,${(0.7 * rt).toFixed(3)}) 50%, rgba(255,255,255,0) 100%)` : "none"; });
+{ const g = $("grain"); g.style.backgroundImage = `url(${DIR}img/grain.png)`; U.push(() => { const f = Math.floor(T() * 30 + 1e-6); g.style.backgroundPosition = `${(f * 193) % 512}px ${(f * 331) % 512}px`; }); }
+
+// ---------- 湯気（図）：画面の下から立ちのぼる白い煙。正弦波の和（乱数なし）。1場面目の頭は濃く、晴れていく ----------
+{ const N = 16, ps = Array.from({ length: N }, () => sv("ellipse", { fill: "#FFFFFF", filter: "url(#sb)" }, $("dust")));
+  U.push(() => { const t = T(), s = sceneAt(t), base = s.type === "frost" ? 0.0 : s.type === "rating" ? 0.25 : 0.55;
+    ps.forEach((p, k) => { const sp = 70 + 9 * (k % 5), y = 2150 - ((t * sp + 260 * k) % 2400), x = 540 + 470 * Math.sin(k * 2.399) + 70 * Math.sin(t * 0.6 + k), life = clamp((2150 - y) / 2400);
+      p.setAttribute("cx", x.toFixed(1)); p.setAttribute("cy", y.toFixed(1)); p.setAttribute("rx", (90 + 60 * life + 20 * (k % 3)).toFixed(1)); p.setAttribute("ry", (60 + 50 * life).toFixed(1));
+      p.setAttribute("opacity", (base * 0.16 * Math.sin(Math.PI * life)).toFixed(3)); }); });
+  // 1場面目の頭：画面いっぱいの湯気（白い霧）が 0.9秒で晴れる
+  U.push(() => { const t = T(), a = 1 - E.inOutCubic((t - 0.1) / 0.9); fog.style.background = a > 0.002 ? `radial-gradient(900px 900px at 540px 900px, rgba(255,255,255,${(0.62 * a).toFixed(3)}) 0%, rgba(255,255,255,${(0.35 * a).toFixed(3)}) 60%, rgba(255,255,255,${(0.12 * a).toFixed(3)}) 100%)` : "none"; }); }
+
+// ---------- 字の道具 ----------
+const line = (style, html, tin, tout, d = 0.8, track = [0.1, 0.0]) => { const e = ln(style, html); U.push(() => { reveal(e, tin, tout, d, 0.22);
+  if (track) e.firstElementChild.style.letterSpacing = lerp(track[0], track[1], E.outCubic((T() - tin) / 1.4)).toFixed(3) + "em"; }); return e; };
+const fade = (e, tin, tout, d = 0.35) => U.push(() => { const t = T(), a = clamp((t - tin) / d) * (1 - clamp((t - tout) / 0.22)); e.style.opacity = a.toFixed(3); e.style.visibility = a > 0.001 ? "visible" : "hidden"; });
+const vis = (e, a) => { e.style.opacity = a.toFixed(3); e.style.display = a > 0.001 ? "inline" : "none"; };
+const noteAt = (txt, x, y, w, tin, tout) => { if (!txt) return; const n = note(txt, y, tin, tout); n.style.left = x + "px"; n.style.width = w + "px"; };
+const countTo = (node, from, to, dec, t0, t1) => U.push(() => { node.textContent = (from + (to - from) * E.inOutCubic((TF() - t0) / Math.max(0.1, t1 - t0))).toFixed(dec || 0); });
+const tag = (s, k) => `<span class="tag${k ? " k" : ""}">${s}</span>`;
+// 写真（販売ページの実物）：#world の .m＝商品の側（字と重ねない）。f(t) が {x, y, w, h, o, blur, rot, clip} を返す
+const photo = (src, cls, f) => { const d = el("div", { class: `m ${cls || ""}` }, `<img src="${DIR}img/${src}" alt="">`, $("world"));
+  U.push(() => { const r = f(T()); if (!r || r.o <= 0.001) { d.style.display = "none"; return; }
+    d.style.display = "block"; d.style.left = r.x.toFixed(2) + "px"; d.style.top = r.y.toFixed(2) + "px"; d.style.width = r.w.toFixed(2) + "px"; d.style.height = r.h.toFixed(2) + "px";
+    d.style.opacity = r.o.toFixed(3); d.style.transform = r.rot ? `rotate(${r.rot.toFixed(3)}deg)` : "none"; d.style.clipPath = r.clip || "none";
+    d.style.filter = `${r.blur > 0.05 ? `blur(${r.blur.toFixed(2)}px) ` : ""}${r.shadow ? "drop-shadow(0 30px 40px rgba(10,20,30,.35))" : ""}` || "none"; }); return d; };
+
+// ---------- 場面 ----------
+for (const s of SC) { const c = s.c, out = s === last ? 99 : s.t1 - 0.3, D = s.t1 - s.t0;
+  if (s.type === "hook") {   // 湯気が晴れて、箸で持ち上げた1粒（ページの写真）。ゆっくり寄る
+    const l2 = E_(s, "line2", s.t0 + 1.2);
+    photo("hero.jpg", "feather", (t) => { if (!onS(s, t)) return null; const u = clamp((t - s.t0) / D), k = 1 + 0.08 * E.inOutSine(u), w = 1080 * k, h = 661.5 * k;
+      return { x: 540 - w * 0.5 - 30 * u, y: 890 - h * 0.5, w, h, o: inS(s, t), blur: 12 * (1 - E.inOutCubic((t - (s.t0 + 0.15)) / 0.9)) }; });
+    line(`left:64px;top:236px;font:500 26px/1.2 'Noto Sans JP'`, tag(`${c.brand}<span style="opacity:.6">　｜　</span>${c.series}`, 1), -1, out, 0.01, null);
+    line(`left:64px;top:296px;font:900 80px/1.2 'Noto Sans JP'`, tag(c.hook), -1, out, 0.01, null);
+    line(`left:64px;top:410px;font:900 76px/1.2 'Noto Sans JP'`, tag(c.hook2, 1), l2 - 0.05, out, 0.7, [0.06, 0.0]);
+    line(`left:64px;top:1246px;font:400 24px/1.2 'Noto Sans JP'`, tag(P.target.who), -1, out, 0.01, null);
+    line(`left:64px;top:1298px;font:700 40px/1.2 'Noto Sans JP'`, tag(c.spec), -1, out, 0.01, null);
+    noteAt(c.note, 64, 1372, 640, -1, out);
+  } else if (s.type === "count") {   // 60粒の山（切り抜き）が下から上がり、数え上げが 60 に着く。山の上に「1kg 約30粒」の括弧
+    const tr = E_(s, "rise", s.t0 + 0.4), tn = E_(s, "num", tr + 1.0), ta = E_(s, "after", tn + 0.6), PW = 1000, PH = PW * 1140 / 1900;
+    photo("pile.png", "", (t) => { if (!onS(s, t)) return null; const a = E.outBack((t - (tr - 0.35)) / 0.8), u = clamp((t - s.t0) / D), k = 1 + 0.05 * E.inOutSine(u);
+      return { x: 540 - PW * k / 2, y: 730 + 180 * (1 - a) - 20 * u, w: PW * k, h: PH * k, o: inS(s, t) * clamp((t - (tr - 0.35)) / 0.25), blur: 0, shadow: 1 }; });
+    line(`left:64px;top:236px;font:700 34px/1.2 'Noto Sans JP'`, tag(c.label, 1), s.t0 + 0.2, out, 0.6, null);
+    const big = line(`left:64px;top:300px;font-size:150px;line-height:1`, tag(`<span style="font:700 56px/1 'Noto Sans JP';vertical-align:30%;margin-right:8px">${c.pre}</span><span class="num">0</span><span style="font:700 64px/1 'Noto Sans JP';margin-left:6px">${c.unit}</span>`), tr - 0.2, out, 0.6, null);
+    countTo(big.querySelector(".num"), 0, +c.big, 0, tr, tn);
+    line(`left:64px;top:510px;font:700 44px/1.2 'Noto Sans JP'`, tag(c.after, 1), ta - 0.1, out, 0.7, [0.1, 0.02]);
+    // 括弧（図）：山の上に左右1つずつ。中央から外へ伸びる
+    const BR = [[70, 545], [560, 1030]], brs = BR.map(([x0, x1], k) => { const g = sv("g", {}), p = sv("path", { fill: "none", stroke: "#fff", "stroke-width": 5, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+      const lb = line(`left:${k ? 600 : 110}px;top:612px;font:500 30px/1.2 'Noto Sans JP'`, tag(c.side), tn - 0.2, out, 0.6, null); return { g, p, x0, x1, lb }; });
+    U.push(() => { const t = T(), a = E.outCubic((t - (tn - 0.25)) / 0.6), o = onS(s, t) ? 1 - clamp((t - out) / 0.22) : 0;
+      brs.forEach(({ g, p, x0, x1 }) => { const m = (x0 + x1) / 2, h = (x1 - x0) / 2 * a, y = 690; p.setAttribute("d", `M${(m - h).toFixed(1)} ${y + 16} L${(m - h).toFixed(1)} ${y} L${(m + h).toFixed(1)} ${y} L${(m + h).toFixed(1)} ${y + 16}`); vis(g, a > 0.01 ? o : 0); }); });
+    // 数え上げが着いた時、山の上で光の輪が1回広がる（図）
+    const rg = sv("circle", { fill: "none", stroke: "#FFE7B0", cx: 540, cy: 1030 });
+    U.push(() => { const t = T(), a = (t - tn) / 1.0, v = a >= 0 && a < 1 && onS(s, t); rg.setAttribute("r", (200 + 520 * E.outCubic(a)).toFixed(1)); rg.setAttribute("stroke-width", (18 * (1 - clamp(a))).toFixed(2)); rg.style.opacity = (v ? 0.7 * (1 - a) : 0).toFixed(3); });
+    noteAt(c.note, 64, 1366, 640, s.t0 + 0.4, out);
+  } else if (s.type === "frost") {   // 1粒の切り抜き。周りに霜の線（六方の結晶・図）が伸びる
+    const th = E_(s, "head", s.t0 + 0.5), ts = E_(s, "sub", th + 1.2), OW = 800, OH = OW * 596 / 762;
+    photo("one.png", "", (t) => { if (!onS(s, t)) return null; const u = clamp((t - s.t0) / D), k = 0.94 + 0.08 * E.inOutSine(u);
+      return { x: 540 - OW * k / 2, y: 1010 - OH * k / 2, w: OW * k, h: OH * k, o: inS(s, t), blur: 0, rot: -3 + 5 * E.inOutSine(u), shadow: 1 }; });
+    line(`left:64px;top:236px;font:700 40px/1.2 'Noto Sans JP'`, tag(c.kicker, 1), s.t0 + 0.25, out, 0.6, null);
+    line(`left:64px;top:302px;font:900 74px/1.2 'Noto Sans JP'`, tag(c.head), th - 0.1, out, 0.7, [0.06, 0.0]);
+    line(`left:64px;top:1340px;font:700 36px/1.2 'Noto Sans JP'`, tag(c.sub, 1), ts - 0.1, out, 0.7, [0.1, 0.02]);
+    noteAt(c.note, 64, 1404, 520, s.t0 + 0.4, out);
+    // 霜の結晶：実物の縁の外側に 9 個。中心から6本の枝が伸び、枝に小枝
+    const CR = Array.from({ length: 9 }, (_, k) => { const a = -Math.PI / 2 + k * 2 * Math.PI / 9 + 0.2, R = [430, 360][k % 2], cx = 540 + R * Math.cos(a) * 1.05, cy = 1010 + R * 0.86 * Math.sin(a), sz = 34 + 14 * (k % 3);
+      const g = sv("g", { transform: `translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${(k * 17).toFixed(1)})`, filter: "url(#fb)" }), arms = [];
+      for (let j = 0; j < 6; j++) { const r = sv("g", { transform: `rotate(${j * 60})` }, g); arms.push(sv("path", { fill: "none", stroke: ICE, "stroke-width": 4, "stroke-linecap": "round" }, r)); }
+      return { g, arms, sz, d: 0.06 * k }; });
+    U.push(() => { const t = T(), o = onS(s, t) ? 1 - clamp((t - out) / 0.25) : 0;
+      CR.forEach(({ g, arms, sz, d }) => { const a = E.outCubic((t - th - d) / 0.7), L = sz * a, b = 0.55 * L, w = 0.32 * L;
+        arms.forEach((p) => p.setAttribute("d", `M0 0 L0 ${(-L).toFixed(1)} M0 ${(-b).toFixed(1)} L${(-w).toFixed(1)} ${(-b - w).toFixed(1)} M0 ${(-b).toFixed(1)} L${w.toFixed(1)} ${(-b - w).toFixed(1)}`));
+        vis(g, a > 0.01 ? o * (0.75 + 0.25 * Math.sin(t * 2 + d * 30)) : 0); }); });
+  } else if (s.type === "menu") {   // 調理例の写真2枚を斜めに割り、言葉に合わせて左右から入れる
+    const ta = E_(s, "a", s.t0 + 0.3), tb = E_(s, "b", ta + 0.9), Y0 = 560, H = 760;
+    photo("nabe.jpg", "", (t) => { if (!onS(s, t)) return null; const a = E.outCubic((t - (ta - 0.15)) / 0.75), u = clamp((t - s.t0) / D);
+      return { x: -480 * (1 - a), y: Y0, w: 640, h: H, o: inS(s, t) * clamp((t - (ta - 0.15)) / 0.3), blur: 0, clip: "polygon(0 0, 100% 0, 75% 100%, 0 100%)" }; });
+    photo("fry.jpg", "", (t) => { if (!onS(s, t)) return null; const a = E.outCubic((t - (tb - 0.15)) / 0.75);
+      return { x: 460 + 480 * (1 - a), y: Y0, w: 620, h: H, o: inS(s, t) * clamp((t - (tb - 0.15)) / 0.3), blur: 0, clip: "polygon(28% 0, 100% 0, 100% 100%, 2% 100%)" }; });
+    line(`left:64px;top:300px;font:900 72px/1.2 'Noto Sans JP'`, tag(c.a, 1), ta - 0.1, out, 0.7, [0.06, 0.0]);
+    line(`left:64px;top:410px;font:900 72px/1.2 'Noto Sans JP'`, tag(c.b), tb - 0.1, out, 0.7, [0.06, 0.0]);
+    noteAt(c.note, 64, 1366, 520, s.t0 + 0.3, out);
+  } else if (s.type === "rating") {   // 評価：食卓の映像。数え上げと星
+    const tin = s.t0 + XF + 0.05, td = E_(s, "dot", tin + 1.0), val = parseFloat(c.score);   // 前の場面の写真が消え切ってから字を出す（点検「文字と写真の重なり」）
+    const sc = line(`left:64px;top:880px;font-size:200px;line-height:1`, tag(`<span class="num">0.00</span>`), tin, out, 0.7, null);
+    const STAR = "M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z", g = sv("g", {}), cp = sv("clipPath", { id: `sc${s.i}` }, g), cr = sv("rect", { x: 66, y: 1152, height: 60, width: 0 }, cp);
+    for (const [fill, clip] of [["rgba(17,26,46,.18)", null], ["#F5A300", `url(#sc${s.i})`]]) { const gg = sv("g", clip ? { "clip-path": clip } : {}, g); for (let k = 0; k < 5; k++) sv("path", { d: STAR, fill, transform: `translate(${90 + k * 58}, 1182)` }, gg); }
+    line(`left:380px;top:1162px;font:500 34px/1 'Noto Sans JP'`, tag(c.count_label), td - 0.1, out, 0.8, [0.12, 0.04]);
+    line(`left:64px;top:1236px;font:400 24px/1 'Noto Sans JP'`, tag(c.date), td - 0.05, out, 0.8, null);
+    noteAt(c.note, 64, 1290, 600, tin, out);
+    U.push(() => { const t = T(), k = E.inOutCubic((TF() - tin) / (td + 0.3 - tin)); sc.querySelector(".num").textContent = (k * val).toFixed(2); vis(g, onS(s, t) ? clamp((t - tin) / 0.3) * (1 - clamp((t - out) / 0.22)) : 0); cr.setAttribute("width", (278 * k * val / 5).toFixed(1)); });
+  } else if (s.type === "end") {   // 締め：湯気の上がる1粒（ページの写真）・名前・要点・行動
+    const tin = s.t0 + 0.4, tn = E_(s, "name", tin + 0.2), tc = E_(s, "cta", tn + 1.6), tp = E_(s, "press", tc + 0.5), LW = 760, LH = LW * 900 / 1000;
+    photo("lift.jpg", "soft", (t) => { if (!onS(s, t)) return null; const u = clamp((t - s.t0) / (TL.end - s.t0)), k = 1 + 0.06 * E.inOutSine(u);
+      return { x: 540 - LW * k / 2, y: 790 - LH * k / 2, w: LW * k, h: LH * k, o: inS(s, t), blur: 0 }; });
+    const pl = el("div", { class: "plate", style: "left:64px;top:236px" }, c.brand); fade(pl, tin, 99);
+    line(`left:64px;top:290px;font:900 60px/1.15 'Noto Sans JP'`, tag(c.head), tn - 0.1, 99, 0.9);
+    (c.points || []).forEach((p, k) => { const e = el("div", { style: `position:absolute;left:64px;top:${1134 + k * 48}px;font:500 30px/1 'Noto Sans JP';white-space:nowrap;opacity:0` }, tag(`<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${AMB};margin-right:12px;vertical-align:3px"></span>${p}`));
+      U.push(() => { const a = E.outCubic((T() - (tn + 0.6 + k * 0.18)) / 0.5); e.style.opacity = a.toFixed(3); e.style.transform = `translateX(${((1 - a) * -24).toFixed(2)}px)`; }); });
+    const cta = el("div", { class: "pill", style: "left:64px;top:1296px" }, c.cta);
+    U.push(() => { const t = T(), a = E.outCubic((t - tc) / 0.5), pr = Math.sin(Math.PI * clamp((t - tp) / 0.3)); cta.style.opacity = a.toFixed(3); cta.style.transform = `translateY(${((1 - a) * 24).toFixed(2)}px) scale(${(1 - 0.05 * pr).toFixed(4)})`; });
+    noteAt(c.note, 64, 1372, 640, tin + 0.2, 99); }
+  else throw new Error(`${s.id} の type が違う: ${s.type}`); }
+
+SK.boot([300, 400, 500, 700, 900]);
+window.READY = window.READY.then(async () => { for (const w of [400, 900]) await document.fonts.load(`${w} 40px "Noto Sans JP"`, $("ui").textContent + "0123456789.・粒kg約"); window.seek(0); await Promise.all(WAITS); return true; });
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+</script>
+</body></html>

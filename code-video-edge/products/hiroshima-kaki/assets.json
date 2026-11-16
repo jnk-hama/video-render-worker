@@ -1,0 +1,78 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。jmas #375（dish の型）：商品は販売ページの実物の写真だけ・場面は Pexels の本物の映像。asp_images の順が dl の asp0〜5（箸の1粒・60粒の山・1粒・湯気の1粒・かき鍋・かきフライ）、videos の順が vid0〜3（鍋のふた・湯気・こんろの鍋・食卓の鍋）。prep.py が組ごとに切り抜き・切り出し・コマ出しをする",
+ "asp_images": [
+  "https://shop.r10s.jp/masuyone/cabinet/kago/kaki2kg-kago.jpg",
+  "https://image.rakuten.co.jp/masuyone/cabinet/goods/kaki/2kg/2015_kaki2kg_013a.jpg",
+  "https://image.rakuten.co.jp/masuyone/cabinet/goods/kaki/2kg/2015_kaki2kg_014a.jpg",
+  "https://image.rakuten.co.jp/masuyone/cabinet/goods/kaki/2kg/2015_kaki2kg_012.jpg",
+  "https://shop.r10s.jp/masuyone/cabinet/goods/kaki/0000cooking_big06.jpg",
+  "https://shop.r10s.jp/masuyone/cabinet/goods/kaki/0000cooking_big03.jpg"
+ ],
+ "videos": [
+  "https://videos.pexels.com/video-files/40801691/17432877_1080_1920_60fps.mp4",
+  "https://videos.pexels.com/video-files/40995593/17536696_1080_1922_30fps.mp4",
+  "https://videos.pexels.com/video-files/4253136/4253136-hd_1080_2048_25fps.mp4",
+  "https://videos.pexels.com/video-files/37876544/16070321_1080_1920_24fps.mp4"
+ ],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "冬の鍋に、ジャンボの広島かき。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "にキロで、やく、ろくじゅうつぶ。じゅうにんまえです。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "ひとつぶずつ、急速冷凍。解凍しやすく、ドリップも少なめ。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "かき鍋にも、カキフライにも。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "評価は、4.68。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "広島産ジャンボかき、にキロ。リンクはプロフィールから。",
+   "speed": 0.95,
+   "pause": 0.5
+  }
+ ],
+ "prep": [
+  [
+   "base"
+  ],
+  [
+   "one"
+  ],
+  [
+   "pile"
+  ]
+ ]
+}
