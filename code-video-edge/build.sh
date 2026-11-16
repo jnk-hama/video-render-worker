@@ -43,7 +43,7 @@ PY
 # 下ごしらえ：組ごとに別の処理で（BiRefNet は1つの処理で2回呼ぶとメモリが 14GB まで膨らんで落ちた）
 python3 -c "import json,sys;[print(' '.join(g)) for g in json.load(open(sys.argv[1]))['prep']]" "$PK/assets.json" | while read -r g; do
   # shellcheck disable=SC2086
-  python3 "$PK/prep.py" "dl-$KEY" "$P/b3d" $g
+  python3 "$PK/prep.py" "dl-$KEY" "$P/b3d" $g < /dev/null   # 中の ffmpeg が標準入力（＝残りの組の名前）を食べて、次の組が「e」になった（hiroshima-kaki）
 done
 # 3DCG の商品（jmas #366）：cycles-product が描いた絵を Release から取る。描いた本体（sha256）とコマの時刻が今の物と同じか照合してから使う
 if [ -f "$PK/cycles.json" ]; then
