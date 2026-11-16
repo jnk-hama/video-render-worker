@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-15T11:11:28+00:00",
+ "generated_at": "2026-11-16T11:40:55+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
@@ -22,15 +22,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xst13r",
-    "title": "Insane chrome effect in grafitti",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xst13r/insane_chrome_effect_in_grafitti/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xuvvxo",
     "title": "Service Dog Alerts Owner During Playtime",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xuvvxo/service_dog_alerts_owner_during_playtime/",
@@ -40,91 +31,64 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xsmink",
-    "title": "Internationally Acclaimed Watercolorist From South Korea Jung Hun-Sung",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xsmink/internationally_acclaimed_watercolorist_from/",
+    "id": "t3_1xwkaiu",
+    "title": "History Made with First Starship Tower Catch!",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xwkaiu/history_made_with_first_starship_tower_catch/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xtmivp",
-    "title": "Wildlife in barren fields after forests were burned for palm oil plantations in Indonesia",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xtmivp/wildlife_in_barren_fields_after_forests_were/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xst13r",
+    "title": "Insane chrome effect in grafitti",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xst13r/insane_chrome_effect_in_grafitti/",
+    "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xvkpfd",
-    "title": "A man trying to get his old job back 2,700 years ago complained about three unanswered letters. The letter containing his complaint was found unopened.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xvkpfd/a_man_trying_to_get_his_old_job_back_2700_years/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xrqezr",
+    "title": "Shoulder traffic skipper gets instant karma",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xrqezr/shoulder_traffic_skipper_gets_instant_karma/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xu5vyi",
-    "title": "Mutated fish found in Mekong River, Myanmar, possibly caused by toxic water contamination from rare earth mining.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xu5vyi/mutated_fish_found_in_mekong_river_myanmar/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xunz4o",
+    "title": "Ima Driver Ima Winner",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xunz4o/ima_driver_ima_winner/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xvb3ji",
-    "title": "Lyre made out of human skull with antelope horns, Africa 19th c.",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xvb3ji/lyre_made_out_of_human_skull_with_antelope_horns/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xvxvow",
+    "title": "Let me steal this guitar and run away",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xvxvow/let_me_steal_this_guitar_and_run_away/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xs5ln9",
-    "title": "Lung-shaped ashtray I saw in a restaurant’s outdoor seating area",
-    "url": "https://www.reddit.com/r/Damnthatsinteresting/comments/1xs5ln9/lungshaped_ashtray_i_saw_in_a_restaurants_outdoor/",
-    "subreddit": "Damnthatsinteresting",
+    "id": "t3_1xu6zn8",
+    "title": "An Argentinian man overcame an intruder who attempted to take his bike.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xu6zn8/an_argentinian_man_overcame_an_intruder_who/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xqy53z",
-    "title": "Total overreaction perhaps",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xqy53z/total_overreaction_perhaps/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xvewbj",
-    "title": "Nothing to worry about",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xvewbj/nothing_to_worry_about/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xthnz7",
-    "title": "Big Bruce is enjoying life",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xthnz7/big_bruce_is_enjoying_life/",
-    "subreddit": "Unexpected",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xtt299",
-    "title": "Will we eat cake or not?",
-    "url": "https://www.reddit.com/r/Unexpected/comments/1xtt299/will_we_eat_cake_or_not/",
-    "subreddit": "Unexpected",
+    "id": "t3_1xtl4wb",
+    "title": "That's the sound of lamentation.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xtl4wb/thats_the_sound_of_lamentation/",
+    "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -133,6 +97,42 @@
     "id": "t3_1xsh63v",
     "title": "It was a BIG problem, until it wasn't (source link in description)",
     "url": "https://www.reddit.com/r/toptalent/comments/1xsh63v/it_was_a_big_problem_until_it_wasnt_source_link/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xubg5i",
+    "title": "Can you crochet a noodle (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xubg5i/can_you_crochet_a_noodle_source_link_in/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xu7qv1",
+    "title": "Drawing Charizard with Japanese Caligraphy (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xu7qv1/drawing_charizard_with_japanese_caligraphy_source/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xttkf9",
+    "title": "The process for those who value the extraordinary (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xttkf9/the_process_for_those_who_value_the_extraordinary/",
+    "subreddit": "toptalent",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xutyaq",
+    "title": "Guy training with a speed bag to the song “Children” by Robert Miles (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xutyaq/guy_training_with_a_speed_bag_to_the_song/",
     "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
@@ -195,9 +195,9 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xrh85m",
-    "title": "Lara Croft (Tomb Raider) cosplay",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xrh85m/lara_croft_tomb_raider_cosplay/",
+    "id": "t3_1xwg3gt",
+    "title": "Silk/Cindy Moon Cosplay !",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xwg3gt/silkcindy_moon_cosplay/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
@@ -222,48 +222,48 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xth8gw",
-    "title": "[DISC] See-through glasses - by @kou88450",
-    "url": "https://www.reddit.com/r/manga/comments/1xth8gw/disc_seethrough_glasses_by_kou88450/",
-    "subreddit": "manga",
+    "id": "t3_1xw0q1m",
+    "title": "'Re:ZERO' Season 5 Announced",
+    "url": "https://www.reddit.com/r/anime/comments/1xw0q1m/rezero_season_5_announced/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xsw2x2",
-    "title": "[DISC] Some Proof (Oneshot by Holiday Yasumi)",
-    "url": "https://www.reddit.com/r/manga/comments/1xsw2x2/disc_some_proof_oneshot_by_holiday_yasumi/",
-    "subreddit": "manga",
+    "id": "t3_1xsmpa7",
+    "title": "Asking for a kiss [The Magical Revol of the Reincarnated Princess and the Gen Young Lady]",
+    "url": "https://www.reddit.com/r/anime/comments/1xsmpa7/asking_for_a_kiss_the_magical_revol_of_the/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xrfch4",
-    "title": "[DISC] The Two Just Don't Fit Into the World - Ch. 1",
-    "url": "https://www.reddit.com/r/manga/comments/1xrfch4/disc_the_two_just_dont_fit_into_the_world_ch_1/",
-    "subreddit": "manga",
+    "id": "t3_1xuga02",
+    "title": "Slaying zombies with style [Highschool of the Dead]",
+    "url": "https://www.reddit.com/r/anime/comments/1xuga02/slaying_zombies_with_style_highschool_of_the_dead/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xubg8d",
-    "title": "uzaki chan in ishuzoku reviewers 👀",
-    "url": "https://www.reddit.com/r/manga/comments/1xubg8d/uzaki_chan_in_ishuzoku_reviewers/",
-    "subreddit": "manga",
+    "id": "t3_1xvxwb2",
+    "title": "Gushing over Magical Girls Season 2 New Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xvxwb2/gushing_over_magical_girls_season_2_new_visual/",
+    "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xrsktl",
-    "title": "[ART] A quick flash after tying my hair in a ponytail🩷💛💚 - Now That We Draw",
-    "url": "https://www.reddit.com/r/manga/comments/1xrsktl/art_a_quick_flash_after_tying_my_hair_in_a/",
-    "subreddit": "manga",
+    "id": "t3_1xva5e1",
+    "title": "The Apothecary Diaries Season 3 • Kusuriya no Hitorigoto Season 3 - Episode 7 discussion",
+    "url": "https://www.reddit.com/r/anime/comments/1xva5e1/the_apothecary_diaries_season_3_kusuriya_no/",
+    "subreddit": "anime",
     "views": 0,
-    "has_media": true,
+    "has_media": false,
     "source": "rss"
    }
   ]
