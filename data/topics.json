@@ -1,21 +1,12 @@
 {
- "generated_at": "2026-11-16T11:40:55+00:00",
+ "generated_at": "2026-11-17T12:05:54+00:00",
  "_note": "Reddit の公開RSSから取得。未認証の .json API は 2026-05-28 に廃止されたが RSS は応答する。RSS には score が無いため views は常に0。GAS 側はこれをスコア足切りの対象外として扱うこと。",
  "accounts": {
   "A": [
    {
-    "id": "t3_1xrrm2n",
-    "title": "Beating failure with dignity",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xrrm2n/beating_failure_with_dignity/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xrxonb",
-    "title": "World's Biggest Human Catapult",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xrxonb/worlds_biggest_human_catapult/",
+    "id": "t3_1xwkaiu",
+    "title": "History Made with First Starship Tower Catch!",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xwkaiu/history_made_with_first_starship_tower_catch/",
     "subreddit": "nextfuckinglevel",
     "views": 0,
     "has_media": true,
@@ -31,15 +22,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xwkaiu",
-    "title": "History Made with First Starship Tower Catch!",
-    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xwkaiu/history_made_with_first_starship_tower_catch/",
-    "subreddit": "nextfuckinglevel",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xst13r",
     "title": "Insane chrome effect in grafitti",
     "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xst13r/insane_chrome_effect_in_grafitti/",
@@ -49,9 +31,36 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xrqezr",
-    "title": "Shoulder traffic skipper gets instant karma",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xrqezr/shoulder_traffic_skipper_gets_instant_karma/",
+    "id": "t3_1xx5sy6",
+    "title": "A Kagu on the brink of extinction finds its own kind",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xx5sy6/a_kagu_on_the_brink_of_extinction_finds_its_own/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xx6ozq",
+    "title": "Tell me you’re a pro without saying anything",
+    "url": "https://www.reddit.com/r/nextfuckinglevel/comments/1xx6ozq/tell_me_youre_a_pro_without_saying_anything/",
+    "subreddit": "nextfuckinglevel",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xvxvow",
+    "title": "Let me steal this guitar and run away",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xvxvow/let_me_steal_this_guitar_and_run_away/",
+    "subreddit": "WinStupidPrizes",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xxaflg",
+    "title": "Tourist bitten after posing too close to a King's Guard horse.",
+    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xxaflg/tourist_bitten_after_posing_too_close_to_a_kings/",
     "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
@@ -61,15 +70,6 @@
     "id": "t3_1xunz4o",
     "title": "Ima Driver Ima Winner",
     "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xunz4o/ima_driver_ima_winner/",
-    "subreddit": "WinStupidPrizes",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
-    "id": "t3_1xvxvow",
-    "title": "Let me steal this guitar and run away",
-    "url": "https://www.reddit.com/r/WinStupidPrizes/comments/1xvxvow/let_me_steal_this_guitar_and_run_away/",
     "subreddit": "WinStupidPrizes",
     "views": 0,
     "has_media": true,
@@ -94,18 +94,18 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xsh63v",
-    "title": "It was a BIG problem, until it wasn't (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1xsh63v/it_was_a_big_problem_until_it_wasnt_source_link/",
+    "id": "t3_1xubg5i",
+    "title": "Can you crochet a noodle (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xubg5i/can_you_crochet_a_noodle_source_link_in/",
     "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xubg5i",
-    "title": "Can you crochet a noodle (source link in description)",
-    "url": "https://www.reddit.com/r/toptalent/comments/1xubg5i/can_you_crochet_a_noodle_source_link_in/",
+    "id": "t3_1xxoc13",
+    "title": "Final round of the World Champ qualifiers in Brazil (source link in description)",
+    "url": "https://www.reddit.com/r/toptalent/comments/1xxoc13/final_round_of_the_world_champ_qualifiers_in/",
     "subreddit": "toptalent",
     "views": 0,
     "has_media": true,
@@ -150,15 +150,6 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xrqi3b",
-    "title": "The Legend of Hei - Wuxian appears",
-    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xrqi3b/the_legend_of_hei_wuxian_appears/",
-    "subreddit": "AnimeSakuga",
-    "views": 0,
-    "has_media": true,
-    "source": "rss"
-   },
-   {
     "id": "t3_1xt498s",
     "title": "Etochiya (えとちや), Ruta (るた) — mirror mirror MV",
     "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xt498s/etochiya_えとちや_ruta_るた_mirror_mirror_mv/",
@@ -186,10 +177,10 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xsixbu",
-    "title": "seaside sorceress / scarlet witch summer skin from marvel rivals",
-    "url": "https://www.reddit.com/r/cosplay/comments/1xsixbu/seaside_sorceress_scarlet_witch_summer_skin_from/",
-    "subreddit": "cosplay",
+    "id": "t3_1xws41l",
+    "title": "Metal Sonic Tribute Animation",
+    "url": "https://www.reddit.com/r/AnimeSakuga/comments/1xws41l/metal_sonic_tribute_animation/",
+    "subreddit": "AnimeSakuga",
     "views": 0,
     "has_media": true,
     "source": "rss"
@@ -216,6 +207,15 @@
     "id": "t3_1xtuzd2",
     "title": "my mavis dracula cosplay from halloween!",
     "url": "https://www.reddit.com/r/cosplay/comments/1xtuzd2/my_mavis_dracula_cosplay_from_halloween/",
+    "subreddit": "cosplay",
+    "views": 0,
+    "has_media": true,
+    "source": "rss"
+   },
+   {
+    "id": "t3_1xt15w0",
+    "title": "Ahri cosplay league of legends",
+    "url": "https://www.reddit.com/r/cosplay/comments/1xt15w0/ahri_cosplay_league_of_legends/",
     "subreddit": "cosplay",
     "views": 0,
     "has_media": true,
@@ -249,21 +249,21 @@
     "source": "rss"
    },
    {
-    "id": "t3_1xvxwb2",
-    "title": "Gushing over Magical Girls Season 2 New Visual",
-    "url": "https://www.reddit.com/r/anime/comments/1xvxwb2/gushing_over_magical_girls_season_2_new_visual/",
+    "id": "t3_1xxll3e",
+    "title": "Are You a Landmine, Chihara-san? | Key Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xxll3e/are_you_a_landmine_chiharasan_key_visual/",
     "subreddit": "anime",
     "views": 0,
     "has_media": true,
     "source": "rss"
    },
    {
-    "id": "t3_1xva5e1",
-    "title": "The Apothecary Diaries Season 3 • Kusuriya no Hitorigoto Season 3 - Episode 7 discussion",
-    "url": "https://www.reddit.com/r/anime/comments/1xva5e1/the_apothecary_diaries_season_3_kusuriya_no/",
+    "id": "t3_1xvxwb2",
+    "title": "Gushing over Magical Girls Season 2 New Visual",
+    "url": "https://www.reddit.com/r/anime/comments/1xvxwb2/gushing_over_magical_girls_season_2_new_visual/",
     "subreddit": "anime",
     "views": 0,
-    "has_media": false,
+    "has_media": true,
     "source": "rss"
    }
   ]
