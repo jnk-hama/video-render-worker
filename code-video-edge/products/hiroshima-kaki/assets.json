@@ -1,5 +1,5 @@
 {
- "_comment": "素材の取り方（edge-video.yml）。jmas #375（dish の型）：商品は販売ページの実物の写真だけ・場面は Pexels の本物の映像。asp_images の順が dl の asp0〜5（箸の1粒・60粒の山・1粒・湯気の1粒・かき鍋・かきフライ）、videos の順が vid0〜3（鍋のふた・湯気・こんろの鍋・食卓の鍋）。prep.py が組ごとに切り抜き・切り出し・コマ出しをする",
+ "_comment": "素材の取り方（edge-video.yml）。jmas #377（board の型・v2）：商品は販売ページの実物の写真だけ（奥行きで動かす＝depth）。映像は Pexels の本物（鍋と炎・氷・霜・油・煙）。どちらも実行時に取り、ここには置かない",
  "asp_images": [
   "https://shop.r10s.jp/masuyone/cabinet/kago/kaki2kg-kago.jpg",
   "https://image.rakuten.co.jp/masuyone/cabinet/goods/kaki/2kg/2015_kaki2kg_013a.jpg",
@@ -10,24 +10,19 @@
  ],
  "videos": [
   "https://videos.pexels.com/video-files/40801691/17432877_1080_1920_60fps.mp4",
-  "https://videos.pexels.com/video-files/40995593/17536696_1080_1922_30fps.mp4",
-  "https://videos.pexels.com/video-files/4253136/4253136-hd_1080_2048_25fps.mp4",
-  "https://videos.pexels.com/video-files/37876544/16070321_1080_1920_24fps.mp4"
+  "https://videos.pexels.com/video-files/7127619/7127619-hd_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/6621236/6621236-hd_1080_2048_25fps.mp4",
+  "https://videos.pexels.com/video-files/6797578/6797578-hd_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/11580342/11580342-hd_1080_1920_25fps.mp4",
+  "https://videos.pexels.com/video-files/19036346/19036346-hd_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/9694229/9694229-hd_1080_1920_25fps.mp4"
  ],
  "lines": [
   {
    "engine": "voicevox",
    "speaker": "WhiteCUL",
    "style": "ノーマル",
-   "text": "冬の鍋に、ジャンボの広島かき。",
-   "speed": 0.95,
-   "pause": 0.5
-  },
-  {
-   "engine": "voicevox",
-   "speaker": "WhiteCUL",
-   "style": "ノーマル",
-   "text": "にキロで、やく、ろくじゅうつぶ。じゅうにんまえです。",
+   "text": "このひとつぶが、やく、ろくじゅうつぶ。",
    "speed": 0.95,
    "pause": 0.5
   },
@@ -51,7 +46,7 @@
    "engine": "voicevox",
    "speaker": "WhiteCUL",
    "style": "ノーマル",
-   "text": "評価は、4.68。",
+   "text": "にキロで、やく、じゅうにんまえ。",
    "speed": 0.95,
    "pause": 0.5
   },
@@ -59,7 +54,15 @@
    "engine": "voicevox",
    "speaker": "WhiteCUL",
    "style": "ノーマル",
-   "text": "広島産ジャンボかき、にキロ。リンクはプロフィールから。",
+   "text": "レビュー、ななせんにひゃくさんじゅうにけん。評価は、4.68。",
+   "speed": 0.95,
+   "pause": 0.5
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "広島産、ジャンボかき。リンクはプロフィールから。",
    "speed": 0.95,
    "pause": 0.5
   }
@@ -74,5 +77,6 @@
   [
    "pile"
   ]
- ]
+ ],
+ "depth": true
 }

@@ -89,7 +89,9 @@ im = np.array(Image.open(f0).convert("RGB")).astype(int)
 BR = json.load(open(pj)).get("brand") or sys.exit("設計書に brand（ground・accent・accent_box）が無い")
 ground = im[60:120, 900:1040].reshape(-1, 3).mean(0); hexv = lambda h: np.array([int(h[i:i + 2], 16) for i in (1, 3, 5)])
 x0, y0, x1, y1 = BR["accent_box"]; reg = im[y0:y1, x0:x1].reshape(-1, 3); acc = np.abs(reg - hexv(BR["accent"])).max(1) <= 8
-R["描画されたブランド色"] = {"ok": bool(np.abs(ground - hexv(BR["ground"])).max() <= 3 and acc.sum() > 2000),
+# 全画面の映像の型（board・#377）は「地の色」が無い：設計書の brand.ground が null の時は地の色を見ず、要の色だけ見る（画素数の下限は同じ）
+ground_ok = BR["ground"] is None or bool(np.abs(ground - hexv(BR["ground"])).max() <= 3)
+R["描画されたブランド色"] = {"ok": bool(ground_ok and acc.sum() > 2000),
                      "地（実測）": "#%02X%02X%02X" % tuple(int(round(v)) for v in ground), "地（設計）": BR["ground"], "要の色の画素数": int(acc.sum())}
 
 # 9) 事実：画面の各文字の出典 id が facts.json にある／画面の数字がすべて facts.json の原文にある

@@ -40,6 +40,14 @@ for i, line in enumerate(A["lines"]):
     prep.vv_synth(line, f"{vdir}/line{i}.mp3")
 print("画像", len(A["asp_images"]), "枚・映像", len(A.get("videos", [])), "本・声", len(A["lines"]), "行")
 PY
+# 写真の奥行き（jmas #343・#377）：assets.json に "depth": true がある商品だけ。モデルは Depth Anything V2 Small（Apache-2.0＝商用可）。版は depth.py が固定。
+#   取り寄せの仕組み（jmas-ai-os の motion-sample-fetch）と同じ版の torch・transformers を入れる（版が違うと奥行きが変わり、絵が黙って変わる）
+if python3 -c "import json,sys;sys.exit(0 if json.load(open(sys.argv[1])).get('depth') else 1)" "$PK/assets.json"; then
+  python3 -m pip install --quiet --disable-pip-version-check torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+  python3 -m pip install --quiet --disable-pip-version-check transformers==4.46.3
+  python3 factory/depth.py "dl-$KEY" < /dev/null
+  [ "$(ls "dl-$KEY"/depth/asp*.png 2>/dev/null | wc -l)" = "$(ls "dl-$KEY"/asp*.jpg | wc -l)" ] || { echo "::error::奥行きの枚数が写真の枚数と違う"; exit 1; }
+fi
 # 下ごしらえ：組ごとに別の処理で（BiRefNet は1つの処理で2回呼ぶとメモリが 14GB まで膨らんで落ちた）
 python3 -c "import json,sys;[print(' '.join(g)) for g in json.load(open(sys.argv[1]))['prep']]" "$PK/assets.json" | while read -r g; do
   # shellcheck disable=SC2086

@@ -1,6 +1,5 @@
 {
  "product_key": "hiroshima-kaki",
- "template": "dish",
  "name": "広島産ジャンボかき 2kg",
  "item_no": "y-517P3",
  "genre": "food",
@@ -12,83 +11,82 @@
   "voice": "voicevox:WhiteCUL",
   "speed": 0.95
  },
+ "template": "board",
  "brand": {
-  "ground": "#F4F5F7",
+  "ground": null,
   "accent": "#174A63",
   "accent_box": [
-   0,
-   130,
-   1080,
-   170
+   60,
+   170,
+   144,
+   220
   ]
  },
  "beats": [
   {
    "kind": "S1",
-   "source": "F1,F2,F8",
+   "source": "F1,F2,F3",
    "voice": "line0.mp3",
-   "say": "冬の鍋に、ジャンボの広島かき。",
-   "brand": "広島産",
-   "series": "ジャンボかき",
-   "hook": "冬の鍋に、",
-   "hook2": "ジャンボの広島かき。",
-   "spec": "2kg・約60粒",
-   "note": "※加熱用。写真は販売ページより。映像はイメージです。"
-  },
-  {
-   "kind": "S2",
-   "source": "F2,F3",
-   "voice": "line1.mp3",
-   "say": "2キロで、約60粒。10人前です。",
-   "label": "2kg",
+   "say": "この一粒が、約60粒。",
+   "hook": "この1粒が、",
    "pre": "約",
    "big": "60",
    "unit": "粒",
-   "after": "約10人前",
-   "side": "1kg 約30粒",
-   "note": "※解凍後は1〜2割目減りします。写真は販売ページより。"
+   "pack": "2kg（1kg × 2袋）",
+   "note": "※写真は販売ページより。映像はイメージです。",
+   "note2": "※解凍後は1〜2割目減りします。"
+  },
+  {
+   "kind": "S2",
+   "source": "F4",
+   "voice": "line1.mp3",
+   "say": "1粒ずつ急速冷凍。解凍しやすく、ドリップも少なめ。",
+   "kicker": "1粒ずつ",
+   "head": "急速冷凍。",
+   "sub": "解凍しやすく、",
+   "sub2": "ドリップも少なめ。",
+   "note": "※販売ページの記載。映像はイメージです。"
   },
   {
    "kind": "S3",
-   "source": "F4",
-   "voice": "line2.mp3",
-   "say": "一粒ずつ、急速冷凍。解凍しやすく、ドリップも少なめ。",
-   "kicker": "1粒ずつ",
-   "head": "個別に急速冷凍",
-   "sub": "解凍しやすく、ドリップも少なく",
-   "note": "※販売ページの記載。霜の線は図です。"
-  },
-  {
-   "kind": "S4",
    "source": "F5",
-   "voice": "line3.mp3",
+   "voice": "line2.mp3",
    "say": "かき鍋にも、カキフライにも。",
    "a": "かき鍋にも、",
    "b": "カキフライにも。",
    "note": "※調理例の写真は販売ページより。"
   },
   {
+   "kind": "S4",
+   "source": "F1,F2",
+   "voice": "line3.mp3",
+   "say": "2キロで、約10人前。",
+   "lead": "2kgで、",
+   "pre": "約",
+   "big": "10",
+   "unit": "人前"
+  },
+  {
    "kind": "S5",
    "source": "F6",
    "voice": "line4.mp3",
-   "say": "評価は、4.68。",
+   "say": "レビュー7,232件、評価4.68。",
+   "label": "楽天市場のレビュー",
+   "reviews_n": "7,232",
+   "unit": "件",
    "score": "4.68",
    "count_label": "レビュー7,232件",
    "date": "楽天市場 2026年11月16日時点",
-   "note": "※評価・件数は販売ページの表示です。映像はイメージです。"
+   "note": "※評価・件数は販売ページの表示です。"
   },
   {
    "kind": "S6",
-   "source": "F1,F2,F4,F5",
+   "source": "F1,F2,F4,F8",
    "voice": "line5.mp3",
-   "say": "広島産ジャンボかき、2キロ。リンクはプロフィールから。",
+   "say": "広島産ジャンボかき。リンクはプロフィールから。",
    "brand": "広島産",
    "head": "ジャンボかき 2kg",
-   "points": [
-    "約60粒・約10人前",
-    "1粒ずつ個別に急速冷凍",
-    "かき鍋・カキフライに"
-   ],
+   "points": "約60粒・1粒ずつ急速冷凍",
    "cta": "リンクはプロフィールから",
    "note": "※加熱用。価格・在庫はリンク先でご確認ください。"
   }
@@ -98,27 +96,27 @@
    [
     "S1",
     "line0.mp3",
-    3.0
+    3.5
    ],
    [
     "S2",
     "line1.mp3",
-    4.2
+    5.5
    ],
    [
     "S3",
     "line2.mp3",
-    5.4
+    2.75
    ],
    [
     "S4",
     "line3.mp3",
-    2.8
+    3.0
    ],
    [
     "S5",
     "line4.mp3",
-    2.6
+    4.75
    ],
    [
     "S6",
@@ -127,26 +125,23 @@
    ]
   ],
   "climax": [
-   "S5",
-   "ヨンテン"
+   "S4",
+   "ジュウニン"
   ],
   "music": {
    "quiet": [
-    "S1",
-    "S3"
+    "S2"
    ],
    "hush": [
     [
      [
-      "cue",
-      "S5",
-      "ヨンテン",
+      "t0",
+      "S4",
       -0.45
      ],
      [
-      "cue",
-      "S5",
-      "ヨンテン",
+      "t0",
+      "S4",
       0.02
      ]
     ]
@@ -154,54 +149,30 @@
   },
   "events": [
    {
-    "id": "steam",
-    "at": [
-     "t0",
-     "S1",
-     0.15
-    ],
-    "what": "S1 湯気が晴れて1粒が見える",
-    "sfx": [
-     "glide",
-     0.9,
-     70,
-     140,
-     0.45
-    ],
-    "band": "low"
-   },
-   {
-    "id": "hook2",
+    "id": "yaku",
     "at": [
      "cue",
      "S1",
-     "ジャンボ"
+     "ヤク"
     ],
-    "what": "S1 2行目"
-   },
-   {
-    "id": "kg",
-    "at": [
-     "cue",
-     "S2",
-     "ニキロ"
-    ],
-    "what": "S2 60粒の山が上がる",
+    "what": "c2 氷の上の60粒へ切り替わる",
     "sfx": [
-     "tock",
-     220,
-     0.7
+     "whoosh",
+     0.35,
+     300,
+     3800,
+     0.5
     ],
-    "band": "low-mid"
+    "band": "mid"
    },
    {
     "id": "roku",
     "at": [
      "cue",
-     "S2",
+     "S1",
      "ロクジュウ"
     ],
-    "what": "S2 数え上げが60に着く",
+    "what": "c2 数字が60に着く",
     "sfx": [
      "bell",
      1568.0,
@@ -211,76 +182,177 @@
     "band": "high"
    },
    {
-    "id": "ninmae",
+    "id": "close",
     "at": [
-     "cue",
-     "S2",
-     "ジュウニン"
+     "ev",
+     "roku",
+     0.8
     ],
-    "what": "S2 約10人前"
+    "what": "c3 山へ寄る"
    },
    {
-    "id": "kyuu",
+    "id": "frz",
     "at": [
-     "cue",
-     "S3",
-     "キュウソク"
+     "t0",
+     "S2"
     ],
-    "what": "S3 霜の線が伸びる",
+    "what": "c4 1粒の大写し",
     "sfx": [
      "shimmer",
-     0.9,
+     1.1,
      0.4
     ],
     "band": "high"
    },
    {
+    "id": "kyuu",
+    "at": [
+     "cue",
+     "S2",
+     "キュウソク"
+    ],
+    "what": "c4 霜が縁から伸びる"
+   },
+   {
     "id": "kaitou",
     "at": [
      "cue",
-     "S3",
+     "S2",
      "カイトオ"
     ],
-    "what": "S3 解凍しやすく"
+    "what": "c5 湯の上の1粒へ",
+    "sfx": [
+     "glide",
+     0.7,
+     240,
+     110,
+     0.4
+    ],
+    "band": "low"
+   },
+   {
+    "id": "drip",
+    "at": [
+     "cue",
+     "S2",
+     "ドリップ"
+    ],
+    "what": "c5 2行目"
+   },
+   {
+    "id": "flame",
+    "at": [
+     "t1",
+     "S2",
+     -0.5
+    ],
+    "what": "c6 青い炎",
+    "sfx": [
+     "whoosh",
+     0.45,
+     120,
+     1400,
+     0.7
+    ],
+    "band": "low-mid"
    },
    {
     "id": "nabe",
     "at": [
-     "cue",
-     "S4",
-     "カキナベ"
+     "t0",
+     "S3"
     ],
-    "what": "S4 かき鍋の写真が入る",
+    "what": "c7 かき鍋",
     "sfx": [
-     "tick",
-     2400,
-     0.5
+     "tock",
+     240,
+     0.6
+    ],
+    "band": "low-mid"
+   },
+   {
+    "id": "oil",
+    "at": [
+     "cue",
+     "S3",
+     "カキフライ"
+    ],
+    "what": "c8 油の泡（言葉と同時）",
+    "sfx": [
+     "whoosh",
+     0.3,
+     2000,
+     7000,
+     0.4
     ],
     "band": "high"
    },
    {
     "id": "fry",
     "at": [
-     "cue",
-     "S4",
-     "カキフライ"
+     "ev",
+     "oil",
+     0.35
     ],
-    "what": "S4 カキフライの写真が入る",
+    "what": "c9 カキフライ",
     "sfx": [
      "tick",
-     2800,
+     2600,
      0.5
     ],
     "band": "high"
    },
    {
-    "id": "dot",
+    "id": "nin",
+    "at": [
+     "cue",
+     "S4",
+     "ジュウニン"
+    ],
+    "what": "c10 約10人前（山場）",
+    "sfx": [
+     "bell",
+     1046.5,
+     0.5,
+     1.6
+    ],
+    "band": "high-mid"
+   },
+   {
+    "id": "nana",
+    "at": [
+     "cue",
+     "S5",
+     "ナナセン"
+    ],
+    "what": "c11 件数を数え上げる"
+   },
+   {
+    "id": "m2",
+    "at": [
+     "ev",
+     "nana",
+     0.28
+    ],
+    "what": "c11 証拠の連打：カキフライ"
+   },
+   {
+    "id": "rcut",
+    "at": [
+     "ev",
+     "nana",
+     1.25
+    ],
+    "what": "c11 証拠の連打：湯の上の1粒"
+   },
+   {
+    "id": "yon",
     "at": [
      "cue",
      "S5",
      "ヨンテン"
     ],
-    "what": "S5「4.68」",
+    "what": "c12 4.68",
     "sfx": [
      "bell",
      2093.0,
@@ -290,22 +362,22 @@
     "band": "high"
    },
    {
-    "id": "name",
+    "id": "jumbo",
     "at": [
      "cue",
      "S6",
-     "ヒロシマ"
+     "ジャンボ"
     ],
-    "what": "S6 名前"
+    "what": "c13 名前"
    },
    {
-    "id": "cta",
+    "id": "link",
     "at": [
      "cue",
      "S6",
      "リンクワ"
     ],
-    "what": "S6「リンクは」で札"
+    "what": "c13 行動のボタン"
    },
    {
     "id": "under",
@@ -314,7 +386,7 @@
      "S6",
      "プロフィ"
     ],
-    "what": "S6「プロフィール」で札が押される",
+    "what": "c13 ボタンの音",
     "sfx": [
      "bell",
      1318.5,
@@ -333,99 +405,1030 @@
     ],
     "to": [
      "t1",
-     "S2"
+     "S1"
     ],
     "sfx": [
      "roomtone"
     ],
     "over_db": -12.0,
-    "what": "S1〜S2 台所の静けさ"
+    "what": "台所の静けさ"
    }
   ]
  },
- "dish": {
+ "board": {
   "clips": {
-   "a": {
-    "n": 232
+   "pot": {
+    "n": 234
    },
-   "b": {
-    "n": 175
+   "ice": {
+    "n": 210
    },
-   "c": {
-    "n": 206
+   "bed": {
+    "n": 180
    },
-   "d": {
-    "n": 268
+   "frost": {
+    "n": 180
+   },
+   "oil": {
+    "n": 28
+   },
+   "mist": {
+    "n": 138
+   },
+   "steam": {
+    "n": 270
    }
   },
-  "bg": {
-   "S1": {
-    "clip": "a"
+  "seqs": {
+   "hero_in": {
+    "n": 54
    },
-   "S2": {
-    "clip": "b"
+   "hero_out": {
+    "n": 110
    },
-   "S3": {
-    "clip": "b",
-    "from": 60,
-    "pp": true
+   "hero_end": {
+    "n": 130
    },
-   "S4": {
-    "clip": "c"
+   "lift": {
+    "n": 80
    },
-   "S5": {
-    "clip": "d"
+   "nabe": {
+    "n": 54
    },
-   "S6": {
-    "clip": "a",
-    "from": 90,
-    "pp": true
+   "fry": {
+    "n": 50
    }
   },
-  "scenes": {
-   "S1": {
-    "type": "hook",
-    "ev": {
-     "line2": "hook2"
+  "shots": [
+   {
+    "id": "c1",
+    "why": "止める：一番旨そうな1粒へ寄る",
+    "bg": {
+     "clip": "pot",
+     "blur": 12,
+     "zoom": [
+      1.08,
+      1.14
+     ]
+    },
+    "prod": [
+     {
+      "seq": "hero_in",
+      "box": [
+       0,
+       500,
+       1080,
+       900
+      ],
+      "mask": "feather"
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": [
+       0.55,
+       0.3
+      ],
+      "from": 20
+     }
+    ],
+    "text": [
+     {
+      "k": "chip",
+      "s": "${TARGET}",
+      "x": 64,
+      "y": 250
+     },
+     {
+      "k": "h1",
+      "s": "${S1.hook}",
+      "x": 64,
+      "y": 318,
+      "size": 118
+     },
+     {
+      "k": "note",
+      "s": "${S1.note}",
+      "x": 64,
+      "y": 1388
+     }
+    ],
+    "scrim": "dark"
+   },
+   {
+    "id": "c2",
+    "at": [
+     "ev",
+     "yaku"
+    ],
+    "why": "約束：この量",
+    "bg": {
+     "clip": "bed",
+     "zoom": [
+      1.0,
+      1.04
+     ],
+     "bright": 1.04
+    },
+    "prod": [
+     {
+      "img": "pile.png",
+      "box": [
+       20,
+       690,
+       1040,
+       624
+      ],
+      "shadow": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "mist",
+      "opacity": [
+       0.35,
+       0.2
+      ],
+      "mask": "edge"
+     }
+    ],
+    "text": [
+     {
+      "k": "num",
+      "s": "<small>${S1.pre}</small><span class=\"n\">${S1.big}</span><small>${S1.unit}</small>",
+      "x": 66,
+      "y": 236,
+      "c": "ink",
+      "count": {
+       "from": 0,
+       "to": 60,
+       "at": [
+        "ev",
+        "roku",
+        -0.3
+       ],
+       "dur": 0.5
+      },
+      "at": [
+       "ev",
+       "roku",
+       -0.3
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S1.pack}",
+      "x": 68,
+      "y": 470,
+      "c": "ink",
+      "size": 40,
+      "at": [
+       "ev",
+       "roku",
+       0.15
+      ]
+     },
+     {
+      "k": "note",
+      "s": "${S1.note2}",
+      "x": 64,
+      "y": 1388,
+      "c": "ink"
+     }
+    ],
+    "scrim": "light"
+   },
+   {
+    "id": "c3",
+    "at": [
+     "ev",
+     "close"
+    ],
+    "why": "量を近くで：山へ寄る",
+    "bg": {
+     "clip": "bed",
+     "base": "c2",
+     "zoom": [
+      1.3,
+      1.36
+     ],
+     "bright": 1.04
+    },
+    "prod": [
+     {
+      "img": "pile.png",
+      "box": [
+       -250,
+       570,
+       1768,
+       1061
+      ],
+      "box2": [
+       -430,
+       560,
+       1768,
+       1061
+      ],
+      "shadow": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "mist",
+      "base": "c2",
+      "opacity": [
+       0.2,
+       0.15
+      ],
+      "mask": "edge"
+     }
+    ],
+    "text": [
+     {
+      "k": "num",
+      "s": "<small>${S1.pre}</small>${S1.big}<small>${S1.unit}</small>",
+      "x": 66,
+      "y": 236,
+      "c": "ink",
+      "anim": "cut"
+     },
+     {
+      "k": "cap",
+      "s": "${S1.pack}",
+      "x": 68,
+      "y": 470,
+      "c": "ink",
+      "size": 40,
+      "anim": "cut"
+     }
+    ],
+    "scrim": "light"
+   },
+   {
+    "id": "c4",
+    "at": [
+     "t0",
+     "S2"
+    ],
+    "why": "理由：1粒ずつ凍っている",
+    "bg": {
+     "clip": "ice",
+     "zoom": [
+      1.04,
+      1.1
+     ],
+     "blur": 2
+    },
+    "prod": [
+     {
+      "img": "one.png",
+      "box": [
+       150,
+       640,
+       780,
+       610
+      ],
+      "box2": [
+       130,
+       620,
+       820,
+       642
+      ],
+      "rot": [
+       -5,
+       0
+      ],
+      "shadow": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "frost",
+      "mask": "edge2",
+      "opacity": [
+       0.0,
+       1.0
+      ],
+      "at": [
+       "ev",
+       "kyuu",
+       -0.25
+      ]
+     },
+     {
+      "clip": "mist",
+      "opacity": [
+       0.4,
+       0.3
+      ]
+     }
+    ],
+    "text": [
+     {
+      "k": "h2",
+      "s": "${S2.kicker}",
+      "x": 64,
+      "y": 250,
+      "at": [
+       "t0",
+       "S2",
+       0.12
+      ],
+      "c": "ink"
+     },
+     {
+      "k": "h1",
+      "s": "${S2.head}",
+      "x": 64,
+      "y": 322,
+      "at": [
+       "ev",
+       "kyuu"
+      ],
+      "c": "ink"
+     },
+     {
+      "k": "note",
+      "s": "${S2.note}",
+      "x": 64,
+      "y": 1388,
+      "c": "ink"
+     }
+    ],
+    "scrim": "light"
+   },
+   {
+    "id": "c5",
+    "at": [
+     "ev",
+     "kaitou",
+     -0.05
+    ],
+    "x": 0.3,
+    "why": "結果：凍った1粒が湯の上へ",
+    "bg": {
+     "clip": "pot",
+     "from": 150,
+     "blur": 10,
+     "zoom": [
+      1.06,
+      1.12
+     ]
+    },
+    "prod": [
+     {
+      "seq": "lift",
+      "box": [
+       0,
+       440,
+       1080,
+       972
+      ],
+      "mask": "feather"
+     }
+    ],
+    "fx": [
+     {
+      "clip": "frost",
+      "mask": "edge",
+      "opacity": [
+       0.7,
+       0.0
+      ],
+      "to": [
+       "ev",
+       "kaitou",
+       0.8
+      ]
+     },
+     {
+      "clip": "steam",
+      "opacity": [
+       0.2,
+       0.5
+      ],
+      "from": 60
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S2.sub}",
+      "x": 64,
+      "y": 250,
+      "size": 78
+     },
+     {
+      "k": "h1",
+      "s": "${S2.sub2}",
+      "x": 64,
+      "y": 346,
+      "size": 78,
+      "at": [
+       "ev",
+       "drip"
+      ]
+     }
+    ],
+    "scrim": "dark"
+   },
+   {
+    "id": "c6",
+    "at": [
+     "ev",
+     "flame"
+    ],
+    "why": "原因：火",
+    "bg": {
+     "clip": "pot",
+     "from": 60,
+     "zoom": [
+      2.2,
+      2.5
+     ],
+     "origin": "50% 100%",
+     "bright": 1.15
     }
    },
-   "S2": {
-    "type": "count",
-    "ev": {
-     "rise": "kg",
-     "num": "roku",
-     "after": "ninmae"
+   {
+    "id": "c7",
+    "at": [
+     "ev",
+     "nabe"
+    ],
+    "why": "結果：かき鍋",
+    "bg": {
+     "clip": "pot",
+     "from": 200,
+     "blur": 10,
+     "zoom": [
+      1.08,
+      1.12
+     ]
+    },
+    "prod": [
+     {
+      "seq": "nabe",
+      "box": [
+       0,
+       440,
+       1080,
+       968
+      ],
+      "mask": "feather"
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": [
+       0.45,
+       0.3
+      ],
+      "from": 120,
+      "mask": "low"
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.a}",
+      "x": 64,
+      "y": 262
+     }
+    ],
+    "scrim": "dark"
+   },
+   {
+    "id": "c8",
+    "at": [
+     "ev",
+     "oil"
+    ],
+    "why": "原因：油",
+    "bg": {
+     "clip": "oil",
+     "mode": "pp",
+     "zoom": [
+      1.0,
+      1.08
+     ]
     }
    },
-   "S3": {
-    "type": "frost",
-    "ev": {
-     "head": "kyuu",
-     "sub": "kaitou"
-    }
+   {
+    "id": "c9",
+    "at": [
+     "ev",
+     "fry"
+    ],
+    "why": "結果：カキフライ",
+    "bg": {
+     "clip": "oil",
+     "mode": "pp",
+     "blur": 16,
+     "bright": 0.92
+    },
+    "prod": [
+     {
+      "seq": "fry",
+      "box": [
+       0,
+       480,
+       1080,
+       903
+      ],
+      "mask": "feather"
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.b}",
+      "x": 64,
+      "y": 262,
+      "size": 98
+     },
+     {
+      "k": "note",
+      "s": "${S3.note}",
+      "x": 64,
+      "y": 1388
+     }
+    ],
+    "scrim": "dark"
    },
-   "S4": {
-    "type": "menu",
-    "ev": {
-     "a": "nabe",
-     "b": "fry"
-    }
+   {
+    "id": "c10",
+    "at": [
+     "t0",
+     "S4"
+    ],
+    "x": 0.35,
+    "why": "山場：湯気の中から1粒が現れる",
+    "bg": {
+     "clip": "pot",
+     "from": 30,
+     "blur": 12,
+     "zoom": [
+      1.1,
+      1.16
+     ]
+    },
+    "prod": [
+     {
+      "seq": "hero_out",
+      "box": [
+       0,
+       560,
+       1080,
+       900
+      ],
+      "mask": "feather"
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": [
+       0.95,
+       0.28
+      ],
+      "from": 150,
+      "mask": "low"
+     }
+    ],
+    "text": [
+     {
+      "k": "h2",
+      "s": "${S4.lead}",
+      "x": 64,
+      "y": 250,
+      "at": [
+       "t0",
+       "S4",
+       0.25
+      ]
+     },
+     {
+      "k": "num",
+      "s": "<small>${S4.pre}</small>${S4.big}<small>${S4.unit}</small>",
+      "x": 66,
+      "y": 312,
+      "size": 190,
+      "c": "yel",
+      "at": [
+       "ev",
+       "nin",
+       -0.05
+      ],
+      "anim": "rise"
+     }
+    ],
+    "scrim": "dark",
+    "scrimk": 0.62
    },
-   "S5": {
-    "type": "rating",
-    "ev": {
-     "dot": "dot"
-    }
+   {
+    "id": "c11",
+    "at": [
+     "t0",
+     "S5"
+    ],
+    "x": 0.3,
+    "scrim": "dark",
+    "why": "証拠：かき鍋",
+    "bg": {
+     "clip": "pot",
+     "from": 60,
+     "blur": 12,
+     "zoom": [
+      1.08,
+      1.12
+     ]
+    },
+    "prod": [
+     {
+      "seq": "nabe",
+      "box": [
+       0,
+       560,
+       1080,
+       968
+      ],
+      "mask": "feather"
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": [
+       0.3,
+       0.3
+      ],
+      "from": 40,
+      "mask": "low"
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "${S5.label}",
+      "x": 68,
+      "y": 252,
+      "size": 40
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S5.reviews_n}</span><small>${S5.unit}</small>",
+      "x": 66,
+      "y": 308,
+      "size": 190,
+      "count": {
+       "from": 0,
+       "to": 7232,
+       "sep": true,
+       "at": [
+        "ev",
+        "nana",
+        -0.1
+       ],
+       "dur": 0.9
+      },
+      "at": [
+       "ev",
+       "nana",
+       -0.1
+      ]
+     }
+    ],
+    "scrimk": 0.66
    },
-   "S6": {
-    "type": "end",
-    "ev": {
-     "name": "name",
-     "cta": "cta",
-     "press": "under"
-    }
+   {
+    "id": "c11m",
+    "at": [
+     "ev",
+     "m2"
+    ],
+    "scrim": "dark",
+    "why": "証拠：カキフライ",
+    "bg": {
+     "clip": "oil",
+     "mode": "pp",
+     "blur": 16,
+     "bright": 0.92
+    },
+    "prod": [
+     {
+      "seq": "fry",
+      "box": [
+       0,
+       580,
+       1080,
+       903
+      ],
+      "mask": "feather"
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "${S5.label}",
+      "x": 68,
+      "y": 252,
+      "size": 40,
+      "anim": "cut"
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S5.reviews_n}</span><small>${S5.unit}</small>",
+      "x": 66,
+      "y": 308,
+      "size": 190,
+      "count": {
+       "from": 0,
+       "to": 7232,
+       "sep": true,
+       "at": [
+        "ev",
+        "nana",
+        -0.1
+       ],
+       "dur": 0.9
+      },
+      "anim": "cut"
+     }
+    ],
+    "scrimk": 0.66
+   },
+   {
+    "id": "c11b",
+    "at": [
+     "ev",
+     "rcut"
+    ],
+    "scrim": "dark",
+    "why": "証拠：湯の上の1粒",
+    "bg": {
+     "clip": "pot",
+     "from": 150,
+     "blur": 10,
+     "zoom": [
+      1.06,
+      1.1
+     ]
+    },
+    "prod": [
+     {
+      "seq": "lift",
+      "box": [
+       0,
+       560,
+       1080,
+       972
+      ],
+      "mask": "feather"
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": [
+       0.3,
+       0.45
+      ],
+      "from": 90,
+      "mask": "low"
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "${S5.label}",
+      "x": 68,
+      "y": 252,
+      "size": 40,
+      "anim": "cut"
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S5.reviews_n}</span><small>${S5.unit}</small>",
+      "x": 66,
+      "y": 308,
+      "size": 190,
+      "count": {
+       "from": 0,
+       "to": 7232,
+       "sep": true,
+       "at": [
+        "ev",
+        "nana",
+        -0.1
+       ],
+       "dur": 0.9
+      },
+      "anim": "cut"
+     }
+    ],
+    "scrimk": 0.66
+   },
+   {
+    "id": "c12",
+    "at": [
+     "ev",
+     "yon",
+     -0.05
+    ],
+    "scrim": "light",
+    "why": "証拠：評価（山の全体）",
+    "bg": {
+     "clip": "bed",
+     "from": 10,
+     "zoom": [
+      1.0,
+      1.04
+     ],
+     "bright": 1.04
+    },
+    "prod": [
+     {
+      "img": "pile.png",
+      "box": [
+       20,
+       800,
+       1040,
+       624
+      ],
+      "shadow": true
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "<svg width=\"330\" height=\"62\" viewBox=\"0 0 330 62\"><defs><linearGradient id=\"sg\"><stop offset=\"93.6%\" stop-color=\"#F2B705\"/><stop offset=\"93.6%\" stop-color=\"rgba(14,36,51,.22)\"/></linearGradient></defs><path transform=\"translate(33,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(99,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(165,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(231,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(297,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/></svg>",
+      "x": 64,
+      "y": 236,
+      "c": "ink",
+      "at": [
+       "ev",
+       "yon",
+       0.12
+      ]
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S5.score}</span>",
+      "x": 66,
+      "y": 292,
+      "c": "ink",
+      "size": 220,
+      "count": {
+       "from": 0,
+       "to": 4.68,
+       "dec": 2,
+       "dur": 0.5,
+       "at": [
+        "ev",
+        "yon",
+        0.12
+       ]
+      },
+      "at": [
+       "ev",
+       "yon",
+       0.12
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S5.count_label}",
+      "x": 68,
+      "y": 528,
+      "c": "ink",
+      "size": 44,
+      "at": [
+       "ev",
+       "yon",
+       0.12
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S5.date}",
+      "x": 68,
+      "y": 596,
+      "c": "ink",
+      "size": 28,
+      "at": [
+       "ev",
+       "yon",
+       0.12
+      ]
+     },
+     {
+      "k": "note",
+      "s": "${S5.note}",
+      "x": 64,
+      "y": 690,
+      "c": "ink",
+      "at": [
+       "ev",
+       "yon",
+       0.12
+      ]
+     }
+    ]
+   },
+   {
+    "id": "c13",
+    "at": [
+     "t0",
+     "S6"
+    ],
+    "x": 0.3,
+    "why": "行動：1カット目と同じ1粒を引きで",
+    "bg": {
+     "clip": "pot",
+     "from": 100,
+     "blur": 10,
+     "zoom": [
+      1.06,
+      1.12
+     ]
+    },
+    "prod": [
+     {
+      "seq": "hero_end",
+      "box": [
+       0,
+       560,
+       1080,
+       662
+      ],
+      "mask": "feather"
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": [
+       0.4,
+       0.55
+      ],
+      "from": 20,
+      "mask": "low"
+     }
+    ],
+    "text": [
+     {
+      "k": "h2",
+      "s": "${S6.brand}",
+      "x": 64,
+      "y": 244
+     },
+     {
+      "k": "h1",
+      "s": "${S6.head}",
+      "x": 64,
+      "y": 312,
+      "size": 96,
+      "at": [
+       "ev",
+       "jumbo",
+       -0.1
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S6.points}",
+      "x": 68,
+      "y": 440,
+      "size": 38,
+      "at": [
+       "ev",
+       "jumbo",
+       0.5
+      ]
+     },
+     {
+      "k": "pill",
+      "s": "${S6.cta}",
+      "x": 64,
+      "y": 1270,
+      "at": [
+       "ev",
+       "link"
+      ]
+     },
+     {
+      "k": "note",
+      "s": "${S6.note}",
+      "x": 64,
+      "y": 1388
+     }
+    ],
+    "scrim": "dark"
    }
-  }
+  ]
  },
  "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00pmn5n.sdgff119.g00pmn5n.sdgfg61f/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmasuyone%2F130030%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmasuyone%2Fi%2F10000215%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
  "item_code": "masuyone:10000215"
