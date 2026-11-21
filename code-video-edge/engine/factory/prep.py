@@ -40,6 +40,17 @@ def vv_synth(d, out):
     # 句読点の間（pause_mora）だけを縮める（#339・25秒に収めるため）。問い合わせ結果そのものを書き換えるので、下の時刻の計算にも同じ値が入る
     for ap in q["accent_phrases"]:
         if ap.get("pause_mora") and "pause" in d: ap["pause_mora"]["vowel_length"] *= d["pause"]
+    # 数字の前の溜め・数字の持ち上げ（ルタオ r2・#379）：句（accent phrase）を読みのカナで指す。
+    #   hold＝{句: 秒} その句の後の間を決めた秒に（句読点の無い句には間を足す）。lift＝{句: 量} その句の音の高さに足す（VOICEVOX の pitch は対数・0.06 で約6%高い）
+    for ap in q["accent_phrases"]:
+        key = "".join(m["text"] for m in ap["moras"])
+        if key in d.get("hold", {}):
+            ap["pause_mora"] = ap.get("pause_mora") or {"text": "、", "consonant": None, "consonant_length": None, "vowel": "pau", "vowel_length": 0.0, "pitch": 0.0}
+            ap["pause_mora"]["vowel_length"] = d["hold"][key]
+        for m in ap["moras"]:
+            if key in d.get("lift", {}) and m["pitch"] > 0: m["pitch"] += d["lift"][key]
+    miss = [k for k in list(d.get("hold", {})) + list(d.get("lift", {})) if k not in {"".join(m["text"] for m in ap["moras"]) for ap in q["accent_phrases"]}]
+    if miss: sys.exit(f"hold/lift の句が読みに無い: {miss}（読みは {q.get('kana')}）")   # 当たらない指定を黙って無視しない
     wav = out[:-4] + ".wav"; open(wav, "wb").write(api(f"/synthesis?speaker={st['id']}", json.dumps(q).encode()))
     subprocess.run([FF, "-loglevel", "error", "-y", "-i", wav, "-b:a", "192k", out], check=True); os.remove(wav)
     open(out[:-4] + ".kana.txt", "w").write(q.get("kana", "")); print(os.path.basename(out), d["text"], "→", q.get("kana", ""))

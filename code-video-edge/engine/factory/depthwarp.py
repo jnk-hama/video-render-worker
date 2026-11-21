@@ -35,5 +35,14 @@ for name, frames in json.load(open(jobs)).items():
             px = (u - ox) / m + ox + j["dx"] * (d - j["focus"]); py = (v - oy) / m + oy + j["dy"] * (d - j["focus"])
         coords = [np.clip(py, 0, 1) * (H - 1), np.clip(px, 0, 1) * (W - 1)]
         rgb = np.stack([map_coordinates(im[..., c], coords, order=1) for c in range(3)], -1)
+        # ピント（dof・ルタオ r2）：{"at": ピントの奥行き 0〜1, "k": 最大のぼけ px, "range": ぼけきる奥行きの差}。at をコマごとに動かす＝ピント送り。
+        #   レンズのぼけと同じく、ピントの面から離れた所ほどぼかすだけ（形は描き変えない）。ぼかした4段を奥行きの差で混ぜる
+        if j.get("dof"):
+            from scipy.ndimage import gaussian_filter
+            f = j["dof"]; dd = map_coordinates(dp, coords, order=1)
+            w = np.clip(np.abs(dd - f["at"]) / f.get("range", 0.5), 0, 1) * 3
+            lv = [rgb] + [np.stack([gaussian_filter(rgb[..., c], f["k"] * q / 3) for c in range(3)], -1) for q in (1, 2, 3)]
+            i0 = np.floor(w).astype(int).clip(0, 2); fr = (w - i0)[..., None]
+            rgb = sum(np.where((i0 == q)[..., None], lv[q] * (1 - fr) + lv[q + 1] * fr, 0) for q in range(3))
         Image.fromarray(np.clip(rgb + 0.5, 0, 255).astype(np.uint8)).save(os.path.join(out, j["out"]), quality=92)
     print(name, len(frames), "コマ")

@@ -18,11 +18,12 @@
   html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:#F3EEE6; }
   body { position:relative; font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; color:#fff; }
   #bg, #far, #behind, #world, #fx, #near, #shade, #ui, #post, #grain { position:absolute; left:0; top:0; width:1080px; height:1920px; overflow:hidden; pointer-events:none; }
-  #far img, #fx img { position:absolute; left:0; top:0; width:1080px; height:1920px; display:none; }
+  #far img, #fx img { position:absolute; left:0; top:0; width:1080px; height:1920px; display:none; object-fit:cover; }   /* 横長の写真を奥に敷く時も縦に伸ばさない（r2） */
   .m { position:absolute; display:none; will-change:transform; }
   .m img { display:block; width:100%; height:100%; }
   .feather { -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%); mask-image:linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%); }
   .soft { -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, rgba(0,0,0,.5) 82%, transparent 100%); mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, rgba(0,0,0,.5) 82%, transparent 100%); }
+  .top { -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 16%); mask-image:linear-gradient(180deg, transparent 0%, #000 16%); }   /* 画面の下の端まで写真・上だけ溶かす（上下のぼかし帯をやめる・r2） */
   .low { -webkit-mask-image:linear-gradient(180deg, transparent 0px, transparent 560px, #000 820px); mask-image:linear-gradient(180deg, transparent 0px, transparent 560px, #000 820px); }
   .bw { position:absolute; white-space:nowrap; font:500 300px/1 "Cormorant Garamond", serif; letter-spacing:-.01em; color:rgba(255,246,227,.86); display:none; }
   .t { position:absolute; white-space:nowrap; visibility:hidden; transform-origin:0 60%; }
@@ -113,10 +114,10 @@ const place = (node, box, cam, p, extra = "") => {
 
 for (const s of SH) {
   // 奥（#far）：本物の映像 clip か、奥行きの連番 seq をぼかした物。rate＜1 で溜め（ゆっくり）
-  if (s.far) { const g = s.far, im = el("img", { alt: "" }, "", $("far")), n = g.seq ? NN("seqs", g.seq) : NN("clips", g.clip), base = g.base ? SH.find((x) => x.id === g.base).a : s.a;
+  if (s.far) { const g = s.far, im = el("img", { alt: "" }, "", $("far")), n = g.img ? 1 : g.seq ? NN("seqs", g.seq) : NN("clips", g.clip), base = g.base ? SH.find((x) => x.id === g.base).a : s.a;
     U.push(() => { const t = T(); if (!onS(s, t)) { im.style.display = "none"; return; } im.style.display = "block";
       const i = frameAt(n, Math.floor((t - base) * 30 * (g.rate || 1) + 1e-6) + (g.from || 0), g.mode || "pp");
-      show(im, g.seq ? `${DIR}dp/${g.seq}_${pad(i)}.jpg` : `${DIR}fv/${g.clip}_${pad(i)}.jpg`);
+      show(im, g.img ? `${DIR}img/${g.img}` : g.seq ? `${DIR}dp/${g.seq}_${pad(i)}.jpg` : `${DIR}fv/${g.clip}_${pad(i)}.jpg`);   // img＝同じ写真を大きくぼかして奥に敷く（写真の縁を地の色に溶かす・r2）
       const cam = camOf(s, t), b = g.blur ? lerp(g.blur[0], g.blur[1], E.outQuart((t - s.a) / Math.max(0.3, s.z - s.a))) : 0;
       im.style.transformOrigin = "540px 900px"; im.style.transform = `translate(${(-cam.x * 0.35).toFixed(2)}px, ${(-cam.y * 0.35).toFixed(2)}px) rotate(${(cam.r * 0.35).toFixed(3)}deg) scale(${(1.1 + (cam.z - 1) * 0.35).toFixed(4)})`;
       im.style.filter = `blur(${(b + cam.blur * 0.5).toFixed(2)}px) brightness(${g.bright || 1}) saturate(${g.sat || 1})`; im.style.opacity = io(s, t).toFixed(3); }); }
@@ -148,8 +149,10 @@ for (const s of SH) {
   // 線（商品の1点に付く引き出し線・寸法の線）：path を「描く」。d＝SVG の道・at＝描き始め・dur
   for (const ln of s.lines || []) { const p = sv("path", { d: ln.d, fill: "none", stroke: ln.color || "#fff", "stroke-width": ln.w || 4, "stroke-linecap": "round" }, $("over")), L = p.getTotalLength(), a0 = R(ln.at, s.a);
     const dots = (ln.dots || []).map(([cx, cy]) => sv("circle", { cx, cy, r: 9, fill: ln.color || "#fff" }, $("over")));
-    U.push(() => { const t = T(), on = onS(s, t) && t >= a0; const k = on ? E.outExpo((t - a0) / (ln.dur || 0.45)) : 0;
+    const st = p.getPointAtLength(0); p.style.transformOrigin = `${st.x}px ${st.y}px`;
+    U.push(() => { const t = T(), on = onS(s, t) && t >= a0; const k = on ? E.outExpo((t - a0) / (ln.dur || 0.45)) : 0, z = on ? SP(t - a0, 0.6, 0.25) : 0;
       p.style.strokeDasharray = `${L}`; p.style.strokeDashoffset = `${(L * (1 - k)).toFixed(2)}`; p.style.opacity = (on ? io(s, t) : 0).toFixed(3);
+      p.style.transform = `scale(${(0.55 + 0.45 * z).toFixed(4)})`; p.style.filter = z < 0.98 ? `blur(${(4 * (1 - z)).toFixed(2)}px)` : "none";   // 奥から手前へ（r2）
       dots.forEach((c) => { c.setAttribute("r", (9 * SP(t - a0, 0.4, 0.3)).toFixed(2)); c.style.opacity = (on ? io(s, t) : 0).toFixed(3); }); }); }
 
   // ---------- 動く字（#ui）：mask＝1字ずつ下から／flip＝1字ずつ奥から回って起きる／slam＝奥から飛んできてぶつかる（揺れ・色ずれ）／rise／cut ----------
@@ -179,7 +182,13 @@ for (const s of SH) {
       else e.style.textShadow = x.glow ? "0 0 26px rgba(255,214,120,.75), 0 2px 18px rgba(0,0,0,.3)" : "";
       if (out > 0) tf += ` scale(${(1 + 0.05 * out).toFixed(4)})`;
       e.style.transform = tf || "none"; e.style.filter = fl || "none";
-      if (cn) { const k = SP(t - R(c.at, a), c.dur || 0.7, 0.12); cn.textContent = fmt(c.from + (c.to - c.from) * clamp(k, 0, 1)); } }); }
+      if (cn) { const k = SP(t - R(c.at, a), c.dur || 0.7, 0.12); cn.textContent = fmt(c.from + (c.to - c.from) * clamp(k, 0, 1));
+        const v = t - (R(c.at, a) + (c.dur || 0.7)), q = v >= 0 && v < 0.5 ? Math.exp(-v * 7) : 0;
+        cn.style.display = "inline-block"; cn.style.transformOrigin = "50% 70%"; cn.style.transform = q ? `scale(${(1 + 0.07 * q * Math.cos(v * 26)).toFixed(4)})` : "none";
+        cn.style.textShadow = q ? `0 0 ${(40 * q).toFixed(0)}px rgba(255,214,120,${(0.9 * q).toFixed(3)})` : ""; }
+      // 一覧の今の行（hl＝[始め, 終わり]）：太く・少し右へバネで出る。他の行も消さない（字の見える時間・r2）
+      if (x.hl) { const h0 = R(x.hl[0]), h1 = R(x.hl[1]), act = t >= h0 && t < h1, kk = act ? SP(t - h0, 0.45, 0.3) : 0;
+        e.style.fontWeight = act ? "900" : "500"; e.style.color = act ? "" : "#463F38"; tf += ` translateX(${(14 * kk).toFixed(2)}px)`; e.style.transform = tf; } }); }   // 同梱の太さは 500/700/900 だけ（800 は合成の太字＝点検の豆腐で落ちた）
 }
 
 // ---------- 舞う粒（#near・視差 1.6）：ボケた光の粒。カットの near で濃さを決める。乱数なし（hash） ----------
@@ -209,10 +218,14 @@ for (const s of SH) {
 // ---------- 行動の札（CTA）：奥に倒れた所からバネで起き上がり、光が走り、押されて輪が広がる ----------
 if (K.cta) { const c = K.cta, w = el("div", { id: "cta" }, `<div class="btn"><span class="lbl">${txt(c.s)}</span><span class="shine"></span></div>`), b = w.firstChild, sh = b.lastChild;
   const ring = el("div", { class: "ring", style: "width:10px;height:10px;border-radius:999px;border:4px solid rgba(255,214,120,.9)" }, "", $("post"));
+  const tap = el("div", { class: "ring", style: "border-radius:50%;border:5px solid rgba(255,255,255,.95);background:rgba(255,255,255,.25);mix-blend-mode:normal" }, "", $("ui"));   // 指の輪はボタンの上（字の層）
   const a = R(c.at), pr = R(c.press);
   U.push(() => { const t = T(), on = t >= a; w.style.visibility = on ? "visible" : "hidden"; if (!on) { ring.style.display = "none"; return; }
     const k = SP(t - a, 0.7, 0.3), p = t >= pr ? 1 - 0.07 * Math.sin(Math.PI * clamp((t - pr) / 0.26)) : 1, glow = 0.55 + 0.45 * Math.sin(t * 5.2);
-    b.style.transform = `translateY(${((1 - k) * 90).toFixed(2)}px) translateZ(${(k * 40).toFixed(1)}px) rotateX(${((1 - k) * 62).toFixed(2)}deg) scale(${p.toFixed(4)})`;
+    const tilt = k * 6 * Math.sin((t - a) * 2.1), pulse = 1 + 0.025 * k * Math.max(0, Math.sin((t - a) * 7.5));
+    b.style.transform = `translateY(${((1 - k) * 90).toFixed(2)}px) translateZ(${(k * 40).toFixed(1)}px) rotateX(${((1 - k) * 62).toFixed(2)}deg) rotateY(${tilt.toFixed(2)}deg) scale(${(p * pulse).toFixed(4)})`;
+    { const v = (t - pr - 0.5) % 1.1, r = b.getBoundingClientRect(), on2 = t >= pr + 0.5; tap.style.display = on2 ? "block" : "none";   // 押す誘導：ボタンの右寄りに指の輪（1.1秒ごと）
+      if (on2) { const d = 30 + 70 * E.outQuart(v / 0.8); tap.style.width = tap.style.height = d.toFixed(1) + "px"; tap.style.left = (r.right - 110 - d / 2).toFixed(1) + "px"; tap.style.top = (r.top + r.height / 2 - d / 2).toFixed(1) + "px"; tap.style.opacity = clamp(1 - v / 0.8).toFixed(3); } }
     // 厚み（下に 12px の濃い金の側面＝押しボタンの立体）・落ち影・外の光（呼吸する）。押すと厚みが沈む
     const dep = 12 * k * (t >= pr ? 1 - 0.75 * Math.sin(Math.PI * clamp((t - pr) / 0.26)) : 1);
     b.style.boxShadow = `inset 0 3px 0 rgba(255,246,214,.85), inset 0 -4px 0 rgba(150,98,10,.35), 0 ${dep.toFixed(1)}px 0 #A8740F, 0 ${(dep + 18 * k).toFixed(1)}px ${(38 * k).toFixed(1)}px rgba(120,80,10,.38), 0 0 ${(44 + 60 * glow).toFixed(1)}px ${(6 * glow).toFixed(1)}px rgba(255,205,100,${(0.7 * glow * k).toFixed(3)})`;
