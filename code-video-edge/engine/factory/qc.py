@@ -5,7 +5,7 @@ from PIL import Image
 pj, outdir = sys.argv[1], sys.argv[2]
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FF = os.environ["FFMPEG"]; V = os.path.join(outdir, "final.mp4"); R = {}
-env = dict(os.environ)
+env = dict(os.environ, QC_CONTRAST=os.environ.get("QC_CONTRAST", "3"))   # 古い型の点検は 3:1 のまま（qctext の既定が 4.5 になった・#381）
 # 1) 1コマ目・文字の最小サイズ
 pg = json.loads(subprocess.run(["node", os.path.join(ROOT, "factory/qcpage.mjs")], capture_output=True, text=True, env=env, cwd=ROOT).stdout.strip().splitlines()[-1])
 R["1コマ目に商品"] = {"ok": pg["frame0"]["product"]}

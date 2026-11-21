@@ -112,7 +112,8 @@ for b in P["beats"]:
         for n in re.findall(r"\d+(?:\.\d+)?", s):
             if n == "4" and "F7" in b.get("source", ""): continue    # 「4色」＝F7 の色の数（グレー 水色 ホワイト ピンク）
             if n not in corpus: miss_num.append(f'{b["kind"]}「{s[:16]}」の {n}')
-R["事実（出典）"] = {"ok": not miss_id and not miss_num, "出典の無い id": miss_id, "原文に無い数字": miss_num}
+R["事実（出典）"] = {"ok": not miss_id and not miss_num and not tx.get("countOver"), "出典の無い id": miss_id, "原文に無い数字": miss_num,
+                   "数え上がりの行き過ぎ": tx.get("countOver", []), "数え上げを読んだ数": tx.get("countRead", 0)}   # #381
 
 # 10) 配信の重さ
 kbps = os.path.getsize(V) * 8 / 1000 / dur; R["配信の重さ"] = {"ok": kbps <= 8000, "kbps": round(kbps)}

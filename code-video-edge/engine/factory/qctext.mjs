@@ -105,7 +105,7 @@ for (let t = 0.25; t < TL.end; t += 0.5) {
     return boxes.flatMap((b) => { const w = Math.max(1, Math.round(b.x1 - b.x0)), h = Math.max(1, Math.round(b.y1 - b.y0)); const d = g.getImageData(Math.round(b.x0), Math.round(b.y0), w, h).data, ls = [];
       for (let i = 0; i < d.length; i += 16) ls.push(L([d[i], d[i + 1], d[i + 2]])); ls.sort((a, c) => a - c); const bg = ls[Math.floor(ls.length / 2)], fg = L(b.c);
       const cr = (Math.max(bg, fg) + 0.05) / (Math.min(bg, fg) + 0.05); return cr < th ? [`${b.text}（${cr.toFixed(1)}:1）`] : []; });
-  }, [png, boxes, +(process.env.QC_CONTRAST || 3)]);   // 既定 3:1（#277）。UGREEN v2 は 4.5:1（#333・QC_CONTRAST=4.5）
+  }, [png, boxes, +(process.env.QC_CONTRAST || 4.5)]);   // 既定は本番と同じ 4.5:1（単独で回しても本番と同じ線・#381）。古い qc.py は 3 を明示して渡す   // 既定 3:1（#277）。UGREEN v2 は 4.5:1（#333・QC_CONTRAST=4.5）
   bad.forEach((x) => { if (!lowc.some((y) => y.startsWith(x.split("（")[0]))) lowc.push(`${x} ${t.toFixed(1)}秒`); });
 }
 out.lowContrast = lowc;
@@ -128,4 +128,15 @@ out.prRatio = Math.round((prN / n) * 100) / 100; out.expected = expected.length;
     }, vv);
   }
 }
+// 5) 数え上がりの行き過ぎ（#381・ルタオで 4.64 が一瞬 4.9 台を出した）：字の層の .n（数え上げの数字）を 1/30秒ごとに読み、
+//    最後に落ち着いた値より大きい（減る数なら小さい）値を一瞬でも出したら落とす＝ページに無い数字を画面に出さない
+{ const seen = new Map();
+  for (let t = 0; t < TL.end; t += 1 / 30) {
+    await p.evaluate((t) => window.seek(t), t);
+    const vs = await p.evaluate(() => [...document.querySelectorAll("#ui .n")].map((e) => { let x = e, on = true; for (; x && x !== document.body; x = x.parentElement) { const cs = getComputedStyle(x); if (cs.display === "none" || cs.visibility === "hidden" || +cs.opacity < 0.05) { on = false; break; } }
+      const v = parseFloat(e.textContent.replace(/,/g, "")); return on && isFinite(v) ? v : null; }));
+    vs.forEach((v, i) => { if (v == null) return; const r = seen.get(i) || { first: v, last: v, max: v, min: v, tMax: t, tMin: t }; r.last = v; if (v > r.max) { r.max = v; r.tMax = t; } if (v < r.min) { r.min = v; r.tMin = t; } seen.set(i, r); }); }
+  out.countOver = [...seen.values()].flatMap((r) => r.last >= r.first ? (r.max > r.last + 1e-9 ? [`${r.max}（落ち着いた値 ${r.last}・${r.tMax.toFixed(2)}秒）`] : [])
+                                                                       : (r.min < r.last - 1e-9 ? [`${r.min}（落ち着いた値 ${r.last}・${r.tMin.toFixed(2)}秒）`] : []));
+  out.countRead = seen.size; }
 console.log(JSON.stringify(out)); await b.close();
