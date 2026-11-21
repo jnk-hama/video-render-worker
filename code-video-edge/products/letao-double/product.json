@@ -523,17 +523,23 @@
   "shots": [
    {
     "leak": 0.25,
-    "near": 0.35,
+    "near": 0.55,
     "cam": {
      "z": [
       1.0,
-      1.08
+      1.14
      ],
      "x": [
-      -10,
-      6
+      -26,
+      8
      ],
-     "ease": "slow"
+     "r": [
+      -1.4,
+      0
+     ],
+     "ease": "spring",
+     "dur": 1.4,
+     "bounce": 0.1
     },
     "scrim": "dark",
     "scrimk": 0.8,
@@ -597,10 +603,16 @@
     "near": 0.35,
     "cam": {
      "z": [
-      1.0,
-      1.05
+      1.08,
+      1.0
      ],
-     "ease": "slow"
+     "y": [
+      18,
+      0
+     ],
+     "ease": "spring",
+     "dur": 1.0,
+     "bounce": 0.08
     },
     "scrim": "dark",
     "scrimk": 0.85,
@@ -659,7 +671,11 @@
     "cam": {
      "z": [
       1.0,
-      1.05
+      1.08
+     ],
+     "x": [
+      -18,
+      14
      ],
      "ease": "slow"
     },
@@ -761,7 +777,11 @@
     "cam": {
      "z": [
       1.0,
-      1.05
+      1.1
+     ],
+     "y": [
+      0,
+      -20
      ],
      "ease": "slow"
     },
@@ -828,8 +848,12 @@
     "near": 0.35,
     "cam": {
      "z": [
-      1.0,
-      1.05
+      1.1,
+      1.0
+     ],
+     "x": [
+      16,
+      -6
      ],
      "ease": "slow"
     },
@@ -894,15 +918,19 @@
    {
     "x": 0.45,
     "leak": 0.4,
-    "near": 0.5,
+    "near": 0.55,
     "cam": {
      "z": [
-      1.06,
+      1.12,
       1.0
+     ],
+     "r": [
+      -1.5,
+      0
      ],
      "ease": "spring",
      "dur": 1.6,
-     "bounce": 0.1
+     "bounce": 0.12
     },
     "scrim": "dark",
     "scrimk": 0.78,
@@ -1005,7 +1033,11 @@
     "cam": {
      "z": [
       1.0,
-      1.05
+      1.09
+     ],
+     "x": [
+      -14,
+      10
      ],
      "ease": "slow"
     },
@@ -1075,10 +1107,16 @@
     "near": 0.35,
     "cam": {
      "z": [
-      1.0,
-      1.05
+      1.06,
+      1.0
      ],
-     "ease": "slow"
+     "y": [
+      -14,
+      0
+     ],
+     "ease": "spring",
+     "dur": 1.0,
+     "bounce": 0.08
     },
     "scrim": "dark",
     "scrimk": 0.88,
@@ -1184,7 +1222,11 @@
     "cam": {
      "z": [
       1.0,
-      1.05
+      1.07
+     ],
+     "x": [
+      12,
+      -12
      ],
      "ease": "slow"
     },
@@ -1356,11 +1398,11 @@
    {
     "x": 0.35,
     "leak": 0.15,
-    "near": 0.5,
+    "near": 0.55,
     "cam": {
      "z": [
       1.0,
-      1.05
+      1.06
      ],
      "ease": "slow"
     },
@@ -1428,7 +1470,7 @@
     "scrimh": 760
    }
   ],
-  "hand": 0.4
+  "hand": 0.6
  },
  "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00rjikn.sdgffb7a.g00rjikn.sdgfg7c7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fletao%2Ff910%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fletao%2Fi%2F10000155%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
  "item_code": "letao:10000155"
