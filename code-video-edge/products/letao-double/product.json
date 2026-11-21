@@ -1,0 +1,1542 @@
+{
+ "product_key": "letao-double",
+ "template": "kinetic",
+ "name": "ドゥーブルフロマージュ",
+ "item_no": "W910",
+ "genre": "food",
+ "target": {
+  "who": "クリスマス・お歳暮に",
+  "source": "クリスマス お歳暮 冬ギフト（商品名 line 12）"
+ },
+ "prep": {
+  "voice": "voicevox:WhiteCUL",
+  "speed": 1.0
+ },
+ "brand": {
+  "ground": null,
+  "accent": "#1A6DA6",
+  "accent_box": [
+   60,
+   170,
+   144,
+   220
+  ]
+ },
+ "beats": [
+  {
+   "kind": "S1",
+   "source": "F1,F10",
+   "voice": "line0.mp3",
+   "say": "二層のチーズが生む、奇跡のくちどけ。",
+   "hook": "2層のチーズが生む",
+   "hook2": "奇跡のくちどけ。",
+   "note": "※写真は販売ページより。映像はイメージです。"
+  },
+  {
+   "kind": "S2",
+   "source": "F2",
+   "voice": "line1.mp3",
+   "say": "上はレアチーズ、下はベイクドチーズ。",
+   "top": "マスカルポーネ レアチーズ層",
+   "bottom": "ベイクドチーズ層"
+  },
+  {
+   "kind": "S3",
+   "source": "F3,F4",
+   "voice": "line2.mp3",
+   "say": "北海道の生クリームと、世界のチーズ。",
+   "a": "北海道産牛乳",
+   "b": "特製生クリーム",
+   "c": "オーストラリア産クリームチーズ",
+   "d": "北イタリア産マスカルポーネ"
+  },
+  {
+   "kind": "S4",
+   "source": "F5",
+   "voice": "line3.mp3",
+   "say": "直径12センチ。2人から4人に、ちょうどいい。",
+   "pre": "直径",
+   "big": "12",
+   "unit": "cm",
+   "sub": "2〜4名様にちょうど良いサイズ"
+  },
+  {
+   "kind": "S5",
+   "source": "F6,F7",
+   "voice": "line4.mp3",
+   "say": "累計2,700万個の看板商品。評価は4.64。",
+   "lead": "累計",
+   "big": "2,700",
+   "unit": "万個",
+   "label": "看板商品",
+   "score": "4.64",
+   "count_label": "レビュー14,295件",
+   "date": "楽天市場 2026年11月20日時点",
+   "note": "※評価・件数は販売ページの表示です。"
+  },
+  {
+   "kind": "S6",
+   "source": "F8,F9",
+   "voice": "line5.mp3",
+   "say": "選べるスイーツとのセット。リンクはプロフィールから。",
+   "kicker": "2品目は3種類から選べる",
+   "c1": "ジャージーミルクロール",
+   "c2": "ヴェネチアランデヴー",
+   "c3": "ナイアガラ&ロイヤルモンターニュ",
+   "head": "ドゥーブルフロマージュ",
+   "sub": "と選べるスイーツセット",
+   "cta": "リンクはプロフィールから",
+   "note": "※冷凍でお届け。価格・在庫はリンク先でご確認ください。"
+  }
+ ],
+ "score": {
+  "scenes": [
+   [
+    "S1",
+    "line0.mp3",
+    0
+   ],
+   [
+    "S2",
+    "line1.mp3",
+    3.0
+   ],
+   [
+    "S3",
+    "line2.mp3",
+    3.4
+   ],
+   [
+    "S4",
+    "line3.mp3",
+    3.5
+   ],
+   [
+    "S5",
+    "line4.mp3",
+    0
+   ],
+   [
+    "S6",
+    "line5.mp3",
+    0
+   ]
+  ],
+  "climax": [
+   "S4",
+   "ジュウニ"
+  ],
+  "music": {
+   "quiet": [
+    "S2"
+   ],
+   "hush": [
+    [
+     [
+      "cue",
+      "S4",
+      "ジュウニ",
+      -0.5
+     ],
+     [
+      "cue",
+      "S4",
+      "ジュウニ",
+      0.02
+     ]
+    ]
+   ]
+  },
+  "events": [
+   {
+    "id": "flare0",
+    "at": [
+     "t0",
+     "S1",
+     0.1
+    ],
+    "what": "c1 フレアが横切る",
+    "sfx": [
+     "whoosh",
+     0.6,
+     300,
+     5200,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "kiseki",
+    "at": [
+     "cue",
+     "S1",
+     "キセキ"
+    ],
+    "what": "c2 奇跡のくちどけ（ぶつかる字）",
+    "sfx": [
+     "impact",
+     0.9,
+     1.4
+    ],
+    "band": "low"
+   },
+   {
+    "id": "ue",
+    "at": [
+     "cue",
+     "S2",
+     "ウエワ"
+    ],
+    "what": "c3 上の層へ線"
+   },
+   {
+    "id": "shita",
+    "at": [
+     "cue",
+     "S2",
+     "シタワ"
+    ],
+    "what": "c3 下の層へ線",
+    "sfx": [
+     "tick",
+     2400,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "hokkai",
+    "at": [
+     "t0",
+     "S3"
+    ],
+    "what": "c4 北海道産牛乳",
+    "sfx": [
+     "whoosh",
+     0.3,
+     800,
+     6000,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "nama",
+    "at": [
+     "t0",
+     "S3",
+     0.85
+    ],
+    "what": "c5 特製生クリーム",
+    "sfx": [
+     "tick",
+     2600,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "sekai",
+    "at": [
+     "t0",
+     "S3",
+     1.7
+    ],
+    "what": "c6 クリームチーズ",
+    "sfx": [
+     "tick",
+     2900,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "chiizu",
+    "at": [
+     "t0",
+     "S3",
+     2.55
+    ],
+    "what": "c7 マスカルポーネ",
+    "sfx": [
+     "tick",
+     3200,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "jyuni",
+    "at": [
+     "cue",
+     "S4",
+     "ジュウニ"
+    ],
+    "what": "c8 12cm（山場）",
+    "sfx": [
+     "impact",
+     1.0,
+     1.8
+    ],
+    "band": "low"
+   },
+   {
+    "id": "futari",
+    "at": [
+     "cue",
+     "S4",
+     "フタリ"
+    ],
+    "what": "c8 2〜4名様"
+   },
+   {
+    "id": "nisen",
+    "at": [
+     "cue",
+     "S5",
+     "ニセンナナ"
+    ],
+    "what": "c9 2,700万個",
+    "sfx": [
+     "impact",
+     0.8,
+     1.2
+    ],
+    "band": "low"
+   },
+   {
+    "id": "hyouka",
+    "at": [
+     "cue",
+     "S5",
+     "ヒョオカ"
+    ],
+    "what": "c10 評価へ",
+    "sfx": [
+     "whoosh",
+     0.35,
+     400,
+     4000,
+     0.5
+    ],
+    "band": "mid"
+   },
+   {
+    "id": "yon",
+    "at": [
+     "cue",
+     "S5",
+     "ヨンテン"
+    ],
+    "what": "c10 4.64",
+    "sfx": [
+     "bell",
+     2093.0,
+     0.5,
+     1.4
+    ],
+    "band": "high"
+   },
+   {
+    "id": "sw2",
+    "at": [
+     "cue",
+     "S6",
+     "スイイツ"
+    ],
+    "what": "c12 ヴェネチア"
+   },
+   {
+    "id": "sw3",
+    "at": [
+     "cue",
+     "S6",
+     "セット"
+    ],
+    "what": "c13 チョコ"
+   },
+   {
+    "id": "link",
+    "at": [
+     "cue",
+     "S6",
+     "リンクワ"
+    ],
+    "what": "c14 ボタン",
+    "sfx": [
+     "whoosh",
+     0.4,
+     300,
+     3000,
+     0.5
+    ],
+    "band": "mid"
+   },
+   {
+    "id": "under",
+    "at": [
+     "cue",
+     "S6",
+     "プロフィ"
+    ],
+    "what": "c14 ボタンを押す",
+    "sfx": [
+     "bell",
+     1318.5,
+     0.4,
+     0.9
+    ],
+    "band": "high-mid"
+   }
+  ],
+  "sustain": [
+   {
+    "id": "room",
+    "from": [
+     "t0",
+     "S2"
+    ],
+    "to": [
+     "t1",
+     "S2"
+    ],
+    "sfx": [
+     "roomtone"
+    ],
+    "over_db": -12.0,
+    "what": "2層の溜め"
+   }
+  ]
+ },
+ "kinetic": {
+  "clips": {
+   "glit": {
+    "n": 180
+   },
+   "tree": {
+    "n": 180
+   },
+   "milk": {
+    "n": 120
+   },
+   "snow": {
+    "n": 210
+   },
+   "bokeh": {
+    "n": 180
+   }
+  },
+  "seqs": {
+   "whole_in": {
+    "n": 48
+   },
+   "slice_mac": {
+    "n": 56
+   },
+   "slice_wide": {
+    "n": 100
+   },
+   "slice_low": {
+    "n": 150
+   },
+   "set_in": {
+    "n": 70
+   },
+   "set_end": {
+    "n": 140
+   }
+  },
+  "flares": [
+   [
+    "t0",
+    "S1",
+    0.1
+   ],
+   [
+    "ev",
+    "kiseki",
+    -0.05
+   ],
+   [
+    "ev",
+    "jyuni",
+    -0.1
+   ],
+   [
+    "ev",
+    "link",
+    0.1
+   ]
+  ],
+  "cta": {
+   "s": "${S6.cta}",
+   "at": [
+    "ev",
+    "link"
+   ],
+   "press": [
+    "ev",
+    "under"
+   ]
+  },
+  "shots": [
+   {
+    "id": "c1",
+    "why": "フック：切った所へ急接近",
+    "scrim": "dark",
+    "leak": 0.25,
+    "near": 0.7,
+    "cam": {
+     "z": [
+      1.0,
+      1.12
+     ],
+     "ease": "expo",
+     "dur": 1.0
+    },
+    "far": {
+     "clip": "bokeh",
+     "blur": [
+      14,
+      8
+     ],
+     "bright": 1.0
+    },
+    "behind": {
+     "s": "Fromage Double",
+     "x": 40,
+     "y": 430,
+     "size": 230,
+     "dx": 420
+    },
+    "prod": [
+     {
+      "seq": "whole_in",
+      "box": [
+       0,
+       530,
+       1080,
+       803
+      ],
+      "mask": "feather"
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "${TARGET}",
+      "x": 68,
+      "y": 250,
+      "c": "g",
+      "fx": "mask"
+     },
+     {
+      "k": "h1",
+      "s": "${S1.hook}",
+      "x": 64,
+      "y": 306,
+      "size": 88,
+      "fx": "flip"
+     },
+     {
+      "k": "note",
+      "s": "${S1.note}",
+      "x": 64,
+      "y": 1404,
+      "fx": "cut",
+      "blob": true,
+      "to": [
+       "ev",
+       "kiseki",
+       -0.4
+      ]
+     }
+    ],
+    "scrimk": 0.8
+   },
+   {
+    "id": "c2",
+    "at": [
+     "ev",
+     "kiseki",
+     -0.12
+    ],
+    "mx": "zoom",
+    "why": "くちどけ：上の層の大写しに字がぶつかる",
+    "scrim": "dark",
+    "leak": 0.6,
+    "near": 0.6,
+    "cam": {
+     "z": [
+      1.0,
+      1.06
+     ],
+     "ease": "spring",
+     "dur": 0.9
+    },
+    "far": {
+     "clip": "glit",
+     "blur": [
+      16,
+      10
+     ],
+     "bright": 0.85
+    },
+    "prod": [
+     {
+      "seq": "slice_mac",
+      "box": [
+       0,
+       570,
+       1080,
+       803
+      ],
+      "mask": "feather"
+     }
+    ],
+    "text": [
+     {
+      "k": "h2",
+      "s": "${S1.hook}",
+      "x": 64,
+      "y": 256,
+      "fx": "cut"
+     },
+     {
+      "k": "h1",
+      "s": "${S1.hook2}",
+      "x": 64,
+      "y": 330,
+      "size": 102,
+      "fx": "slam",
+      "glitch": true,
+      "c": "g",
+      "blob": true
+     }
+    ],
+    "scrimk": 0.85
+   },
+   {
+    "id": "c3",
+    "at": [
+     "t0",
+     "S2"
+    ],
+    "why": "2層：溜め（ゆっくり回る）と引き出し線",
+    "scrim": "light",
+    "leak": 0.3,
+    "near": 0.35,
+    "cam": {
+     "z": [
+      1.02,
+      1.07
+     ],
+     "x": [
+      -10,
+      12
+     ],
+     "ease": "slow"
+    },
+    "far": {
+     "clip": "snow",
+     "rate": 0.4,
+     "blur": [
+      6,
+      6
+     ],
+     "bright": 1.05
+    },
+    "prod": [
+     {
+      "seq": "slice_wide",
+      "box": [
+       0,
+       600,
+       1080,
+       803
+      ],
+      "mask": "feather"
+     }
+    ],
+    "lines": [
+     {
+      "d": "M560 890 L560 640 L820 290",
+      "at": [
+       "ev",
+       "ue",
+       -0.05
+      ],
+      "color": "#B8860B",
+      "w": 4,
+      "dots": [
+       [
+        560,
+        890
+       ]
+      ]
+     },
+     {
+      "d": "M600 1150 L930 1150 L930 455 L520 455",
+      "at": [
+       "ev",
+       "shita",
+       -0.05
+      ],
+      "color": "#1C1A17",
+      "w": 4,
+      "dots": [
+       [
+        600,
+        1150
+       ]
+      ]
+     }
+    ],
+    "text": [
+     {
+      "k": "lab",
+      "s": "${S2.top}",
+      "x": 64,
+      "y": 252,
+      "c": "k",
+      "fx": "mask",
+      "at": [
+       "ev",
+       "ue",
+       0.05
+      ],
+      "size": 52
+     },
+     {
+      "k": "lab",
+      "s": "${S2.bottom}",
+      "x": 64,
+      "y": 420,
+      "c": "k",
+      "fx": "mask",
+      "at": [
+       "ev",
+       "shita",
+       0.05
+      ],
+      "size": 52
+     }
+    ]
+   },
+   {
+    "id": "c4",
+    "at": [
+     "t0",
+     "S3"
+    ],
+    "mx": "zoom",
+    "why": "素材の高速カット1",
+    "scrim": "light",
+    "near": 0.2,
+    "leak": 0.2,
+    "cam": {
+     "z": [
+      1.0,
+      1.08
+     ],
+     "ease": "expo",
+     "dur": 0.6
+    },
+    "far": {
+     "clip": "milk",
+     "blur": [
+      18,
+      18
+     ],
+     "bright": 1.08
+    },
+    "prod": [
+     {
+      "img": "milk.jpg",
+      "box": [
+       200,
+       560,
+       600,
+       880
+      ],
+      "mask": "soft",
+      "pop": 1
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.a}",
+      "x": 64,
+      "y": 300,
+      "c": "k",
+      "fx": "slam",
+      "size": 96,
+      "shake": 8
+     }
+    ]
+   },
+   {
+    "id": "c5",
+    "at": [
+     "ev",
+     "nama"
+    ],
+    "mx": "zoom",
+    "why": "素材2",
+    "scrim": "light",
+    "near": 0.2,
+    "leak": 0.2,
+    "cam": {
+     "z": [
+      1.0,
+      1.08
+     ],
+     "ease": "expo",
+     "dur": 0.6
+    },
+    "far": {
+     "clip": "milk",
+     "from": 40,
+     "blur": [
+      18,
+      18
+     ],
+     "bright": 1.08
+    },
+    "prod": [
+     {
+      "img": "cream.jpg",
+      "box": [
+       100,
+       560,
+       880,
+       868
+      ],
+      "mask": "soft",
+      "pop": 1
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.b}",
+      "x": 64,
+      "y": 300,
+      "c": "k",
+      "fx": "slam",
+      "size": 96,
+      "shake": 8
+     }
+    ]
+   },
+   {
+    "id": "c6",
+    "at": [
+     "ev",
+     "sekai"
+    ],
+    "mx": "zoom",
+    "why": "素材3",
+    "scrim": "light",
+    "near": 0.2,
+    "leak": 0.2,
+    "cam": {
+     "z": [
+      1.0,
+      1.08
+     ],
+     "ease": "expo",
+     "dur": 0.6
+    },
+    "far": {
+     "clip": "milk",
+     "from": 70,
+     "blur": [
+      18,
+      18
+     ],
+     "bright": 1.08
+    },
+    "prod": [
+     {
+      "img": "cheese.jpg",
+      "box": [
+       160,
+       560,
+       760,
+       966
+      ],
+      "mask": "soft",
+      "pop": 1
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.c}",
+      "x": 64,
+      "y": 300,
+      "c": "k",
+      "fx": "slam",
+      "size": 54,
+      "shake": 8
+     }
+    ]
+   },
+   {
+    "id": "c7",
+    "at": [
+     "ev",
+     "chiizu"
+    ],
+    "mx": "zoom",
+    "why": "素材4",
+    "scrim": "light",
+    "near": 0.2,
+    "leak": 0.2,
+    "cam": {
+     "z": [
+      1.0,
+      1.08
+     ],
+     "ease": "expo",
+     "dur": 0.6
+    },
+    "far": {
+     "clip": "milk",
+     "from": 100,
+     "blur": [
+      18,
+      18
+     ],
+     "bright": 1.08
+    },
+    "prod": [
+     {
+      "img": "masc.jpg",
+      "box": [
+       180,
+       560,
+       720,
+       880
+      ],
+      "mask": "soft",
+      "pop": 1
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.d}",
+      "x": 64,
+      "y": 300,
+      "c": "k",
+      "fx": "slam",
+      "size": 62,
+      "shake": 8
+     }
+    ]
+   },
+   {
+    "id": "c8",
+    "at": [
+     "t0",
+     "S4"
+    ],
+    "x": 0.3,
+    "why": "山場：12cm のケーキが奥行きの中に浮かぶ（溜め・重低音）",
+    "scrim": "light",
+    "leak": 0.55,
+    "near": 0.8,
+    "cam": {
+     "z": [
+      1.12,
+      1.0
+     ],
+     "r": [
+      -1.5,
+      0
+     ],
+     "ease": "spring",
+     "dur": 1.6,
+     "bounce": 0.12
+    },
+    "far": {
+     "clip": "snow",
+     "from": 0,
+     "rate": 0.3,
+     "blur": [
+      10,
+      4
+     ],
+     "bright": 1.06
+    },
+    "behind": {
+     "s": "12cm",
+     "x": 110,
+     "y": 420,
+     "size": 420,
+     "dx": 0,
+     "color": "rgba(233,185,73,.55)",
+     "at": [
+      "ev",
+      "jyuni"
+     ]
+    },
+    "prod": [
+     {
+      "img": "cake.png",
+      "box": [
+       200,
+       780,
+       680,
+       603
+      ],
+      "rise": 220,
+      "shadow": true,
+      "at": [
+       "t0",
+       "S4",
+       0.05
+      ]
+     }
+    ],
+    "lines": [
+     {
+      "d": "M210 1430 L870 1430 M210 1414 L210 1446 M870 1414 L870 1446",
+      "at": [
+       "ev",
+       "jyuni",
+       -0.1
+      ],
+      "color": "#1C1A17",
+      "w": 4,
+      "dur": 0.6
+     }
+    ],
+    "text": [
+     {
+      "k": "num",
+      "s": "<small>${S4.pre}</small><span class=\"n\">${S4.big}</span><small>${S4.unit}</small>",
+      "x": 66,
+      "y": 236,
+      "c": "k",
+      "fx": "slam",
+      "at": [
+       "ev",
+       "jyuni",
+       -0.05
+      ],
+      "count": {
+       "from": 0,
+       "to": 12,
+       "dur": 0.5
+      }
+     },
+     {
+      "k": "cap",
+      "s": "${S4.sub}",
+      "x": 68,
+      "y": 486,
+      "c": "k",
+      "fx": "mask",
+      "at": [
+       "ev",
+       "futari",
+       -0.05
+      ],
+      "size": 44
+     }
+    ]
+   },
+   {
+    "id": "c9",
+    "at": [
+     "t0",
+     "S5"
+    ],
+    "mx": "zoom",
+    "why": "証拠：2,700万個（セットの写真へ引く）",
+    "scrim": "dark",
+    "scrimk": 0.78,
+    "leak": 0.45,
+    "near": 0.5,
+    "cam": {
+     "z": [
+      1.06,
+      1.0
+     ],
+     "ease": "spring",
+     "dur": 1.0
+    },
+    "far": {
+     "clip": "glit",
+     "from": 40,
+     "blur": [
+      14,
+      10
+     ],
+     "bright": 1.0
+    },
+    "prod": [
+     {
+      "seq": "set_in",
+      "box": [
+       0,
+       560,
+       1080,
+       1277
+      ],
+      "mask": "feather"
+     }
+    ],
+    "text": [
+     {
+      "k": "lab",
+      "s": "${S5.label}",
+      "x": 68,
+      "y": 250,
+      "c": "w",
+      "fx": "mask"
+     },
+     {
+      "k": "num",
+      "s": "<small>${S5.lead}</small><span class=\"n\">${S5.big}</span><small>${S5.unit}</small>",
+      "x": 64,
+      "y": 312,
+      "size": 170,
+      "fx": "slam",
+      "glitch": true,
+      "glow": true,
+      "at": [
+       "ev",
+       "nisen",
+       -0.05
+      ],
+      "count": {
+       "from": 0,
+       "to": 2700,
+       "sep": true,
+       "dur": 0.8
+      }
+     }
+    ]
+   },
+   {
+    "id": "c10",
+    "at": [
+     "ev",
+     "hyouka",
+     -0.05
+    ],
+    "mx": "spin",
+    "why": "証拠：評価（1切れの上に星）",
+    "scrim": "light",
+    "leak": 0.35,
+    "near": 0.4,
+    "cam": {
+     "z": [
+      1.0,
+      1.05
+     ],
+     "ease": "slow"
+    },
+    "far": {
+     "clip": "glit",
+     "from": 100,
+     "blur": [
+      20,
+      20
+     ],
+     "bright": 1.12
+    },
+    "prod": [
+     {
+      "seq": "slice_low",
+      "box": [
+       0,
+       700,
+       1080,
+       803
+      ],
+      "mask": "feather"
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "<svg width=\"330\" height=\"62\" viewBox=\"0 0 330 62\"><defs><linearGradient id=\"sg\"><stop offset=\"92.8%\" stop-color=\"#E9B949\"/><stop offset=\"92.8%\" stop-color=\"rgba(28,26,23,.2)\"/></linearGradient></defs><path transform=\"translate(33,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(99,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(165,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(231,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(297,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/></svg>",
+      "x": 64,
+      "y": 240,
+      "c": "k",
+      "fx": "rise"
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S5.score}</span>",
+      "x": 64,
+      "y": 300,
+      "c": "k",
+      "size": 230,
+      "fx": "slam",
+      "at": [
+       "ev",
+       "yon",
+       -0.35
+      ],
+      "count": {
+       "from": 0,
+       "to": 4.64,
+       "dec": 2,
+       "dur": 0.5
+      }
+     },
+     {
+      "k": "cap",
+      "s": "${S5.count_label}",
+      "x": 68,
+      "y": 548,
+      "c": "k",
+      "size": 44,
+      "fx": "mask",
+      "at": [
+       "ev",
+       "hyouka",
+       0.2
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S5.date}",
+      "x": 68,
+      "y": 612,
+      "c": "k",
+      "size": 28,
+      "fx": "cut",
+      "at": [
+       "ev",
+       "hyouka",
+       0.2
+      ]
+     },
+     {
+      "k": "note",
+      "s": "${S5.note}",
+      "x": 64,
+      "y": 664,
+      "c": "k",
+      "fx": "cut",
+      "at": [
+       "ev",
+       "hyouka",
+       0.2
+      ]
+     }
+    ]
+   },
+   {
+    "id": "c11",
+    "at": [
+     "t0",
+     "S6"
+    ],
+    "mx": "zoom",
+    "why": "行動：選べる1（高速）",
+    "scrim": "light",
+    "near": 0.3,
+    "leak": 0.3,
+    "cam": {
+     "z": [
+      1.0,
+      1.06
+     ],
+     "ease": "expo",
+     "dur": 0.5
+    },
+    "far": {
+     "clip": "tree",
+     "blur": [
+      16,
+      16
+     ],
+     "bright": 1.1
+    },
+    "prod": [
+     {
+      "img": "roll.jpg",
+      "box": [
+       40,
+       640,
+       1000,
+       900
+      ],
+      "mask": "soft",
+      "pop": 1
+     }
+    ],
+    "text": [
+     {
+      "k": "lab",
+      "s": "${S6.kicker}",
+      "x": 64,
+      "y": 250,
+      "c": "k",
+      "fx": "mask",
+      "size": 50,
+      "to": [
+       "ev",
+       "link",
+       -0.1
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S6.c1}",
+      "x": 104,
+      "y": 330,
+      "c": "k",
+      "fx": "rise",
+      "size": 44,
+      "to": [
+       "ev",
+       "link",
+       -0.1
+      ],
+      "at": [
+       "t0",
+       "S6",
+       0.08
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S6.c2}",
+      "x": 104,
+      "y": 390,
+      "c": "k",
+      "fx": "rise",
+      "size": 44,
+      "to": [
+       "ev",
+       "link",
+       -0.1
+      ],
+      "at": [
+       "t0",
+       "S6",
+       0.16
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S6.c3}",
+      "x": 104,
+      "y": 450,
+      "c": "k",
+      "fx": "rise",
+      "size": 44,
+      "to": [
+       "ev",
+       "link",
+       -0.1
+      ],
+      "at": [
+       "t0",
+       "S6",
+       0.24
+      ]
+     }
+    ],
+    "lines": [
+     {
+      "d": "M68 360 L86 360",
+      "at": [
+       "t0",
+       "S6",
+       0.3
+      ],
+      "color": "#B8860B",
+      "w": 12,
+      "dur": 0.2
+     }
+    ]
+   },
+   {
+    "id": "c12",
+    "at": [
+     "ev",
+     "sw2",
+     -0.05
+    ],
+    "mx": "zoom",
+    "why": "選べる2",
+    "scrim": "light",
+    "near": 0.3,
+    "leak": 0.3,
+    "cam": {
+     "z": [
+      1.0,
+      1.06
+     ],
+     "ease": "expo",
+     "dur": 0.5
+    },
+    "far": {
+     "clip": "tree",
+     "from": 30,
+     "blur": [
+      16,
+      16
+     ],
+     "bright": 1.1
+    },
+    "prod": [
+     {
+      "img": "ven.jpg",
+      "box": [
+       40,
+       640,
+       1000,
+       912
+      ],
+      "mask": "soft",
+      "pop": 1
+     }
+    ],
+    "text": [],
+    "lines": [
+     {
+      "d": "M68 420 L86 420",
+      "color": "#B8860B",
+      "w": 12,
+      "dur": 0.2
+     }
+    ]
+   },
+   {
+    "id": "c13",
+    "at": [
+     "ev",
+     "sw3",
+     -0.05
+    ],
+    "mx": "zoom",
+    "why": "選べる3",
+    "scrim": "light",
+    "near": 0.3,
+    "leak": 0.3,
+    "cam": {
+     "z": [
+      1.0,
+      1.06
+     ],
+     "ease": "expo",
+     "dur": 0.5
+    },
+    "far": {
+     "clip": "tree",
+     "from": 60,
+     "blur": [
+      16,
+      16
+     ],
+     "bright": 1.1
+    },
+    "prod": [
+     {
+      "img": "choco.jpg",
+      "box": [
+       40,
+       640,
+       1000,
+       744
+      ],
+      "mask": "soft",
+      "pop": 1
+     }
+    ],
+    "text": [],
+    "lines": [
+     {
+      "d": "M68 480 L86 480",
+      "color": "#B8860B",
+      "w": 12,
+      "dur": 0.2
+     }
+    ]
+   },
+   {
+    "id": "c14",
+    "at": [
+     "ev",
+     "link",
+     -0.1
+    ],
+    "x": 0.25,
+    "why": "行動：セットの写真・名前・立体のボタン",
+    "scrim": "light",
+    "leak": 0.5,
+    "near": 0.6,
+    "cam": {
+     "z": [
+      1.0,
+      1.06
+     ],
+     "ease": "slow"
+    },
+    "far": {
+     "clip": "tree",
+     "from": 90,
+     "blur": [
+      14,
+      14
+     ],
+     "bright": 1.12
+    },
+    "prod": [
+     {
+      "seq": "set_end",
+      "box": [
+       250,
+       420,
+       580,
+       685
+      ],
+      "mask": "soft"
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S6.head}",
+      "x": 64,
+      "y": 244,
+      "c": "k",
+      "fx": "flip",
+      "size": 74
+     },
+     {
+      "k": "cap",
+      "s": "${S6.sub}",
+      "x": 68,
+      "y": 352,
+      "c": "k",
+      "fx": "mask",
+      "size": 44
+     },
+     {
+      "k": "note",
+      "s": "${S6.note}",
+      "x": 64,
+      "y": 1392,
+      "c": "k",
+      "fx": "cut"
+     }
+    ]
+   }
+  ]
+ },
+ "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00rjikn.sdgffb7a.g00rjikn.sdgfg7c7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fletao%2Ff910%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fletao%2Fi%2F10000155%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
+ "item_code": "letao:10000155"
+}

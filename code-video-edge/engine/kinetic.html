@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<!-- 奥行きの型（kinetic・#379）：オーナーの指示「平面的な画像スライド＋単調なテロップを壊す。Z軸の奥行き・バネ・動く文字・質感・マッチカット」
+     board（#377・カット割りの表をそのまま並べる）の骨組みは同じ。その上に、1台のカメラと5枚の奥行きの層を足した。
+     層（奥から）：#far 本物の映像か、ぼかした写真（視差 0.35）→ #behind 被写体の後ろを通る大きな字（0.6）→ #world 商品＝販売ページの写真（1.0）
+                 → #fx 商品の前の湯気・光 → #near 舞う粒（1.6）→ #post 光漏れ・フレア・周辺の陰り → #ui 字（光は字の後ろ＝読みやすさ 4.5:1）→ 粒子
+     カメラ：カットごとに寄り・横・回転を書き、全部の層を視差の係数だけ動かす（遠い物ほど動かない＝2.5D）。手持ちの揺れは周期の違う正弦の和、ぶつかる字で揺れる
+     動き：全部 MK.springBD（バネ・閉じた式）か outExpo。直線と ease-in-out は使わない（字が出る・動く・大きくなる所すべて）
+     切り替え：mx＝"zoom"（前のカメラの寄りの勢いのまま次へ）／"spin"（前の回転を次の初めに引き継ぐ）。0.12秒だけ溶かす（1コマで画面の 30% 超を変えない・#334）
+     商品は販売ページの実物の写真だけ（#370）。暗くしない（#366：周辺の陰りは 22% まで・地は明るい）。すべての値は時刻 T だけの関数（qc_seek が見る） -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts2/fonts.css">
+<script src="edge_tokens.js"></script>
+<script src="motionkit.js"></script>
+<script src="stagekit.js"></script>
+<style>
+  :root { --ink:#1C1A17; --acc:#1F7FBF; --gold:#E9B949; --cream:#FFF6E3; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:#F3EEE6; }
+  body { position:relative; font-family:"Noto Sans JP",sans-serif; font-feature-settings:"palt" 1; color:#fff; }
+  #bg, #far, #behind, #world, #fx, #near, #shade, #ui, #post, #grain { position:absolute; left:0; top:0; width:1080px; height:1920px; overflow:hidden; pointer-events:none; }
+  #far img, #fx img { position:absolute; left:0; top:0; width:1080px; height:1920px; display:none; }
+  .m { position:absolute; display:none; will-change:transform; }
+  .m img { display:block; width:100%; height:100%; }
+  .feather { -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%); mask-image:linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%); }
+  .soft { -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, rgba(0,0,0,.5) 82%, transparent 100%); mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 60%, rgba(0,0,0,.5) 82%, transparent 100%); }
+  .low { -webkit-mask-image:linear-gradient(180deg, transparent 0px, transparent 560px, #000 820px); mask-image:linear-gradient(180deg, transparent 0px, transparent 560px, #000 820px); }
+  .bw { position:absolute; white-space:nowrap; font:500 300px/1 "Cormorant Garamond", serif; letter-spacing:-.01em; color:rgba(255,246,227,.86); display:none; }
+  .t { position:absolute; white-space:nowrap; visibility:hidden; transform-origin:0 60%; }
+  .t .c { display:inline-block; overflow:hidden; vertical-align:top; padding:0 .01em .12em; margin-bottom:-.12em; }
+  .t .ci { display:inline-block; will-change:transform; }
+  .t.flip { perspective:700px; } .t.flip .c { overflow:visible; }
+  .h1 { font:900 112px/1.12 "Noto Sans JP"; letter-spacing:.01em; }
+  .h2 { font:700 56px/1.2 "Noto Sans JP"; letter-spacing:.03em; }
+  .num { font:900 210px/1 "Noto Sans JP"; letter-spacing:-.02em; font-feature-settings:"tnum" 1, "palt" 0; }
+  .num small { font:900 .4em/1 "Noto Sans JP"; letter-spacing:0; margin:0 .05em; }
+  .cap { font:500 36px/1.3 "Noto Sans JP"; letter-spacing:.04em; }
+  .lab { font:700 38px/1.2 "Noto Sans JP"; letter-spacing:.03em; }
+  .note { font:400 24px/1.4 "Noto Sans JP"; }
+  .w { color:#fff; text-shadow:0 2px 18px rgba(0,0,0,.32); } .k { color:var(--ink); } .g { color:var(--gold); text-shadow:0 2px 18px rgba(0,0,0,.3); }
+  .scr { position:absolute; left:0; top:0; width:1080px; height:720px; display:none; }
+  .sh { position:absolute; display:none; border-radius:50%; filter:blur(20px); }
+  #cta { position:absolute; left:64px; top:1240px; perspective:900px; visibility:hidden; }
+  #cta .btn { position:relative; display:inline-block; padding:34px 62px 38px; border-radius:999px; background:linear-gradient(180deg, #F6CF6A 0%, #E2AC2E 100%); color:var(--ink);
+              font:900 54px/1 "Noto Sans JP"; letter-spacing:.04em; overflow:hidden; transform-origin:50% 100%; }
+  #cta .shine { position:absolute; top:-20%; left:0; width:38%; height:140%; background:linear-gradient(100deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.75) 50%, rgba(255,255,255,0) 100%); }
+  #pr { position:absolute; left:64px; top:176px; width:76px; height:40px; box-sizing:border-box; font:700 24px/40px "Noto Sans JP"; text-align:center; color:#fff; border-radius:6px; letter-spacing:.08em; background:var(--acc); z-index:3; }
+  #credit { position:absolute; left:156px; top:182px; font:500 20px/1 "Noto Sans JP"; letter-spacing:.04em; color:#fff; background:rgba(28,26,23,.6); padding:6px 10px; border-radius:6px; z-index:3; }
+  #grain { mix-blend-mode:overlay; opacity:.13; background-size:512px 512px; }
+  #vig { position:absolute; inset:0; background:radial-gradient(ellipse 78% 62% at 50% 46%, rgba(30,20,10,0) 62%, rgba(30,20,10,.22) 100%); }
+  .leak, .flare, .ring, .lens { position:absolute; display:none; mix-blend-mode:screen; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="far" class="scrim"></div>
+<div id="behind" class="scrim"></div>
+<div id="world"></div>
+<div id="fx" class="scrim"></div>
+<svg id="near" class="scrim" width="1080" height="1920" viewBox="0 0 1080 1920"><defs><filter id="nb" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter></defs></svg>
+<div id="shade" class="scrim"></div>
+<svg id="over" class="scrim" width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0"></svg>
+<div id="post" class="scrim"><div id="vig"></div></div>
+<div id="ui"><div id="pr">PR</div></div>
+<div id="grain" class="scrim"></div>
+<script>
+const TL = window.TIMELINE, P = window.PRODUCT, K = P.kinetic, { clamp, lerp } = EDGE, { el, sv, $ } = SK;
+if (!K || !K.shots || K.shots.length < 10) throw new Error("設計書に kinetic.shots が無いか、10カット未満（#377）");
+const E = Object.assign({}, EDGE.E), SP = MK.springBD;
+const DIR = `p/${P.product_key}/`, U = SK.U, T = () => SK.T, pad = (i) => String(i).padStart(4, "0"), WAITS = [];
+const evT = (id) => { const e = TL.events.find((x) => x.id === id); if (!e) throw new Error(`timing.json に出来事 ${id} が無い`); return e.t; };
+const scOf = (id) => { const s = TL.scenes.find((x) => x.id === id); if (!s) throw new Error(`timing.json に場面 ${id} が無い`); return s; };
+const R = (a, d) => a == null ? d : typeof a === "number" ? a : a[0] === "ev" ? evT(a[1]) + (a[2] || 0) : a[0] === "t0" ? scOf(a[1]).t0 + (a[2] || 0) : a[0] === "t1" ? scOf(a[1]).t1 + (a[2] || 0) : (() => { throw new Error(`時刻の形が違う: ${JSON.stringify(a)}`); })();
+const COPY = Object.fromEntries(P.beats.map((b) => [b.kind, b]));
+const txt = (s) => s.replace(/\$\{(\w+)(?:\.(\w+))?\}/g, (_, k, f) => { const v = k === "TARGET" ? P.target.who : (COPY[k] || {})[f]; if (v == null) throw new Error(`設計書の字が無い: ${k}.${f}`); return v; });
+const show = (im, src) => { if (im.getAttribute("src") !== src) { im.setAttribute("src", src); WAITS.push(im.decode().catch(() => {})); } };
+const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+if (P.brand && P.brand.accent) document.documentElement.style.setProperty("--acc", P.brand.accent);   // PR の札の色＝設計書のブランド色（点検「描画されたブランド色」と同じ値）
+{ const vv = /^voicevox:([^/]+)/.exec((P.prep && P.prep.voice) || ""); if (vv) { const c = document.createElement("div"); c.id = "credit"; c.textContent = `VOICEVOX:${vv[1]}`; document.body.appendChild(c); } }
+
+// ---------- カット：始まり a・終わり z（＝次の始まり）。次が溶けて入る x 秒の間だけ残る ----------
+const XD = 0.12;
+const SH = K.shots.map((s, i) => Object.assign({}, s, { i, a: i === 0 ? 0 : R(s.at) }));
+SH.forEach((s) => { if (s.i > 0 && s.x == null) s.x = XD; });
+SH.forEach((s, i) => { const nx = SH[i + 1]; s.nx = nx; s.z = nx ? nx.a : TL.end + 1; s.zx = s.z + (nx ? nx.x : 0); if (s.z - s.a < 0.3) throw new Error(`カット ${s.id} が短すぎる ${(s.z - s.a).toFixed(2)}秒`); });
+const onS = (s, t) => (s.i === 0 || t >= s.a) && t < s.zx;
+const io = (s, t) => (s.x ? clamp((t - s.a) / s.x) : 1) * (s.zx > s.z ? 1 - clamp((t - s.z) / (s.zx - s.z)) : 1);
+const frameAt = (n, i, mode) => { if (mode === "pp") { const m = 2 * (n - 1); i = ((i % m) + m) % m; return i >= n ? m - i : i; } if (mode === "loop") return ((i % n) + n) % n; return Math.min(n - 1, Math.max(0, i)); };
+const NN = (kind, name) => { const c = (K[kind] || {})[name]; if (!c) throw new Error(`kinetic.${kind} に ${name} が無い`); return c.n; };
+
+// ---------- カメラ（カットごと）：寄り z・横 x/y・回転 r。ease＝spring（行き過ぎて戻る）か expo（急に寄ってぴたっと止まる） ----------
+//   手持ちの揺れ（周期の違う正弦の和・乱数なし）と、ぶつかる字での揺れ（減衰する正弦）を足す
+const SHAKES = [];   // [時刻, 強さ]
+const camOf = (s, t) => {
+  const c = s.cam || {}, u = t - s.a, D = Math.max(0.3, s.z - s.a), dur = c.dur || Math.min(D, 1.2);
+  const k = c.ease === "spring" ? SP(u, dur, c.bounce == null ? 0.22 : c.bounce) : c.ease === "slow" ? E.outQuart(u / D) : E.outExpo(u / dur);
+  const L = (v, d) => (v ? lerp(v[0], v[1], k) : d);
+  let z = L(c.z, 1.04), x = L(c.x, 0), y = L(c.y, 0), r = L(c.r, 0), blur = 0;
+  // マッチカット：入る側は前の勢いを初速に（zoom＝寄った所から少し戻って止まる・spin＝前の回転から 0 へ）
+  if (s.mx && t >= s.a) { const q = 1 - SP(u, 0.5, 0.18); if (s.mx === "zoom") { z *= 1 + 0.28 * q; blur += 9 * q; } if (s.mx === "spin") r += -9 * q; }
+  // 出る側：次が zoom なら最後の 0.22秒で加速して寄る・spin なら回りだす（ぶれは描く側の SUB で付く）
+  if (s.nx && s.nx.mx && t > s.z - 0.22) { const q = E.inCubic((t - (s.z - 0.22)) / 0.22); if (s.nx.mx === "zoom") { z *= 1 + 0.32 * q; blur += 8 * q; } if (s.nx.mx === "spin") r += 9 * q; }
+  const hx = 5 * Math.sin(t * 1.31 + s.i) + 2.4 * Math.sin(t * 2.93 + 1.1), hy = 4 * Math.sin(t * 1.07 + 1.7) + 2 * Math.sin(t * 3.71), hr = 0.22 * Math.sin(t * 0.83 + s.i);
+  let kx = 0, ky = 0;
+  for (const [t0, A] of SHAKES) { const d = t - t0; if (d >= 0 && d < 0.5) { const e = A * Math.exp(-d * 9); kx += e * Math.sin(d * 62); ky += e * 0.7 * Math.cos(d * 55); } }
+  return { z, x: x + hx + kx, y: y + hy + ky, r: r + hr, blur };
+};
+// 層の置き方：視差の係数 p だけカメラを受ける。拡大は画面の中心（540, 900）から
+const place = (node, box, cam, p, extra = "") => {
+  const [x, y, w, h] = box, s = 1 + (cam.z - 1) * p, tx = -cam.x * p, ty = -cam.y * p;
+  node.style.left = x + "px"; node.style.top = y + "px"; node.style.width = w + "px"; node.style.height = h + "px";
+  node.style.transformOrigin = `${(540 - x).toFixed(1)}px ${(900 - y).toFixed(1)}px`;
+  node.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px) rotate(${(cam.r * p).toFixed(3)}deg) scale(${s.toFixed(4)}) ${extra}`;
+};
+
+for (const s of SH) {
+  // 奥（#far）：本物の映像 clip か、奥行きの連番 seq をぼかした物。rate＜1 で溜め（ゆっくり）
+  if (s.far) { const g = s.far, im = el("img", { alt: "" }, "", $("far")), n = g.seq ? NN("seqs", g.seq) : NN("clips", g.clip), base = g.base ? SH.find((x) => x.id === g.base).a : s.a;
+    U.push(() => { const t = T(); if (!onS(s, t)) { im.style.display = "none"; return; } im.style.display = "block";
+      const i = frameAt(n, Math.floor((t - base) * 30 * (g.rate || 1) + 1e-6) + (g.from || 0), g.mode || "pp");
+      show(im, g.seq ? `${DIR}dp/${g.seq}_${pad(i)}.jpg` : `${DIR}fv/${g.clip}_${pad(i)}.jpg`);
+      const cam = camOf(s, t), b = g.blur ? lerp(g.blur[0], g.blur[1], E.outQuart((t - s.a) / Math.max(0.3, s.z - s.a))) : 0;
+      im.style.transformOrigin = "540px 900px"; im.style.transform = `translate(${(-cam.x * 0.35).toFixed(2)}px, ${(-cam.y * 0.35).toFixed(2)}px) rotate(${(cam.r * 0.35).toFixed(3)}deg) scale(${(1.1 + (cam.z - 1) * 0.35).toFixed(4)})`;
+      im.style.filter = `blur(${(b + cam.blur * 0.5).toFixed(2)}px) brightness(${g.bright || 1}) saturate(${g.sat || 1})`; im.style.opacity = io(s, t).toFixed(3); }); }
+  // 被写体の後ろを通る大きな字（#behind・飾り＝点検の字ではない。言葉は商品名・数字の繰り返しだけ）
+  if (s.behind) { const b = s.behind, ba = R(b.at, s.a + 0.05), e = el("div", { class: "bw", style: `${b.size ? `font-size:${b.size}px;` : ""}${b.color ? `color:${b.color};` : ""}` }, txt(b.s), $("behind"));
+    U.push(() => { const t = T(); if (!onS(s, t)) { e.style.display = "none"; return; } e.style.display = "block";
+      const cam = camOf(s, t), k = SP(t - ba, 0.7, 0.2), slide = (1 - k) * (b.dx == null ? 260 : b.dx);
+      place(e, [b.x + slide, b.y, 0, 0], cam, 0.6); e.style.width = "auto"; e.style.height = "auto"; e.style.opacity = (io(s, t) * clamp(k * 1.4)).toFixed(3); }); }
+  // 商品（#world・販売ページの実物の写真）：seq＝奥行きで動かした連番／img＝切り抜き。pop＝バネで出る大きさの行き過ぎ
+  for (const p of s.prod || []) { const d = el("div", { class: `m ${p.mask || ""}` }, `<img alt="">`, $("world")), im = d.firstChild, n = p.seq ? NN("seqs", p.seq) : 0, a0 = R(p.at, s.a);
+    if (p.img) im.setAttribute("src", `${DIR}img/${p.img}`);
+    U.push(() => { const t = T(), on = (s.i === 0 || t >= a0) && t < s.zx; if (!on) { d.style.display = "none"; return; } d.style.display = "block";
+      if (p.seq) show(im, `${DIR}dp/${p.seq}_${pad(frameAt(n, Math.floor((t - a0) * 30 * (p.rate || 1) + 1e-6) + (p.from || 0), "clamp"))}.jpg`);
+      const cam = camOf(s, t), k = p.pop ? SP(t - a0, 0.6, 0.28) : 1, sc = p.pop ? 0.82 + 0.18 * k : 1, dy = p.rise ? (1 - SP(t - a0, 0.7, 0.2)) * p.rise : 0;
+      const b0 = p.box, b1 = p.box2 || b0, u = E.outQuart((t - s.a) / Math.max(0.3, s.z - s.a)), box = b0.map((v, q) => lerp(v, b1[q], u));
+      place(d, [box[0], box[1] + dy, box[2], box[3]], cam, p.par || 1, `scale(${sc.toFixed(4)})`);
+      d.style.opacity = (io(s, t) * (p.pop || p.rise ? clamp((t - a0) / 0.12) : 1)).toFixed(3);
+      d.style.filter = `${cam.blur > 0.2 ? `blur(${cam.blur.toFixed(2)}px) ` : ""}${p.shadow ? "drop-shadow(0 40px 36px rgba(60,40,10,.30))" : ""}` || "none"; }); }
+  // 商品の前を流れる本物の湯気・光（黒地の映像を明るい所だけ重ねる）
+  for (const f of s.fx || []) { const im = el("img", { alt: "", class: f.mask || "", style: `mix-blend-mode:${f.blend || "screen"}` }, "", $("fx")), n = NN("clips", f.clip);
+    U.push(() => { const t = T(); if (!onS(s, t)) { im.style.display = "none"; return; } im.style.display = "block";
+      show(im, `${DIR}fv/${f.clip}_${pad(frameAt(n, Math.floor((t - s.a) * 30 * (f.rate || 1) + 1e-6) + (f.from || 0), "pp"))}.jpg`);
+      const cam = camOf(s, t); im.style.transformOrigin = "540px 900px"; im.style.transform = `translate(${(-cam.x * 1.2).toFixed(2)}px, ${(-cam.y * 1.2).toFixed(2)}px) scale(${(1.08 + (cam.z - 1) * 1.2).toFixed(4)})`;
+      im.style.opacity = ((f.opacity || 0.5) * io(s, t)).toFixed(3); }); }
+  // 上の陰り（字の後ろ）：暗い映像は dark・明るい面は light（四角の札にしない・#357）
+  if (s.scrim) { const g = s.scrim === "light" ? "255,250,240" : "18,14,10", k = s.scrimk || (s.scrim === "light" ? 0.62 : 0.5);
+    const w = el("div", { class: "scr", style: `background:linear-gradient(180deg, rgba(${g},${k}) 0px, rgba(${g},${(k * 0.85).toFixed(2)}) 330px, rgba(${g},${(k * 0.4).toFixed(2)}) 520px, rgba(${g},0) 710px)` }, "", $("shade"));
+    U.push(() => { const t = T(), on = onS(s, t); w.style.display = on ? "block" : "none"; if (on) w.style.opacity = io(s, t).toFixed(3); }); }
+  // 線（商品の1点に付く引き出し線・寸法の線）：path を「描く」。d＝SVG の道・at＝描き始め・dur
+  for (const ln of s.lines || []) { const p = sv("path", { d: ln.d, fill: "none", stroke: ln.color || "#fff", "stroke-width": ln.w || 4, "stroke-linecap": "round" }, $("over")), L = p.getTotalLength(), a0 = R(ln.at, s.a);
+    const dots = (ln.dots || []).map(([cx, cy]) => sv("circle", { cx, cy, r: 9, fill: ln.color || "#fff" }, $("over")));
+    U.push(() => { const t = T(), on = onS(s, t) && t >= a0; const k = on ? E.outExpo((t - a0) / (ln.dur || 0.45)) : 0;
+      p.style.strokeDasharray = `${L}`; p.style.strokeDashoffset = `${(L * (1 - k)).toFixed(2)}`; p.style.opacity = (on ? io(s, t) : 0).toFixed(3);
+      dots.forEach((c) => { c.setAttribute("r", (9 * SP(t - a0, 0.4, 0.3)).toFixed(2)); c.style.opacity = (on ? io(s, t) : 0).toFixed(3); }); }); }
+
+  // ---------- 動く字（#ui）：mask＝1字ずつ下から／flip＝1字ずつ奥から回って起きる／slam＝奥から飛んできてぶつかる（揺れ・色ずれ）／rise／cut ----------
+  for (const x of s.text || []) { const a = R(x.at, s.a), zz = x.to ? R(x.to) : s.z, raw = txt(x.s), per = x.fx === "mask" || x.fx === "flip";
+    const html = per ? [...raw.replace(/<[^>]+>/g, "")].map((ch) => `<span class="c"><span class="ci">${ch === " " ? "&nbsp;" : ch}</span></span>`).join("") : raw;
+    const e = el("div", { class: `t ${x.k} ${x.c || "w"}${x.fx === "flip" ? " flip" : ""}`, style: `left:${x.x}px;top:${x.y}px;${x.size ? `font-size:${x.size}px;` : ""}` }, html);
+    const cis = [...e.querySelectorAll(".ci")], cn = x.count ? e.querySelector(".n") : null, c = x.count;
+    if (x.count && !cn) throw new Error(`${s.id}: count の字に <span class="n"> が無い`);
+    if (x.fx === "slam") SHAKES.push([a + 0.16, x.shake == null ? 16 : x.shake]);
+    const sh = x.blob ? el("div", { class: "sh", style: `background:${x.c === "k" ? "rgba(255,250,240,.7)" : "rgba(18,14,10,.55)"}` }, "", $("shade")) : null;
+    if (sh) SK.AFTER_FONTS.push(() => { e.style.visibility = "visible"; const r = e.getBoundingClientRect(); e.style.visibility = "hidden";
+      sh.style.left = (r.left - 34) + "px"; sh.style.top = (r.top - 18) + "px"; sh.style.width = (r.width + 68) + "px"; sh.style.height = (r.height + 36) + "px"; });
+    const fmt = (v) => (c.sep ? Math.round(v).toLocaleString("en-US") : v.toFixed(c.dec || 0));
+    U.push(() => { const t = T(), first = s.i === 0 && a <= 0.001, on = (first || t >= a) && t < zz; e.style.visibility = on ? "visible" : "hidden"; if (sh) sh.style.display = on ? "block" : "none"; if (!on) return;
+      const u = first ? 9 : t - a, out = clamp((t - (zz - 0.12)) / 0.12), o = (x.fx === "cut" || first ? 1 : clamp(u / 0.06)) * (1 - out);
+      e.style.opacity = o.toFixed(3); if (sh) sh.style.opacity = o.toFixed(3);
+      let tf = "", fl = "";
+      // 奥から飛んできてぶつかる：小さい所からバネで大きくなり、行き過ぎて戻る。行き過ぎても右の枠（x 900）を越えない所で止める（セーフ領域・#333）
+      if (x.fx === "slam") { const k = SP(u, 0.55, 0.3), mx = Math.max(1, (900 - x.x) / Math.max(1, e.offsetWidth)); tf = `scale(${Math.min(mx, 0.35 + 0.65 * k).toFixed(4)})`; fl = u < 0.18 ? `blur(${(10 * (1 - u / 0.18)).toFixed(2)}px)` : ""; }
+      else if (x.fx === "rise") tf = `translateY(${((1 - SP(u, 0.6, 0.25)) * 60).toFixed(2)}px)`;
+      else if (x.fx === "mask") cis.forEach((ci, i) => { const k = SP(u - i * 0.035, 0.55, 0.22); ci.style.transform = `translateY(${((1 - k) * 110).toFixed(2)}%)`; });
+      else if (x.fx === "flip") cis.forEach((ci, i) => { const k = SP(u - i * 0.04, 0.6, 0.3); ci.style.transform = `translateZ(${((1 - k) * -260).toFixed(1)}px) rotateX(${((1 - k) * -92).toFixed(2)}deg)`; ci.style.opacity = clamp(k * 3).toFixed(3); });
+      // 色ずれ＋一瞬のずれ（グリッチ）：鍵の言葉だけ。出てから 0.22秒、コマごとに決まった量（hash）だけずらす
+      const gl = x.glitch && u >= 0 && u < 0.26, f = Math.floor(t * 60);
+      if (gl) { const q = 1 - u / 0.26, dx = (hash(f) - 0.5) * 22 * q, cr = 7 * q; tf += ` translateX(${dx.toFixed(2)}px) skewX(${((hash(f + 7) - 0.5) * 8 * q).toFixed(2)}deg)`;
+        e.style.textShadow = `${(-cr).toFixed(1)}px 0 rgba(255,40,90,.85), ${cr.toFixed(1)}px 0 rgba(0,210,255,.85), 0 0 ${(30 * q + 10).toFixed(0)}px rgba(255,214,120,.9)`; }
+      else e.style.textShadow = x.glow ? "0 0 26px rgba(255,214,120,.75), 0 2px 18px rgba(0,0,0,.3)" : "";
+      if (out > 0) tf += ` scale(${(1 + 0.05 * out).toFixed(4)})`;
+      e.style.transform = tf || "none"; e.style.filter = fl || "none";
+      if (cn) { const k = SP(t - R(c.at, a), c.dur || 0.7, 0.12); cn.textContent = fmt(c.from + (c.to - c.from) * clamp(k, 0, 1)); } }); }
+}
+
+// ---------- 舞う粒（#near・視差 1.6）：ボケた光の粒。カットの near で濃さを決める。乱数なし（hash） ----------
+{ const N = 26, ps = Array.from({ length: N }, (_, k) => sv("circle", { fill: "#FFF4D6", filter: hash(k + 3) > 0.5 ? "url(#nb)" : "" }, $("near")));
+  U.push(() => { const t = T(), s = SH.reduce((a, x) => (t >= x.a ? x : a), SH[0]), dens = s.near == null ? 0.5 : s.near, cam = camOf(s, t);
+    ps.forEach((p, k) => { const sp = 30 + 50 * hash(k + 11), y = ((hash(k) * 2100 + t * sp) % 2100) - 90, x = hash(k + 5) * 1080 + 40 * Math.sin(t * 0.7 + k), r = 3 + 16 * Math.pow(hash(k + 9), 2.2);
+      p.setAttribute("cx", (x - cam.x * 1.6).toFixed(1)); p.setAttribute("cy", (y - cam.y * 1.6).toFixed(1)); p.setAttribute("r", (r * (1 + (cam.z - 1) * 1.6)).toFixed(2));
+      p.setAttribute("opacity", (dens * (0.25 + 0.5 * hash(k + 21)) * (0.6 + 0.4 * Math.sin(t * 1.3 + k))).toFixed(3)); }); }); }
+
+// ---------- 質感（#post）：光漏れ（動く暖かい光）・フレアの通過・粒子。周辺の陰りは 22% まで（暗くしない・#366） ----------
+{ const L1 = el("div", { class: "leak", style: "width:1400px;height:1400px;border-radius:50%;background:radial-gradient(circle, rgba(255,190,110,.55) 0%, rgba(255,150,80,.18) 40%, rgba(255,140,60,0) 70%)" }, "", $("post"));
+  const L2 = el("div", { class: "leak", style: "width:1000px;height:1000px;border-radius:50%;background:radial-gradient(circle, rgba(255,236,190,.5) 0%, rgba(255,220,160,0) 68%)" }, "", $("post"));
+  U.push(() => { const t = T(), s = SH.reduce((a, x) => (t >= x.a ? x : a), SH[0]), k = s.leak == null ? 0.35 : s.leak;
+    [[L1, -300 + 260 * Math.sin(t * 0.37), -420 + 180 * Math.cos(t * 0.29)], [L2, 520 + 220 * Math.cos(t * 0.31), 1150 + 260 * Math.sin(t * 0.23)]].forEach(([n, x, y], j) => {
+      n.style.display = k > 0.01 ? "block" : "none"; n.style.left = x.toFixed(1) + "px"; n.style.top = y.toFixed(1) + "px"; n.style.opacity = (k * (0.7 + 0.3 * Math.sin(t * 0.9 + j * 2))).toFixed(3); }); });
+  // フレア：横に長い光の帯と、反対側へ動く輪 3つ（レンズの中の反射）。K.flares の時刻に 0.7秒で横切る
+  const FL = (K.flares || []).map((a) => { const at = R(a), band = el("div", { class: "flare", style: "left:0;width:1080px;height:26px;background:linear-gradient(90deg, rgba(255,210,140,0) 0%, rgba(255,226,170,.85) 50%, rgba(255,210,140,0) 100%);filter:blur(6px)" }, "", $("post"));
+    const core = el("div", { class: "flare", style: "width:240px;height:240px;border-radius:50%;background:radial-gradient(circle, rgba(255,250,235,.95) 0%, rgba(255,214,140,.35) 35%, rgba(255,200,120,0) 70%)" }, "", $("post"));
+    const ghosts = [0.4, 0.7, 1.15].map((g, i) => [g, el("div", { class: "lens", style: `width:${[90, 150, 60][i]}px;height:${[90, 150, 60][i]}px;border-radius:50%;border:3px solid rgba(255,220,170,.5);background:rgba(255,220,170,.10)` }, "", $("post"))]);
+    return { at, band, core, ghosts }; });
+  U.push(() => { const t = T(); for (const f of FL) { const u = (t - f.at) / 0.7, on = u >= 0 && u < 1, o = on ? Math.sin(Math.PI * u) : 0, cx = -200 + 1480 * E.outQuart(u), cy = 560;
+    for (const n of [f.band, f.core, ...f.ghosts.map((g) => g[1])]) n.style.display = on ? "block" : "none"; if (!on) continue;
+    f.band.style.top = (cy - 13) + "px"; f.band.style.opacity = (0.85 * o).toFixed(3); f.core.style.left = (cx - 120).toFixed(1) + "px"; f.core.style.top = (cy - 120) + "px"; f.core.style.opacity = o.toFixed(3);
+    f.ghosts.forEach(([g, n]) => { const gx = 540 + (540 - cx) * g, gy = 900 + (900 - cy) * g, w = parseFloat(n.style.width); n.style.left = (gx - w / 2).toFixed(1) + "px"; n.style.top = (gy - w / 2).toFixed(1) + "px"; n.style.opacity = (0.8 * o).toFixed(3); }); } }); }
+{ const g = $("grain"); g.style.backgroundImage = `url(${DIR}img/grain.png)`; U.push(() => { const f = Math.floor(T() * 30 + 1e-6); g.style.backgroundPosition = `${(f * 193) % 512}px ${(f * 331) % 512}px`; }); }
+
+// ---------- 行動の札（CTA）：奥に倒れた所からバネで起き上がり、光が走り、押されて輪が広がる ----------
+if (K.cta) { const c = K.cta, w = el("div", { id: "cta" }, `<div class="btn"><span class="lbl">${txt(c.s)}</span><span class="shine"></span></div>`), b = w.firstChild, sh = b.lastChild;
+  const ring = el("div", { class: "ring", style: "width:10px;height:10px;border-radius:999px;border:4px solid rgba(255,214,120,.9)" }, "", $("post"));
+  const a = R(c.at), pr = R(c.press);
+  U.push(() => { const t = T(), on = t >= a; w.style.visibility = on ? "visible" : "hidden"; if (!on) { ring.style.display = "none"; return; }
+    const k = SP(t - a, 0.7, 0.3), p = t >= pr ? 1 - 0.07 * Math.sin(Math.PI * clamp((t - pr) / 0.26)) : 1, glow = 0.55 + 0.45 * Math.sin(t * 5.2);
+    b.style.transform = `translateY(${((1 - k) * 90).toFixed(2)}px) translateZ(${(k * 40).toFixed(1)}px) rotateX(${((1 - k) * 62).toFixed(2)}deg) scale(${p.toFixed(4)})`;
+    // 厚み（下に 12px の濃い金の側面＝押しボタンの立体）・落ち影・外の光（呼吸する）。押すと厚みが沈む
+    const dep = 12 * k * (t >= pr ? 1 - 0.75 * Math.sin(Math.PI * clamp((t - pr) / 0.26)) : 1);
+    b.style.boxShadow = `inset 0 3px 0 rgba(255,246,214,.85), inset 0 -4px 0 rgba(150,98,10,.35), 0 ${dep.toFixed(1)}px 0 #A8740F, 0 ${(dep + 18 * k).toFixed(1)}px ${(38 * k).toFixed(1)}px rgba(120,80,10,.38), 0 0 ${(44 + 60 * glow).toFixed(1)}px ${(6 * glow).toFixed(1)}px rgba(255,205,100,${(0.7 * glow * k).toFixed(3)})`;
+    w.style.opacity = clamp((t - a) / 0.1).toFixed(3); sh.style.transform = `translateX(${(-120 + 420 * clamp(((t - a - 0.35) % 1.6) / 0.7)).toFixed(1)}%) skewX(-18deg)`;
+    const u = (t - pr) / 0.6; ring.style.display = u >= 0 && u < 1 ? "block" : "none";
+    if (u >= 0 && u < 1) { const r = b.getBoundingClientRect(), gx = 150 * E.outExpo(u), gy = 110 * E.outExpo(u);   // 輪はボタンの周りだけ（画面の幅を越えると横線に見えた）
+      ring.style.width = (r.width + gx).toFixed(1) + "px"; ring.style.height = (r.height + gy).toFixed(1) + "px"; ring.style.left = (r.left - gx / 2).toFixed(1) + "px"; ring.style.top = (r.top - gy / 2).toFixed(1) + "px"; ring.style.opacity = (1 - u).toFixed(3); } }); }
+
+SK.boot([400, 500, 700, 900]);
+window.READY = window.READY.then(async () => { for (const w of [400, 500, 700, 900]) await document.fonts.load(`${w} 40px "Noto Sans JP"`, $("ui").textContent + "0123456789.,・粒kg約件人前万個");
+  await document.fonts.load(`500 300px "Cormorant Garamond"`, $("behind").textContent || "Fromage Double"); window.seek(0); await Promise.all(WAITS); return true; });
+{ const seek0 = window.seek; window.seek = (t) => { WAITS.length = 0; seek0(t); return Promise.all(WAITS); }; }
+</script>
+</body></html>

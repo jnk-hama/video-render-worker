@@ -1,0 +1,95 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。jmas #379（kinetic の型）：商品は販売ページの実物の写真だけ（奥行きで動かす＝depth）。映像は Pexels の本物（金のきらめき・ツリー・注ぐ牛乳・雪・金のボケ）。どちらも実行時に取り、ここには置かない",
+ "asp_images": [
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/202604/f910_01_new.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_02.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_03.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_04.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_05.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_06.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_07.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_08.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_09.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_10.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/f910/2505/f910_11.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_02.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_03.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_04.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_05.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_06.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_07.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_08.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_09.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_10.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_11.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/202502/f910/f910_12.jpg",
+  "https://image.rakuten.co.jp/letao/cabinet/item/half_thawed.jpg",
+  "https://shop.r10s.jp/letao/cabinet/item/f910/202604/f910df_maru.jpg"
+ ],
+ "videos": [
+  "https://videos.pexels.com/video-files/8516369/8516369-hd_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/6306022/6306022-hd_1080_2048_24fps.mp4",
+  "https://videos.pexels.com/video-files/6535488/6535488-hd_1080_2048_30fps.mp4",
+  "https://videos.pexels.com/video-files/6286998/6286998-hd_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/6340529/6340529-hd_1080_1920_30fps.mp4"
+ ],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "にそうのチーズが生む、奇跡のくちどけ。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "うえはレアチーズ、したはベイクドチーズ。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "北海道の生クリームと、世界のチーズ。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "直径じゅうにセンチ。ふたりから、よにんに、ちょうどいい。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "累計、にせんななひゃくまんこの看板商品。評価は、4.64。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "選べるスイーツとのセット。リンクはプロフィールから。",
+   "speed": 1.0,
+   "pause": 0.4
+  }
+ ],
+ "prep": [
+  [
+   "base"
+  ],
+  [
+   "cake"
+  ]
+ ],
+ "depth": true
+}
