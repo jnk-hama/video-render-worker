@@ -174,11 +174,12 @@
     ],
     "what": "c2 奇跡のくちどけ（ぶつかる字）",
     "sfx": [
-     "impact",
-     0.9,
-     1.4
+     "bell",
+     1567.98,
+     0.45,
+     1.2
     ],
-    "band": "low"
+    "band": "high"
    },
    {
     "id": "ue",
@@ -298,11 +299,12 @@
     ],
     "what": "c9 2,700万個",
     "sfx": [
-     "impact",
-     0.8,
+     "bell",
+     1567.98,
+     0.45,
      1.2
     ],
-    "band": "low"
+    "band": "high"
    },
    {
     "id": "hyouka",
@@ -502,16 +504,6 @@
    ],
    [
     "ev",
-    "kiseki",
-    -0.05
-   ],
-   [
-    "ev",
-    "jyuni",
-    -0.1
-   ],
-   [
-    "ev",
     "link",
     0.1
    ]
@@ -521,7 +513,7 @@
    "at": [
     "ev",
     "link",
-    0.1
+    0.3
    ],
    "press": [
     "ev",
@@ -530,41 +522,31 @@
   },
   "shots": [
    {
-    "id": "c1",
-    "why": "フック：本物のツリーの光の中の全体へ、寄りながら回り込む（3層の視差）",
-    "scrim": "dark",
     "leak": 0.25,
-    "near": 0.9,
+    "near": 0.35,
     "cam": {
      "z": [
       1.0,
-      1.15
+      1.08
      ],
      "x": [
-      -22,
+      -10,
       6
      ],
-     "r": [
-      -1.2,
-      0
-     ],
-     "ease": "expo",
-     "dur": 1.1
+     "ease": "slow"
     },
+    "scrim": "dark",
+    "scrimk": 0.8,
+    "id": "c1",
+    "why": "約束：本物のツリーの光の中の全体へ、ゆっくり寄る",
     "far": {
      "clip": "tree",
+     "from": 0,
      "blur": [
       12,
-      7
+      8
      ],
-     "bright": 0.95
-    },
-    "behind": {
-     "s": "Fromage Double",
-     "x": 40,
-     "y": 470,
-     "size": 230,
-     "dx": 420
+     "bright": 1.0
     },
     "prod": [
      {
@@ -593,7 +575,7 @@
       "x": 64,
       "y": 306,
       "size": 88,
-      "fx": "flip"
+      "fx": "mask"
      },
      {
       "k": "note",
@@ -601,36 +583,34 @@
       "x": 64,
       "y": 1404,
       "fx": "cut",
-      "blob": true,
       "to": [
        "ev",
        "kiseki",
        -0.4
       ]
      }
-    ],
-    "scrimk": 0.8
+    ]
    },
    {
+    "x": 0.35,
+    "leak": 0.25,
+    "near": 0.35,
+    "cam": {
+     "z": [
+      1.0,
+      1.05
+     ],
+     "ease": "slow"
+    },
+    "scrim": "dark",
+    "scrimk": 0.85,
     "id": "c2",
     "at": [
      "ev",
      "kiseki",
-     -0.12
+     -0.25
     ],
-    "mx": "zoom",
-    "why": "くちどけ：上の層の大写し。ピントが奥から手前へ来る（ピント送り）",
-    "scrim": "dark",
-    "leak": 0.6,
-    "near": 1.0,
-    "cam": {
-     "z": [
-      1.0,
-      1.06
-     ],
-     "ease": "spring",
-     "dur": 0.9
-    },
+    "why": "約束：上の層の大写し。ピントが奥から手前へ",
     "far": {
      "seq": "slice_mac",
      "blur": [
@@ -665,42 +645,39 @@
       "x": 64,
       "y": 330,
       "size": 102,
-      "fx": "slam",
-      "glitch": true,
+      "fx": "rise",
       "c": "g",
+      "glow": true,
       "blob": true
      }
-    ],
-    "scrimk": 0.85
+    ]
    },
    {
+    "x": 0.35,
+    "leak": 0.25,
+    "near": 0.35,
+    "cam": {
+     "z": [
+      1.0,
+      1.05
+     ],
+     "ease": "slow"
+    },
+    "scrim": "dark",
+    "scrimk": 0.78,
     "id": "c3",
     "at": [
      "t0",
      "S2"
     ],
-    "why": "2層：溜め（ゆっくり回る）と引き出し線",
-    "scrim": "light",
-    "leak": 0.3,
-    "near": 0.35,
-    "cam": {
-     "z": [
-      1.02,
-      1.07
-     ],
-     "x": [
-      -10,
-      12
-     ],
-     "ease": "slow"
-    },
+    "why": "理由：2層。細い線を引いて名前",
     "far": {
      "seq": "slice_wide",
      "blur": [
       30,
       30
      ],
-     "bright": 0.92
+     "bright": 0.85
     },
     "prod": [
      {
@@ -722,8 +699,8 @@
        "ue",
        -0.05
       ],
-      "color": "#B8860B",
-      "w": 4,
+      "color": "#E9B949",
+      "w": 3,
       "dots": [
        [
         600,
@@ -738,8 +715,8 @@
        "shita",
        -0.05
       ],
-      "color": "#1C1A17",
-      "w": 4,
+      "color": "#FFF6E3",
+      "w": 3,
       "dots": [
        [
         660,
@@ -754,7 +731,6 @@
       "s": "${S2.top}",
       "x": 64,
       "y": 252,
-      "c": "k",
       "fx": "mask",
       "at": [
        "ev",
@@ -768,7 +744,6 @@
       "s": "${S2.bottom}",
       "x": 64,
       "y": 420,
-      "c": "k",
       "fx": "mask",
       "at": [
        "ev",
@@ -780,238 +755,171 @@
     ]
    },
    {
+    "x": 0.35,
+    "leak": 0.25,
+    "near": 0.35,
+    "cam": {
+     "z": [
+      1.0,
+      1.05
+     ],
+     "ease": "slow"
+    },
+    "scrim": "dark",
+    "scrimk": 0.75,
     "id": "c4",
     "at": [
      "t0",
      "S3"
     ],
-    "mx": "zoom",
-    "why": "素材の高速カット1",
-    "scrim": "light",
-    "near": 0.2,
-    "leak": 0.2,
-    "cam": {
-     "z": [
-      1.0,
-      1.08
-     ],
-     "ease": "expo",
-     "dur": 0.6
-    },
-    "far": {
-     "clip": "milk",
-     "blur": [
-      0,
-      2
-     ],
-     "bright": 1.0
-    },
-    "prod": [],
-    "text": [
-     {
-      "k": "h1",
-      "s": "${S3.a}",
-      "x": 64,
-      "y": 300,
-      "c": "k",
-      "fx": "slam",
-      "size": 96,
-      "shake": 8
-     }
-    ]
-   },
-   {
-    "id": "c5",
-    "at": [
-     "ev",
-     "nama"
-    ],
-    "mx": "zoom",
-    "why": "素材2",
-    "scrim": "light",
-    "near": 0.2,
-    "leak": 0.2,
-    "cam": {
-     "z": [
-      1.0,
-      1.08
-     ],
-     "ease": "expo",
-     "dur": 0.6
-    },
+    "why": "理由：素材1（特製生クリーム）",
     "far": {
      "img": "cream.jpg",
      "blur": [
       34,
       34
      ],
-     "bright": 1.05
+     "bright": 0.95
     },
     "prod": [
      {
       "img": "cream.jpg",
       "box": [
-       90,
+       -168,
        520,
-       900,
-       890
+       1416,
+       1400
       ],
-      "mask": "soft",
-      "pop": 1
+      "mask": "top"
      }
     ],
     "text": [
+     {
+      "k": "lab",
+      "s": "${S3.a}",
+      "x": 64,
+      "y": 252,
+      "fx": "mask",
+      "size": 52,
+      "at": [
+       "t0",
+       "S3",
+       0.1
+      ]
+     },
      {
       "k": "h1",
       "s": "${S3.b}",
       "x": 64,
-      "y": 300,
-      "c": "k",
-      "fx": "slam",
+      "y": 322,
       "size": 96,
-      "shake": 8
+      "fx": "rise",
+      "at": [
+       "t0",
+       "S3",
+       0.35
+      ]
      }
     ]
    },
    {
-    "id": "c6",
-    "at": [
-     "ev",
-     "sekai"
-    ],
-    "mx": "zoom",
-    "why": "素材3",
-    "scrim": "light",
-    "near": 0.2,
-    "leak": 0.2,
+    "x": 0.35,
+    "leak": 0.25,
+    "near": 0.35,
     "cam": {
      "z": [
       1.0,
-      1.08
+      1.05
      ],
-     "ease": "expo",
-     "dur": 0.6
+     "ease": "slow"
     },
-    "far": {
-     "img": "cheese.jpg",
-     "blur": [
-      34,
-      34
-     ],
-     "bright": 1.05
-    },
-    "prod": [
-     {
-      "img": "cheese.jpg",
-      "box": [
-       150,
-       500,
-       780,
-       1010
-      ],
-      "mask": "soft",
-      "pop": 1
-     }
-    ],
-    "text": [
-     {
-      "k": "h1",
-      "s": "${S3.c}",
-      "x": 64,
-      "y": 300,
-      "c": "k",
-      "fx": "slam",
-      "size": 54,
-      "shake": 8
-     }
-    ]
-   },
-   {
-    "id": "c7",
+    "scrim": "dark",
+    "scrimk": 0.75,
+    "id": "c5",
     "at": [
      "ev",
-     "chiizu"
+     "sekai",
+     -0.3
     ],
-    "mx": "zoom",
-    "why": "素材4",
-    "scrim": "light",
-    "near": 0.2,
-    "leak": 0.2,
-    "cam": {
-     "z": [
-      1.0,
-      1.08
-     ],
-     "ease": "expo",
-     "dur": 0.6
-    },
+    "why": "理由：素材2（世界のチーズ）",
     "far": {
      "img": "masc.jpg",
      "blur": [
       34,
       34
      ],
-     "bright": 1.05
+     "bright": 0.95
     },
     "prod": [
      {
       "img": "masc.jpg",
       "box": [
-       140,
-       500,
-       800,
-       978
+       -32,
+       520,
+       1145,
+       1400
       ],
-      "mask": "soft",
-      "pop": 1
+      "mask": "top"
      }
     ],
     "text": [
      {
+      "k": "lab",
+      "s": "${S3.c}",
+      "x": 64,
+      "y": 252,
+      "fx": "mask",
+      "size": 52,
+      "at": [
+       "ev",
+       "sekai",
+       -0.2
+      ]
+     },
+     {
       "k": "h1",
       "s": "${S3.d}",
       "x": 64,
-      "y": 300,
-      "c": "k",
-      "fx": "slam",
+      "y": 322,
       "size": 62,
-      "shake": 8
+      "fx": "rise",
+      "at": [
+       "ev",
+       "chiizu",
+       -0.1
+      ]
      }
     ]
    },
    {
-    "id": "c8",
+    "x": 0.45,
+    "leak": 0.4,
+    "near": 0.5,
+    "cam": {
+     "z": [
+      1.06,
+      1.0
+     ],
+     "ease": "spring",
+     "dur": 1.6,
+     "bounce": 0.1
+    },
+    "scrim": "dark",
+    "scrimk": 0.78,
+    "id": "c6",
     "at": [
      "t0",
      "S4"
     ],
-    "x": 0.3,
-    "why": "山場：12cm のケーキが奥行きの中に浮かぶ（溜め・重低音）",
-    "scrim": "light",
-    "leak": 0.55,
-    "near": 0.8,
-    "cam": {
-     "z": [
-      1.12,
-      1.0
-     ],
-     "r": [
-      -1.5,
-      0
-     ],
-     "ease": "spring",
-     "dur": 1.6,
-     "bounce": 0.12
-    },
+    "why": "山場：12cm のケーキがツリーの光の中にふわりと浮かぶ（溜め）",
     "far": {
-     "clip": "snow",
-     "from": 0,
-     "rate": 0.3,
+     "clip": "tree",
+     "from": 40,
      "blur": [
-      10,
-      4
+      16,
+      10
      ],
-     "bright": 1.06
+     "bright": 1.0
     },
     "behind": {
      "s": "12cm",
@@ -1019,7 +927,7 @@
      "y": 420,
      "size": 420,
      "dx": 0,
-     "color": "rgba(233,185,73,.55)",
+     "color": "rgba(233,185,73,.4)",
      "at": [
       "ev",
       "jyuni"
@@ -1034,7 +942,7 @@
        680,
        603
       ],
-      "rise": 220,
+      "rise": 160,
       "shadow": true,
       "at": [
        "t0",
@@ -1051,8 +959,8 @@
        "jyuni",
        -0.1
       ],
-      "color": "#1C1A17",
-      "w": 4,
+      "color": "#FFF6E3",
+      "w": 3,
       "dur": 0.6
      }
     ],
@@ -1062,8 +970,7 @@
       "s": "<small>${S4.pre}</small><span class=\"n\">${S4.big}</span><small>${S4.unit}</small>",
       "x": 66,
       "y": 236,
-      "c": "k",
-      "fx": "slam",
+      "fx": "rise",
       "at": [
        "ev",
        "jyuni",
@@ -1072,7 +979,7 @@
       "count": {
        "from": 0,
        "to": 12,
-       "dur": 0.5
+       "dur": 0.6
       }
      },
      {
@@ -1080,7 +987,6 @@
       "s": "${S4.sub}",
       "x": 68,
       "y": 486,
-      "c": "k",
       "fx": "mask",
       "at": [
        "ev",
@@ -1089,35 +995,36 @@
       ],
       "size": 44
      }
-    ]
+    ],
+    "scrimh": 860
    },
    {
-    "id": "c9",
+    "x": 0.35,
+    "leak": 0.25,
+    "near": 0.35,
+    "cam": {
+     "z": [
+      1.0,
+      1.05
+     ],
+     "ease": "slow"
+    },
+    "scrim": "dark",
+    "scrimk": 0.85,
+    "id": "c7",
     "at": [
      "t0",
      "S5"
     ],
-    "mx": "zoom",
-    "why": "証拠：2,700万個（セットの写真へ引く）",
-    "scrim": "dark",
-    "scrimk": 0.88,
-    "leak": 0.45,
-    "near": 0.5,
-    "cam": {
-     "z": [
-      1.06,
-      1.0
-     ],
-     "ease": "spring",
-     "dur": 1.0
-    },
+    "why": "証拠：累計 2,700万個（セットの写真）",
     "far": {
-     "clip": "bokeh",
+     "clip": "tree",
+     "from": 90,
      "blur": [
       14,
       10
      ],
-     "bright": 0.85
+     "bright": 1.0
     },
     "prod": [
      {
@@ -1146,8 +1053,7 @@
       "x": 64,
       "y": 312,
       "size": 170,
-      "fx": "slam",
-      "glitch": true,
+      "fx": "rise",
       "glow": true,
       "at": [
        "ev",
@@ -1164,17 +1070,9 @@
     ]
    },
    {
-    "id": "c10",
-    "at": [
-     "ev",
-     "hyouka",
-     -0.05
-    ],
-    "mx": "spin",
-    "why": "証拠：評価（1切れの上に星）",
-    "scrim": "light",
-    "leak": 0.35,
-    "near": 0.4,
+    "x": 0.35,
+    "leak": 0.25,
+    "near": 0.35,
     "cam": {
      "z": [
       1.0,
@@ -1182,13 +1080,22 @@
      ],
      "ease": "slow"
     },
+    "scrim": "dark",
+    "scrimk": 0.88,
+    "id": "c8",
+    "at": [
+     "ev",
+     "hyouka",
+     -0.05
+    ],
+    "why": "証拠：評価（1切れの上）",
     "far": {
      "seq": "slice_low",
      "blur": [
       30,
       30
      ],
-     "bright": 0.92
+     "bright": 0.85
     },
     "prod": [
      {
@@ -1208,27 +1115,25 @@
       "s": "<svg width=\"330\" height=\"62\" viewBox=\"0 0 330 62\"><defs><linearGradient id=\"sg\"><stop offset=\"92.8%\" stop-color=\"#E9B949\"/><stop offset=\"92.8%\" stop-color=\"rgba(28,26,23,.2)\"/></linearGradient></defs><path transform=\"translate(33,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(99,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(165,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(231,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(297,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/></svg>",
       "x": 64,
       "y": 240,
-      "c": "k",
       "fx": "rise"
      },
      {
       "k": "num",
       "s": "<span class=\"n\">${S5.score}</span>",
-      "x": 64,
+      "x": 74,
       "y": 300,
-      "c": "k",
       "size": 230,
-      "fx": "slam",
+      "fx": "rise",
       "at": [
        "ev",
-       "yon",
-       -0.35
+       "hyouka",
+       0.05
       ],
       "count": {
        "from": 0,
        "to": 4.64,
        "dec": 2,
-       "dur": 0.5
+       "dur": 0.6
       }
      },
      {
@@ -1236,13 +1141,12 @@
       "s": "${S5.count_label}",
       "x": 68,
       "y": 548,
-      "c": "k",
       "size": 44,
       "fx": "mask",
       "at": [
        "ev",
        "hyouka",
-       0.2
+       0.55
       ]
      },
      {
@@ -1250,13 +1154,12 @@
       "s": "${S5.date}",
       "x": 68,
       "y": 612,
-      "c": "k",
       "size": 28,
       "fx": "cut",
       "at": [
        "ev",
        "hyouka",
-       0.2
+       0.55
       ]
      },
      {
@@ -1264,54 +1167,104 @@
       "s": "${S5.note}",
       "x": 64,
       "y": 664,
-      "c": "k",
       "fx": "cut",
       "at": [
        "ev",
        "hyouka",
-       0.2
+       0.55
       ]
      }
-    ]
+    ],
+    "scrimh": 1000
    },
    {
-    "id": "c11",
+    "x": 0.35,
+    "leak": 0.25,
+    "near": 0.35,
+    "cam": {
+     "z": [
+      1.0,
+      1.05
+     ],
+     "ease": "slow"
+    },
+    "scrim": "dark",
+    "scrimk": 0.85,
+    "id": "c9",
     "at": [
      "t0",
      "S6"
     ],
-    "mx": "zoom",
-    "why": "行動：選べる1（高速）",
-    "scrim": "light",
-    "near": 0.3,
-    "leak": 0.3,
-    "cam": {
-     "z": [
-      1.0,
-      1.06
-     ],
-     "ease": "expo",
-     "dur": 0.5
-    },
+    "why": "行動の理由：2品目は3種類。今の名前の品に金の点",
     "far": {
      "clip": "tree",
+     "from": 20,
      "blur": [
-      16,
-      16
+      12,
+      8
      ],
-     "bright": 1.1
+     "bright": 1.0
     },
     "prod": [
      {
-      "img": "roll.jpg",
+      "seq": "set_end",
       "box": [
-       -640,
+       0,
        600,
-       2361,
-       1320
+       1080,
+       1277
       ],
-      "mask": "top",
-      "pop": 1
+      "mask": "top"
+     }
+    ],
+    "lines": [
+     {
+      "d": "M100 750 L100 750",
+      "at": [
+       "t0",
+       "S6",
+       0.1
+      ],
+      "color": "#E9B949",
+      "w": 2,
+      "dots": [
+       [
+        100,
+        750
+       ]
+      ]
+     },
+     {
+      "d": "M110 1340 L110 1340",
+      "at": [
+       "ev",
+       "sw2",
+       -0.05
+      ],
+      "color": "#E9B949",
+      "w": 2,
+      "dots": [
+       [
+        110,
+        1340
+       ]
+      ]
+     },
+     {
+      "d": "M560 1650 L560 1650",
+      "at": [
+       "ev",
+       "sw3",
+       -0.05
+      ],
+      "color": "#E9B949",
+      "w": 2,
+      "dots": [
+       [
+        560,
+        1650
+       ]
+      ]
      }
     ],
     "text": [
@@ -1320,28 +1273,16 @@
       "s": "${S6.kicker}",
       "x": 64,
       "y": 250,
-      "c": "k",
       "fx": "mask",
-      "size": 50,
-      "to": [
-       "ev",
-       "link",
-       -0.1
-      ]
+      "size": 50
      },
      {
       "k": "cap",
       "s": "${S6.c1}",
       "x": 104,
       "y": 330,
-      "c": "k",
       "fx": "rise",
       "size": 44,
-      "to": [
-       "ev",
-       "link",
-       -0.1
-      ],
       "at": [
        "t0",
        "S6",
@@ -1364,14 +1305,8 @@
       "s": "${S6.c2}",
       "x": 104,
       "y": 390,
-      "c": "k",
       "fx": "rise",
       "size": 44,
-      "to": [
-       "ev",
-       "link",
-       -0.1
-      ],
       "at": [
        "t0",
        "S6",
@@ -1395,14 +1330,8 @@
       "s": "${S6.c3}",
       "x": 104,
       "y": 450,
-      "c": "k",
       "fx": "rise",
       "size": 44,
-      "to": [
-       "ev",
-       "link",
-       -0.1
-      ],
       "at": [
        "t0",
        "S6",
@@ -1422,143 +1351,28 @@
       ]
      }
     ],
-    "lines": [
-     {
-      "d": "M68 360 L86 360",
-      "at": [
-       "t0",
-       "S6",
-       0.3
-      ],
-      "color": "#B8860B",
-      "w": 12,
-      "dur": 0.2
-     }
-    ]
+    "scrimh": 880
    },
    {
-    "id": "c12",
-    "at": [
-     "ev",
-     "sw2",
-     -0.05
-    ],
-    "mx": "zoom",
-    "why": "選べる2",
-    "scrim": "light",
-    "near": 0.3,
-    "leak": 0.3,
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.5,
     "cam": {
      "z": [
       1.0,
-      1.06
+      1.05
      ],
-     "ease": "expo",
-     "dur": 0.5
+     "ease": "slow"
     },
-    "far": {
-     "clip": "tree",
-     "from": 30,
-     "blur": [
-      16,
-      16
-     ],
-     "bright": 1.1
-    },
-    "prod": [
-     {
-      "img": "ven.jpg",
-      "box": [
-       -329,
-       600,
-       1738,
-       1320
-      ],
-      "mask": "top",
-      "pop": 1
-     }
-    ],
-    "text": [],
-    "lines": [
-     {
-      "d": "M68 420 L86 420",
-      "color": "#B8860B",
-      "w": 12,
-      "dur": 0.2
-     }
-    ]
-   },
-   {
-    "id": "c13",
-    "at": [
-     "ev",
-     "sw3",
-     -0.05
-    ],
-    "mx": "zoom",
-    "why": "選べる3",
-    "scrim": "light",
-    "near": 0.3,
-    "leak": 0.3,
-    "cam": {
-     "z": [
-      1.0,
-      1.06
-     ],
-     "ease": "expo",
-     "dur": 0.5
-    },
-    "far": {
-     "clip": "tree",
-     "from": 60,
-     "blur": [
-      16,
-      16
-     ],
-     "bright": 1.1
-    },
-    "prod": [
-     {
-      "img": "choco.jpg",
-      "box": [
-       -524,
-       600,
-       2128,
-       1320
-      ],
-      "mask": "top",
-      "pop": 1
-     }
-    ],
-    "text": [],
-    "lines": [
-     {
-      "d": "M68 480 L86 480",
-      "color": "#B8860B",
-      "w": 12,
-      "dur": 0.2
-     }
-    ]
-   },
-   {
-    "id": "c14",
+    "scrim": "dark",
+    "scrimk": 0.72,
+    "id": "c10",
     "at": [
      "ev",
      "link",
      -0.1
     ],
-    "x": 0.12,
     "why": "行動：セットの写真・名前・立体のボタン",
-    "scrim": "light",
-    "leak": 0.5,
-    "near": 0.6,
-    "cam": {
-     "z": [
-      1.0,
-      1.06
-     ],
-     "ease": "slow"
-    },
     "far": {
      "clip": "tree",
      "from": 90,
@@ -1566,14 +1380,15 @@
       14,
       14
      ],
-     "bright": 1.12
+     "bright": 1.0
     },
     "prod": [
      {
       "seq": "set_end",
+      "from": 50,
       "box": [
        250,
-       420,
+       470,
        580,
        685
       ],
@@ -1586,8 +1401,7 @@
       "s": "${S6.head}",
       "x": 64,
       "y": 244,
-      "c": "k",
-      "fx": "flip",
+      "fx": "mask",
       "size": 74
      },
      {
@@ -1595,7 +1409,6 @@
       "s": "${S6.sub}",
       "x": 68,
       "y": 352,
-      "c": "k",
       "fx": "mask",
       "size": 44
      },
@@ -1603,18 +1416,19 @@
       "k": "note",
       "s": "${S6.note}",
       "x": 64,
-      "y": 1392,
-      "c": "k",
+      "y": 412,
       "fx": "cut",
       "at": [
        "ev",
        "link",
-       0.15
+       0.3
       ]
      }
-    ]
+    ],
+    "scrimh": 760
    }
-  ]
+  ],
+  "hand": 0.4
  },
  "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00rjikn.sdgffb7a.g00rjikn.sdgfg7c7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fletao%2Ff910%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fletao%2Fi%2F10000155%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
  "item_code": "letao:10000155"

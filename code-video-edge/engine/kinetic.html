@@ -99,7 +99,8 @@ const camOf = (s, t) => {
   if (s.mx && t >= s.a) { const q = 1 - SP(u, 0.5, 0.18); if (s.mx === "zoom") { z *= 1 + 0.28 * q; blur += 9 * q; } if (s.mx === "spin") r += -9 * q; }
   // 出る側：次が zoom なら最後の 0.22秒で加速して寄る・spin なら回りだす（ぶれは描く側の SUB で付く）
   if (s.nx && s.nx.mx && t > s.z - 0.22) { const q = E.inCubic((t - (s.z - 0.22)) / 0.22); if (s.nx.mx === "zoom") { z *= 1 + 0.32 * q; blur += 8 * q; } if (s.nx.mx === "spin") r += 9 * q; }
-  const hx = 5 * Math.sin(t * 1.31 + s.i) + 2.4 * Math.sin(t * 2.93 + 1.1), hy = 4 * Math.sin(t * 1.07 + 1.7) + 2 * Math.sin(t * 3.71), hr = 0.22 * Math.sin(t * 0.83 + s.i);
+  const HAND = K.hand == null ? 1 : K.hand;   // 手持ちの揺れの強さ（静かな版は 0.4・v3）
+  const hx = HAND * (5 * Math.sin(t * 1.31 + s.i) + 2.4 * Math.sin(t * 2.93 + 1.1)), hy = HAND * (4 * Math.sin(t * 1.07 + 1.7) + 2 * Math.sin(t * 3.71)), hr = HAND * 0.22 * Math.sin(t * 0.83 + s.i);
   let kx = 0, ky = 0;
   for (const [t0, A] of SHAKES) { const d = t - t0; if (d >= 0 && d < 0.5) { const e = A * Math.exp(-d * 9); kx += e * Math.sin(d * 62); ky += e * 0.7 * Math.cos(d * 55); } }
   return { z, x: x + hx + kx, y: y + hy + ky, r: r + hr, blur };
@@ -144,7 +145,8 @@ for (const s of SH) {
       im.style.opacity = ((f.opacity || 0.5) * io(s, t)).toFixed(3); }); }
   // 上の陰り（字の後ろ）：暗い映像は dark・明るい面は light（四角の札にしない・#357）
   if (s.scrim) { const g = s.scrim === "light" ? "255,250,240" : "18,14,10", k = s.scrimk || (s.scrim === "light" ? 0.62 : 0.5);
-    const w = el("div", { class: "scr", style: `background:linear-gradient(180deg, rgba(${g},${k}) 0px, rgba(${g},${(k * 0.85).toFixed(2)}) 330px, rgba(${g},${(k * 0.4).toFixed(2)}) 520px, rgba(${g},0) 710px)` }, "", $("shade"));
+    const hh = (s.scrimh || 710) / 710;   // 陰りの届く深さ（字が下の方にあるカットは深く・v3）
+    const w = el("div", { class: "scr", style: `height:${Math.round(720 * hh)}px;background:linear-gradient(180deg, rgba(${g},${k}) 0px, rgba(${g},${(k * 0.85).toFixed(2)}) ${Math.round(330 * hh)}px, rgba(${g},${(k * 0.4).toFixed(2)}) ${Math.round(520 * hh)}px, rgba(${g},0) ${Math.round(710 * hh)}px)` }, "", $("shade"));
     U.push(() => { const t = T(), on = onS(s, t); w.style.display = on ? "block" : "none"; if (on) w.style.opacity = io(s, t).toFixed(3); }); }
   // 線（商品の1点に付く引き出し線・寸法の線）：path を「描く」。d＝SVG の道・at＝描き始め・dur
   for (const ln of s.lines || []) { const p = sv("path", { d: ln.d, fill: "none", stroke: ln.color || "#fff", "stroke-width": ln.w || 4, "stroke-linecap": "round" }, $("over")), L = p.getTotalLength(), a0 = R(ln.at, s.a);
@@ -162,7 +164,7 @@ for (const s of SH) {
     const cis = [...e.querySelectorAll(".ci")], cn = x.count ? e.querySelector(".n") : null, c = x.count;
     if (x.count && !cn) throw new Error(`${s.id}: count の字に <span class="n"> が無い`);
     if (x.fx === "slam") SHAKES.push([a + 0.16, x.shake == null ? 16 : x.shake]);
-    const sh = x.blob ? el("div", { class: "sh", style: `background:${x.c === "k" ? "rgba(255,250,240,.7)" : "rgba(18,14,10,.55)"}` }, "", $("shade")) : null;
+    const sh = x.blob ? el("div", { class: "sh", style: `background:${x.c === "k" ? "rgba(255,250,240,.7)" : `rgba(18,14,10,${typeof x.blob === "number" ? x.blob : 0.55})`}` }, "", $("shade")) : null;
     if (sh) SK.AFTER_FONTS.push(() => { e.style.visibility = "visible"; const r = e.getBoundingClientRect(); e.style.visibility = "hidden";
       sh.style.left = (r.left - 34) + "px"; sh.style.top = (r.top - 18) + "px"; sh.style.width = (r.width + 68) + "px"; sh.style.height = (r.height + 36) + "px"; });
     const fmt = (v) => (c.sep ? Math.round(v).toLocaleString("en-US") : v.toFixed(c.dec || 0));
@@ -188,7 +190,7 @@ for (const s of SH) {
         cn.style.textShadow = q ? `0 0 ${(40 * q).toFixed(0)}px rgba(255,214,120,${(0.9 * q).toFixed(3)})` : ""; }
       // 一覧の今の行（hl＝[始め, 終わり]）：太く・少し右へバネで出る。他の行も消さない（字の見える時間・r2）
       if (x.hl) { const h0 = R(x.hl[0]), h1 = R(x.hl[1]), act = t >= h0 && t < h1, kk = act ? SP(t - h0, 0.45, 0.3) : 0;
-        e.style.fontWeight = act ? "900" : "500"; e.style.color = act ? "" : "#463F38"; tf += ` translateX(${(14 * kk).toFixed(2)}px)`; e.style.transform = tf; } }); }   // 同梱の太さは 500/700/900 だけ（800 は合成の太字＝点検の豆腐で落ちた）
+        e.style.fontWeight = act ? "900" : "500"; e.style.color = act ? "" : (x.c || "w") === "w" ? "#E6DCCF" : "#463F38"; tf += ` translateX(${(14 * kk).toFixed(2)}px)`; e.style.transform = tf; } }); }   // 同梱の太さは 500/700/900 だけ（800 は合成の太字＝点検の豆腐で落ちた）
 }
 
 // ---------- 舞う粒（#near・視差 1.6）：ボケた光の粒。カットの near で濃さを決める。乱数なし（hash） ----------
@@ -228,7 +230,7 @@ if (K.cta) { const c = K.cta, w = el("div", { id: "cta" }, `<div class="btn"><sp
       if (on2) { const d = 30 + 70 * E.outQuart(v / 0.8); tap.style.width = tap.style.height = d.toFixed(1) + "px"; tap.style.left = (r.right - 110 - d / 2).toFixed(1) + "px"; tap.style.top = (r.top + r.height / 2 - d / 2).toFixed(1) + "px"; tap.style.opacity = clamp(1 - v / 0.8).toFixed(3); } }
     // 厚み（下に 12px の濃い金の側面＝押しボタンの立体）・落ち影・外の光（呼吸する）。押すと厚みが沈む
     const dep = 12 * k * (t >= pr ? 1 - 0.75 * Math.sin(Math.PI * clamp((t - pr) / 0.26)) : 1);
-    b.style.boxShadow = `inset 0 3px 0 rgba(255,246,214,.85), inset 0 -4px 0 rgba(150,98,10,.35), 0 ${dep.toFixed(1)}px 0 #A8740F, 0 ${(dep + 18 * k).toFixed(1)}px ${(38 * k).toFixed(1)}px rgba(120,80,10,.38), 0 0 ${(44 + 60 * glow).toFixed(1)}px ${(6 * glow).toFixed(1)}px rgba(255,205,100,${(0.7 * glow * k).toFixed(3)})`;
+    b.style.boxShadow = `inset 0 3px 0 rgba(255,246,214,.85), inset 0 -4px 0 rgba(150,98,10,.35), 0 ${dep.toFixed(1)}px 0 #A8740F, 0 ${(dep + 18 * k).toFixed(1)}px ${(38 * k).toFixed(1)}px rgba(120,80,10,.38), 0 0 ${(30 + 34 * glow).toFixed(1)}px ${(3 * glow).toFixed(1)}px rgba(255,205,100,${(0.6 * glow * k).toFixed(3)})`;
     w.style.opacity = clamp((t - a) / 0.1).toFixed(3); sh.style.transform = `translateX(${(-120 + 420 * clamp(((t - a - 0.35) % 1.6) / 0.7)).toFixed(1)}%) skewX(-18deg)`;
     const u = (t - pr) / 0.6; ring.style.display = u >= 0 && u < 1 ? "block" : "none";
     if (u >= 0 && u < 1) { const r = b.getBoundingClientRect(), gx = 150 * E.outExpo(u), gy = 110 * E.outExpo(u);   // 輪はボタンの周りだけ（画面の幅を越えると横線に見えた）
