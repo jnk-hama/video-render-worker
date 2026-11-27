@@ -1,0 +1,1142 @@
+{
+ "product_key": "smativ-steam",
+ "template": "kinetic",
+ "name": "スチームモップマルチクリーナー",
+ "item_no": "LEHIMC700",
+ "genre": "appliance",
+ "target": {
+  "who": "年末の大掃除に",
+  "source": "caption「年末の大掃除や引っ越し前後の掃除にもおすすめ」（F10）"
+ },
+ "prep": {
+  "voice": "voicevox:WhiteCUL",
+  "speed": 1.0
+ },
+ "brand": {
+  "ground": null,
+  "accent": "#1A6DA6",
+  "accent_box": [
+   60,
+   170,
+   144,
+   220
+  ]
+ },
+ "beats": [
+  {
+   "kind": "S1",
+   "source": "F2,F10",
+   "voice": "line0.mp3",
+   "say": "年末の大掃除は、水だけで。",
+   "hook": "水だけで。",
+   "note": "※写真は販売ページより。映像はイメージです。"
+  },
+  {
+   "kind": "S2",
+   "source": "F1,F5,F8",
+   "voice": "line1.mp3",
+   "say": "電源を入れて、約60秒で高温スチーム。",
+   "lead": "電源を入れて",
+   "pre": "約",
+   "big": "60",
+   "unit": "秒",
+   "sub": "高温スチーム・強と弱の2段階"
+  },
+  {
+   "kind": "S3",
+   "source": "F4,F7",
+   "voice": "line2.mp3",
+   "say": "コンロの油汚れも、窓のサッシも。",
+   "a": "コンロの油汚れに",
+   "b": "レンジフードに",
+   "c": "窓のサッシに",
+   "mode": "ハンディモード"
+  },
+  {
+   "kind": "S4",
+   "source": "F3,F4",
+   "voice": "line3.mp3",
+   "say": "アタッチメントは10点。床はスティックで。",
+   "label": "アタッチメント",
+   "big": "10",
+   "unit": "点",
+   "floor": "床はスティックモード"
+  },
+  {
+   "kind": "S5",
+   "source": "F6,F9",
+   "voice": "line4.mp3",
+   "say": "本体は1.2キロ。評価は4.27。",
+   "lab": "本体",
+   "big": "1.2",
+   "unit": "kg",
+   "score": "4.27",
+   "count_label": "レビュー748件",
+   "date": "楽天市場 2026年11月27日時点",
+   "note": "※評価・件数は販売ページの表示です。"
+  },
+  {
+   "kind": "S6",
+   "source": "F11",
+   "voice": "line5.mp3",
+   "say": "スチームモップマルチクリーナー。リンクはプロフィールから。",
+   "head": "スチームモップマルチクリーナー",
+   "sub": "Smativ+",
+   "cta": "リンクはプロフィールから",
+   "note": "※価格・在庫はリンク先でご確認ください。"
+  }
+ ],
+ "score": {
+  "scenes": [
+   [
+    "S1",
+    "line0.mp3",
+    2.5
+   ],
+   [
+    "S2",
+    "line1.mp3",
+    4.0
+   ],
+   [
+    "S3",
+    "line2.mp3",
+    3.4
+   ],
+   [
+    "S4",
+    "line3.mp3",
+    4.0
+   ],
+   [
+    "S5",
+    "line4.mp3",
+    4.0
+   ],
+   [
+    "S6",
+    "line5.mp3",
+    4.0
+   ]
+  ],
+  "climax": [
+   "S4",
+   "ジュッテン"
+  ],
+  "music": {
+   "quiet": [
+    "S2"
+   ],
+   "hush": [
+    [
+     [
+      "cue",
+      "S4",
+      "ジュッテン",
+      -0.5
+     ],
+     [
+      "cue",
+      "S4",
+      "ジュッテン",
+      0.02
+     ]
+    ]
+   ]
+  },
+  "events": [
+   {
+    "id": "flare0",
+    "at": [
+     "t0",
+     "S1",
+     0.1
+    ],
+    "what": "c1 光が横切る",
+    "sfx": [
+     "whoosh",
+     0.5,
+     300,
+     5200,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "mizu",
+    "at": [
+     "cue",
+     "S1",
+     "ミズダケ"
+    ],
+    "what": "c1 水だけで",
+    "sfx": [
+     "bell",
+     1567.98,
+     0.45,
+     1.2
+    ],
+    "band": "high"
+   },
+   {
+    "id": "roku",
+    "at": [
+     "cue",
+     "S2",
+     "ヤクロク"
+    ],
+    "what": "c2 約60秒",
+    "sfx": [
+     "tick",
+     2600,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "steam",
+    "at": [
+     "cue",
+     "S2",
+     "コオオン"
+    ],
+    "what": "c2 高温スチーム"
+   },
+   {
+    "id": "hood",
+    "at": [
+     "t0",
+     "S3",
+     0.9
+    ],
+    "what": "c4 レンジフード",
+    "sfx": [
+     "whoosh",
+     0.3,
+     800,
+     6000,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "mado",
+    "at": [
+     "t0",
+     "S3",
+     1.85
+    ],
+    "what": "c5 窓のサッシ",
+    "sfx": [
+     "whoosh",
+     0.3,
+     700,
+     6000,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "juten",
+    "at": [
+     "cue",
+     "S4",
+     "ジュッテン"
+    ],
+    "what": "c6 10点（山場）",
+    "sfx": [
+     "impact",
+     1.0,
+     1.8
+    ],
+    "band": "low"
+   },
+   {
+    "id": "yuka",
+    "at": [
+     "cue",
+     "S4",
+     "ユカワ"
+    ],
+    "what": "c7 床はスティック",
+    "sfx": [
+     "whoosh",
+     0.3,
+     600,
+     5000,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "hontai",
+    "at": [
+     "cue",
+     "S5",
+     "ホンタイ"
+    ],
+    "what": "c8 本体"
+   },
+   {
+    "id": "hyouka",
+    "at": [
+     "cue",
+     "S5",
+     "ヒョオカ"
+    ],
+    "what": "c9 評価へ",
+    "sfx": [
+     "whoosh",
+     0.35,
+     400,
+     4000,
+     0.5
+    ],
+    "band": "mid"
+   },
+   {
+    "id": "yon",
+    "at": [
+     "cue",
+     "S5",
+     "ヨンテ"
+    ],
+    "what": "c9 4.27",
+    "sfx": [
+     "bell",
+     2093.0,
+     0.5,
+     1.4
+    ],
+    "band": "high"
+   },
+   {
+    "id": "link",
+    "at": [
+     "cue",
+     "S6",
+     "リンクワ"
+    ],
+    "what": "c10 ボタン",
+    "sfx": [
+     "whoosh",
+     0.4,
+     300,
+     3000,
+     0.5
+    ],
+    "band": "mid"
+   },
+   {
+    "id": "under",
+    "at": [
+     "cue",
+     "S6",
+     "プロフィ"
+    ],
+    "what": "c10 ボタンを押す",
+    "sfx": [
+     "bell",
+     1318.5,
+     0.4,
+     0.9
+    ],
+    "band": "high-mid"
+   }
+  ],
+  "sustain": [
+   {
+    "id": "room",
+    "from": [
+     "t0",
+     "S2"
+    ],
+    "to": [
+     "t1",
+     "S2"
+    ],
+    "sfx": [
+     "roomtone"
+    ],
+    "over_db": -12.0,
+    "what": "起動の溜め"
+   }
+  ]
+ },
+ "affiliate_url": "https://hb.afl.rakuten.co.jp/hgc/g00txsjn.sdgffbdb.g00txsjn.sdgfg25f/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsmartiv%2Fae20b00016-%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fsmartiv%2Fi%2F10000031%2F&rafcid=wsc_i_is_9b3ed67a-9239-467c-8315-9a36173a599b",
+ "item_code": "smartiv:10000031",
+ "kinetic": {
+  "clips": {
+   "kit": {
+    "n": 210
+   },
+   "counter": {
+    "n": 240
+   },
+   "window": {
+    "n": 240
+   }
+  },
+  "seqs": {
+   "woman_in": {
+    "n": 90
+   },
+   "floor_in": {
+    "n": 120
+   },
+   "woman_end": {
+    "n": 120
+   }
+  },
+  "flares": [
+   [
+    "t0",
+    "S1",
+    0.1
+   ],
+   [
+    "ev",
+    "link",
+    0.1
+   ]
+  ],
+  "cta": {
+   "s": "${S6.cta}",
+   "at": [
+    "ev",
+    "link",
+    0.3
+   ],
+   "press": [
+    "ev",
+    "under"
+   ]
+  },
+  "hand": 0.6,
+  "shots": [
+   {
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.92,
+    "cam": {
+     "z": [
+      1.0,
+      1.1
+     ],
+     "x": [
+      -14,
+      6
+     ],
+     "ease": "spring",
+     "dur": 1.4,
+     "bounce": 0.1
+    },
+    "id": "c1",
+    "why": "約束：年末の大掃除を、水だけで（床を拭く人へゆっくり寄る）",
+    "far": {
+     "seq": "woman_in",
+     "blur": [
+      30,
+      30
+     ],
+     "bright": 0.9
+    },
+    "prod": [
+     {
+      "seq": "woman_in",
+      "box": [
+       158,
+       560,
+       765,
+       1360
+      ],
+      "mask": "top"
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "${TARGET}",
+      "x": 68,
+      "y": 250,
+      "fx": "mask",
+      "size": 52
+     },
+     {
+      "k": "h1",
+      "s": "${S1.hook}",
+      "x": 64,
+      "y": 318,
+      "size": 120,
+      "fx": "rise",
+      "c": "g",
+      "glow": true,
+      "at": [
+       "ev",
+       "mizu",
+       -0.1
+      ]
+     },
+     {
+      "k": "note",
+      "s": "${S1.note}",
+      "x": 64,
+      "y": 480,
+      "fx": "cut"
+     }
+    ],
+    "scrimh": 760
+   },
+   {
+    "x": 0.35,
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.8,
+    "cam": {
+     "z": [
+      1.0,
+      1.06
+     ],
+     "ease": "slow"
+    },
+    "id": "c2",
+    "at": [
+     "t0",
+     "S2"
+    ],
+    "why": "理由：約60秒で高温スチーム（床のヘッドへ寄りながら横へ・ピントは手前）",
+    "far": {
+     "seq": "floor_in",
+     "blur": [
+      30,
+      30
+     ],
+     "bright": 0.9
+    },
+    "prod": [
+     {
+      "seq": "floor_in",
+      "box": [
+       0,
+       596,
+       1080,
+       1324
+      ],
+      "mask": "top"
+     }
+    ],
+    "text": [
+     {
+      "k": "lab",
+      "s": "${S2.lead}",
+      "x": 64,
+      "y": 250,
+      "fx": "mask",
+      "size": 50
+     },
+     {
+      "k": "num",
+      "s": "<small>${S2.pre}</small><span class=\"n\">${S2.big}</span><small>${S2.unit}</small>",
+      "x": 64,
+      "y": 300,
+      "size": 170,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "roku",
+       -0.1
+      ],
+      "count": {
+       "from": 0,
+       "to": 60,
+       "dur": 0.7
+      }
+     },
+     {
+      "k": "cap",
+      "s": "${S2.sub}",
+      "x": 68,
+      "y": 500,
+      "fx": "mask",
+      "size": 44,
+      "at": [
+       "ev",
+       "steam",
+       -0.1
+      ]
+     }
+    ],
+    "scrimh": 800
+   },
+   {
+    "x": 0.35,
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.88,
+    "cam": {
+     "z": [
+      1.0,
+      1.1
+     ],
+     "y": [
+      0,
+      -16
+     ],
+     "ease": "slow"
+    },
+    "id": "c3",
+    "at": [
+     "t0",
+     "S3"
+    ],
+    "why": "旅：コンロの油汚れ（ハンディモード）",
+    "far": {
+     "img": "stove.jpg",
+     "blur": [
+      34,
+      34
+     ],
+     "bright": 0.95
+    },
+    "prod": [
+     {
+      "img": "stove.jpg",
+      "box": [
+       -110,
+       760,
+       1300,
+       579
+      ],
+      "mask": "soft"
+     }
+    ],
+    "text": [
+     {
+      "k": "lab",
+      "s": "${S3.mode}",
+      "x": 68,
+      "y": 250,
+      "c": "g",
+      "fx": "mask",
+      "to": [
+       "t1",
+       "S3",
+       -0.15
+      ]
+     },
+     {
+      "k": "h1",
+      "s": "${S3.a}",
+      "x": 64,
+      "y": 310,
+      "size": 84,
+      "fx": "rise"
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.88,
+    "cam": {
+     "z": [
+      1.1,
+      1.0
+     ],
+     "x": [
+      16,
+      -6
+     ],
+     "ease": "slow"
+    },
+    "id": "c4",
+    "at": [
+     "ev",
+     "hood"
+    ],
+    "why": "旅：レンジフード",
+    "far": {
+     "img": "hood.jpg",
+     "blur": [
+      34,
+      34
+     ],
+     "bright": 0.95
+    },
+    "prod": [
+     {
+      "img": "hood.jpg",
+      "box": [
+       -110,
+       760,
+       1300,
+       471
+      ],
+      "mask": "soft"
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.b}",
+      "x": 64,
+      "y": 310,
+      "size": 84,
+      "fx": "rise"
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.88,
+    "cam": {
+     "z": [
+      1.0,
+      1.09
+     ],
+     "x": [
+      -12,
+      10
+     ],
+     "ease": "slow"
+    },
+    "id": "c5",
+    "at": [
+     "ev",
+     "mado"
+    ],
+    "why": "旅：窓のサッシ",
+    "far": {
+     "img": "sash.jpg",
+     "blur": [
+      34,
+      34
+     ],
+     "bright": 0.95
+    },
+    "prod": [
+     {
+      "img": "sash.jpg",
+      "box": [
+       -40,
+       640,
+       1160,
+       740
+      ],
+      "mask": "soft"
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S3.c}",
+      "x": 64,
+      "y": 310,
+      "size": 84,
+      "fx": "rise"
+     }
+    ]
+   },
+   {
+    "x": 0.45,
+    "leak": 0.35,
+    "near": 0.5,
+    "scrim": "dark",
+    "scrimk": 0.92,
+    "cam": {
+     "z": [
+      1.08,
+      1.0
+     ],
+     "r": [
+      -1.2,
+      0
+     ],
+     "ease": "spring",
+     "dur": 1.6,
+     "bounce": 0.12
+    },
+    "id": "c6",
+    "at": [
+     "t0",
+     "S4"
+    ],
+    "why": "山場：付いてくる物を全部（アタッチメント10点）。音が引いて、10 で着地",
+    "far": {
+     "img": "set.jpg",
+     "blur": [
+      40,
+      40
+     ],
+     "bright": 1.0
+    },
+    "prod": [
+     {
+      "img": "set.jpg",
+      "box": [
+       -330,
+       640,
+       1740,
+       499
+      ],
+      "rise": 120,
+      "shadow": false,
+      "at": [
+       "t0",
+       "S4",
+       0.05
+      ],
+      "mask": "soft"
+     }
+    ],
+    "text": [
+     {
+      "k": "lab",
+      "s": "${S4.label}",
+      "x": 68,
+      "y": 250,
+      "fx": "mask"
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S4.big}</span><small>${S4.unit}</small>",
+      "x": 76,
+      "y": 300,
+      "size": 200,
+      "fx": "rise",
+      "glow": true,
+      "at": [
+       "ev",
+       "juten",
+       -0.75
+      ],
+      "count": {
+       "from": 0,
+       "to": 10,
+       "dur": 0.7
+      }
+     }
+    ],
+    "scrimh": 900
+   },
+   {
+    "x": 0.35,
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.72,
+    "cam": {
+     "z": [
+      1.06,
+      1.0
+     ],
+     "ease": "spring",
+     "dur": 1.0,
+     "bounce": 0.08
+    },
+    "id": "c7",
+    "at": [
+     "ev",
+     "yuka",
+     0.1
+    ],
+    "why": "旅の続き：床はスティックモード（引いて全体）",
+    "far": {
+     "seq": "woman_end",
+     "blur": [
+      30,
+      30
+     ],
+     "bright": 0.9
+    },
+    "prod": [
+     {
+      "seq": "woman_end",
+      "box": [
+       158,
+       560,
+       765,
+       1360
+      ],
+      "mask": "top"
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S4.floor}",
+      "x": 64,
+      "y": 310,
+      "size": 76,
+      "fx": "rise"
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.88,
+    "cam": {
+     "z": [
+      1.0,
+      1.08
+     ],
+     "x": [
+      -12,
+      10
+     ],
+     "ease": "slow"
+    },
+    "id": "c8",
+    "at": [
+     "t0",
+     "S5"
+    ],
+    "why": "証拠：本体 1.2kg（片手で壁を拭く）",
+    "far": {
+     "img": "kwall.jpg",
+     "blur": [
+      34,
+      34
+     ],
+     "bright": 0.95
+    },
+    "prod": [
+     {
+      "img": "kwall.jpg",
+      "box": [
+       -100,
+       760,
+       1280,
+       540
+      ],
+      "mask": "soft"
+     }
+    ],
+    "text": [
+     {
+      "k": "lab",
+      "s": "${S5.lab}",
+      "x": 68,
+      "y": 250,
+      "fx": "mask"
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S5.big}</span><small>${S5.unit}</small>",
+      "x": 64,
+      "y": 300,
+      "size": 200,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "hontai",
+       0.3
+      ]
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.2,
+    "near": 0.3,
+    "scrim": "dark",
+    "scrimk": 0.88,
+    "cam": {
+     "z": [
+      1.06,
+      1.0
+     ],
+     "y": [
+      -14,
+      0
+     ],
+     "ease": "spring",
+     "dur": 1.0,
+     "bounce": 0.08
+    },
+    "id": "c9",
+    "at": [
+     "ev",
+     "hyouka",
+     -0.05
+    ],
+    "why": "証拠：評価（床のヘッド）",
+    "far": {
+     "seq": "floor_in",
+     "from": 60,
+     "blur": [
+      30,
+      30
+     ],
+     "bright": 0.85
+    },
+    "prod": [
+     {
+      "seq": "floor_in",
+      "from": 60,
+      "box": [
+       0,
+       700,
+       1080,
+       1324
+      ],
+      "mask": "top"
+     }
+    ],
+    "text": [
+     {
+      "k": "cap",
+      "s": "<svg width=\"330\" height=\"62\" viewBox=\"0 0 330 62\"><defs><linearGradient id=\"sg\"><stop offset=\"92.8%\" stop-color=\"#E9B949\"/><stop offset=\"92.8%\" stop-color=\"rgba(28,26,23,.2)\"/></linearGradient></defs><path transform=\"translate(33,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(99,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(165,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(231,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(297,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/></svg>",
+      "x": 64,
+      "y": 240,
+      "fx": "rise"
+     },
+     {
+      "k": "num",
+      "s": "<span class=\"n\">${S5.score}</span>",
+      "x": 74,
+      "y": 300,
+      "size": 230,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "hyouka",
+       0.05
+      ],
+      "count": {
+       "from": 0,
+       "to": 4.27,
+       "dec": 2,
+       "dur": 0.6
+      }
+     },
+     {
+      "k": "cap",
+      "s": "${S5.count_label}",
+      "x": 68,
+      "y": 548,
+      "size": 44,
+      "fx": "mask",
+      "at": [
+       "ev",
+       "hyouka",
+       0.55
+      ]
+     },
+     {
+      "k": "cap",
+      "s": "${S5.date}",
+      "x": 68,
+      "y": 612,
+      "size": 28,
+      "fx": "cut",
+      "at": [
+       "ev",
+       "hyouka",
+       0.55
+      ]
+     },
+     {
+      "k": "note",
+      "s": "${S5.note}",
+      "x": 64,
+      "y": 664,
+      "fx": "cut",
+      "at": [
+       "ev",
+       "hyouka",
+       0.55
+      ]
+     }
+    ],
+    "scrimh": 1000
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.5,
+    "scrim": "dark",
+    "scrimk": 0.8,
+    "cam": {
+     "z": [
+      1.0,
+      1.06
+     ],
+     "ease": "slow"
+    },
+    "id": "c10",
+    "at": [
+     "ev",
+     "link",
+     -0.1
+    ],
+    "why": "行動：名前・立体のボタン",
+    "far": {
+     "clip": "counter",
+     "from": 30,
+     "blur": [
+      14,
+      14
+     ],
+     "bright": 1.0
+    },
+    "prod": [
+     {
+      "seq": "woman_end",
+      "from": 60,
+      "box": [
+       350,
+       470,
+       380,
+       676
+      ],
+      "mask": "soft"
+     }
+    ],
+    "text": [
+     {
+      "k": "h1",
+      "s": "${S6.head}",
+      "x": 64,
+      "y": 244,
+      "fx": "mask",
+      "size": 54
+     },
+     {
+      "k": "cap",
+      "s": "${S6.sub}",
+      "x": 68,
+      "y": 322,
+      "fx": "mask",
+      "size": 40,
+      "c": "w"
+     },
+     {
+      "k": "note",
+      "s": "${S6.note}",
+      "x": 64,
+      "y": 400,
+      "fx": "cut",
+      "at": [
+       "ev",
+       "link",
+       0.3
+      ]
+     }
+    ],
+    "scrimh": 760
+   }
+  ]
+ }
+}

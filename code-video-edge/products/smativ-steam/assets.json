@@ -1,0 +1,87 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。jmas #376 の定期の制作（2026-11-27・手で）：商品は販売ページの実物の写真だけ（奥行きで動かす＝depth）。映像は Pexels の本物（朝日の台所・明るい台・窓辺の机）。どちらも実行時に取り、ここには置かない",
+ "asp_images": [
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-v2.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_1.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_2.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_3.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_4.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_5.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_6.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_7.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_8.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_9.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_10.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_11.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_12.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_13.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_15.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_16.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_17.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_18.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_m005.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/itempage/electric/ae20b00016-_m007_vr2.jpg",
+  "https://image.rakuten.co.jp/smartiv/cabinet/evidence/ae20b00016.jpg"
+ ],
+ "videos": [
+  "https://videos.pexels.com/video-files/35801802/15178301_1080_1920_30fps.mp4",
+  "https://videos.pexels.com/video-files/6998411/6998411-hd_1080_1920_25fps.mp4",
+  "https://videos.pexels.com/video-files/40945285/17510396_1080_1920_60fps.mp4"
+ ],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "年末の大掃除は、水だけで。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "電源を入れて、約ろくじゅうびょうで、高温スチーム。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "コンロの油汚れも、窓のサッシも。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "アタッチメントは、じゅってん。床は、スティックで。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "本体は、いってんにキロ。評価は、よんてんにいなな。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "スチームモップマルチクリーナー。リンクはプロフィールから。",
+   "speed": 1.0,
+   "pause": 0.4
+  }
+ ],
+ "prep": [
+  [
+   "base"
+  ]
+ ],
+ "depth": true
+}
