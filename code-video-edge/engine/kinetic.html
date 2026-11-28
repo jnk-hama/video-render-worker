@@ -130,7 +130,7 @@ for (const s of SH) {
       const cam = camOf(s, t), k = SP(t - ba, 0.7, 0.2), slide = (1 - k) * (b.dx == null ? 260 : b.dx);
       place(e, [b.x + slide, b.y, 0, 0], cam, 0.6); e.style.width = "auto"; e.style.height = "auto"; e.style.opacity = (io(s, t) * clamp(k * 1.4)).toFixed(3); }); }
   // 商品（#world・販売ページの実物の写真）：seq＝奥行きで動かした連番／img＝切り抜き。pop＝バネで出る大きさの行き過ぎ
-  for (const p of s.prod || []) { const d = el("div", { class: `m ${p.mask || ""}` }, `<img alt="">`, $("world")), im = d.firstChild, n = p.seq ? NN("seqs", p.seq) : 0, a0 = R(p.at, s.a);
+  for (const p of s.prod || []) { const d = el("div", { class: `m ${p.mask || ""}`, ...(p.backdrop ? { "data-backdrop": "1" } : {}) }, `<img alt="">`, $("world")), im = d.firstChild, n = p.seq ? NN("seqs", p.seq) : 0, a0 = R(p.at, s.a);
     if (p.img) im.setAttribute("src", `${DIR}img/${p.img}`);
     U.push(() => { const t = T(), on = (s.i === 0 || t >= a0) && t < s.zx; if (!on) { d.style.display = "none"; return; } d.style.display = "block";
       if (p.seq) show(im, `${DIR}dp/${p.seq}_${pad(frameAt(n, Math.floor((t - a0) * 30 * (p.rate || 1) + 1e-6) + (p.from || 0), "clamp"))}.jpg`);

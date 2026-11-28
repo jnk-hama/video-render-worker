@@ -1,0 +1,1113 @@
+{
+ "product_key": "bruno-hotplate",
+ "template": "kinetic",
+ "name": "コンパクトホットプレート",
+ "item_no": "BOE021",
+ "genre": "appliance",
+ "target": {
+  "who": "クリスマスに",
+  "source": "caption 商品補足説明「クリスマス」「ホームパーティー」（F11）"
+ },
+ "prep": {
+  "voice": "voicevox:WhiteCUL",
+  "speed": 1.0
+ },
+ "brand": {
+  "ground": null,
+  "accent": "#B23A2E",
+  "accent_box": [
+   60,
+   170,
+   144,
+   220
+  ]
+ },
+ "beats": [
+  {
+   "kind": "S1",
+   "source": "F8,F11",
+   "voice": "line0.mp3",
+   "say": "いつもの夕食を、たこ焼きパーティーに。",
+   "lead": "いつもの夕食を、",
+   "hook": "たこ焼きパーティーへ。",
+   "note": "※写真は販売ページより。湯気の映像はイメージです。"
+  },
+  {
+   "kind": "S2",
+   "source": "F1,F12",
+   "voice": "line1.mp3",
+   "say": "火力は、最大250度。",
+   "lead": "火力は",
+   "pre": "最大",
+   "big": "250",
+   "unit": "℃",
+   "sub": "温度調節 65〜250℃"
+  },
+  {
+   "kind": "S3",
+   "source": "F2,F3",
+   "voice": "line2.mp3",
+   "say": "一度に、最大24個。平面プレートで、焼き肉も。",
+   "lead": "一度に",
+   "pre": "最大",
+   "big": "24",
+   "unit": "個",
+   "grill": "平面プレートで、焼き肉も。"
+  },
+  {
+   "kind": "S4",
+   "source": "F4",
+   "voice": "line3.mp3",
+   "say": "ホーロー鍋のような、レトロなデザイン。",
+   "lead": "ホーロー鍋のような、",
+   "hook": "レトロなデザイン。"
+  },
+  {
+   "kind": "S5",
+   "source": "F5,F6,F7",
+   "voice": "line4.mp3",
+   "say": "A4サイズで、2.3キロ。評価は4.67。",
+   "size": "A4サイズ",
+   "big": "2.3",
+   "unit": "kg",
+   "sub": "2〜3人用にぴったり",
+   "score": "4.67",
+   "count_label": "レビュー843件",
+   "date": "楽天市場 2026年11月28日時点",
+   "note": "※評価・件数は販売ページの表示です。"
+  },
+  {
+   "kind": "S6",
+   "source": "F9,F10",
+   "voice": "line5.mp3",
+   "say": "ブルーノの、コンパクトホットプレート。リンクはプロフィールから。",
+   "shelf": "コンパクトだから、スッキリ収納。",
+   "head": "コンパクトホットプレート",
+   "sub": "BRUNO",
+   "cta": "リンクはプロフィールから",
+   "note": "※価格・在庫はリンク先でご確認ください。"
+  }
+ ],
+ "score": {
+  "scenes": [
+   [
+    "S1",
+    "line0.mp3",
+    3.0
+   ],
+   [
+    "S2",
+    "line1.mp3",
+    3.0
+   ],
+   [
+    "S3",
+    "line2.mp3",
+    5.0
+   ],
+   [
+    "S4",
+    "line3.mp3",
+    3.5
+   ],
+   [
+    "S5",
+    "line4.mp3",
+    4.5
+   ],
+   [
+    "S6",
+    "line5.mp3",
+    4.5
+   ]
+  ],
+  "climax": [
+   "S4",
+   "レトロ"
+  ],
+  "music": {
+   "quiet": [
+    "S2"
+   ],
+   "hush": [
+    [
+     [
+      "cue",
+      "S4",
+      "レトロ",
+      -0.5
+     ],
+     [
+      "cue",
+      "S4",
+      "レトロ",
+      0.02
+     ]
+    ]
+   ]
+  },
+  "events": [
+   {
+    "id": "flare0",
+    "at": [
+     "t0",
+     "S1",
+     0.1
+    ],
+    "what": "c1 光",
+    "sfx": [
+     "whoosh",
+     0.5,
+     300,
+     5200,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "tako",
+    "at": [
+     "cue",
+     "S1",
+     "タコヤ"
+    ],
+    "what": "c1 たこ焼きパーティー",
+    "sfx": [
+     "bell",
+     1567.98,
+     0.45,
+     1.2
+    ],
+    "band": "high"
+   },
+   {
+    "id": "nihyaku",
+    "at": [
+     "cue",
+     "S2",
+     "ニヒャク"
+    ],
+    "what": "c2 250℃",
+    "sfx": [
+     "tick",
+     2600,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "nijuu",
+    "at": [
+     "cue",
+     "S3",
+     "ニジュウ"
+    ],
+    "what": "c3 24個",
+    "sfx": [
+     "tick",
+     2900,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "heimen",
+    "at": [
+     "cue",
+     "S3",
+     "ヘエメン"
+    ],
+    "what": "c4 平面プレート",
+    "sfx": [
+     "whoosh",
+     0.3,
+     700,
+     6000,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "retoro",
+    "at": [
+     "cue",
+     "S4",
+     "レトロ"
+    ],
+    "what": "c5 レトロなデザイン（山場）",
+    "sfx": [
+     "impact",
+     1.0,
+     1.8
+    ],
+    "band": "low"
+   },
+   {
+    "id": "dezain",
+    "at": [
+     "cue",
+     "S4",
+     "デザ"
+    ],
+    "what": "c6 寄り"
+   },
+   {
+    "id": "ei",
+    "at": [
+     "cue",
+     "S5",
+     "エイ"
+    ],
+    "what": "c7 A4"
+   },
+   {
+    "id": "niten",
+    "at": [
+     "cue",
+     "S5",
+     "ニテン"
+    ],
+    "what": "c7 2.3kg",
+    "sfx": [
+     "tick",
+     2400,
+     0.5
+    ],
+    "band": "high"
+   },
+   {
+    "id": "hyouka",
+    "at": [
+     "cue",
+     "S5",
+     "ヒョオカ"
+    ],
+    "what": "c8 評価",
+    "sfx": [
+     "whoosh",
+     0.35,
+     400,
+     4000,
+     0.5
+    ],
+    "band": "mid"
+   },
+   {
+    "id": "yon",
+    "at": [
+     "cue",
+     "S5",
+     "ヨンテ"
+    ],
+    "what": "c8 4.67",
+    "sfx": [
+     "bell",
+     2093.0,
+     0.5,
+     1.4
+    ],
+    "band": "high"
+   },
+   {
+    "id": "link",
+    "at": [
+     "cue",
+     "S6",
+     "リンクワ"
+    ],
+    "what": "c10 ボタン",
+    "sfx": [
+     "whoosh",
+     0.4,
+     300,
+     3000,
+     0.5
+    ],
+    "band": "mid"
+   },
+   {
+    "id": "under",
+    "at": [
+     "cue",
+     "S6",
+     "プロフィ"
+    ],
+    "what": "c10 押す",
+    "sfx": [
+     "bell",
+     1318.5,
+     0.4,
+     0.9
+    ],
+    "band": "high-mid"
+   }
+  ],
+  "sustain": [
+   {
+    "id": "room",
+    "from": [
+     "t0",
+     "S2"
+    ],
+    "to": [
+     "t1",
+     "S2"
+    ],
+    "sfx": [
+     "roomtone"
+    ],
+    "over_db": -12.0,
+    "what": "焼ける音の代わりの部屋の音"
+   }
+  ]
+ },
+ "affiliate_url": "",
+ "item_code": "bruno-official:10000287",
+ "kinetic": {
+  "clips": {
+   "steam": {
+    "n": 240
+   },
+   "steam2": {
+    "n": 240
+   },
+   "xmas": {
+    "n": 240
+   }
+  },
+  "seqs": {
+   "party_in": {
+    "n": 90
+   },
+   "close_in": {
+    "n": 90
+   },
+   "open_in": {
+    "n": 100
+   },
+   "grill_in": {
+    "n": 90
+   },
+   "paella_in": {
+    "n": 110
+   },
+   "hold_in": {
+    "n": 100
+   },
+   "shelf_in": {
+    "n": 100
+   },
+   "party_end": {
+    "n": 120
+   },
+   "hands2_in": {
+    "n": 90
+   }
+  },
+  "flares": [
+   [
+    "t0",
+    "S1",
+    0.1
+   ],
+   [
+    "ev",
+    "link",
+    0.1
+   ]
+  ],
+  "cta": {
+   "s": "${S6.cta}",
+   "at": [
+    "ev",
+    "link",
+    0.3
+   ],
+   "press": [
+    "ev",
+    "under"
+   ]
+  },
+  "hand": 0.6,
+  "shots": [
+   {
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c1",
+    "why": "約束：2人の手が串でたこ焼きを返す（寄る・本物の湯気）",
+    "prod": [
+     {
+      "seq": "party_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": 0.35,
+      "blend": "screen"
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${TARGET}",
+      "x": 64,
+      "y": 226,
+      "fx": "mask",
+      "size": 40
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "h2",
+      "s": "${S1.lead}",
+      "x": 64,
+      "y": 290,
+      "fx": "mask",
+      "size": 52
+     },
+     {
+      "c": "b",
+      "chip": true,
+      "k": "h1",
+      "s": "${S1.hook}",
+      "x": 64,
+      "y": 372,
+      "size": 72,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "tako",
+       -0.1
+      ]
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "note",
+      "s": "${S1.note}",
+      "x": 64,
+      "y": 520,
+      "fx": "cut"
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c2",
+    "at": [
+     "t0",
+     "S2"
+    ],
+    "why": "理由：火力最大250℃（たこ焼きの寄り・湯気）",
+    "prod": [
+     {
+      "seq": "close_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": 0.4,
+      "blend": "screen"
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "lab",
+      "s": "${S2.lead}",
+      "x": 64,
+      "y": 232,
+      "fx": "mask",
+      "size": 44
+     },
+     {
+      "c": "b",
+      "chip": true,
+      "k": "num",
+      "s": "<small>${S2.pre}</small><span class=\"n\">${S2.big}</span><small>${S2.unit}</small>",
+      "x": 64,
+      "y": 310,
+      "size": 150,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "nihyaku",
+       -0.2
+      ],
+      "count": {
+       "from": 0,
+       "to": 250,
+       "dur": 0.7
+      }
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S2.sub}",
+      "x": 64,
+      "y": 520,
+      "fx": "mask",
+      "size": 38
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c3",
+    "at": [
+     "t0",
+     "S3"
+    ],
+    "why": "旅：一度に最大24個（24の穴を見せて引く）",
+    "prod": [
+     {
+      "seq": "open_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "lab",
+      "s": "${S3.lead}",
+      "x": 64,
+      "y": 232,
+      "fx": "mask",
+      "size": 44
+     },
+     {
+      "c": "b",
+      "chip": true,
+      "k": "num",
+      "s": "<small>${S3.pre}</small><span class=\"n\">${S3.big}</span><small>${S3.unit}</small>",
+      "x": 64,
+      "y": 310,
+      "size": 150,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "nijuu",
+       -0.3
+      ],
+      "count": {
+       "from": 0,
+       "to": 24,
+       "dur": 0.4
+      }
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c4",
+    "at": [
+     "ev",
+     "heimen",
+     0.05
+    ],
+    "why": "旅：平面プレートで焼き肉も（本物の湯気が上がる串焼き）",
+    "prod": [
+     {
+      "seq": "grill_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam2",
+      "opacity": 0.3,
+      "blend": "screen"
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "h1",
+      "s": "${S3.grill}",
+      "x": 64,
+      "y": 300,
+      "size": 60,
+      "fx": "rise"
+     }
+    ]
+   },
+   {
+    "x": 0.45,
+    "leak": 0.3,
+    "near": 0.4,
+    "cam": {
+     "z": [
+      1.0,
+      1.05
+     ],
+     "ease": "slow"
+    },
+    "id": "c5",
+    "at": [
+     "t0",
+     "S4"
+    ],
+    "why": "山場：音が引いて、赤いホーローの鍋へゆっくり寄る",
+    "prod": [
+     {
+      "seq": "paella_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "h2",
+      "s": "${S4.lead}",
+      "x": 64,
+      "y": 250,
+      "fx": "mask",
+      "size": 52
+     }
+    ]
+   },
+   {
+    "x": 0.3,
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.04,
+      1.0
+     ],
+     "ease": "spring",
+     "dur": 1.2,
+     "bounce": 0.1
+    },
+    "id": "c6",
+    "at": [
+     "ev",
+     "retoro",
+     -0.15
+    ],
+    "why": "山場の着地：レトロなデザイン（同じ写真のさらに寄り）",
+    "prod": [
+     {
+      "seq": "paella_in",
+      "from": 60,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "h2",
+      "s": "${S4.lead}",
+      "x": 64,
+      "y": 250,
+      "fx": "cut",
+      "size": 52
+     },
+     {
+      "c": "b",
+      "chip": true,
+      "k": "h1",
+      "s": "${S4.hook}",
+      "x": 64,
+      "y": 330,
+      "size": 86,
+      "fx": "rise"
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c7",
+    "at": [
+     "t0",
+     "S5"
+    ],
+    "why": "証拠：A4サイズで2.3kg（持つ人から引く）",
+    "prod": [
+     {
+      "seq": "hold_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "lab",
+      "s": "${S5.size}",
+      "x": 64,
+      "y": 232,
+      "fx": "mask",
+      "size": 44
+     },
+     {
+      "c": "b",
+      "chip": true,
+      "k": "num",
+      "s": "<span class=\"n\">${S5.big}</span><small>${S5.unit}</small>",
+      "x": 64,
+      "y": 310,
+      "size": 150,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "niten",
+       -0.1
+      ]
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S5.sub}",
+      "x": 64,
+      "y": 520,
+      "fx": "rise",
+      "size": 38,
+      "at": [
+       "ev",
+       "ei",
+       0.3
+      ]
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c8",
+    "at": [
+     "ev",
+     "hyouka",
+     -0.05
+    ],
+    "why": "証拠：評価（もう1人の手が串でたこ焼きを取る・引く）",
+    "prod": [
+     {
+      "seq": "hands2_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": 0.3,
+      "blend": "screen"
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "<svg width=\"330\" height=\"62\" viewBox=\"0 0 330 62\"><defs><linearGradient id=\"sg\"><stop offset=\"92.8%\" stop-color=\"#E9B949\"/><stop offset=\"92.8%\" stop-color=\"rgba(28,26,23,.2)\"/></linearGradient></defs><path transform=\"translate(33,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(99,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(165,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(231,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(297,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/></svg>",
+      "x": 64,
+      "y": 232,
+      "fx": "rise"
+     },
+     {
+      "c": "b",
+      "chip": true,
+      "k": "num",
+      "s": "<span class=\"n\">${S5.score}</span>",
+      "x": 74,
+      "y": 330,
+      "size": 150,
+      "fx": "rise",
+      "at": [
+       "ev",
+       "hyouka",
+       0.05
+      ],
+      "count": {
+       "from": 0,
+       "to": 4.67,
+       "dec": 2,
+       "dur": 0.6
+      }
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S5.count_label}",
+      "x": 64,
+      "y": 548,
+      "size": 40,
+      "fx": "mask",
+      "at": [
+       "ev",
+       "hyouka",
+       0.55
+      ]
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S5.date}",
+      "x": 64,
+      "y": 628,
+      "size": 26,
+      "fx": "cut",
+      "at": [
+       "ev",
+       "hyouka",
+       0.55
+      ]
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "note",
+      "s": "${S5.note}",
+      "x": 64,
+      "y": 700,
+      "fx": "cut",
+      "at": [
+       "ev",
+       "hyouka",
+       0.55
+      ]
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.25,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c9",
+    "at": [
+     "t0",
+     "S6"
+    ],
+    "why": "行動の前：コンパクトだからスッキリ収納（棚へ寄る）",
+    "prod": [
+     {
+      "seq": "shelf_in",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "h1",
+      "s": "${S6.shelf}",
+      "x": 64,
+      "y": 300,
+      "size": 48,
+      "fx": "rise"
+     }
+    ]
+   },
+   {
+    "x": 0.35,
+    "leak": 0.15,
+    "near": 0.4,
+    "cam": {
+     "z": [
+      1.0,
+      1.04
+     ],
+     "ease": "slow"
+    },
+    "id": "c10",
+    "at": [
+     "ev",
+     "link",
+     -0.1
+    ],
+    "why": "行動：たこ焼き全体から引いて名前とボタン",
+    "prod": [
+     {
+      "seq": "party_end",
+      "from": 0,
+      "box": [
+       0,
+       0,
+       1080,
+       1920
+      ],
+      "backdrop": true
+     }
+    ],
+    "fx": [
+     {
+      "clip": "steam",
+      "opacity": 0.25,
+      "blend": "screen"
+     }
+    ],
+    "text": [
+     {
+      "c": "k",
+      "chip": true,
+      "k": "h1",
+      "s": "${S6.head}",
+      "x": 64,
+      "y": 244,
+      "fx": "mask",
+      "size": 58
+     },
+     {
+      "c": "b",
+      "chip": true,
+      "k": "cap",
+      "s": "${S6.sub}",
+      "x": 64,
+      "y": 340,
+      "fx": "mask",
+      "size": 40
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "note",
+      "s": "${S6.note}",
+      "x": 64,
+      "y": 420,
+      "fx": "cut",
+      "at": [
+       "ev",
+       "link",
+       0.3
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

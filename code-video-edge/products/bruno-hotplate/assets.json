@@ -1,0 +1,92 @@
+{
+ "_comment": "素材の取り方（edge-video.yml）。jmas #382 A（素材の良い商品・合成しない）：商品は販売ページの実物の写真だけ（字の無い範囲を全画面・奥行きで動かす）。湯気は Pexels の本物（黒地）。どちらも実行時に取り、ここには置かない",
+ "asp_images": [
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_3/1702868_fv_gray.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_02.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_03.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_04.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_05.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_06.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_07.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_08.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_09.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_10.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_11.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_12.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_13.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_14.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_15.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_16.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_17.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_18.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_19.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_20.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_21.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/1702868_page8_re.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2026_1/detail_02.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2025_2/chp_3color_gr.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2025_2/standerd_chp.jpg",
+  "https://image.rakuten.co.jp/bruno-official/cabinet/item/2025_2/staff_chp_point_01.jpg"
+ ],
+ "videos": [
+  "https://videos.pexels.com/video-files/9694804/9694804-hd_1080_2048_25fps.mp4",
+  "https://videos.pexels.com/video-files/9694229/9694229-hd_1080_1920_25fps.mp4",
+  "https://videos.pexels.com/video-files/6289659/6289659-hd_1080_2048_25fps.mp4"
+ ],
+ "lines": [
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "いつもの夕食を、たこ焼きパーティーに。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "火力は、最大、にひゃくごじゅうど。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "一度に、最大、にじゅうよんこ。平面プレートで、焼き肉も。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "ホーロー鍋のような、レトロなデザイン。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "A4サイズで、にてんさんキロ。評価は、よんてんろくなな。",
+   "speed": 1.0,
+   "pause": 0.4
+  },
+  {
+   "engine": "voicevox",
+   "speaker": "WhiteCUL",
+   "style": "ノーマル",
+   "text": "ブルーノの、コンパクトホットプレート。リンクはプロフィールから。",
+   "speed": 1.0,
+   "pause": 0.4
+  }
+ ],
+ "prep": [
+  [
+   "base"
+  ]
+ ],
+ "depth": true
+}
