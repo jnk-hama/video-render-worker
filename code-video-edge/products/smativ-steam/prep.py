@@ -16,6 +16,23 @@ except Exception: FF = os.environ.get("FFMPEG", "ffmpeg")
 A = lambda i: Image.open(os.path.join(src, f"asp{i}.jpg")).convert("RGB")
 up = lambda im, w: im.resize((w, round(im.height * w / im.width)), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1.4, 50, 2))
 
+# 切り抜き（r2・film の考え方 #371）：実物を「カメラの手前の被写体」として映像の前に置く。組は1回に1つ（BiRefNet を1つの処理で2回呼ぶと落ちた）
+CUT = {"handy": (16, (20, 200, 262, 632)),        # セット内容の写真の本体（白地・手は写っていない）
+       "stick": (9, (1150, 470, 1500, 1180))}      # スティックモードの柄とヘッド（カーペットの写真・人は写っていない）
+if G in CUT:
+    from rembg import remove, new_session
+    i, bx = CUT[G]
+    c = remove(A(i).crop(bx), session=new_session("birefnet-general", providers=["CPUExecutionProvider"]), only_mask=False, post_process_mask=False)
+    from scipy.ndimage import label
+    arr = np.array(c); lab, n = label(arr[:, :, 3] > 128)   # 一番大きな塊だけ残す（隣に写った別の付属品を消す）
+    if n > 1:
+        big = 1 + int(np.argmax([(lab == k).sum() for k in range(1, n + 1)])); keep = np.isin(lab, [big])
+        from scipy.ndimage import binary_dilation
+        arr[:, :, 3] = np.where(binary_dilation(keep, iterations=3), arr[:, :, 3], 0); c = Image.fromarray(arr)
+    a = np.array(c)[:, :, 3]; ys, xs = np.where(a > 128)
+    if not len(xs): sys.exit(f"{G} の切り抜きが空（読まずに進めない）")
+    c = c.crop((max(0, xs.min() - 6), max(0, ys.min() - 6), min(c.width, xs.max() + 7), min(c.height, ys.max() + 7)))
+    c = c.resize((c.width * 2, c.height * 2), Image.LANCZOS); c.save(os.path.join(img, f"{G}.png")); print(G, c.size); sys.exit(0)
 if G != "base": sys.exit(f"組の名前が違う: {G}")
 # 1) 平らに使う写真（字・札・枠の無い範囲＝元の画像の画素・目で決めた）。2倍に拡大
 FLAT = {"stove": (8, (0, 415, 640, 700)), "hood": (8, (700, 410, 1500, 700)), "sash": (3, (700, 740, 1500, 1250)),

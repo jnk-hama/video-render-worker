@@ -29,18 +29,20 @@
    "voice": "line0.mp3",
    "say": "年末の大掃除は、水だけで。",
    "hook": "水だけで。",
-   "note": "※写真は販売ページより。映像はイメージです。"
+   "note": "※写真は販売ページより。映像はイメージです。",
+   "lead": "いつもの大掃除を、"
   },
   {
    "kind": "S2",
-   "source": "F1,F5,F8",
+   "source": "F1,F5,F8,F12",
    "voice": "line1.mp3",
    "say": "電源を入れて、約60秒で高温スチーム。",
    "lead": "電源を入れて",
    "pre": "約",
    "big": "60",
    "unit": "秒",
-   "sub": "高温スチーム・強と弱の2段階"
+   "sub": "強と弱の2段階の高温スチーム",
+   "sub2": "使いたい時に、すぐ。"
   },
   {
    "kind": "S3",
@@ -50,21 +52,24 @@
    "a": "コンロの油汚れに",
    "b": "レンジフードに",
    "c": "窓のサッシに",
-   "mode": "ハンディモード"
+   "mode": "ハンディモード",
+   "sub": "細かいところは、ハンディで。"
   },
   {
    "kind": "S4",
-   "source": "F3,F4",
+   "source": "F3,F4,F13",
    "voice": "line3.mp3",
    "say": "アタッチメントは10点。床はスティックで。",
    "label": "アタッチメント",
    "big": "10",
    "unit": "点",
-   "floor": "床はスティックモード"
+   "floor": "床はスティックモード",
+   "sub": "家じゅうを、1台で。",
+   "floor_sub": "広いところは、スティックで。"
   },
   {
    "kind": "S5",
-   "source": "F6,F9",
+   "source": "F6,F9,F14",
    "voice": "line4.mp3",
    "say": "本体は1.2キロ。評価は4.27。",
    "lab": "本体",
@@ -73,7 +78,8 @@
    "score": "4.27",
    "count_label": "レビュー748件",
    "date": "楽天市場 2026年11月27日時点",
-   "note": "※評価・件数は販売ページの表示です。"
+   "note": "※評価・件数は販売ページの表示です。",
+   "sub": "高いところも、片手で。"
   },
   {
    "kind": "S6",
@@ -415,63 +421,73 @@
   "hand": 0.6,
   "shots": [
    {
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.92,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
       1.0,
-      1.1
+      1.07
      ],
      "x": [
-      -14,
+      -10,
       6
      ],
-     "ease": "spring",
-     "dur": 1.4,
-     "bounce": 0.1
+     "ease": "slow"
     },
     "id": "c1",
-    "why": "約束：年末の大掃除を、水だけで（床を拭く人へゆっくり寄る）",
+    "why": "約束：本物の朝の台所。手前にスティックが下から入り、ピントが映像から実物へ送られる",
     "far": {
-     "seq": "woman_in",
+     "clip": "kit",
+     "from": 0,
      "blur": [
-      30,
-      30
+      2,
+      18
      ],
-     "bright": 0.9
+     "bright": 1.0
     },
     "prod": [
      {
-      "seq": "woman_in",
+      "img": "stick.png",
       "box": [
-       158,
-       560,
-       765,
-       1360
+       520,
+       80,
+       700,
+       1312
       ],
-      "mask": "top"
+      "par": 1.15,
+      "shadow": true
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "cap",
       "s": "${TARGET}",
-      "x": 68,
-      "y": 250,
+      "x": 64,
+      "y": 226,
+      "fx": "mask",
+      "size": 40
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "h2",
+      "s": "${S1.lead}",
+      "x": 64,
+      "y": 290,
       "fx": "mask",
       "size": 52
      },
      {
+      "c": "b",
+      "chip": true,
       "k": "h1",
       "s": "${S1.hook}",
       "x": 64,
-      "y": 318,
-      "size": 120,
+      "y": 372,
+      "size": 110,
       "fx": "rise",
-      "c": "g",
-      "glow": true,
       "at": [
        "ev",
        "mizu",
@@ -479,25 +495,28 @@
       ]
      },
      {
+      "c": "k",
+      "chip": true,
       "k": "note",
       "s": "${S1.note}",
       "x": 64,
-      "y": 480,
+      "y": 560,
       "fx": "cut"
      }
-    ],
-    "scrimh": 760
+    ]
    },
    {
     "x": 0.35,
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.8,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
       1.0,
       1.06
+     ],
+     "y": [
+      0,
+      40
      ],
      "ease": "slow"
     },
@@ -506,42 +525,78 @@
      "t0",
      "S2"
     ],
-    "why": "理由：約60秒で高温スチーム（床のヘッドへ寄りながら横へ・ピントは手前）",
+    "why": "理由：約60秒で高温スチーム。ヘッドへ寄り、拡大鏡に床の実写真",
     "far": {
-     "seq": "floor_in",
+     "clip": "counter",
+     "from": 0,
      "blur": [
-      30,
-      30
+      18,
+      18
      ],
-     "bright": 0.9
+     "bright": 1.0
     },
     "prod": [
      {
+      "img": "stick.png",
+      "box": [
+       520,
+       80,
+       700,
+       1312
+      ],
+      "par": 1.15,
+      "shadow": true
+     },
+     {
       "seq": "floor_in",
       "box": [
-       0,
-       596,
-       1080,
-       1324
+       64,
+       860,
+       380,
+       380
       ],
-      "mask": "top"
+      "mask": "lens",
+      "pop": 1,
+      "from": 20
+     }
+    ],
+    "lines": [
+     {
+      "d": "M444 1050 L700 1250",
+      "at": [
+       "t0",
+       "S2",
+       0.4
+      ],
+      "color": "#FFFFFF",
+      "w": 4,
+      "dots": [
+       [
+        700,
+        1250
+       ]
+      ]
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "lab",
       "s": "${S2.lead}",
       "x": 64,
-      "y": 250,
+      "y": 232,
       "fx": "mask",
-      "size": 50
+      "size": 44
      },
      {
+      "c": "b",
+      "chip": true,
       "k": "num",
       "s": "<small>${S2.pre}</small><span class=\"n\">${S2.big}</span><small>${S2.unit}</small>",
       "x": 64,
-      "y": 300,
-      "size": 170,
+      "y": 320,
+      "size": 150,
       "fx": "rise",
       "at": [
        "ev",
@@ -555,35 +610,49 @@
       }
      },
      {
+      "c": "k",
+      "chip": true,
       "k": "cap",
       "s": "${S2.sub}",
-      "x": 68,
-      "y": 500,
+      "x": 64,
+      "y": 540,
       "fx": "mask",
-      "size": 44,
+      "size": 38,
       "at": [
        "ev",
        "steam",
        -0.1
       ]
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S2.sub2}",
+      "x": 64,
+      "y": 610,
+      "fx": "mask",
+      "size": 38,
+      "at": [
+       "ev",
+       "steam",
+       0.3
+      ]
      }
-    ],
-    "scrimh": 800
+    ]
    },
    {
     "x": 0.35,
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.88,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
       1.0,
-      1.1
+      1.05
      ],
-     "y": [
-      0,
-      -16
+     "x": [
+      -8,
+      8
      ],
      "ease": "slow"
     },
@@ -592,34 +661,67 @@
      "t0",
      "S3"
     ],
-    "why": "旅：コンロの油汚れ（ハンディモード）",
+    "why": "旅：ハンディの先からコンロへ（拡大鏡）",
     "far": {
-     "img": "stove.jpg",
+     "clip": "kit",
+     "from": 60,
      "blur": [
-      34,
-      34
+      18,
+      18
      ],
-     "bright": 0.95
+     "bright": 1.0
     },
     "prod": [
      {
+      "img": "handy.png",
+      "box": [
+       70,
+       690,
+       420,
+       894
+      ],
+      "par": 1.15,
+      "shadow": true,
+      "rise": 200
+     },
+     {
       "img": "stove.jpg",
       "box": [
-       -110,
-       760,
-       1300,
-       579
+       470,
+       640,
+       520,
+       520
       ],
-      "mask": "soft"
+      "mask": "lens",
+      "pop": 1
+     }
+    ],
+    "lines": [
+     {
+      "d": "M470 900 L250 712",
+      "at": [
+       "t0",
+       "S3",
+       0.25
+      ],
+      "color": "#FFFFFF",
+      "w": 4,
+      "dots": [
+       [
+        250,
+        712
+       ]
+      ]
      }
     ],
     "text": [
      {
+      "c": "b",
+      "chip": true,
       "k": "lab",
       "s": "${S3.mode}",
-      "x": 68,
-      "y": 250,
-      "c": "g",
+      "x": 64,
+      "y": 232,
       "fx": "mask",
       "to": [
        "t1",
@@ -628,29 +730,45 @@
       ]
      },
      {
+      "c": "k",
+      "chip": true,
       "k": "h1",
       "s": "${S3.a}",
       "x": 64,
-      "y": 310,
-      "size": 84,
+      "y": 320,
+      "size": 72,
       "fx": "rise"
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S3.sub}",
+      "x": 64,
+      "y": 430,
+      "fx": "mask",
+      "size": 40,
+      "at": [
+       "t0",
+       "S3",
+       0.3
+      ],
+      "to": [
+       "t1",
+       "S3",
+       -0.15
+      ]
      }
     ]
    },
    {
     "x": 0.35,
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.88,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
-      1.1,
+      1.03,
       1.0
-     ],
-     "x": [
-      16,
-      -6
      ],
      "ease": "slow"
     },
@@ -661,50 +779,77 @@
     ],
     "why": "旅：レンジフード",
     "far": {
-     "img": "hood.jpg",
+     "clip": "kit",
+     "from": 90,
      "blur": [
-      34,
-      34
+      18,
+      18
      ],
-     "bright": 0.95
+     "bright": 1.0
     },
     "prod": [
      {
+      "img": "handy.png",
+      "box": [
+       70,
+       690,
+       420,
+       894
+      ],
+      "par": 1.15,
+      "shadow": true
+     },
+     {
       "img": "hood.jpg",
       "box": [
-       -110,
-       760,
-       1300,
-       471
+       470,
+       640,
+       520,
+       520
       ],
-      "mask": "soft"
+      "mask": "lens",
+      "pop": 1
+     }
+    ],
+    "lines": [
+     {
+      "d": "M470 900 L250 712",
+      "at": [
+       "ev",
+       "hood",
+       0.05
+      ],
+      "color": "#FFFFFF",
+      "w": 4,
+      "dots": [
+       [
+        250,
+        712
+       ]
+      ]
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "h1",
       "s": "${S3.b}",
       "x": 64,
-      "y": 310,
-      "size": 84,
+      "y": 320,
+      "size": 72,
       "fx": "rise"
      }
     ]
    },
    {
     "x": 0.35,
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.88,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
       1.0,
-      1.09
-     ],
-     "x": [
-      -12,
-      10
+      1.05
      ],
      "ease": "slow"
     },
@@ -715,49 +860,80 @@
     ],
     "why": "旅：窓のサッシ",
     "far": {
-     "img": "sash.jpg",
+     "clip": "kit",
+     "from": 120,
      "blur": [
-      34,
-      34
+      18,
+      18
      ],
-     "bright": 0.95
+     "bright": 1.0
     },
     "prod": [
      {
+      "img": "handy.png",
+      "box": [
+       70,
+       690,
+       420,
+       894
+      ],
+      "par": 1.15,
+      "shadow": true
+     },
+     {
       "img": "sash.jpg",
       "box": [
-       -40,
+       470,
        640,
-       1160,
-       740
+       520,
+       520
       ],
-      "mask": "soft"
+      "mask": "lens",
+      "pop": 1
+     }
+    ],
+    "lines": [
+     {
+      "d": "M470 900 L250 712",
+      "at": [
+       "ev",
+       "mado",
+       0.05
+      ],
+      "color": "#FFFFFF",
+      "w": 4,
+      "dots": [
+       [
+        250,
+        712
+       ]
+      ]
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "h1",
       "s": "${S3.c}",
       "x": 64,
-      "y": 310,
-      "size": 84,
+      "y": 320,
+      "size": 72,
       "fx": "rise"
      }
     ]
    },
    {
     "x": 0.45,
-    "leak": 0.35,
-    "near": 0.5,
-    "scrim": "dark",
-    "scrimk": 0.92,
+    "leak": 0.3,
+    "near": 0.45,
     "cam": {
      "z": [
       1.08,
       1.0
      ],
      "r": [
-      -1.2,
+      -1.0,
       0
      ],
      "ease": "spring",
@@ -769,12 +945,13 @@
      "t0",
      "S4"
     ],
-    "why": "山場：付いてくる物を全部（アタッチメント10点）。音が引いて、10 で着地",
+    "why": "山場：音が引いて、大きな窓に付いてくる物の全部。10 で着地",
     "far": {
-     "img": "set.jpg",
+     "clip": "window",
+     "from": 0,
      "blur": [
-      40,
-      40
+      20,
+      14
      ],
      "bright": 1.0
     },
@@ -782,37 +959,34 @@
      {
       "img": "set.jpg",
       "box": [
-       -330,
-       640,
-       1740,
-       499
+       110,
+       650,
+       860,
+       860
       ],
-      "rise": 120,
-      "shadow": false,
-      "at": [
-       "t0",
-       "S4",
-       0.05
-      ],
-      "mask": "soft"
+      "mask": "lens",
+      "pop": 1
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "lab",
       "s": "${S4.label}",
-      "x": 68,
-      "y": 250,
+      "x": 64,
+      "y": 232,
       "fx": "mask"
      },
      {
+      "c": "b",
+      "chip": true,
       "k": "num",
       "s": "<span class=\"n\">${S4.big}</span><small>${S4.unit}</small>",
       "x": 76,
-      "y": 300,
-      "size": 200,
+      "y": 310,
+      "size": 150,
       "fx": "rise",
-      "glow": true,
       "at": [
        "ev",
        "juten",
@@ -823,23 +997,39 @@
        "to": 10,
        "dur": 0.7
       }
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S4.sub}",
+      "x": 64,
+      "y": 500,
+      "fx": "rise",
+      "size": 40,
+      "at": [
+       "ev",
+       "juten",
+       -0.2
+      ]
      }
-    ],
-    "scrimh": 900
+    ]
    },
    {
     "x": 0.35,
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.72,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
-      1.06,
+      1.14,
       1.0
      ],
+     "y": [
+      120,
+      0
+     ],
      "ease": "spring",
-     "dur": 1.0,
+     "dur": 1.2,
      "bounce": 0.08
     },
     "id": "c7",
@@ -848,52 +1038,65 @@
      "yuka",
      0.1
     ],
-    "why": "旅の続き：床はスティックモード（引いて全体）",
+    "why": "旅の続き：床はスティック（ヘッドから柄へ引く）",
     "far": {
-     "seq": "woman_end",
+     "clip": "counter",
+     "from": 60,
      "blur": [
-      30,
-      30
+      18,
+      18
      ],
-     "bright": 0.9
+     "bright": 1.0
     },
     "prod": [
      {
-      "seq": "woman_end",
+      "img": "stick.png",
       "box": [
-       158,
-       560,
-       765,
-       1360
+       520,
+       80,
+       700,
+       1312
       ],
-      "mask": "top"
+      "par": 1.15,
+      "shadow": true
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "h1",
       "s": "${S4.floor}",
       "x": 64,
-      "y": 310,
-      "size": 76,
+      "y": 320,
+      "size": 64,
       "fx": "rise"
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S4.floor_sub}",
+      "x": 64,
+      "y": 420,
+      "fx": "mask",
+      "size": 40,
+      "at": [
+       "ev",
+       "yuka",
+       0.25
+      ]
      }
     ]
    },
    {
     "x": 0.35,
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.88,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
       1.0,
-      1.08
-     ],
-     "x": [
-      -12,
-      10
+      1.06
      ],
      "ease": "slow"
     },
@@ -902,42 +1105,92 @@
      "t0",
      "S5"
     ],
-    "why": "証拠：本体 1.2kg（片手で壁を拭く）",
+    "why": "証拠：本体 1.2kg（ハンディ・拡大鏡に壁を拭く写真）",
     "far": {
-     "img": "kwall.jpg",
+     "clip": "kit",
+     "from": 150,
      "blur": [
-      34,
-      34
+      18,
+      18
      ],
-     "bright": 0.95
+     "bright": 1.0
     },
     "prod": [
      {
+      "img": "handy.png",
+      "box": [
+       70,
+       690,
+       420,
+       894
+      ],
+      "par": 1.15,
+      "shadow": true
+     },
+     {
       "img": "kwall.jpg",
       "box": [
-       -100,
-       760,
-       1280,
-       540
+       470,
+       640,
+       520,
+       520
       ],
-      "mask": "soft"
+      "mask": "lens",
+      "pop": 1
+     }
+    ],
+    "lines": [
+     {
+      "d": "M470 900 L250 712",
+      "at": [
+       "t0",
+       "S5",
+       0.2
+      ],
+      "color": "#FFFFFF",
+      "w": 4,
+      "dots": [
+       [
+        250,
+        712
+       ]
+      ]
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "lab",
       "s": "${S5.lab}",
-      "x": 68,
-      "y": 250,
+      "x": 64,
+      "y": 232,
       "fx": "mask"
      },
      {
+      "c": "b",
+      "chip": true,
       "k": "num",
       "s": "<span class=\"n\">${S5.big}</span><small>${S5.unit}</small>",
       "x": 64,
-      "y": 300,
-      "size": 200,
+      "y": 310,
+      "size": 150,
       "fx": "rise",
+      "at": [
+       "ev",
+       "hontai",
+       0.3
+      ]
+     },
+     {
+      "c": "k",
+      "chip": true,
+      "k": "cap",
+      "s": "${S5.sub}",
+      "x": 64,
+      "y": 500,
+      "fx": "rise",
+      "size": 40,
       "at": [
        "ev",
        "hontai",
@@ -948,18 +1201,12 @@
    },
    {
     "x": 0.35,
-    "leak": 0.2,
-    "near": 0.3,
-    "scrim": "dark",
-    "scrimk": 0.88,
+    "leak": 0.15,
+    "near": 0.25,
     "cam": {
      "z": [
-      1.06,
+      1.05,
       1.0
-     ],
-     "y": [
-      -14,
-      0
      ],
      "ease": "spring",
      "dur": 1.0,
@@ -971,43 +1218,47 @@
      "hyouka",
      -0.05
     ],
-    "why": "証拠：評価（床のヘッド）",
+    "why": "証拠：評価（スティック）",
     "far": {
-     "seq": "floor_in",
-     "from": 60,
+     "clip": "counter",
+     "from": 120,
      "blur": [
-      30,
-      30
+      18,
+      18
      ],
-     "bright": 0.85
+     "bright": 1.0
     },
     "prod": [
      {
-      "seq": "floor_in",
-      "from": 60,
+      "img": "stick.png",
       "box": [
-       0,
+       520,
+       80,
        700,
-       1080,
-       1324
+       1312
       ],
-      "mask": "top"
+      "par": 1.15,
+      "shadow": true
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "cap",
       "s": "<svg width=\"330\" height=\"62\" viewBox=\"0 0 330 62\"><defs><linearGradient id=\"sg\"><stop offset=\"92.8%\" stop-color=\"#E9B949\"/><stop offset=\"92.8%\" stop-color=\"rgba(28,26,23,.2)\"/></linearGradient></defs><path transform=\"translate(33,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(99,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(165,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(231,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/><path transform=\"translate(297,31) scale(1.35)\" fill=\"url(#sg)\" d=\"M0,-22 L6.5,-7 L22.5,-6.5 L10,3.5 L14,19 L0,10 L-14,19 L-10,3.5 L-22.5,-6.5 L-6.5,-7 Z\"/></svg>",
       "x": 64,
-      "y": 240,
+      "y": 232,
       "fx": "rise"
      },
      {
+      "c": "b",
+      "chip": true,
       "k": "num",
       "s": "<span class=\"n\">${S5.score}</span>",
       "x": 74,
-      "y": 300,
-      "size": 230,
+      "y": 330,
+      "size": 150,
       "fx": "rise",
       "at": [
        "ev",
@@ -1022,11 +1273,13 @@
       }
      },
      {
+      "c": "k",
+      "chip": true,
       "k": "cap",
       "s": "${S5.count_label}",
-      "x": 68,
+      "x": 64,
       "y": 548,
-      "size": 44,
+      "size": 40,
       "fx": "mask",
       "at": [
        "ev",
@@ -1035,11 +1288,13 @@
       ]
      },
      {
+      "c": "k",
+      "chip": true,
       "k": "cap",
       "s": "${S5.date}",
-      "x": 68,
-      "y": 612,
-      "size": 28,
+      "x": 64,
+      "y": 628,
+      "size": 26,
       "fx": "cut",
       "at": [
        "ev",
@@ -1048,10 +1303,12 @@
       ]
      },
      {
+      "c": "k",
+      "chip": true,
       "k": "note",
       "s": "${S5.note}",
       "x": 64,
-      "y": 664,
+      "y": 700,
       "fx": "cut",
       "at": [
        "ev",
@@ -1059,15 +1316,12 @@
        0.55
       ]
      }
-    ],
-    "scrimh": 1000
+    ]
    },
    {
     "x": 0.35,
     "leak": 0.15,
-    "near": 0.5,
-    "scrim": "dark",
-    "scrimk": 0.8,
+    "near": 0.4,
     "cam": {
      "z": [
       1.0,
@@ -1081,52 +1335,57 @@
      "link",
      -0.1
     ],
-    "why": "行動：名前・立体のボタン",
+    "why": "行動：名前・本体・立体のボタン",
     "far": {
      "clip": "counter",
-     "from": 30,
+     "from": 180,
      "blur": [
-      14,
-      14
+      16,
+      16
      ],
      "bright": 1.0
     },
     "prod": [
      {
-      "seq": "woman_end",
-      "from": 60,
+      "img": "handy.png",
       "box": [
-       350,
-       470,
-       380,
-       676
+       690,
+       420,
+       260,
+       553
       ],
-      "mask": "soft"
+      "par": 1.15,
+      "shadow": true
      }
     ],
     "text": [
      {
+      "c": "k",
+      "chip": true,
       "k": "h1",
       "s": "${S6.head}",
       "x": 64,
       "y": 244,
       "fx": "mask",
-      "size": 54
+      "size": 46
      },
      {
+      "c": "b",
+      "chip": true,
       "k": "cap",
       "s": "${S6.sub}",
-      "x": 68,
-      "y": 322,
+      "x": 64,
+      "y": 340,
       "fx": "mask",
-      "size": 40,
-      "c": "w"
+      "size": 40
      },
      {
+      "c": "k",
+      "chip": true,
       "k": "note",
       "s": "${S6.note}",
       "x": 64,
-      "y": 400,
+      "y": 430,
       "fx": "cut",
       "at": [
        "ev",
@@ -1134,8 +1393,7 @@
        0.3
       ]
      }
-    ],
-    "scrimh": 760
+    ]
    }
   ]
  }
